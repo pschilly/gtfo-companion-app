@@ -1,8 +1,12 @@
 import {
+  AdminPositionDetail,
   AtcFlightPlanPackage,
   DiscordUserSession,
+  MemberAward,
+  MemberCertificate,
   MemberGradeLevel,
   MemberPortalProfile,
+  QualifiedAirframe,
   SquadronAssignment,
   UserTier,
 } from '../types';
@@ -564,16 +568,120 @@ export function normalizeMemberPortalProfile(
       : raw.adminPosition
       ? [String(raw.adminPosition)]
       : [],
+    adminPositionDetails: Array.isArray(raw.adminPositionDetails ?? raw.admin_position_details)
+      ? ((raw.adminPositionDetails ?? raw.admin_position_details) as any[]).map((d: any) => ({
+          id: Number(d.id || 0),
+          name: String(d.name || ''),
+          slug: String(d.slug || ''),
+          discordRole: d.discordRole || d.discord_role,
+        }))
+      : [],
     isCouncilMember: Boolean(raw.isCouncilMember ?? raw.is_council_member ?? false),
     isSquadronLeader: Boolean(raw.isSquadronLeader ?? raw.is_squadron_leader ?? false),
     position: String(raw.position || (rosterTier === 'CORE' ? 'Aviator' : 'Member')),
     checkFlightCompleted: matchedGrade !== 'G0',
     squadronAssignment: primarySq,
     secondarySquadronAssignment: secondarySq,
-    qualifiedAirframes: Array.isArray(raw.qualifiedAirframes)
-      ? (raw.qualifiedAirframes as string[])
+    qualifiedAirframes: Array.isArray(raw.qualifiedAirframes ?? raw.qualified_airframes)
+      ? ((raw.qualifiedAirframes ?? raw.qualified_airframes) as any[]).map((item: any, idx: number) => {
+          if (typeof item === 'string') {
+            return {
+              id: idx + 1,
+              name: item,
+              abbreviation: item.toLowerCase().replace(/[^a-z0-9]/g, ''),
+              dcsEntity: item,
+              imageUrl: null,
+              isPrimary: idx === 0,
+              isPilot: true,
+              isCrew: false,
+              isInstructor: false,
+              role: 'pilot',
+              roleLabel: 'Pilot',
+              status: 'qualified',
+            };
+          }
+          return {
+            id: Number(item.id || idx + 1),
+            name: String(item.name || item.airframe || 'Airframe'),
+            abbreviation: String(item.abbreviation || item.airframe_abbreviation || ''),
+            dcsEntity: String(item.dcsEntity || item.dcs_entity || ''),
+            imageUrl: item.imageUrl || item.image_url || null,
+            isPrimary: Boolean(item.isPrimary ?? item.is_primary ?? false),
+            isPilot: Boolean(item.isPilot ?? item.is_pilot ?? true),
+            isCrew: Boolean(item.isCrew ?? item.is_crew ?? false),
+            isInstructor: Boolean(item.isInstructor ?? item.is_instructor ?? false),
+            role: String(item.role || 'pilot'),
+            roleLabel: String(item.roleLabel || item.role_label || 'Pilot'),
+            status: String(item.status || 'qualified'),
+            discordRole: item.discordRole || item.discord_role,
+            squadron: item.squadron ? String(item.squadron) : undefined,
+          };
+        })
       : [],
-    awardsCount: typeof raw.awardsCount === 'number' ? raw.awardsCount : 0,
+    certificates: Array.isArray(raw.certificates)
+      ? raw.certificates.map((cert: any, idx: number) => ({
+          id: Number(cert.id || idx + 1),
+          code: String(cert.code || ''),
+          name: String(cert.name || 'Certificate'),
+          slug: String(cert.slug || ''),
+          description: String(cert.description || ''),
+          requirements: Array.isArray(cert.requirements)
+            ? cert.requirements.map((r: any) => ({
+                skill: String(r.skill || ''),
+                benchmarks: String(r.benchmarks || ''),
+              }))
+            : [],
+          xpValue: Number(cert.xpValue || cert.xp_value || 0),
+          airframe: String(cert.airframe || ''),
+          airframeAbbreviation: cert.airframeAbbreviation || cert.airframe_abbreviation,
+          airframes: Array.isArray(cert.airframes) ? cert.airframes : cert.airframe ? [cert.airframe] : [],
+          awardedRole: cert.awardedRole || cert.awarded_role,
+          status: String(cert.status || 'issued'),
+          isIssued: Boolean(cert.isIssued ?? cert.is_issued ?? true),
+          progress: cert.progress ?? null,
+          startedAt: cert.startedAt || cert.started_at,
+          completedAt: cert.completedAt || cert.completed_at,
+          issuedAt: cert.issuedAt || cert.issued_at,
+          issuedBy: cert.issuedBy || cert.issued_by,
+        }))
+      : [],
+    awards: Array.isArray(raw.awards)
+      ? raw.awards.map((aw: any, idx: number) => ({
+          id: Number(aw.id || idx + 1),
+          name: String(aw.name || 'Award'),
+          category: String(aw.category || 'General'),
+          description: String(aw.description || ''),
+          citation: aw.citation || null,
+          requirements: Array.isArray(aw.requirements)
+            ? aw.requirements.map((r: any) => ({
+                requirement: String(r.requirement || ''),
+              }))
+            : [],
+          xpValue: Number(aw.xpValue || aw.xp_value || 0),
+          issuedAt: String(aw.issuedAt || aw.issued_at || ''),
+          issuedBy: aw.issuedBy || aw.issued_by,
+          ribbonUrl: aw.ribbonUrl || aw.ribbon_url || null,
+          medalUrl: aw.medalUrl || aw.medal_url || null,
+          issueCount: Number(aw.issueCount || aw.issue_count || 1),
+          numeralAlignment: aw.numeralAlignment || aw.numeral_alignment,
+          numeralType: aw.numeralType || aw.numeral_type,
+          numeralUrl: aw.numeralUrl || aw.numeral_url || null,
+          issuances: Array.isArray(aw.issuances)
+            ? aw.issuances.map((iss: any, iIdx: number) => ({
+                id: Number(iss.id || iIdx + 1),
+                issuedAt: String(iss.issuedAt || iss.issued_at || ''),
+                issuedBy: iss.issuedBy || iss.issued_by,
+                citation: iss.citation || null,
+              }))
+            : [],
+        }))
+      : [],
+    awardsCount:
+      typeof raw.awardsCount === 'number'
+        ? raw.awardsCount
+        : Array.isArray(raw.awards)
+        ? raw.awards.length
+        : 0,
     flightHoursLogged: typeof raw.flightHoursLogged === 'number' ? raw.flightHoursLogged : 0,
     portalSyncSource: 'portal_api',
     lastPortalSyncAt: new Date().toISOString(),
@@ -605,6 +713,7 @@ export function buildFallbackMemberProfile(
     joinedAt: '—',
     adminPosition: null,
     adminPositions: [],
+    adminPositionDetails: [],
     isCouncilMember: false,
     isSquadronLeader: false,
     nextGrade: {
@@ -617,6 +726,8 @@ export function buildFallbackMemberProfile(
     squadronAssignment: null,
     secondarySquadronAssignment: null,
     qualifiedAirframes: [],
+    certificates: [],
+    awards: [],
     awardsCount: 0,
     flightHoursLogged: 0,
     portalSyncSource: 'discord_fallback',

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   AlertTriangle,
   ArrowUpCircle,
@@ -31,6 +31,31 @@ export const LibraryView: React.FC = () => {
   } = useApp();
 
   const installedList = Object.values(installedAssets);
+  const [isVerifyingAll, setIsVerifyingAll] = useState(false);
+  const [verifyAllFeedback, setVerifyAllFeedback] = useState<string | null>(null);
+
+  const handleVerifyAll = async () => {
+    if (installedList.length === 0 || isVerifyingAll) return;
+    setIsVerifyingAll(true);
+    setVerifyAllFeedback(null);
+    let totalIssuesFound = 0;
+
+    for (const record of installedList) {
+      const ok = await verifyAsset(record.assetId);
+      if (!ok) {
+        totalIssuesFound++;
+        // If an issue is found, RepairPromptModal opens automatically.
+        // We pause bulk iteration so the user can review and decide.
+        break;
+      }
+    }
+
+    setIsVerifyingAll(false);
+    if (totalIssuesFound === 0) {
+      setVerifyAllFeedback(`All ${installedList.length} packages verified! No file issues found.`);
+      setTimeout(() => setVerifyAllFeedback(null), 4000);
+    }
+  };
 
   return (
     <div className="space-y-6 pb-8 max-w-7xl mx-auto">
@@ -45,14 +70,30 @@ export const LibraryView: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2.5">
           <button
             onClick={rescanLocalAssets}
             className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-200 font-mono text-xs flex items-center gap-2 transition-colors"
           >
             <RefreshCw className="w-3.5 h-3.5 text-amber-400" />
-            Rescan Local DCS Folder
+            Rescan DCS Folder
           </button>
+
+          {installedList.length > 0 && (
+            <button
+              onClick={handleVerifyAll}
+              disabled={isVerifyingAll || Boolean(verifyingAssetId)}
+              className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-200 font-mono text-xs flex items-center gap-2 transition-colors disabled:opacity-60"
+              title="Verify local file integrity for all installed packages"
+            >
+              {isVerifyingAll ? (
+                <Loader2 className="w-3.5 h-3.5 text-amber-400 animate-spin" />
+              ) : (
+                <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+              )}
+              <span>{isVerifyingAll ? 'Verifying All...' : 'Verify All'}</span>
+            </button>
+          )}
 
           {outdatedAssets.length > 0 && (
             <button
@@ -65,6 +106,13 @@ export const LibraryView: React.FC = () => {
           )}
         </div>
       </div>
+
+      {verifyAllFeedback && (
+        <div className="p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 font-mono text-xs flex items-center gap-2 animate-fadeIn">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+          <span>{verifyAllFeedback}</span>
+        </div>
+      )}
 
       {installedList.length === 0 ? (
         <div className="p-12 rounded-2xl bg-stone-900/85 border border-stone-800 text-center space-y-4">

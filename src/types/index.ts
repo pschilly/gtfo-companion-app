@@ -42,6 +42,86 @@ export interface SquadronAssignment {
   rosterUrl?: string;
 }
 
+export interface QualifiedAirframe {
+  id: number;
+  name: string;
+  abbreviation: string;
+  dcsEntity: string;
+  imageUrl?: string | null;
+  isPrimary: boolean;
+  isPilot: boolean;
+  isCrew: boolean;
+  isInstructor: boolean;
+  role: string;
+  roleLabel: string;
+  status: string;
+  discordRole?: string | number;
+  squadron?: string;
+}
+
+export interface CertificateRequirement {
+  skill: string;
+  benchmarks: string;
+}
+
+export interface MemberCertificate {
+  id: number;
+  code: string;
+  name: string;
+  slug: string;
+  description: string;
+  requirements?: CertificateRequirement[];
+  xpValue: number;
+  airframe: string;
+  airframeAbbreviation?: string;
+  airframes?: string[];
+  awardedRole?: string;
+  status: string;
+  isIssued: boolean;
+  progress?: number | null;
+  startedAt?: string;
+  completedAt?: string;
+  issuedAt?: string;
+  issuedBy?: string;
+}
+
+export interface AwardRequirement {
+  requirement: string;
+}
+
+export interface AwardIssuance {
+  id: number;
+  issuedAt: string;
+  issuedBy?: string;
+  citation?: string | null;
+}
+
+export interface MemberAward {
+  id: number;
+  name: string;
+  category: string;
+  description: string;
+  citation?: string | null;
+  requirements?: AwardRequirement[];
+  xpValue: number;
+  issuedAt: string;
+  issuedBy?: string;
+  ribbonUrl?: string | null;
+  medalUrl?: string | null;
+  issueCount: number;
+  numeralAlignment?: string;
+  numeralType?: string;
+  numeralUrl?: string | null;
+  issuances?: AwardIssuance[];
+}
+
+export interface AdminPositionDetail {
+  id: number;
+  name: string;
+  slug: string;
+  discordRole?: string | number;
+}
+
 export interface MemberPortalProfile {
   discordId: string;
   callsign: string;
@@ -62,6 +142,7 @@ export interface MemberPortalProfile {
   joinedAt: string;
   adminPosition?: string | null;
   adminPositions?: string[];
+  adminPositionDetails?: AdminPositionDetail[];
   isCouncilMember?: boolean;
   isSquadronLeader?: boolean;
   nextGrade?: {
@@ -75,7 +156,9 @@ export interface MemberPortalProfile {
   checkFlightCompleted: boolean;
   squadronAssignment: SquadronAssignment | null;
   secondarySquadronAssignment?: SquadronAssignment | null;
-  qualifiedAirframes: string[];
+  qualifiedAirframes: QualifiedAirframe[];
+  certificates: MemberCertificate[];
+  awards: MemberAward[];
   awardsCount: number;
   flightHoursLogged: number;
   portalSyncSource: 'portal_api' | 'discord_fallback';
