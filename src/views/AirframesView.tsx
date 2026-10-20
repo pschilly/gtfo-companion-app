@@ -166,7 +166,7 @@ export const AirframesView: React.FC = () => {
               {airframes.length}
             </p>
             <p className="text-[11px] font-mono text-stone-500 mt-0.5">
-              Authorized combat-ready types
+              Campaign Authorized Airframes
             </p>
           </div>
           <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0">
@@ -181,7 +181,7 @@ export const AirframesView: React.FC = () => {
               {instructorCount > 0 ? `${instructorCount} Endorsement${instructorCount === 1 ? '' : 's'}` : 'Standard Pilot'}
             </p>
             <p className="text-[11px] font-mono text-stone-500 mt-0.5">
-              Flight training authorization
+              Flight Training Endorsement
             </p>
           </div>
           <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center shrink-0">
@@ -236,7 +236,7 @@ export const AirframesView: React.FC = () => {
                     <img
                       src={bgImageUrl}
                       alt={airframe.name}
-                      className="absolute inset-0 w-full h-full object-cover object-center opacity-35 group-hover:opacity-50 group-hover:scale-105 transition-all duration-700 ease-out"
+                      className="absolute inset-0 w-full h-full object-cover object-center opacity-75 group-hover:opacity-50 group-hover:scale-105 transition-all duration-700 ease-out"
                       loading="lazy"
                     />
                     {/* Dark gradient overlays to ensure text readability */}
@@ -261,17 +261,11 @@ export const AirframesView: React.FC = () => {
                   <div className="space-y-3">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="w-9 h-9 rounded-xl bg-stone-950/80 border border-stone-700/80 backdrop-blur-md flex items-center justify-center shrink-0 shadow-sm">
-                          <Plane className="w-4 h-4 text-amber-400" />
-                        </div>
+                        
                         <div className="min-w-0">
                           <h3 className="font-display font-bold text-stone-100 text-lg leading-tight truncate drop-shadow-sm">
                             {airframe.name}
                           </h3>
-                          <p className="text-[11px] font-mono text-stone-400 truncate">
-                            {airframe.dcsEntity || airframe.abbreviation.toUpperCase()}
-                            {airframe.squadron ? ` • ${airframe.squadron}` : ''}
-                          </p>
                         </div>
                       </div>
 
