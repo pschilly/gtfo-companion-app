@@ -30,8 +30,37 @@ jobs:
       - name: Install frontend dependencies
         run: npm install
 
+      - name: Create .env from GitHub Secrets
+        shell: bash
+        env:
+          DISCORD_CLIENT_ID: ${{ secrets.VITE_DISCORD_CLIENT_ID }}
+          DISCORD_GUILD_ID: ${{ secrets.VITE_DISCORD_GUILD_ID }}
+          COMMUNITY_ROLE_ID: ${{ secrets.VITE_DISCORD_COMMUNITY_ROLE_ID }}
+          CORE_ROLE_ID: ${{ secrets.VITE_DISCORD_CORE_ROLE_ID }}
+          PORTAL_BASE_URL: ${{ secrets.VITE_PORTAL_BASE_URL }}
+          MANIFEST_URL: ${{ secrets.VITE_MANIFEST_URL }}
+          KB_URL: ${{ secrets.VITE_KB_URL }}
+          CDN_LOGO_URL: ${{ secrets.VITE_CDN_LOGO_URL }}
+        run: |
+          cat << EOF > .env
+          VITE_DISCORD_CLIENT_ID=${DISCORD_CLIENT_ID}
+          VITE_DISCORD_GUILD_ID=${DISCORD_GUILD_ID}
+          VITE_DISCORD_COMMUNITY_ROLE_ID=${COMMUNITY_ROLE_ID}
+          VITE_DISCORD_CORE_ROLE_ID=${CORE_ROLE_ID}
+          VITE_OAUTH_REDIRECT_PORT=54321
+          VITE_PORTAL_BASE_URL=${PORTAL_BASE_URL:-https://members.globaltaskforceoverlord.org/api/v1/companion}
+          VITE_MANIFEST_URL=${MANIFEST_URL:-https://members.globaltaskforceoverlord.org/api/v1/companion/manifest}
+          VITE_KB_URL=${KB_URL:-https://kb.globaltaskforceoverlord.org}
+          VITE_CDN_LOGO_URL=${CDN_LOGO_URL:-https://cdn.globaltaskforceoverlord.org/GTFO-Logo.png}
+          EOF
+
       - name: Build Tauri Windows Executable
         run: npm run tauri:build
+        env:
+          VITE_DISCORD_CLIENT_ID: ${{ secrets.VITE_DISCORD_CLIENT_ID }}
+          VITE_DISCORD_GUILD_ID: ${{ secrets.VITE_DISCORD_GUILD_ID }}
+          VITE_DISCORD_COMMUNITY_ROLE_ID: ${{ secrets.VITE_DISCORD_COMMUNITY_ROLE_ID }}
+          VITE_DISCORD_CORE_ROLE_ID: ${{ secrets.VITE_DISCORD_CORE_ROLE_ID }}
 
       - name: Upload Portable Executable Artifact (.exe)
         uses: actions/upload-artifact@v4
