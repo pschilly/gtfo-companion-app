@@ -8,10 +8,13 @@ import { Sidebar } from './components/Sidebar';
 import { TopBar } from './components/TopBar';
 import { AppProvider, useApp } from './context/AppContext';
 import { openExternalUrl } from './services/tauriBridge';
+import { AirframesView } from './views/AirframesView';
+import { AwardsView } from './views/AwardsView';
 import { CatalogView } from './views/CatalogView';
 import { DashboardView } from './views/DashboardView';
 import { LibraryView } from './views/LibraryView';
 import { LoginGateView } from './views/LoginGateView';
+import { QualificationsView } from './views/QualificationsView';
 import { SettingsView } from './views/SettingsView';
 
 const MainShell: React.FC = () => {
@@ -60,6 +63,9 @@ const MainShell: React.FC = () => {
 
         <main className="flex-1 overflow-y-auto p-6">
           {activeTab === 'dashboard' && <DashboardView />}
+          {activeTab === 'airframes' && <AirframesView />}
+          {activeTab === 'qualifications' && <QualificationsView />}
+          {activeTab === 'awards' && <AwardsView />}
           {activeTab === 'liveries' && (
             <CatalogView category="livery" searchQuery={searchQuery} />
           )}

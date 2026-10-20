@@ -12,7 +12,16 @@ export type RequiredTier = 'community' | 'core';
  */
 export type RequirementLevel = 'required_all' | 'required_core' | 'optional';
 
-export type NavigationTab = 'dashboard' | 'atc' | 'liveries' | 'mods' | 'library' | 'settings';
+export type NavigationTab =
+  | 'dashboard'
+  | 'airframes'
+  | 'qualifications'
+  | 'awards'
+  | 'atc'
+  | 'liveries'
+  | 'mods'
+  | 'library'
+  | 'settings';
 
 export type MemberGradeLevel =
   | 'G0'

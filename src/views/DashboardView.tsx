@@ -5,42 +5,27 @@ import {
   ArrowUpCircle,
   Award,
   CheckCircle2,
-  ChevronDown,
-  ChevronUp,
   Download,
   ExternalLink,
   FileCheck2,
   FolderCheck,
-  GraduationCap,
   HardDrive,
   LayoutDashboard,
-  Medal,
   Package,
   Paintbrush,
   Plane,
   RefreshCw,
-  Scroll,
   ShieldCheck,
   Sparkles,
-  Star,
   Users,
 } from 'lucide-react';
 import { AssetCard } from '../components/AssetCard';
+import { DossierNav } from '../components/DossierNav';
 import { STATIC_CONFIG } from '../config/constants';
 import { useApp } from '../context/AppContext';
 import { GTFO_GRADE_META } from '../data/samplePortalData';
 import { MemberGradeLevel } from '../types';
-import { formatBytes, formatShortDate } from '../utils/formatters';
-
-const HtmlRenderer: React.FC<{ html: string; className?: string }> = ({ html, className = '' }) => {
-  if (!html) return null;
-  return (
-    <div
-      className={`prose prose-invert prose-xs max-w-none text-stone-300 leading-relaxed [&_p]:mb-1.5 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-0.5 [&_strong]:text-amber-300 [&_em]:text-stone-200 ${className}`}
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
-  );
-};
+import { formatBytes } from '../utils/formatters';
 
 export const DashboardView: React.FC = () => {
   const {
@@ -62,8 +47,13 @@ export const DashboardView: React.FC = () => {
   } = useApp();
 
   const [isSyncingPortal, setIsSyncingPortal] = useState(false);
-  const [dossierTab, setDossierTab] = useState<'all' | 'airframes' | 'certificates' | 'awards'>('all');
-  const [expandedCertId, setExpandedCertId] = useState<number | null>(null);
+
+  const airframes = memberProfile.qualifiedAirframes || [];
+  const primaryAirframe = airframes.find((a) => a.isPrimary) || airframes[0] || null;
+  const certificates = memberProfile.certificates || [];
+  const awards = memberProfile.awards || [];
+  const totalCertXp = certificates.reduce((sum, c) => sum + (c.xpValue || 0), 0);
+  const totalAwardXp = awards.reduce((sum, a) => sum + (a.xpValue || 0), 0);
 
   const totalAssets = manifest.assets.length;
   const installedCount = Object.keys(installedAssets).length;
@@ -113,6 +103,9 @@ export const DashboardView: React.FC = () => {
 
   return (
     <div className="space-y-6 pb-8 max-w-7xl mx-auto">
+      {/* Sub Navigation */}
+      <DossierNav />
+
       {/* MEMBER DOSSIER HERO CARD (KB Theme) */}
       <div className="relative rounded-2xl overflow-hidden border border-stone-800 bg-stone-900/90 shadow-2xl">
         {/* Decorative KB Amber/Red Glows */}
@@ -243,28 +236,28 @@ export const DashboardView: React.FC = () => {
 
             <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-stone-800/60">
               <button
-                onClick={() => setDossierTab('airframes')}
-                className="px-2 py-0.5 rounded bg-stone-900 hover:bg-stone-800 border border-stone-800 text-[10px] font-mono text-stone-300 flex items-center gap-1 transition-colors"
+                onClick={() => setActiveTab('airframes')}
+                className="px-2 py-0.5 rounded bg-stone-900 hover:bg-stone-800 border border-stone-800 text-[10px] font-mono text-stone-300 flex items-center gap-1 transition-colors hover:text-amber-300"
                 title="View Qualified Airframes"
               >
                 <Plane className="w-3 h-3 text-amber-400" />
-                <span>{memberProfile.qualifiedAirframes?.length || 0} Airframe{memberProfile.qualifiedAirframes?.length === 1 ? '' : 's'}</span>
+                <span>{airframes.length} Airframe{airframes.length === 1 ? '' : 's'}</span>
               </button>
               <button
-                onClick={() => setDossierTab('certificates')}
-                className="px-2 py-0.5 rounded bg-stone-900 hover:bg-stone-800 border border-stone-800 text-[10px] font-mono text-stone-300 flex items-center gap-1 transition-colors"
-                title="View Combat Certificates"
+                onClick={() => setActiveTab('qualifications')}
+                className="px-2 py-0.5 rounded bg-stone-900 hover:bg-stone-800 border border-stone-800 text-[10px] font-mono text-stone-300 flex items-center gap-1 transition-colors hover:text-amber-300"
+                title="View Combat Qualifications"
               >
                 <FileCheck2 className="w-3 h-3 text-amber-400" />
-                <span>{memberProfile.certificates?.length || 0} Cert{memberProfile.certificates?.length === 1 ? '' : 's'}</span>
+                <span>{certificates.length} Cert{certificates.length === 1 ? '' : 's'}</span>
               </button>
               <button
-                onClick={() => setDossierTab('awards')}
-                className="px-2 py-0.5 rounded bg-stone-900 hover:bg-stone-800 border border-stone-800 text-[10px] font-mono text-stone-300 flex items-center gap-1 transition-colors"
+                onClick={() => setActiveTab('awards')}
+                className="px-2 py-0.5 rounded bg-stone-900 hover:bg-stone-800 border border-stone-800 text-[10px] font-mono text-stone-300 flex items-center gap-1 transition-colors hover:text-amber-300"
                 title="View Awards & Ribbons"
               >
                 <Award className="w-3 h-3 text-amber-400" />
-                <span>{memberProfile.awards?.length || 0} Award{memberProfile.awards?.length === 1 ? '' : 's'}</span>
+                <span>{awards.length} Award{awards.length === 1 ? '' : 's'}</span>
               </button>
             </div>
           </div>
@@ -473,428 +466,99 @@ export const DashboardView: React.FC = () => {
         </div>
       </div>
 
-      {/* PILOT QUALIFICATIONS, CERTIFICATES & COMMENDATIONS SECTION */}
-      <div className="rounded-2xl border border-stone-800 bg-stone-900/90 shadow-2xl overflow-hidden">
-        {/* Top Section Header & Tab Controls */}
-        <div className="px-6 py-4 bg-stone-950/80 border-b border-stone-800 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0">
-              <Scroll className="w-4 h-4 text-amber-400" />
+      {/* DOSSIER SUB-PAGES SHOWCASE STRIP */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Airframes Card */}
+        <div
+          onClick={() => setActiveTab('airframes')}
+          className="p-5 rounded-2xl bg-stone-900/90 border border-stone-800 hover:border-amber-500/50 cursor-pointer transition-all flex flex-col justify-between space-y-3 group shadow-lg hover:shadow-amber-500/5"
+        >
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <Plane className="w-5 h-5 text-amber-400" />
+              </div>
+              <div className="min-w-0">
+                <h3 className="font-display font-bold text-stone-100 text-sm group-hover:text-amber-400 transition-colors truncate">
+                  Qualified Airframes
+                </h3>
+                <p className="text-[11px] font-mono text-stone-400 truncate">
+                  {primaryAirframe?.name || 'Airframe Ratings'}
+                </p>
+              </div>
             </div>
-            <div>
-              <h2 className="font-display text-base font-bold text-stone-100 flex items-center gap-2">
-                <span>Pilot Qualifications &amp; Commendations</span>
-              </h2>
-              <p className="text-xs font-mono text-stone-400">
-                Official airframe type ratings, training certificates, and combat awards
-              </p>
-            </div>
+            <span className="px-2 py-0.5 rounded-full bg-stone-950 border border-stone-800 text-amber-300 font-mono text-xs font-bold shrink-0">
+              {airframes.length}
+            </span>
           </div>
-
-          <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-stone-950 border border-stone-800">
-            <button
-              onClick={() => setDossierTab('all')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-all ${
-                dossierTab === 'all'
-                  ? 'bg-amber-500 text-stone-950 font-bold shadow'
-                  : 'text-stone-400 hover:text-stone-200 hover:bg-stone-900'
-              }`}
-            >
-              All Records
-            </button>
-            <button
-              onClick={() => setDossierTab('airframes')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium flex items-center gap-1.5 transition-all ${
-                dossierTab === 'airframes'
-                  ? 'bg-amber-500 text-stone-950 font-bold shadow'
-                  : 'text-stone-400 hover:text-stone-200 hover:bg-stone-900'
-              }`}
-            >
-              <Plane className="w-3.5 h-3.5" />
-              <span>Airframes</span>
-              <span
-                className={`px-1.5 py-0.2 rounded-full text-[10px] ${
-                  dossierTab === 'airframes'
-                    ? 'bg-stone-950 text-amber-300'
-                    : 'bg-stone-800 text-stone-300'
-                }`}
-              >
-                {memberProfile.qualifiedAirframes?.length || 0}
-              </span>
-            </button>
-            <button
-              onClick={() => setDossierTab('certificates')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium flex items-center gap-1.5 transition-all ${
-                dossierTab === 'certificates'
-                  ? 'bg-amber-500 text-stone-950 font-bold shadow'
-                  : 'text-stone-400 hover:text-stone-200 hover:bg-stone-900'
-              }`}
-            >
-              <FileCheck2 className="w-3.5 h-3.5" />
-              <span>Certificates</span>
-              <span
-                className={`px-1.5 py-0.2 rounded-full text-[10px] ${
-                  dossierTab === 'certificates'
-                    ? 'bg-stone-950 text-amber-300'
-                    : 'bg-stone-800 text-stone-300'
-                }`}
-              >
-                {memberProfile.certificates?.length || 0}
-              </span>
-            </button>
-            <button
-              onClick={() => setDossierTab('awards')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium flex items-center gap-1.5 transition-all ${
-                dossierTab === 'awards'
-                  ? 'bg-amber-500 text-stone-950 font-bold shadow'
-                  : 'text-stone-400 hover:text-stone-200 hover:bg-stone-900'
-              }`}
-            >
-              <Award className="w-3.5 h-3.5" />
-              <span>Awards &amp; Ribbons</span>
-              <span
-                className={`px-1.5 py-0.2 rounded-full text-[10px] ${
-                  dossierTab === 'awards'
-                    ? 'bg-stone-950 text-amber-300'
-                    : 'bg-stone-800 text-stone-300'
-                }`}
-              >
-                {memberProfile.awards?.length || 0}
-              </span>
-            </button>
+          <div className="flex items-center justify-between text-xs font-mono text-stone-400 pt-2.5 border-t border-stone-800/80">
+            <span>{airframes.filter((a) => a.isInstructor).length > 0 ? 'Instructor Rated' : 'Standard Pilot'}</span>
+            <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform flex items-center gap-1 font-semibold">
+              Open Hangar <ArrowRight className="w-3.5 h-3.5" />
+            </span>
           </div>
         </div>
 
-        {/* Section Content */}
-        <div className="p-6 space-y-6">
-          {/* 1. QUALIFIED AIRFRAMES */}
-          {(dossierTab === 'all' || dossierTab === 'airframes') && (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xs font-display font-semibold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
-                  <Plane className="w-4 h-4" />
-                  <span>Qualified Airframes ({memberProfile.qualifiedAirframes?.length || 0})</span>
-                </h3>
+        {/* Qualifications Card */}
+        <div
+          onClick={() => setActiveTab('qualifications')}
+          className="p-5 rounded-2xl bg-stone-900/90 border border-stone-800 hover:border-amber-500/50 cursor-pointer transition-all flex flex-col justify-between space-y-3 group shadow-lg hover:shadow-amber-500/5"
+        >
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <FileCheck2 className="w-5 h-5 text-amber-400" />
               </div>
-
-              {(!memberProfile.qualifiedAirframes || memberProfile.qualifiedAirframes.length === 0) ? (
-                <div className="p-4 rounded-xl bg-stone-950/60 border border-stone-800 text-xs font-mono text-stone-400">
-                  No qualified airframes logged in current Member Portal dossier.
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {memberProfile.qualifiedAirframes.map((airframe) => (
-                    <div
-                      key={airframe.id}
-                      className={`p-4 rounded-xl bg-stone-950/75 border transition-all flex flex-col justify-between space-y-3 ${
-                        airframe.isPrimary
-                          ? 'border-amber-500/50 shadow-lg shadow-amber-500/5'
-                          : 'border-stone-800 hover:border-stone-700'
-                      }`}
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="space-y-0.5 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <Plane className="w-4 h-4 text-amber-400 shrink-0" />
-                            <h4 className="font-display font-bold text-stone-100 text-sm truncate">
-                              {airframe.name}
-                            </h4>
-                          </div>
-                          <p className="text-[11px] font-mono text-stone-400 truncate">
-                            DCS: <code className="text-amber-300/90">{airframe.dcsEntity}</code>
-                            {airframe.abbreviation && ` • ${airframe.abbreviation.toUpperCase()}`}
-                          </p>
-                        </div>
-                        {airframe.isPrimary && (
-                          <span className="px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-mono font-bold uppercase tracking-wider shrink-0">
-                            PRIMARY
-                          </span>
-                        )}
-                      </div>
-
-                      {airframe.squadron && (
-                        <div className="text-xs font-mono text-stone-400 truncate">
-                          Squadron: <span className="text-stone-200">{airframe.squadron}</span>
-                        </div>
-                      )}
-
-                      <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-stone-800/80">
-                        {airframe.isPilot && (
-                          <span className="px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-mono text-[10px] font-medium">
-                            {airframe.roleLabel || 'Pilot'}
-                          </span>
-                        )}
-                        {airframe.isInstructor && (
-                          <span className="px-2 py-0.5 rounded bg-purple-500/15 border border-purple-500/30 text-purple-300 font-mono text-[10px] font-medium">
-                            Instructor
-                          </span>
-                        )}
-                        {airframe.isCrew && (
-                          <span className="px-2 py-0.5 rounded bg-blue-500/15 border border-blue-500/30 text-blue-300 font-mono text-[10px] font-medium">
-                            Crew
-                          </span>
-                        )}
-                        <span className="px-2 py-0.5 rounded bg-stone-900 border border-stone-800 text-amber-400 font-mono text-[10px] uppercase ml-auto font-semibold">
-                          {airframe.status}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* 2. CERTIFICATES & FLIGHT QUALIFICATIONS */}
-          {(dossierTab === 'all' || dossierTab === 'certificates') && (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xs font-display font-semibold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
-                  <FileCheck2 className="w-4 h-4" />
-                  <span>Certificates &amp; Flight Qualifications ({memberProfile.certificates?.length || 0})</span>
+              <div className="min-w-0">
+                <h3 className="font-display font-bold text-stone-100 text-sm group-hover:text-amber-400 transition-colors truncate">
+                  Qualifications &amp; HOPs
                 </h3>
+                <p className="text-[11px] font-mono text-stone-400 truncate">
+                  Combat Syllabus &amp; Tests
+                </p>
               </div>
-
-              {(!memberProfile.certificates || memberProfile.certificates.length === 0) ? (
-                <div className="p-4 rounded-xl bg-stone-950/60 border border-stone-800 text-xs font-mono text-stone-400">
-                  No flight certificates issued in current Member Portal dossier.
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 gap-3.5">
-                  {memberProfile.certificates.map((cert) => {
-                    const isExpanded = expandedCertId === cert.id;
-                    const hasRequirements = cert.requirements && cert.requirements.length > 0;
-
-                    return (
-                      <div
-                        key={cert.id}
-                        className="p-5 rounded-xl bg-stone-950/75 border border-stone-800 hover:border-stone-700 transition-all space-y-3"
-                      >
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                          <div className="flex items-start sm:items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
-                              <FileCheck2 className="w-5 h-5 text-amber-400" />
-                            </div>
-                            <div className="space-y-0.5">
-                              <div className="flex flex-wrap items-center gap-2">
-                                <span className="px-2 py-0.5 rounded bg-stone-900 border border-stone-800 font-mono text-[11px] font-bold text-amber-300">
-                                  {cert.code}
-                                </span>
-                                <h4 className="font-display font-bold text-stone-100 text-sm">
-                                  {cert.name}
-                                </h4>
-                                {cert.isIssued && (
-                                  <span className="px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 font-mono text-[10px] font-bold uppercase">
-                                    ISSUED
-                                  </span>
-                                )}
-                              </div>
-                              <p className="text-xs font-mono text-stone-400">
-                                Airframe: <span className="text-stone-200">{cert.airframe}</span>
-                                {cert.issuedAt && ` • Issued ${formatShortDate(cert.issuedAt)}`}
-                                {cert.issuedBy && ` by ${cert.issuedBy}`}
-                              </p>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-2 shrink-0">
-                            <span className="px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 font-mono text-xs font-bold">
-                              +{cert.xpValue.toLocaleString()} XP
-                            </span>
-                            {hasRequirements && (
-                              <button
-                                onClick={() => setExpandedCertId(isExpanded ? null : cert.id)}
-                                className="px-3 py-1 rounded-lg bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-300 text-xs font-mono flex items-center gap-1.5 transition-colors"
-                              >
-                                <span>{isExpanded ? 'Hide Syllabus' : 'View Syllabus (HOP)'}</span>
-                                {isExpanded ? (
-                                  <ChevronUp className="w-3.5 h-3.5" />
-                                ) : (
-                                  <ChevronDown className="w-3.5 h-3.5" />
-                                )}
-                              </button>
-                            )}
-                          </div>
-                        </div>
-
-                        {cert.description && (
-                          <div className="pt-2 text-xs border-t border-stone-800/70">
-                            <HtmlRenderer html={cert.description} />
-                          </div>
-                        )}
-
-                        {isExpanded && hasRequirements && (
-                          <div className="pt-3 border-t border-stone-800/80 space-y-2.5 animate-fadeIn">
-                            <div className="text-[11px] font-mono uppercase tracking-wider text-amber-400 font-semibold flex items-center gap-1.5">
-                              <GraduationCap className="w-3.5 h-3.5" />
-                              <span>Syllabus Requirements &amp; Benchmarks ({cert.requirements!.length} HOP Battery)</span>
-                            </div>
-                            <div className="grid grid-cols-1 gap-2.5">
-                              {cert.requirements!.map((req, rIdx) => (
-                                <div
-                                  key={rIdx}
-                                  className="p-3.5 rounded-lg bg-stone-900/90 border border-stone-800 space-y-2"
-                                >
-                                  <div className="font-mono text-xs font-bold text-amber-300 flex items-center gap-2">
-                                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                                    <span>{req.skill}</span>
-                                  </div>
-                                  {req.benchmarks && (
-                                    <HtmlRenderer
-                                      html={req.benchmarks}
-                                      className="pl-5 text-stone-300 text-xs border-l-2 border-amber-500/30 ml-1.5"
-                                    />
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
             </div>
-          )}
+            <span className="px-2 py-0.5 rounded-full bg-stone-950 border border-stone-800 text-amber-300 font-mono text-xs font-bold shrink-0">
+              {certificates.length}
+            </span>
+          </div>
+          <div className="flex items-center justify-between text-xs font-mono text-stone-400 pt-2.5 border-t border-stone-800/80">
+            <span>+{totalCertXp.toLocaleString()} XP Earned</span>
+            <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform flex items-center gap-1 font-semibold">
+              View Syllabus <ArrowRight className="w-3.5 h-3.5" />
+            </span>
+          </div>
+        </div>
 
-          {/* 3. AWARDS & RIBBONS */}
-          {(dossierTab === 'all' || dossierTab === 'awards') && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xs font-display font-semibold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
-                  <Award className="w-4 h-4" />
-                  <span>Awards &amp; Decorations ({memberProfile.awards?.length || 0})</span>
+        {/* Awards Card */}
+        <div
+          onClick={() => setActiveTab('awards')}
+          className="p-5 rounded-2xl bg-stone-900/90 border border-stone-800 hover:border-amber-500/50 cursor-pointer transition-all flex flex-col justify-between space-y-3 group shadow-lg hover:shadow-amber-500/5"
+        >
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <Award className="w-5 h-5 text-amber-400" />
+              </div>
+              <div className="min-w-0">
+                <h3 className="font-display font-bold text-stone-100 text-sm group-hover:text-amber-400 transition-colors truncate">
+                  Awards &amp; Ribbons
                 </h3>
+                <p className="text-[11px] font-mono text-stone-400 truncate">
+                  Campaigns &amp; Medals
+                </p>
               </div>
-
-              {(!memberProfile.awards || memberProfile.awards.length === 0) ? (
-                <div className="p-4 rounded-xl bg-stone-950/60 border border-stone-800 text-xs font-mono text-stone-400">
-                  No awards or ribbons recorded in current Member Portal dossier.
-                </div>
-              ) : (
-                <>
-                  {/* Ribbon Rack Bar */}
-                  <div className="p-4 rounded-xl bg-stone-950/80 border border-stone-800/90 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-xs font-display font-semibold uppercase tracking-wider text-amber-400">
-                        <Medal className="w-4 h-4" />
-                        <span>Authorized Ribbon Rack</span>
-                      </div>
-                      <span className="text-[11px] font-mono text-stone-400">
-                        {memberProfile.awards.length} decoration{memberProfile.awards.length === 1 ? '' : 's'} authorized
-                      </span>
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-2.5 p-3 rounded-lg bg-stone-900/60 border border-stone-800/60">
-                      {memberProfile.awards.map((aw) => (
-                        <div
-                          key={aw.id}
-                          className="relative inline-flex items-center justify-center h-8 w-24 rounded bg-stone-950 border border-stone-800 shadow-md overflow-hidden shrink-0 group cursor-help transition-transform hover:scale-105"
-                          title={`${aw.name} (${aw.category}) — ${aw.issueCount}x Awarded`}
-                        >
-                          {aw.ribbonUrl ? (
-                            <img
-                              src={aw.ribbonUrl}
-                              alt={aw.name}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-gradient-to-r from-amber-600 via-stone-800 to-amber-600 flex items-center justify-center font-mono text-[9px] text-stone-300">
-                              {aw.name.slice(0, 8)}
-                            </div>
-                          )}
-                          {aw.numeralUrl ? (
-                            <img
-                              src={aw.numeralUrl}
-                              alt={`${aw.issueCount}`}
-                              className="absolute h-5 w-auto object-contain drop-shadow pointer-events-none"
-                            />
-                          ) : aw.issueCount > 1 ? (
-                            <span className="absolute px-1 rounded bg-black/80 text-amber-300 font-mono font-bold text-[9px] drop-shadow">
-                              {aw.issueCount}
-                            </span>
-                          ) : null}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Award Cards Grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {memberProfile.awards.map((aw) => (
-                      <div
-                        key={aw.id}
-                        className="p-5 rounded-xl bg-stone-950/75 border border-stone-800 hover:border-stone-700 transition-all flex flex-col justify-between space-y-3"
-                      >
-                        <div className="flex items-start gap-4">
-                          {aw.medalUrl ? (
-                            <div className="w-16 h-24 rounded-lg bg-stone-900 border border-stone-800 p-1 flex items-center justify-center shrink-0 shadow-inner">
-                              <img
-                                src={aw.medalUrl}
-                                alt={aw.name}
-                                className="w-full h-full object-contain"
-                              />
-                            </div>
-                          ) : aw.ribbonUrl ? (
-                            <div className="h-8 w-24 rounded bg-stone-900 border border-stone-800 shrink-0 overflow-hidden shadow">
-                              <img
-                                src={aw.ribbonUrl}
-                                alt={aw.name}
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                          ) : (
-                            <div className="w-12 h-12 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0">
-                              <Award className="w-6 h-6 text-amber-400" />
-                            </div>
-                          )}
-
-                          <div className="min-w-0 flex-1 space-y-1.5">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <span className="px-2 py-0.5 rounded bg-stone-900 border border-stone-800 text-[10px] font-mono text-amber-300 uppercase font-semibold">
-                                {aw.category}
-                              </span>
-                              {aw.issueCount > 1 && (
-                                <span className="px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 font-mono text-[10px] font-bold">
-                                  {aw.issueCount}x Awarded
-                                </span>
-                              )}
-                              <span className="px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 font-mono text-[10px] font-semibold ml-auto">
-                                +{aw.xpValue.toLocaleString()} XP
-                              </span>
-                            </div>
-
-                            <h4 className="font-display font-bold text-stone-100 text-sm leading-snug">
-                              {aw.name}
-                            </h4>
-
-                            {aw.description && (
-                              <div className="text-xs pt-1">
-                                <HtmlRenderer html={aw.description} />
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="pt-2.5 border-t border-stone-800/80 flex items-center justify-between text-[11px] font-mono text-stone-400">
-                          <span>
-                            Issued {formatShortDate(aw.issuedAt)}
-                            {aw.issuedBy ? ` by ${aw.issuedBy}` : ''}
-                          </span>
-                          {aw.issuances && aw.issuances.length > 1 && (
-                            <span className="text-amber-400">
-                              {aw.issuances.length} sorties recorded
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
             </div>
-          )}
+            <span className="px-2 py-0.5 rounded-full bg-stone-950 border border-stone-800 text-amber-300 font-mono text-xs font-bold shrink-0">
+              {awards.length}
+            </span>
+          </div>
+          <div className="flex items-center justify-between text-xs font-mono text-stone-400 pt-2.5 border-t border-stone-800/80">
+            <span>+{totalAwardXp.toLocaleString()} XP Bonus</span>
+            <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform flex items-center gap-1 font-semibold">
+              Ribbon Rack <ArrowRight className="w-3.5 h-3.5" />
+            </span>
+          </div>
         </div>
       </div>
 

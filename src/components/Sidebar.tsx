@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import {
+  Award,
   ExternalLink,
+  FileCheck2,
   FolderCheck,
   HardDrive,
   LayoutDashboard,
@@ -8,6 +10,7 @@ import {
   LogOut,
   Package,
   Paintbrush,
+  Plane,
   RefreshCw,
   Settings,
   Shield,
@@ -54,14 +57,32 @@ export const Sidebar: React.FC = () => {
     }[];
   }[] = [
     {
-      title: 'Member Operations',
+      title: 'Member Dossier',
       items: [
         {
           id: 'dashboard',
-          label: 'Member Dossier',
+          label: 'Overview',
           icon: <LayoutDashboard className="w-4 h-4" />,
           badge: memberProfile?.grade,
           badgeColor: 'bg-amber-500/20 text-amber-300 border border-amber-500/40',
+        },
+        {
+          id: 'airframes',
+          label: 'Qualified Airframes',
+          icon: <Plane className="w-4 h-4" />,
+          badge: memberProfile?.qualifiedAirframes?.length || undefined,
+        },
+        {
+          id: 'qualifications',
+          label: 'Qualifications & HOPs',
+          icon: <FileCheck2 className="w-4 h-4" />,
+          badge: memberProfile?.certificates?.length || undefined,
+        },
+        {
+          id: 'awards',
+          label: 'Awards & Ribbons',
+          icon: <Award className="w-4 h-4" />,
+          badge: memberProfile?.awards?.length || undefined,
         },
       ],
     },
