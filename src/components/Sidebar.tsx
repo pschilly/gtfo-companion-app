@@ -98,8 +98,18 @@ export const Sidebar: React.FC = () => {
       ],
     },
     {
-      title: 'Asset Deployment',
+      title: 'Assets',
       items: [
+        {
+          id: 'library',
+          label: 'Library',
+          icon: <FolderCheck className="w-4 h-4" />,
+          badge: outdatedAssets.length > 0 ? outdatedAssets.length : installedCount,
+          badgeColor:
+            outdatedAssets.length > 0
+              ? 'bg-amber-500 text-stone-950 font-bold animate-pulse'
+              : 'bg-stone-800 text-stone-300',
+        },
         {
           id: 'liveries',
           label: 'Airframe Liveries',
@@ -111,16 +121,6 @@ export const Sidebar: React.FC = () => {
           label: 'Mods',
           icon: <Package className="w-4 h-4" />,
           badge: modCount,
-        },
-        {
-          id: 'library',
-          label: 'Installed Library',
-          icon: <FolderCheck className="w-4 h-4" />,
-          badge: outdatedAssets.length > 0 ? outdatedAssets.length : installedCount,
-          badgeColor:
-            outdatedAssets.length > 0
-              ? 'bg-amber-500 text-stone-950 font-bold animate-pulse'
-              : 'bg-stone-800 text-stone-300',
         },
       ],
     }

@@ -62,11 +62,10 @@ export const LibraryView: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-800/80">
         <div>
           <h1 className="font-display text-2xl font-bold bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent">
-            Installed Library // Local DCS Packages
+            Asset Library
           </h1>
           <p className="text-xs text-stone-400 mt-0.5">
-            Automatically detects existing liveries and mods in your DCS Saved Games directory,
-            verifies file checksums, and manages updates.
+            The following are all of the GTFO assets that you already have installed.
           </p>
         </div>
 

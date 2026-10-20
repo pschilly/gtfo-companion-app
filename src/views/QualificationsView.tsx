@@ -218,35 +218,13 @@ export const QualificationsView: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Right: XP Earned Badge & Optional Benchmark Toggle */}
+                  {/* Right: XP Earned Badge */}
                   <div className="flex items-center gap-3 shrink-0 self-start lg:self-center">
                     <span className="px-3.5 py-1.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 font-mono text-xs font-bold shadow-sm">
                       +{cert.xpValue?.toLocaleString() || 0} XP
                     </span>
-
-                    {hasRequirements && (
-                      <button
-                        onClick={() => toggleCert(cert.id)}
-                        className="px-3 py-1.5 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-800 hover:border-stone-700 text-stone-400 hover:text-stone-200 text-xs font-mono flex items-center gap-1.5 transition-colors"
-                        title="Toggle syllabus details"
-                      >
-                        <span>{isExpanded ? 'Hide Details' : 'Details'}</span>
-                        {isExpanded ? (
-                          <ChevronUp className="w-3.5 h-3.5" />
-                        ) : (
-                          <ChevronDown className="w-3.5 h-3.5" />
-                        )}
-                      </button>
-                    )}
                   </div>
                 </div>
-
-                {/* Narrative Description / Scope of Certification */}
-                {cert.description && (
-                  <div className="p-3.5 rounded-xl bg-stone-950/60 border border-stone-800/80 text-xs text-stone-300 leading-relaxed">
-                    <HtmlRenderer html={cert.description} />
-                  </div>
-                )}
 
                 {/* Subdued Syllabus / Benchmarks Details (Collapsible & secondary) */}
                 {isExpanded && hasRequirements && (

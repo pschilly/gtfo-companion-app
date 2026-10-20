@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   ExternalLink,
   GraduationCap,
@@ -11,9 +11,99 @@ import {
 import { DossierNav } from '../components/DossierNav';
 import { STATIC_CONFIG } from '../config/constants';
 import { useApp } from '../context/AppContext';
+import { AssetItem, QualifiedAirframe } from '../types';
+
+const normalize = (str?: string | null): string => {
+  if (!str) return '';
+  return str.toLowerCase().replace(/[^a-z0-9]/g, '');
+};
+
+const AIRCRAFT_FAMILIES: Record<string, string[]> = {
+  fa18: ['fa18', 'fa18c', 'hornet', 'f18'],
+  f16: ['f16', 'f16c', 'viper', 'fightingfalcon'],
+  f14: ['f14', 'f14a', 'f14b', 'tomcat'],
+  f15: ['f15', 'f15e', 'f15c', 'strikeeagle', 'eagle'],
+  a10: ['a10', 'a10c', 'a10cii', 'warthog', 'thunderbolt'],
+  ah64: ['ah64', 'ah64d', 'apache'],
+  ch47: ['ch47', 'ch47f', 'chinook'],
+  uh60: ['uh60', 'uh60l', 'blackhawk'],
+};
+
+const findMatchingLivery = (
+  airframe: QualifiedAirframe,
+  assets: AssetItem[]
+): AssetItem | undefined => {
+  const normName = normalize(airframe.name);
+  const normAbbr = normalize(airframe.abbreviation);
+  const normEntity = normalize(airframe.dcsEntity);
+
+  const liveries = assets.filter((a) => a.category === 'livery' && a.imagePreviewUrl);
+
+  // 1. Direct match on aircraftOrModule
+  let match = liveries.find((l) => {
+    const normMod = normalize(l.aircraftOrModule);
+    if (!normMod) return false;
+    return (
+      normMod === normName ||
+      normMod === normEntity ||
+      normMod === normAbbr ||
+      normName.includes(normMod) ||
+      normMod.includes(normName)
+    );
+  });
+
+  // 2. Target folder match (e.g. "Liveries/FA-18C_hornet/...")
+  if (!match) {
+    match = liveries.find((l) => {
+      const normTarget = normalize(l.targetFolder);
+      return (
+        (normEntity && normTarget.includes(normEntity)) ||
+        (normAbbr && normAbbr.length >= 3 && normTarget.includes(normAbbr))
+      );
+    });
+  }
+
+  // 3. Aircraft family synonyms
+  if (!match) {
+    for (const keywords of Object.values(AIRCRAFT_FAMILIES)) {
+      const matchesAirframe = keywords.some(
+        (kw) => normName.includes(kw) || normAbbr.includes(kw) || normEntity.includes(kw)
+      );
+      if (matchesAirframe) {
+        match = liveries.find((l) => {
+          const normMod = normalize(l.aircraftOrModule);
+          const normTitle = normalize(l.name);
+          const normTarget = normalize(l.targetFolder);
+          return keywords.some(
+            (kw) =>
+              normMod.includes(kw) || normTitle.includes(kw) || normTarget.includes(kw)
+          );
+        });
+        if (match) break;
+      }
+    }
+  }
+
+  // 4. Fallback across all assets (mods etc.)
+  if (!match) {
+    match = assets.find((a) => {
+      if (!a.imagePreviewUrl) return false;
+      const normMod = normalize(a.aircraftOrModule);
+      return (
+        normMod &&
+        (normMod === normName ||
+          normMod === normEntity ||
+          normName.includes(normMod) ||
+          normMod.includes(normName))
+      );
+    });
+  }
+
+  return match;
+};
 
 export const AirframesView: React.FC = () => {
-  const { memberProfile, setActiveTab } = useApp();
+  const { memberProfile, setActiveTab, manifest } = useApp();
 
   const airframes = memberProfile.qualifiedAirframes || [];
   const primaryAirframe = airframes.find((a) => a.isPrimary) || airframes[0] || null;
@@ -54,7 +144,7 @@ export const AirframesView: React.FC = () => {
 
       {/* Summary KPI Strip */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-4 rounded-xl bg-stone-900/90 border border-stone-800 flex items-center justify-between">
+        <div className="p-4 rounded-xl bg-stone-900/90 border border-stone-800 flex items-center justify-between shadow-md">
           <div>
             <p className="text-[11px] font-mono uppercase text-stone-400">Primary Airframe</p>
             <p className="text-lg font-bold font-display text-amber-300 mt-1 truncate">
@@ -69,7 +159,7 @@ export const AirframesView: React.FC = () => {
           </div>
         </div>
 
-        <div className="p-4 rounded-xl bg-stone-900/90 border border-stone-800 flex items-center justify-between">
+        <div className="p-4 rounded-xl bg-stone-900/90 border border-stone-800 flex items-center justify-between shadow-md">
           <div>
             <p className="text-[11px] font-mono uppercase text-stone-400">Total Certifications</p>
             <p className="text-2xl font-bold font-display text-emerald-400 mt-1">
@@ -84,7 +174,7 @@ export const AirframesView: React.FC = () => {
           </div>
         </div>
 
-        <div className="p-4 rounded-xl bg-stone-900/90 border border-stone-800 flex items-center justify-between">
+        <div className="p-4 rounded-xl bg-stone-900/90 border border-stone-800 flex items-center justify-between shadow-md">
           <div>
             <p className="text-[11px] font-mono uppercase text-stone-400">Instructor Status</p>
             <p className="text-2xl font-bold font-display text-purple-300 mt-1">
@@ -126,80 +216,117 @@ export const AirframesView: React.FC = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {airframes.map((airframe) => (
-            <div
-              key={airframe.id}
-              className={`p-5 rounded-2xl bg-stone-900/90 border transition-all flex flex-col justify-between space-y-4 hover:shadow-xl ${
-                airframe.isPrimary
-                  ? 'border-amber-500/50 shadow-lg shadow-amber-500/5 bg-gradient-to-b from-stone-900/95 to-amber-950/10'
-                  : 'border-stone-800 hover:border-stone-700'
-              }`}
-            >
-              <div className="space-y-3">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="space-y-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0">
-                        <Plane className="w-4 h-4 text-amber-400" />
-                      </div>
-                      <h3 className="font-display font-bold text-stone-100 text-base truncate">
-                        {airframe.name}
-                      </h3>
-                    </div>
-                    <p className="text-xs font-mono text-stone-400 pl-10">
-                      Module: <code className="text-amber-300 font-semibold">{airframe.dcsEntity}</code>
-                      {airframe.abbreviation && ` • [${airframe.abbreviation.toUpperCase()}]`}
-                    </p>
-                  </div>
+          {airframes.map((airframe) => {
+            const matchingLivery = findMatchingLivery(airframe, manifest.assets);
+            const bgImageUrl = airframe.imageUrl || matchingLivery?.imagePreviewUrl || null;
 
-                  {airframe.isPrimary && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500 text-stone-950 text-[10px] font-mono font-bold uppercase tracking-wider shrink-0 shadow">
-                      <Sparkles className="w-3 h-3 text-stone-950" />
-                      PRIMARY
-                    </span>
-                  )}
-                </div>
-
-                {airframe.squadron && (
-                  <div className="p-2.5 rounded-xl bg-stone-950/70 border border-stone-800/80 flex items-center gap-2 text-xs font-mono text-stone-300">
-                    <Users className="w-3.5 h-3.5 text-stone-500 shrink-0" />
-                    <span className="truncate">Squadron: <strong className="text-stone-100">{airframe.squadron}</strong></span>
-                  </div>
+            return (
+              <div
+                key={airframe.id}
+                className={`group relative rounded-2xl border transition-all duration-300 flex flex-col justify-between overflow-hidden shadow-xl hover:shadow-2xl ${
+                  airframe.isPrimary
+                    ? 'border-amber-500/60 shadow-amber-500/10'
+                    : 'border-stone-800 hover:border-stone-700'
+                }`}
+                style={{ minHeight: '220px' }}
+              >
+                {/* Background Livery Image & Gradients */}
+                {bgImageUrl ? (
+                  <>
+                    <img
+                      src={bgImageUrl}
+                      alt={airframe.name}
+                      className="absolute inset-0 w-full h-full object-cover object-center opacity-35 group-hover:opacity-50 group-hover:scale-105 transition-all duration-700 ease-out"
+                      loading="lazy"
+                    />
+                    {/* Dark gradient overlays to ensure text readability */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/80 to-stone-950/60" />
+                    {airframe.isPrimary && (
+                      <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 via-transparent to-stone-950/40 pointer-events-none" />
+                    )}
+                    <div className="absolute inset-0 backdrop-blur-[0.5px]" />
+                  </>
+                ) : (
+                  <div
+                    className={`absolute inset-0 ${
+                      airframe.isPrimary
+                        ? 'bg-gradient-to-b from-stone-900/95 via-stone-900/90 to-amber-950/20'
+                        : 'bg-stone-900/90'
+                    }`}
+                  />
                 )}
-              </div>
 
-              <div className="space-y-3 pt-3 border-t border-stone-800/80">
-                <div className="flex flex-wrap items-center gap-1.5">
-                  {airframe.isPilot && (
-                    <span className="px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-mono text-xs font-semibold">
-                      {airframe.roleLabel || 'Pilot'}
-                    </span>
-                  )}
-                  {airframe.isInstructor && (
-                    <span className="px-2.5 py-1 rounded-lg bg-purple-500/15 border border-purple-500/30 text-purple-300 font-mono text-xs font-semibold">
-                      Instructor
-                    </span>
-                  )}
-                  {airframe.isCrew && (
-                    <span className="px-2.5 py-1 rounded-lg bg-blue-500/15 border border-blue-500/30 text-blue-300 font-mono text-xs font-semibold">
-                      Crew
-                    </span>
-                  )}
-                  <span className="px-2.5 py-1 rounded-lg bg-stone-950 border border-stone-800 text-amber-400 font-mono text-xs uppercase ml-auto font-bold">
-                    {airframe.status}
-                  </span>
+                {/* Relative Card Content */}
+                <div className="relative z-10 p-5 flex flex-col justify-between flex-1 space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-9 h-9 rounded-xl bg-stone-950/80 border border-stone-700/80 backdrop-blur-md flex items-center justify-center shrink-0 shadow-sm">
+                          <Plane className="w-4 h-4 text-amber-400" />
+                        </div>
+                        <div className="min-w-0">
+                          <h3 className="font-display font-bold text-stone-100 text-lg leading-tight truncate drop-shadow-sm">
+                            {airframe.name}
+                          </h3>
+                          <p className="text-[11px] font-mono text-stone-400 truncate">
+                            {airframe.dcsEntity || airframe.abbreviation.toUpperCase()}
+                            {airframe.squadron ? ` • ${airframe.squadron}` : ''}
+                          </p>
+                        </div>
+                      </div>
+
+                      {airframe.isPrimary && (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500 text-stone-950 text-[10px] font-mono font-extrabold uppercase tracking-wider shrink-0 shadow-md">
+                          <Sparkles className="w-3 h-3 text-stone-950" />
+                          PRIMARY
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Badges & Optional Livery Link */}
+                  <div className="space-y-3 pt-3 border-t border-stone-800/80">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {airframe.isPilot && (
+                        <span className="px-2.5 py-1 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-mono text-xs font-semibold backdrop-blur-sm">
+                          {airframe.roleLabel || 'Pilot'}
+                        </span>
+                      )}
+                      {airframe.isInstructor && (
+                        <span className="px-2.5 py-1 rounded-lg bg-purple-500/20 border border-purple-500/40 text-purple-300 font-mono text-xs font-semibold backdrop-blur-sm">
+                          Instructor
+                        </span>
+                      )}
+                      {airframe.isCrew && (
+                        <span className="px-2.5 py-1 rounded-lg bg-blue-500/20 border border-blue-500/40 text-blue-300 font-mono text-xs font-semibold backdrop-blur-sm">
+                          Crew
+                        </span>
+                      )}
+                      <span className="px-2.5 py-1 rounded-lg bg-stone-950/80 border border-stone-700 text-amber-400 font-mono text-xs uppercase ml-auto font-bold backdrop-blur-sm">
+                        {airframe.status}
+                      </span>
+                    </div>
+
+                    {matchingLivery && (
+                      <div className="flex items-center justify-between text-xs font-mono text-stone-400 pt-1">
+                        <span className="truncate max-w-[200px] text-stone-300/90 flex items-center gap-1.5 text-[11px]">
+                          <Paintbrush className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                          <span className="truncate">{matchingLivery.name}</span>
+                        </span>
+                        <button
+                          onClick={() => setActiveTab('liveries')}
+                          className="text-amber-400 hover:text-amber-300 hover:underline flex items-center gap-1 text-[11px] shrink-0 font-semibold"
+                        >
+                          <span>Hangar</span>
+                          <ExternalLink className="w-3 h-3" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
-
-                <button
-                  onClick={() => setActiveTab('liveries')}
-                  className="w-full py-2 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-800 text-stone-300 hover:text-amber-300 font-mono text-xs flex items-center justify-center gap-2 transition-all"
-                >
-                  <Paintbrush className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Browse {airframe.name} Liveries</span>
-                </button>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

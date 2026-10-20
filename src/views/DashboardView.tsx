@@ -129,29 +129,25 @@ export const DashboardView: React.FC = () => {
           {/* Column 1: Pilot Identity & Membership Status (4 cols) */}
           <div className="lg:col-span-4 flex flex-col justify-between p-5 rounded-xl bg-stone-950/75 border border-stone-800/90 space-y-4">
             <div className="flex items-center justify-between gap-2">
-              <span className="text-xs font-display font-semibold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4" />
-                <span>Pilot Record</span>
-              </span>
               <div className="flex items-center gap-1.5">
                 {memberProfile.isCouncilMember && (
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/25 border border-amber-500/50 text-amber-300 text-[10px] font-mono font-bold uppercase tracking-wider shrink-0">
                     <Sparkles className="w-3 h-3 text-amber-300" />
-                    COUNCIL
+                    Council Member
                   </span>
                 )}
                 {memberProfile.isSquadronLeader && (
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-mono font-bold uppercase tracking-wider shrink-0">
-                    SQ LEAD
+                    Squadron Leadership
                   </span>
                 )}
                 {effectiveTier === 'core' ? (
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-mono font-bold uppercase tracking-wider shrink-0">
-                    CORE ROSTER
+                    CORE Roster
                   </span>
                 ) : (
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-stone-800 border border-stone-700 text-stone-200 text-[10px] font-mono font-bold uppercase tracking-wider shrink-0">
-                    COMMUNITY
+                    Community Roster
                   </span>
                 )}
               </div>
