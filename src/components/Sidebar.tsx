@@ -5,6 +5,7 @@ import {
   FileCheck2,
   FolderCheck,
   HardDrive,
+  Home,
   LayoutDashboard,
   Lock,
   LogOut,
@@ -56,6 +57,16 @@ export const Sidebar: React.FC = () => {
       badgeColor?: string;
     }[];
   }[] = [
+    {
+      title: 'Operations',
+      items: [
+        {
+          id: 'home',
+          label: 'Home',
+          icon: <Home className="w-4 h-4" />,
+        },
+      ],
+    },
     {
       title: 'Member Dossier',
       items: [

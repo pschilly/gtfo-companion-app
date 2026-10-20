@@ -12,6 +12,7 @@ import { AirframesView } from './views/AirframesView';
 import { AwardsView } from './views/AwardsView';
 import { CatalogView } from './views/CatalogView';
 import { DashboardView } from './views/DashboardView';
+import { HomeView } from './views/HomeView';
 import { LibraryView } from './views/LibraryView';
 import { LoginGateView } from './views/LoginGateView';
 import { QualificationsView } from './views/QualificationsView';
@@ -62,6 +63,7 @@ const MainShell: React.FC = () => {
         <TopBar searchQuery={searchQuery} onSearchChange={handleSearchChange} />
 
         <main className="flex-1 overflow-y-auto p-6">
+          {activeTab === 'home' && <HomeView />}
           {activeTab === 'dashboard' && <DashboardView />}
           {activeTab === 'airframes' && <AirframesView />}
           {activeTab === 'qualifications' && <QualificationsView />}

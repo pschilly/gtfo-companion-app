@@ -13,6 +13,7 @@ export type RequiredTier = 'community' | 'core';
 export type RequirementLevel = 'required_all' | 'required_core' | 'optional';
 
 export type NavigationTab =
+  | 'home'
   | 'dashboard'
   | 'airframes'
   | 'qualifications'

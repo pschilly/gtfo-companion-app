@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import {
   AlertTriangle,
   ArrowRight,
@@ -9,7 +9,6 @@ import {
   ExternalLink,
   FileCheck2,
   FolderCheck,
-  HardDrive,
   LayoutDashboard,
   Package,
   Paintbrush,
@@ -19,13 +18,11 @@ import {
   Sparkles,
   Users,
 } from 'lucide-react';
-import { AssetCard } from '../components/AssetCard';
 import { DossierNav } from '../components/DossierNav';
 import { STATIC_CONFIG } from '../config/constants';
 import { useApp } from '../context/AppContext';
 import { GTFO_GRADE_META } from '../data/samplePortalData';
 import { MemberGradeLevel } from '../types';
-import { formatBytes } from '../utils/formatters';
 
 export const DashboardView: React.FC = () => {
   const {
@@ -54,25 +51,7 @@ export const DashboardView: React.FC = () => {
   const awards = memberProfile.awards || [];
   const totalCertXp = certificates.reduce((sum, c) => sum + (c.xpValue || 0), 0);
   const totalAwardXp = awards.reduce((sum, a) => sum + (a.xpValue || 0), 0);
-
-  const totalAssets = manifest.assets.length;
   const installedCount = Object.keys(installedAssets).length;
-  const totalInstalledBytes = useMemo(() => {
-    return Object.keys(installedAssets).reduce((sum, id) => {
-      const asset = manifest.assets.find((a) => a.id === id);
-      return sum + (asset?.fileSizeBytes || 0);
-    }, 0);
-  }, [manifest.assets, installedAssets]);
-  const requiredAllCount = manifest.assets.filter(
-    (a) => a.requirementLevel === 'required_all'
-  ).length;
-  const requiredCoreCount = manifest.assets.filter(
-    (a) => a.requirementLevel === 'required_core'
-  ).length;
-  const featuredAssets =
-    manifest.assets.filter((a) => a.featured).length > 0
-      ? manifest.assets.filter((a) => a.featured)
-      : manifest.assets;
 
   const handlePortalRefresh = async () => {
     setIsSyncingPortal(true);
@@ -559,143 +538,6 @@ export const DashboardView: React.FC = () => {
               Ribbon Rack <ArrowRight className="w-3.5 h-3.5" />
             </span>
           </div>
-        </div>
-      </div>
-
-      {/* Telemetry Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div
-          onClick={() => setActiveTab('liveries')}
-          className="p-4 rounded-xl bg-stone-900/90 border border-stone-800 hover:border-stone-700 cursor-pointer transition-all flex items-center justify-between"
-        >
-          <div>
-            <p className="text-[11px] font-mono uppercase text-stone-400">Available Packages</p>
-            <p className="text-2xl font-bold font-display text-stone-100 mt-1">{totalAssets}</p>
-            <p className="text-[11px] font-mono text-stone-400 mt-0.5">
-              {requiredAllCount} Mandatory • {requiredCoreCount} CORE
-            </p>
-          </div>
-          <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center">
-            <Package className="w-5 h-5 text-amber-400" />
-          </div>
-        </div>
-
-        <div
-          onClick={() => setActiveTab('library')}
-          className="p-4 rounded-xl bg-stone-900/90 border border-stone-800 hover:border-stone-700 cursor-pointer transition-all flex items-center justify-between"
-        >
-          <div>
-            <p className="text-[11px] font-mono uppercase text-stone-400">Installed Locally</p>
-            <p className="text-2xl font-bold font-display text-emerald-400 mt-1">
-              {installedCount}
-            </p>
-            <p className="text-[11px] font-mono text-stone-400 mt-0.5">
-              {outdatedAssets.length > 0
-                ? `${outdatedAssets.length} update(s) ready`
-                : 'All packages verified'}
-            </p>
-          </div>
-          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center">
-            <FolderCheck className="w-5 h-5 text-emerald-400" />
-          </div>
-        </div>
-
-        <div
-          onClick={() => {
-            if (missingRequiredAssets.length > 0) {
-              installAllRequiredForUser();
-            } else {
-              setActiveTab('library');
-            }
-          }}
-          className={`p-4 rounded-xl bg-stone-900/90 border transition-all cursor-pointer flex items-center justify-between ${
-            missingRequiredAssets.length > 0
-              ? 'border-red-500/40 hover:border-red-500/70 bg-red-950/10'
-              : 'border-stone-800 hover:border-stone-700'
-          }`}
-          title={
-            missingRequiredAssets.length > 0
-              ? 'Click to deploy all required assets'
-              : 'Flight compliant'
-          }
-        >
-          <div>
-            <p className="text-[11px] font-mono uppercase text-stone-400">Flight Readiness</p>
-            <p
-              className={`text-2xl font-bold font-display mt-1 ${
-                missingRequiredAssets.length > 0 ? 'text-red-400' : 'text-emerald-400'
-              }`}
-            >
-              {missingRequiredAssets.length > 0
-                ? `${missingRequiredAssets.length} Missing`
-                : '100% Ready'}
-            </p>
-            <p className="text-[11px] font-mono text-stone-400 mt-0.5">
-              {missingRequiredAssets.length > 0 ? (
-                <span className="text-red-400/90 font-semibold hover:underline">Deploy Required Assets</span>
-              ) : (
-                <span>All required assets active</span>
-              )}
-            </p>
-          </div>
-          <div
-            className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-              missingRequiredAssets.length > 0
-                ? 'bg-red-500/10 border border-red-500/30'
-                : 'bg-emerald-500/10 border border-emerald-500/30'
-            }`}
-          >
-            {missingRequiredAssets.length > 0 ? (
-              <AlertTriangle className="w-5 h-5 text-red-400 animate-pulse" />
-            ) : (
-              <ShieldCheck className="w-5 h-5 text-emerald-400" />
-            )}
-          </div>
-        </div>
-
-        <div
-          onClick={() => setActiveTab('library')}
-          className="p-4 rounded-xl bg-stone-900/90 border border-stone-800 hover:border-stone-700 cursor-pointer transition-all flex items-center justify-between"
-          title="View installed library"
-        >
-          <div>
-            <p className="text-[11px] font-mono uppercase text-stone-400">Storage Used</p>
-            <p className="text-2xl font-bold font-display text-amber-400 mt-1">
-              {formatBytes(totalInstalledBytes)}
-            </p>
-            <p className="text-[11px] font-mono text-stone-400 mt-0.5">
-              {installedCount} package{installedCount === 1 ? '' : 's'} on disk
-            </p>
-          </div>
-          <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0">
-            <HardDrive className="w-5 h-5 text-amber-400" />
-          </div>
-        </div>
-      </div>
-
-      {/* Featured Tactical Packages */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="font-display text-lg font-bold text-stone-100">
-              Featured Assets
-            </h2>
-            <p className="text-xs text-stone-400">
-              New and/or updated assets for you to install
-            </p>
-          </div>
-          <button
-            onClick={() => setActiveTab('liveries')}
-            className="text-xs font-mono text-amber-400 hover:underline flex items-center gap-1"
-          >
-            View All Assets <ArrowRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-          {featuredAssets.map((asset) => (
-            <AssetCard key={asset.id} asset={asset} />
-          ))}
         </div>
       </div>
     </div>

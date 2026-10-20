@@ -137,7 +137,7 @@ const DEFAULT_INSTALLED_ATC: InstalledAtcState = {
 };
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [activeTab, setActiveTab] = useState<NavigationTab>('dashboard');
+  const [activeTab, setActiveTab] = useState<NavigationTab>('home');
   const [manifest, setManifest] = useState<AssetManifest>(SAMPLE_MANIFEST);
   const [isSyncingManifest, setIsSyncingManifest] = useState(false);
   const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(null);
