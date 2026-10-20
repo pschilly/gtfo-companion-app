@@ -1,0 +1,40 @@
+name: Build Portable GTFO Companion App Executable
+
+on:
+  push:
+    branches: [main, master]
+    tags: ['v*']
+  workflow_dispatch:
+
+jobs:
+  build-windows-portable:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Setup Rust stable toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      - name: Install frontend dependencies
+        run: npm install
+
+      - name: Build Tauri Windows Executable
+        run: npm run tauri:build
+
+      - name: Upload Portable Executable Artifact (.exe)
+        uses: actions/upload-artifact@v4
+        with:
+          name: GTFO-Companion-App-Portable-Exe
+          path: src-tauri/target/release/gtfo-companion-app.exe

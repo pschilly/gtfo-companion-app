@@ -1,0 +1,288 @@
+{
+  "schemaVersion": 1,
+  "communityName": "Global Task Force Overlord",
+  "manifestVersion": "2026.10.1",
+  "generatedAt": "2026-10-17T22:00:00Z",
+  "announcement": {
+    "title": "GLOBAL TASK FORCE OVERLORD // OPERATIONAL ASSET STANDARDS",
+    "message": "Ensure all packages marked REQUIRED FOR ALL or REQUIRED FOR CORE (for CORE Roster pilots) are deployed and up to date prior to joining official GTFO servers.",
+    "type": "tactical"
+  },
+  "assets": [
+    {
+      "id": "gtfo-mod-airfield-lighting",
+      "name": "GTFO Airfield Lighting Mod (Runway, PAPI, Approach & Floodlights)",
+      "description": "Custom airfield lighting assets for DCS World created for Global Task Force Overlord. Provides Mission Editor placeable static objects including an 856m Approach-Light Array, 80ft Red/Green Runway Threshold Bar, PAPI-4 Left/Right assemblies, 12m Parking Floodlight Poles with red obstruction beacons, and Elevated/Flush Omnidirectional & Directional fixtures.",
+      "category": "mod",
+      "aircraftOrModule": "Mods/tech // Airfield Objects",
+      "version": "34f59ed",
+      "author": "pschilly // Global Task Force Overlord",
+      "imagePreviewUrl": "https://cdn.globaltaskforceoverlord.org/airfield-light-mod/Approach%20Lights.png",
+      "previewGallery": [
+        {
+          "label": "Approach Lights (856m Array)",
+          "url": "https://cdn.globaltaskforceoverlord.org/airfield-light-mod/Approach%20Lights.png"
+        },
+        {
+          "label": "Parking Flood Light (12m Pole)",
+          "url": "https://cdn.globaltaskforceoverlord.org/airfield-light-mod/Flood%20Light.png"
+        },
+        {
+          "label": "Directional - Blue",
+          "url": "https://cdn.globaltaskforceoverlord.org/airfield-light-mod/Directional%20-%20Blue.png"
+        },
+        {
+          "label": "Directional - Green",
+          "url": "https://cdn.globaltaskforceoverlord.org/airfield-light-mod/Directional%20-%20Green.png"
+        },
+        {
+          "label": "Omni-Directional Elevated - Red",
+          "url": "https://cdn.globaltaskforceoverlord.org/airfield-light-mod/Omni-Directional%20-%20Elevated%20-%20Red.png"
+        },
+        {
+          "label": "Omni-Directional Flush - Blue",
+          "url": "https://cdn.globaltaskforceoverlord.org/airfield-light-mod/Omni-Directional%20-%20Flush%20-%20Blue.png"
+        }
+      ],
+      "targetFolder": "Mods/tech",
+      "installFolderName": "GTFOAirfieldLighting",
+      "githubRepo": "pschilly/gtfo-airfield-lighting",
+      "githubBranch": "master",
+      "githubPathPrefixes": ["Mods/tech/GTFOAirfieldLighting/"],
+      "fileCount": 27,
+      "requiredTier": "community",
+      "requirementLevel": "required_all",
+      "downloadUrl": "https://github.com/pschilly/gtfo-airfield-lighting",
+      "sha256": "ba5c6350bf2110d54acaa9c18348ceb8a231e32b",
+      "fileSizeBytes": 8277363,
+      "updatedAt": "2026-10-17T20:00:00Z",
+      "featured": true,
+      "tags": ["Mods/tech", "Airfield Lighting", "PAPI-4", "Approach Array", "FOB / FARP"],
+      "changelog": [
+        "Includes 856m Approach-Light Array, 80ft Runway Threshold Bar, PAPI4 Left/Right v13, and 12m Parking Floodlight Pole",
+        "Includes Elevated & Flush Omni-Directional and Directional fixtures (Blue, Green, Red, White)",
+        "Uses Git Blob SHA-1 differential sync into Saved Games\\DCS\\Mods\\tech\\GTFOAirfieldLighting"
+      ]
+    },
+    {
+      "id": "gtfo-livery-complete-bundle",
+      "name": "GTFO Complete Official Livery Repository Bundle (All Airframes)",
+      "description": "Full repository synchronization of https://github.com/pschilly/gtfo-liveries into Saved Games\\DCS\\Liveries. Uses Git Blob SHA-1 verification to skip unchanged files and only download new or updated textures.",
+      "category": "livery",
+      "aircraftOrModule": "All Aircraft // Full Repo",
+      "version": "0487beb",
+      "author": "pschilly // Global Task Force Overlord",
+      "imagePreviewUrl": "https://cdn.globaltaskforceoverlord.org/GTFO-Logo.png",
+      "targetFolder": "Liveries",
+      "installFolderName": "",
+      "githubRepo": "pschilly/gtfo-liveries",
+      "githubBranch": "main",
+      "githubPathPrefixes": ["Liveries/"],
+      "fileCount": 247,
+      "requiredTier": "community",
+      "requirementLevel": "required_core",
+      "downloadUrl": "https://github.com/pschilly/gtfo-liveries",
+      "sha256": "0487beb75fb557611eb7ff6257e5f92bf676e220",
+      "fileSizeBytes": 3894094205,
+      "updatedAt": "2026-10-17T20:00:00Z",
+      "featured": true,
+      "tags": ["Complete Pack", "Git SHA-1 Sync", "All Airframes"],
+      "changelog": [
+        "Synchronizes the entire pschilly/gtfo-liveries repository directly into Saved Games\\DCS\\Liveries"
+      ]
+    },
+    {
+      "id": "gtfo-livery-f16c-507thfs",
+      "name": "F-16C Block 50 Viper // 507th FS Squadron Livery",
+      "description": "Official Global Task Force Overlord F-16C_50 507th Fighter Squadron livery package. Includes custom fuselage and wing Main/RoughMet textures, 300 & 370 gal fuel tanks, HMD & gray pilot helmets, and custom 507th FS pilot patches.",
+      "category": "livery",
+      "aircraftOrModule": "F-16C_50",
+      "version": "249aa66",
+      "author": "Global Task Force Overlord",
+      "imagePreviewUrl": "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=1000&q=80",
+      "targetFolder": "Liveries/F-16C_50",
+      "installFolderName": "507thFS",
+      "githubRepo": "pschilly/gtfo-liveries",
+      "githubBranch": "main",
+      "githubPathPrefixes": ["Liveries/F-16C_50/507thFS/"],
+      "fileCount": 25,
+      "requiredTier": "community",
+      "requirementLevel": "required_core",
+      "downloadUrl": "https://github.com/pschilly/gtfo-liveries/tree/main/Liveries/F-16C_50/507thFS",
+      "sha256": "249aa6663b814fe0d9bea636d9f2d636faabc36c",
+      "fileSizeBytes": 370638616,
+      "updatedAt": "2026-10-17T20:00:00Z",
+      "featured": true,
+      "tags": ["F-16C_50", "507thFS", "RoughMet", "Custom Helmet & Patch"],
+      "changelog": [
+        "25 texture & configuration files synced from pschilly/gtfo-liveries (Liveries/F-16C_50/507thFS)"
+      ]
+    },
+    {
+      "id": "gtfo-livery-fa18c-449thtfs",
+      "name": "F/A-18C Hornet // 449th TFS Squadron Livery",
+      "description": "Official Global Task Force Overlord F/A-18C Hornet 449th Tactical Fighter Squadron livery. Includes custom DIFF fuselage textures, dynamic bort numbers, custom helmet & HMD textures, and squadron patches.",
+      "category": "livery",
+      "aircraftOrModule": "FA-18C_hornet",
+      "version": "8cfae70",
+      "author": "Global Task Force Overlord",
+      "imagePreviewUrl": "https://images.unsplash.com/photo-1508614589041-895b88991e3e?auto=format&fit=crop&w=1000&q=80",
+      "targetFolder": "Liveries/FA-18C_hornet",
+      "installFolderName": "449thTFS",
+      "githubRepo": "pschilly/gtfo-liveries",
+      "githubBranch": "main",
+      "githubPathPrefixes": ["Liveries/FA-18C_hornet/449thTFS/"],
+      "fileCount": 8,
+      "requiredTier": "community",
+      "requirementLevel": "required_core",
+      "downloadUrl": "https://github.com/pschilly/gtfo-liveries/tree/main/Liveries/FA-18C_hornet/449thTFS",
+      "sha256": "8cfae70b05262ac496d7abc2f93379c4933934cc",
+      "fileSizeBytes": 59423319,
+      "updatedAt": "2026-10-17T20:00:00Z",
+      "featured": true,
+      "tags": ["FA-18C_hornet", "449thTFS", "Custom Helmet", "Squadron Patch"],
+      "changelog": [
+        "8 texture & configuration files synced from pschilly/gtfo-liveries (Liveries/FA-18C_hornet/449thTFS)"
+      ]
+    },
+    {
+      "id": "gtfo-livery-a10cii-191st",
+      "name": "A-10C II Tank Killer // 191st Grey Livery",
+      "description": "Official Global Task Force Overlord A-10CII 191st Grey tactical livery. Includes full exterior texture set (A-10_1-a through L), custom bort numbers, and description.lua.",
+      "category": "livery",
+      "aircraftOrModule": "A-10CII",
+      "version": "dc0bdee",
+      "author": "Global Task Force Overlord",
+      "imagePreviewUrl": "https://images.unsplash.com/photo-1464037866556-6812c9d1c72e?auto=format&fit=crop&w=1000&q=80",
+      "targetFolder": "Liveries/A-10CII",
+      "installFolderName": "191st Grey",
+      "githubRepo": "pschilly/gtfo-liveries",
+      "githubBranch": "main",
+      "githubPathPrefixes": ["Liveries/A-10CII/191st Grey/"],
+      "fileCount": 15,
+      "requiredTier": "community",
+      "requirementLevel": "required_core",
+      "downloadUrl": "https://github.com/pschilly/gtfo-liveries/tree/main/Liveries/A-10CII/191st%20Grey",
+      "sha256": "dc0bdeedc78bdcca0198afcab2ba16709e357834",
+      "fileSizeBytes": 84025867,
+      "updatedAt": "2026-10-17T20:00:00Z",
+      "featured": false,
+      "tags": ["A-10CII", "191st Grey", "CAS"],
+      "changelog": [
+        "15 texture & configuration files synced from pschilly/gtfo-liveries (Liveries/A-10CII/191st Grey)"
+      ]
+    },
+    {
+      "id": "gtfo-livery-c130j-overlord",
+      "name": "C-130J-30 Super Hercules // Global Task Force Overlord",
+      "description": "Official Global Task Force Overlord strategic airlift livery for the C-130J-30. Includes complete exterior fuselage, wing panels, prop blur/blade textures, CWU-27 flight suits, and cockpit mug.",
+      "category": "livery",
+      "aircraftOrModule": "C-130J-30",
+      "version": "eac972c",
+      "author": "Global Task Force Overlord",
+      "imagePreviewUrl": "https://images.unsplash.com/photo-1517976487468-f20514c44353?auto=format&fit=crop&w=1000&q=80",
+      "targetFolder": "Liveries/C-130J-30",
+      "installFolderName": "Global Task Force Overlord",
+      "githubRepo": "pschilly/gtfo-liveries",
+      "githubBranch": "main",
+      "githubPathPrefixes": ["Liveries/C-130J-30/Global Task Force Overlord/"],
+      "fileCount": 24,
+      "requiredTier": "community",
+      "requirementLevel": "optional",
+      "downloadUrl": "https://github.com/pschilly/gtfo-liveries/tree/main/Liveries/C-130J-30/Global%20Task%20Force%20Overlord",
+      "sha256": "eac972c2d68753d61872a6f596f9121960501a62",
+      "fileSizeBytes": 406857702,
+      "updatedAt": "2026-10-17T20:00:00Z",
+      "featured": false,
+      "tags": ["C-130J-30", "Airlift", "GTFO Flagship"],
+      "changelog": [
+        "24 files synced from pschilly/gtfo-liveries (Liveries/C-130J-30/Global Task Force Overlord)"
+      ]
+    },
+    {
+      "id": "gtfo-livery-ch47f-19thhb-pack",
+      "name": "CH-47F Chinook // 19th HB Complete Pack (Line, CO & XO)",
+      "description": "Complete 19th Heavy Helicopter Battalion livery suite for the CH-47F Chinook, including the standard 19thHB line livery plus the CO (Commanding Officer) and XO (Executive Officer) command variants.",
+      "category": "livery",
+      "aircraftOrModule": "CH-47F",
+      "version": "691e99c",
+      "author": "Global Task Force Overlord",
+      "imagePreviewUrl": "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1000&q=80",
+      "targetFolder": "Liveries/CH-47F",
+      "installFolderName": "19thHB",
+      "githubRepo": "pschilly/gtfo-liveries",
+      "githubBranch": "main",
+      "githubPathPrefixes": [
+        "Liveries/CH-47F/19thHB/",
+        "Liveries/CH-47F/19thHB-CO/",
+        "Liveries/CH-47F/19thHB-XO/"
+      ],
+      "fileCount": 29,
+      "requiredTier": "core",
+      "requirementLevel": "required_core",
+      "downloadUrl": "https://github.com/pschilly/gtfo-liveries/tree/main/Liveries/CH-47F",
+      "sha256": "691e99c6bdbb979c2f5b937cc40460584a90aac2",
+      "fileSizeBytes": 581631351,
+      "updatedAt": "2026-10-17T20:00:00Z",
+      "featured": false,
+      "tags": ["CH-47F", "19thHB", "CO & XO Command", "Rotary"],
+      "changelog": [
+        "Installs 19thHB, 19thHB-CO, and 19thHB-XO into Saved Games\\DCS\\Liveries\\CH-47F"
+      ]
+    },
+    {
+      "id": "gtfo-livery-f100d-overlord",
+      "name": "F-100D Super Sabre // Global Task Force Overlord",
+      "description": "Official Global Task Force Overlord livery for the F-100D Super Sabre featuring custom metallic RoughMets and high-resolution exterior textures.",
+      "category": "livery",
+      "aircraftOrModule": "F-100D",
+      "version": "c5b9e0d",
+      "author": "Global Task Force Overlord",
+      "imagePreviewUrl": "https://images.unsplash.com/photo-1559067515-bf7d799b6d4d?auto=format&fit=crop&w=1000&q=80",
+      "targetFolder": "Liveries/F-100D",
+      "installFolderName": "Global Task Force Overlord",
+      "githubRepo": "pschilly/gtfo-liveries",
+      "githubBranch": "main",
+      "githubPathPrefixes": ["Liveries/F-100D/Global Task Force Overlord/"],
+      "fileCount": 17,
+      "requiredTier": "community",
+      "requirementLevel": "optional",
+      "downloadUrl": "https://github.com/pschilly/gtfo-liveries/tree/main/Liveries/F-100D/Global%20Task%20Force%20Overlord",
+      "sha256": "c5b9e0de047533942047dcc164132597d1f2f299",
+      "fileSizeBytes": 357917744,
+      "updatedAt": "2026-10-17T20:00:00Z",
+      "featured": false,
+      "tags": ["F-100D", "Century Series", "RoughMet"],
+      "changelog": [
+        "17 files synced from pschilly/gtfo-liveries (Liveries/F-100D/Global Task Force Overlord)"
+      ]
+    },
+    {
+      "id": "gtfo-livery-f14a-vf142-pack",
+      "name": "F-14A Tomcat // VF-142 Ghostriders (1976) Full Squadron Pack (AE200–AE213)",
+      "description": "Complete 1976 VF-142 Ghostriders carrier airwing collection for both F-14A-135-GR and F-14A-135-GR-Early (Bort numbers AE200 CAG through AE213). Includes shared base textures, AIM-54/AIM-7 textures, HGU-33 helmets, and flight suits.",
+      "category": "livery",
+      "aircraftOrModule": "F-14A-135-GR",
+      "version": "5773d4a",
+      "author": "Global Task Force Overlord",
+      "imagePreviewUrl": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1000&q=80",
+      "targetFolder": "Liveries",
+      "installFolderName": "F-14A-135-GR",
+      "githubRepo": "pschilly/gtfo-liveries",
+      "githubBranch": "main",
+      "githubPathPrefixes": ["Liveries/F-14A-135-GR/", "Liveries/F-14A-135-GR-Early/"],
+      "fileCount": 157,
+      "requiredTier": "community",
+      "requirementLevel": "optional",
+      "downloadUrl": "https://github.com/pschilly/gtfo-liveries/tree/main/Liveries/F-14A-135-GR",
+      "sha256": "5773d4a6428e3279c4d69e3a5076354cc5e55871",
+      "fileSizeBytes": 2533599606,
+      "updatedAt": "2026-10-17T20:00:00Z",
+      "featured": false,
+      "tags": ["F-14A-135-GR", "F-14A-135-GR-Early", "VF-142 Ghostriders", "AE200-AE213"],
+      "changelog": [
+        "Installs all 12 VF-142 Ghostriders aircraft (AE200–AE213) for both F-14A-135-GR and F-14A-135-GR-Early"
+      ]
+    }
+  ]
+}

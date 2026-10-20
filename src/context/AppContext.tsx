@@ -1,0 +1,1069 @@
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { DEFAULT_SETTINGS, STATIC_CONFIG } from '../config/constants';
+import { SAMPLE_MANIFEST } from '../data/sampleManifest';
+import {
+  buildFallbackMemberProfile,
+  GTFO_GRADE_META,
+  GTFO_SQUADRONS,
+  SAMPLE_ATC_PACKAGES,
+} from '../data/samplePortalData';
+import {
+  detectDcsPaths,
+  fetchMemberPortalProfile,
+  fetchStaticManifest,
+  inspectAtcRouteToolPresetsCommand,
+  installAssetCommand,
+  installAtcDtcFileCommand,
+  installAtcKneeboardCommand,
+  loadInstalledAssets,
+  mergeAtcRouteToolPresetCommand,
+  RoutePresetManifestInfo,
+  RoutePresetMergeResult,
+  scanExistingInstallations,
+  startDiscordOAuthCommand,
+  uninstallAssetCommand,
+  verifyAssetIntegrityCommand,
+  verifyDiscordAccessToken,
+} from '../services/tauriBridge';
+import {
+  AppSettings,
+  AssetItem,
+  AssetManifest,
+  AtcFlightPlanPackage,
+  DcsEnvironmentInfo,
+  DiscordUserSession,
+  DownloadProgressEvent,
+  InstalledAssetRecord,
+  InstalledAtcState,
+  IntegrityCheckResult,
+  MemberGradeLevel,
+  MemberPortalProfile,
+  NavigationTab,
+  TelemetryLogEntry,
+  UserTier,
+} from '../types';
+
+export interface MemberProfileOverridePatch {
+  rosterTier?: 'CORE' | 'Community';
+  grade?: MemberGradeLevel;
+  position?: MemberPortalProfile['position'];
+  squadronCode?: string | null;
+  secondarySquadronCode?: string | null;
+  timeServedMonths?: number;
+  flightHoursLogged?: number;
+}
+
+export interface RepairPromptState {
+  asset?: AssetItem;
+  record: InstalledAssetRecord;
+  result: IntegrityCheckResult;
+}
+
+interface AppContextValue {
+  activeTab: NavigationTab;
+  setActiveTab: (tab: NavigationTab) => void;
+  manifest: AssetManifest;
+  isSyncingManifest: boolean;
+  lastSyncedAt: string | null;
+  syncManifest: () => Promise<void>;
+  installedAssets: Record<string, InstalledAssetRecord>;
+  rescanLocalAssets: () => Promise<void>;
+  activeDownloads: Record<string, DownloadProgressEvent>;
+  dcsEnv: DcsEnvironmentInfo | null;
+  refreshDcsEnv: (overridePath?: string) => Promise<void>;
+  userSession: DiscordUserSession | null;
+  effectiveTier: UserTier;
+  memberProfile: MemberPortalProfile;
+  isPortalLive: boolean;
+  syncMemberPortal: () => Promise<void>;
+  overrideMemberProfile: (patch: MemberProfileOverridePatch) => void;
+  atcPackages: AtcFlightPlanPackage[];
+  installedAtc: InstalledAtcState;
+  deployAtcDtc: (pkg: AtcFlightPlanPackage) => Promise<void>;
+  mergeAtcRoutePreset: (pkg: AtcFlightPlanPackage) => Promise<RoutePresetMergeResult | null>;
+  deployAtcKneeboards: (pkg: AtcFlightPlanPackage) => Promise<void>;
+  deployFullAtcPackage: (pkg: AtcFlightPlanPackage) => Promise<void>;
+  inspectTheatreRouteLua: (theatreFileName: string) => Promise<RoutePresetManifestInfo>;
+  loginModalOpen: boolean;
+  setLoginModalOpen: (open: boolean) => void;
+  selectedAsset: AssetItem | null;
+  setSelectedAsset: (asset: AssetItem | null) => void;
+  settings: AppSettings;
+  updateSettings: (patch: Partial<AppSettings>) => void;
+  installAsset: (asset: AssetItem) => Promise<void>;
+  uninstallAsset: (assetId: string) => Promise<void>;
+  verifyAsset: (assetId: string) => Promise<boolean>;
+  verifyingAssetId: string | null;
+  lastVerifyResults: Record<string, IntegrityCheckResult>;
+  repairPrompt: RepairPromptState | null;
+  setRepairPrompt: (prompt: RepairPromptState | null) => void;
+  updateAllOutdated: () => Promise<void>;
+  installAllRequiredForUser: () => Promise<void>;
+  outdatedAssets: AssetItem[];
+  missingRequiredAssets: AssetItem[];
+  canAccessAsset: (asset: AssetItem) => boolean;
+  isRequiredForCurrentUser: (asset: AssetItem) => boolean;
+  isUpdateAvailable: (asset: AssetItem) => boolean;
+  loginWithDiscordOAuth: () => Promise<void>;
+  logoutDiscord: () => void;
+  hasConfirmedDcsPath: boolean;
+  pathOnboardingOpen: boolean;
+  setPathOnboardingOpen: (open: boolean) => void;
+  confirmDcsPath: (confirmedPath: string) => void;
+  logs: TelemetryLogEntry[];
+  clearLogs: () => void;
+  addLog: (
+    level: TelemetryLogEntry['level'],
+    source: TelemetryLogEntry['source'],
+    message: string
+  ) => void;
+}
+
+const AppContext = createContext<AppContextValue | undefined>(undefined);
+
+const STORAGE_KEYS = {
+  SETTINGS: 'gtfo_settings_v2',
+  SESSION: 'gtfo_discord_session_v2',
+  INSTALLED: 'gtfo_installed_assets_v2',
+  INSTALLED_ATC: 'gtfo_installed_atc_v2',
+  PORTAL_PROFILE: 'gtfo_member_profile_v5',
+  DCS_PATH_CONFIRMED: 'gtfo_dcs_path_confirmed_v1',
+};
+
+const DEFAULT_INSTALLED_ATC: InstalledAtcState = {
+  installedDtcIds: {},
+  mergedRoutePresets: {},
+  installedKneeboardIds: {},
+};
+
+export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [activeTab, setActiveTab] = useState<NavigationTab>('dashboard');
+  const [manifest, setManifest] = useState<AssetManifest>(SAMPLE_MANIFEST);
+  const [isSyncingManifest, setIsSyncingManifest] = useState(false);
+  const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(null);
+  const [installedAssets, setInstalledAssets] = useState<Record<string, InstalledAssetRecord>>({});
+  const [activeDownloads, setActiveDownloads] = useState<Record<string, DownloadProgressEvent>>({});
+  const [dcsEnv, setDcsEnv] = useState<DcsEnvironmentInfo | null>(null);
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [selectedAsset, setSelectedAsset] = useState<AssetItem | null>(null);
+  const [logs, setLogs] = useState<TelemetryLogEntry[]>([]);
+  const [isPortalLive, setIsPortalLive] = useState(false);
+  const [atcPackages, setAtcPackages] = useState<AtcFlightPlanPackage[]>(SAMPLE_ATC_PACKAGES);
+  const [verifyingAssetId, setVerifyingAssetId] = useState<string | null>(null);
+  const [lastVerifyResults, setLastVerifyResults] = useState<Record<string, IntegrityCheckResult>>(
+    {}
+  );
+  const [repairPrompt, setRepairPrompt] = useState<RepairPromptState | null>(null);
+
+  const [installedAtc, setInstalledAtc] = useState<InstalledAtcState>(() => {
+    const raw = localStorage.getItem(STORAGE_KEYS.INSTALLED_ATC);
+    if (raw) {
+      try {
+        return { ...DEFAULT_INSTALLED_ATC, ...JSON.parse(raw) };
+      } catch {
+        return DEFAULT_INSTALLED_ATC;
+      }
+    }
+    return DEFAULT_INSTALLED_ATC;
+  });
+
+  const [settings, setSettings] = useState<AppSettings>(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.SETTINGS);
+    if (saved) {
+      try {
+        return { ...DEFAULT_SETTINGS, ...JSON.parse(saved) };
+      } catch {
+        return DEFAULT_SETTINGS;
+      }
+    }
+    return DEFAULT_SETTINGS;
+  });
+
+  const [hasConfirmedDcsPath, setHasConfirmedDcsPath] = useState<boolean>(() => {
+    const cached = localStorage.getItem(STORAGE_KEYS.DCS_PATH_CONFIRMED);
+    if (cached === 'true') return true;
+    const saved = localStorage.getItem(STORAGE_KEYS.SETTINGS);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.hasConfirmedDcsPath) return true;
+      } catch {
+        // ignore
+      }
+    }
+    return false;
+  });
+
+  const [pathOnboardingOpen, setPathOnboardingOpen] = useState(false);
+
+  const [userSession, setUserSession] = useState<DiscordUserSession | null>(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.SESSION);
+    if (saved) {
+      try {
+        return JSON.parse(saved) as DiscordUserSession;
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  });
+
+  const baseDiscordTier: UserTier = useMemo(() => {
+    if (!userSession || !userSession.isGuildMember) return 'guest';
+    if (userSession.roleIds.includes(STATIC_CONFIG.coreRoleId)) {
+      return 'core';
+    }
+    if (userSession.roleIds.includes(STATIC_CONFIG.communityRoleId)) {
+      return 'community';
+    }
+    return 'guest';
+  }, [userSession]);
+
+  const [memberProfile, setMemberProfile] = useState<MemberPortalProfile>(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.PORTAL_PROFILE);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved) as MemberPortalProfile;
+        if (parsed && typeof parsed.grade === 'string' && parsed.gradeTitle) {
+          return parsed;
+        }
+      } catch {
+        // Ignore parse error
+      }
+    }
+    return buildFallbackMemberProfile(
+      userSession,
+      baseDiscordTier === 'guest' ? 'core' : baseDiscordTier
+    );
+  });
+
+  const effectiveTier: UserTier = useMemo(() => {
+    if (!userSession || !userSession.isGuildMember || baseDiscordTier === 'guest') {
+      return 'guest';
+    }
+    if (memberProfile?.rosterTier === 'CORE') {
+      return 'core';
+    }
+    if (memberProfile?.rosterTier === 'Community') {
+      return 'community';
+    }
+    return baseDiscordTier;
+  }, [baseDiscordTier, memberProfile?.rosterTier, userSession]);
+
+  const addLog = useCallback(
+    (
+      level: TelemetryLogEntry['level'],
+      source: TelemetryLogEntry['source'],
+      message: string
+    ) => {
+      const entry: TelemetryLogEntry = {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        timestamp: new Date().toLocaleTimeString([], {
+          hour12: false,
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        }),
+        level,
+        source,
+        message,
+      };
+      setLogs((prev) => [entry, ...prev.slice(0, 149)]);
+    },
+    []
+  );
+
+  const clearLogs = useCallback(() => setLogs([]), []);
+
+  const updateSettings = useCallback(
+    (patch: Partial<AppSettings>) => {
+      setSettings((prev) => {
+        const next = { ...prev, ...patch };
+        localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(next));
+        return next;
+      });
+      addLog('info', 'SYSTEM', 'Settings saved.');
+    },
+    [addLog]
+  );
+
+  const persistInstalledAtc = useCallback((next: InstalledAtcState) => {
+    localStorage.setItem(STORAGE_KEYS.INSTALLED_ATC, JSON.stringify(next));
+  }, []);
+
+  const refreshDcsEnv = useCallback(
+    async (overridePath?: string) => {
+      try {
+        const custom =
+          overridePath !== undefined
+            ? overridePath
+            : !settings.autoDetectDcsPath && settings.dcsSavedGamesPath
+            ? settings.dcsSavedGamesPath
+            : undefined;
+
+        const envInfo = await detectDcsPaths(custom);
+        setDcsEnv(envInfo);
+        if (!settings.dcsSavedGamesPath && envInfo.activeSavedGamesPath) {
+          setSettings((prev) => {
+            const next = { ...prev, dcsSavedGamesPath: envInfo.activeSavedGamesPath };
+            localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(next));
+            return next;
+          });
+        }
+        addLog(
+          'info',
+          'SYSTEM',
+          `Active DCS Saved Games directory: ${envInfo.activeSavedGamesPath}`
+        );
+      } catch (err) {
+        addLog('error', 'SYSTEM', `Failed to detect DCS Saved Games directory: ${String(err)}`);
+      }
+    },
+    [addLog, settings.autoDetectDcsPath, settings.dcsSavedGamesPath]
+  );
+
+  const syncMemberPortal = useCallback(async () => {
+    const tierForFallback = baseDiscordTier === 'guest' ? 'core' : baseDiscordTier;
+
+    addLog('info', 'PORTAL', 'Syncing Member Dossier from GTFO Member Portal...');
+
+    try {
+      const profileRes = await fetchMemberPortalProfile(
+        userSession,
+        tierForFallback,
+        STATIC_CONFIG.portalBaseUrl
+      );
+
+      setIsPortalLive(profileRes.fromLiveApi);
+
+      if (profileRes.fromLiveApi) {
+        setMemberProfile(profileRes.profile);
+        localStorage.setItem(STORAGE_KEYS.PORTAL_PROFILE, JSON.stringify(profileRes.profile));
+        addLog(
+          'success',
+          'PORTAL',
+          `Member Dossier synced (${profileRes.profile.grade} // ${
+            profileRes.profile.squadronAssignment?.code || 'Unassigned'
+          }).`
+        );
+      } else {
+        setMemberProfile((prev) => {
+          const updated: MemberPortalProfile = {
+            ...prev,
+            discordId: userSession?.id || prev.discordId,
+            callsign: userSession?.globalName || userSession?.username || prev.callsign,
+            lastPortalSyncAt: new Date().toISOString(),
+          };
+          localStorage.setItem(STORAGE_KEYS.PORTAL_PROFILE, JSON.stringify(updated));
+          return updated;
+        });
+        addLog('info', 'PORTAL', 'Member Dossier synchronized.');
+      }
+    } catch (err) {
+      addLog('warn', 'PORTAL', `Portal sync notice: ${String(err)}`);
+    }
+  }, [addLog, baseDiscordTier, userSession]);
+
+  const overrideMemberProfile = useCallback(
+    (patch: MemberProfileOverridePatch) => {
+      setMemberProfile((prev) => {
+        const gradeOrder: MemberGradeLevel[] = [
+          'G0',
+          'G1',
+          'G2',
+          'G3',
+          'G4',
+          'G5',
+          'G6',
+          'G7',
+          'G8',
+          'G9',
+          'G10',
+          'G11',
+        ];
+        const nextGradeKey = patch.grade ?? prev.grade;
+        const meta = GTFO_GRADE_META[nextGradeKey];
+        const idx = gradeOrder.indexOf(nextGradeKey);
+        const nextStepKey =
+          idx >= 0 && idx < gradeOrder.length - 1 ? gradeOrder[idx + 1] : undefined;
+
+        const nextPrimarySq =
+          patch.squadronCode === null
+            ? null
+            : patch.squadronCode !== undefined
+            ? GTFO_SQUADRONS[patch.squadronCode] || null
+            : prev.squadronAssignment;
+
+        const nextSecondarySq =
+          patch.secondarySquadronCode === null
+            ? null
+            : patch.secondarySquadronCode !== undefined
+            ? GTFO_SQUADRONS[patch.secondarySquadronCode] || null
+            : prev.secondarySquadronAssignment;
+
+        const next: MemberPortalProfile = {
+          ...prev,
+          rosterTier: patch.rosterTier ?? prev.rosterTier,
+          position: patch.position ?? prev.position,
+          grade: nextGradeKey,
+          gradeTitle: meta.title,
+          gradeIconUrl: meta.iconUrl,
+          currentGradeXpRequired: meta.xpRequired,
+          timeServedMonths:
+            patch.timeServedMonths ??
+            (patch.grade !== undefined ? Math.max(1, meta.monthsRequired) : prev.timeServedMonths),
+          nextGrade: nextStepKey
+            ? {
+                grade: nextStepKey,
+                xpRequired: GTFO_GRADE_META[nextStepKey].xpRequired,
+                monthsRequired: GTFO_GRADE_META[nextStepKey].monthsRequired,
+              }
+            : undefined,
+          squadronAssignment: nextPrimarySq,
+          secondarySquadronAssignment: nextSecondarySq,
+          flightHoursLogged: patch.flightHoursLogged ?? prev.flightHoursLogged,
+        };
+        localStorage.setItem(STORAGE_KEYS.PORTAL_PROFILE, JSON.stringify(next));
+        return next;
+      });
+      addLog(
+        'info',
+        'PORTAL',
+        'Updated Member Dossier preview state (Grade / Squadron / Roster status).'
+      );
+    },
+    [addLog]
+  );
+
+  const syncManifest = useCallback(async () => {
+    setIsSyncingManifest(true);
+    addLog('info', 'MANIFEST', 'Syncing asset manifest from GTFO Member Portal...');
+    try {
+      const remote = await fetchStaticManifest(
+        STATIC_CONFIG.portalBaseUrl,
+        userSession?.accessToken
+      );
+      setManifest(remote);
+      const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      setLastSyncedAt(now);
+      addLog(
+        'success',
+        'MANIFEST',
+        `Manifest v${remote.manifestVersion} synced (${remote.assets.length} packages available).`
+      );
+    } catch (err) {
+      addLog('warn', 'MANIFEST', `Manifest sync notice: ${String(err)}`);
+    } finally {
+      setIsSyncingManifest(false);
+    }
+  }, [addLog, userSession?.accessToken]);
+
+  const persistInstalledMap = useCallback((nextMap: Record<string, InstalledAssetRecord>) => {
+    localStorage.setItem(STORAGE_KEYS.INSTALLED, JSON.stringify(Object.values(nextMap)));
+  }, []);
+
+  const rescanLocalAssets = useCallback(async () => {
+    const activePath =
+      settings.dcsSavedGamesPath || dcsEnv?.activeSavedGamesPath;
+    if (!activePath) return;
+
+    try {
+      const records = await scanExistingInstallations(activePath, manifest.assets);
+      const map: Record<string, InstalledAssetRecord> = {};
+      for (const r of records) {
+        map[r.assetId] = r;
+      }
+      setInstalledAssets(map);
+      persistInstalledMap(map);
+      if (records.length > 0) {
+        addLog(
+          'info',
+          'INSTALLER',
+          `Detected ${records.length} installed GTFO package(s) in ${activePath}`
+        );
+      }
+    } catch (err) {
+      addLog('warn', 'INSTALLER', `Local DCS folder scan notice: ${String(err)}`);
+    }
+  }, [addLog, dcsEnv?.activeSavedGamesPath, manifest.assets, persistInstalledMap, settings.dcsSavedGamesPath]);
+
+  useEffect(() => {
+    addLog('info', 'SYSTEM', `${STATIC_CONFIG.appTitle} initialized.`);
+    refreshDcsEnv();
+
+    syncManifest();
+    syncMemberPortal();
+
+    if (window.location.hash.includes('access_token=')) {
+      const params = new URLSearchParams(window.location.hash.slice(1));
+      const token = params.get('access_token');
+      window.history.replaceState({}, document.title, window.location.pathname);
+      if (token) {
+        verifyDiscordAccessToken(token)
+          .then((session) => {
+            setUserSession(session);
+            localStorage.setItem(STORAGE_KEYS.SESSION, JSON.stringify(session));
+            addLog(
+              'success',
+              'AUTH',
+              `Authenticated as ${session.globalName} — Assigned Tier: ${session.tier.toUpperCase()}`
+            );
+          })
+          .catch((err) => {
+            addLog('error', 'AUTH', `Discord verification error: ${String(err)}`);
+          });
+      }
+    } else if (userSession?.accessToken) {
+      verifyDiscordAccessToken(userSession.accessToken)
+        .then((fresh) => {
+          setUserSession(fresh);
+          localStorage.setItem(STORAGE_KEYS.SESSION, JSON.stringify(fresh));
+        })
+        .catch(() => {
+          // Keep cached session if offline
+        });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (userSession?.id) {
+      syncMemberPortal();
+      syncManifest();
+    }
+  }, [userSession?.id, syncMemberPortal, syncManifest]);
+
+  // Periodic background polling (every 10 minutes) & window refocus sync
+  useEffect(() => {
+    const POLL_INTERVAL_MS = 10 * 60 * 1000; // 10 minutes
+    const intervalId = setInterval(() => {
+      syncManifest();
+      syncMemberPortal();
+    }, POLL_INTERVAL_MS);
+
+    let lastFocusSync = Date.now();
+    const handleFocus = () => {
+      // Throttle focus sync to once every 2 minutes
+      if (Date.now() - lastFocusSync > 2 * 60 * 1000) {
+        lastFocusSync = Date.now();
+        syncManifest();
+        syncMemberPortal();
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => {
+      clearInterval(intervalId);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [syncManifest, syncMemberPortal]);
+
+  useEffect(() => {
+    const activePath = settings.dcsSavedGamesPath || dcsEnv?.activeSavedGamesPath;
+    if (activePath && manifest.assets.length > 0) {
+      rescanLocalAssets();
+    } else if (manifest.assets.length === 0) {
+      setInstalledAssets({});
+    }
+  }, [dcsEnv?.activeSavedGamesPath, settings.dcsSavedGamesPath, manifest.assets, rescanLocalAssets]);
+
+  const canAccessAsset = useCallback(
+    (asset: AssetItem): boolean => {
+      if (asset.requiredTier === 'community') {
+        return effectiveTier === 'community' || effectiveTier === 'core';
+      }
+      if (asset.requiredTier === 'core') {
+        return effectiveTier === 'core';
+      }
+      return false;
+    },
+    [effectiveTier]
+  );
+
+  const isRequiredForCurrentUser = useCallback(
+    (asset: AssetItem): boolean => {
+      if (asset.requirementLevel === 'required_all') {
+        return true;
+      }
+      if (asset.requirementLevel === 'required_core' && effectiveTier === 'core') {
+        return true;
+      }
+      return false;
+    },
+    [effectiveTier]
+  );
+
+  const isUpdateAvailable = useCallback(
+    (asset: AssetItem): boolean => {
+      const installed = installedAssets[asset.id];
+      if (!installed) return false;
+      return installed.installedVersion !== asset.version;
+    },
+    [installedAssets]
+  );
+
+  const outdatedAssets = useMemo(() => {
+    return manifest.assets.filter((asset) => isUpdateAvailable(asset));
+  }, [manifest.assets, isUpdateAvailable]);
+
+  const missingRequiredAssets = useMemo(() => {
+    return manifest.assets.filter(
+      (asset) =>
+        isRequiredForCurrentUser(asset) &&
+        canAccessAsset(asset) &&
+        (!installedAssets[asset.id] || isUpdateAvailable(asset))
+    );
+  }, [manifest.assets, isRequiredForCurrentUser, canAccessAsset, installedAssets, isUpdateAvailable]);
+
+  const installAsset = useCallback(
+    async (asset: AssetItem) => {
+      if (!canAccessAsset(asset)) {
+        addLog(
+          'warn',
+          'AUTH',
+          `Access denied for "${asset.name}": Requires ${
+            asset.requiredTier === 'core' ? 'CORE Roster' : 'Community Member'
+          } Discord role.`
+        );
+        setLoginModalOpen(true);
+        return;
+      }
+
+      const targetBase =
+        settings.dcsSavedGamesPath ||
+        dcsEnv?.activeSavedGamesPath ||
+        'C:\\Users\\Pilot\\Saved Games\\DCS';
+
+      addLog(
+        'info',
+        'INSTALLER',
+        `Starting deployment of "${asset.name}" (${asset.version}) -> ${targetBase}\\${asset.targetFolder.replace(
+          /\//g,
+          '\\'
+        )}`
+      );
+
+      setActiveDownloads((prev) => ({
+        ...prev,
+        [asset.id]: {
+          assetId: asset.id,
+          stage: 'connecting',
+          bytesDownloaded: 0,
+          totalBytes: asset.fileSizeBytes,
+          percent: 1,
+          message: 'Initializing deployment...',
+        },
+      }));
+
+      try {
+        const record = await installAssetCommand(
+          asset,
+          targetBase,
+          settings.verifyFileHash,
+          (progress) => {
+            setActiveDownloads((prev) => ({
+              ...prev,
+              [asset.id]: progress,
+            }));
+          }
+        );
+
+        setInstalledAssets((prev) => {
+          const next = { ...prev, [asset.id]: record };
+          persistInstalledMap(next);
+          return next;
+        });
+
+        setLastVerifyResults((prev) => ({
+          ...prev,
+          [asset.id]: {
+            valid: true,
+            missingFiles: [],
+            modifiedFiles: [],
+            checkedCount: record.extractedFiles.length,
+          },
+        }));
+
+        setRepairPrompt((prev) => (prev && prev.record.assetId === asset.id ? null : prev));
+
+        addLog(
+          'success',
+          'INSTALLER',
+          `Successfully deployed "${asset.name}" (${asset.version}) to ${record.installedPath}`
+        );
+      } catch (err) {
+        addLog('error', 'INSTALLER', `Deployment failed for "${asset.name}": ${String(err)}`);
+      } finally {
+        setTimeout(() => {
+          setActiveDownloads((prev) => {
+            const copy = { ...prev };
+            delete copy[asset.id];
+            return copy;
+          });
+        }, 1200);
+      }
+    },
+    [
+      addLog,
+      canAccessAsset,
+      dcsEnv?.activeSavedGamesPath,
+      persistInstalledMap,
+      settings.dcsSavedGamesPath,
+      settings.verifyFileHash,
+    ]
+  );
+
+  const uninstallAsset = useCallback(
+    async (assetId: string) => {
+      const record = installedAssets[assetId];
+      if (!record) return;
+
+      const targetBase =
+        settings.dcsSavedGamesPath ||
+        dcsEnv?.activeSavedGamesPath ||
+        'C:\\Users\\Pilot\\Saved Games\\DCS';
+
+      addLog('info', 'INSTALLER', `Removing "${record.name}" from ${record.installedPath}...`);
+      try {
+        await uninstallAssetCommand(record, targetBase);
+        setInstalledAssets((prev) => {
+          const next = { ...prev };
+          delete next[assetId];
+          persistInstalledMap(next);
+          return next;
+        });
+        addLog('success', 'INSTALLER', `Cleanly uninstalled "${record.name}".`);
+      } catch (err) {
+        addLog('error', 'INSTALLER', `Failed to uninstall "${record.name}": ${String(err)}`);
+      }
+    },
+    [addLog, dcsEnv?.activeSavedGamesPath, installedAssets, persistInstalledMap, settings.dcsSavedGamesPath]
+  );
+
+  const verifyAsset = useCallback(
+    async (assetId: string): Promise<boolean> => {
+      const record = installedAssets[assetId];
+      if (!record) return false;
+
+      const remoteAsset = manifest.assets.find((a) => a.id === assetId);
+      const targetBase =
+        settings.dcsSavedGamesPath ||
+        dcsEnv?.activeSavedGamesPath ||
+        'C:\\Users\\Pilot\\Saved Games\\DCS';
+
+      setVerifyingAssetId(assetId);
+      addLog('info', 'INSTALLER', `Verifying local file integrity for "${record.name}"...`);
+      try {
+        const res = await verifyAssetIntegrityCommand(record, remoteAsset, targetBase);
+        setLastVerifyResults((prev) => ({
+          ...prev,
+          [assetId]: res,
+        }));
+
+        if (res.valid) {
+          addLog(
+            'success',
+            'INSTALLER',
+            `Integrity check passed for "${record.name}" (${
+              res.checkedCount || record.extractedFiles.length
+            } file(s) verified).`
+          );
+          return true;
+        } else {
+          const missingCount = res.missingFiles.length;
+          const modifiedCount = res.modifiedFiles?.length || 0;
+          addLog(
+            'warn',
+            'INSTALLER',
+            `Integrity mismatch for "${record.name}": ${missingCount} missing, ${modifiedCount} modified file(s).`
+          );
+          setRepairPrompt({
+            asset: remoteAsset,
+            record,
+            result: res,
+          });
+          return false;
+        }
+      } catch (err) {
+        addLog('error', 'INSTALLER', `Integrity check error: ${String(err)}`);
+        return false;
+      } finally {
+        setVerifyingAssetId(null);
+      }
+    },
+    [addLog, dcsEnv?.activeSavedGamesPath, installedAssets, manifest.assets, settings.dcsSavedGamesPath]
+  );
+
+  const updateAllOutdated = useCallback(async () => {
+    for (const asset of outdatedAssets) {
+      if (canAccessAsset(asset)) {
+        await installAsset(asset);
+      }
+    }
+  }, [canAccessAsset, installAsset, outdatedAssets]);
+
+  const installAllRequiredForUser = useCallback(async () => {
+    for (const asset of missingRequiredAssets) {
+      await installAsset(asset);
+    }
+  }, [installAsset, missingRequiredAssets]);
+
+  // --- ATC Deployment Actions ---
+  const deployAtcDtc = useCallback(
+    async (pkg: AtcFlightPlanPackage) => {
+      const targetBase =
+        settings.dcsSavedGamesPath ||
+        dcsEnv?.activeSavedGamesPath ||
+        'C:\\Users\\Pilot\\Saved Games\\DCS';
+
+      try {
+        const writtenPath = await installAtcDtcFileCommand(targetBase, pkg.dtcPackage);
+        setInstalledAtc((prev) => {
+          const next: InstalledAtcState = {
+            ...prev,
+            installedDtcIds: {
+              ...prev.installedDtcIds,
+              [pkg.id]: {
+                installedPath: writtenPath,
+                installedAt: new Date().toISOString(),
+              },
+            },
+          };
+          persistInstalledAtc(next);
+          return next;
+        });
+        addLog(
+          'success',
+          'ATC',
+          `Deployed DTC cartridge "${pkg.dtcPackage.fileName}" -> ${writtenPath}`
+        );
+      } catch (err) {
+        addLog('error', 'ATC', `Failed deploying DTC for "${pkg.missionTitle}": ${String(err)}`);
+      }
+    },
+    [addLog, dcsEnv?.activeSavedGamesPath, persistInstalledAtc, settings.dcsSavedGamesPath]
+  );
+
+  const mergeAtcRoutePreset = useCallback(
+    async (pkg: AtcFlightPlanPackage): Promise<RoutePresetMergeResult | null> => {
+      const targetBase =
+        settings.dcsSavedGamesPath ||
+        dcsEnv?.activeSavedGamesPath ||
+        'C:\\Users\\Pilot\\Saved Games\\DCS';
+
+      try {
+        const result = await mergeAtcRouteToolPresetCommand(targetBase, pkg.routePreset);
+        setInstalledAtc((prev) => {
+          const next: InstalledAtcState = {
+            ...prev,
+            mergedRoutePresets: {
+              ...prev.mergedRoutePresets,
+              [pkg.id]: {
+                theatre: pkg.routePreset.theatre,
+                filePath: result.filePath,
+                mergedAt: new Date().toISOString(),
+              },
+            },
+          };
+          persistInstalledAtc(next);
+          return next;
+        });
+        addLog(
+          'success',
+          'ATC',
+          `Route Tool Preset ["${pkg.routePreset.presetName}"] ${result.action} in ${result.filePath} (${result.presetNames.length} total preset(s) in theatre manifest).`
+        );
+        return result;
+      } catch (err) {
+        addLog(
+          'error',
+          'ATC',
+          `Failed merging Route Tool preset for "${pkg.missionTitle}": ${String(err)}`
+        );
+        return null;
+      }
+    },
+    [addLog, dcsEnv?.activeSavedGamesPath, persistInstalledAtc, settings.dcsSavedGamesPath]
+  );
+
+  const deployAtcKneeboards = useCallback(
+    async (pkg: AtcFlightPlanPackage) => {
+      if (!pkg.kneeboards.length) return;
+      const targetBase =
+        settings.dcsSavedGamesPath ||
+        dcsEnv?.activeSavedGamesPath ||
+        'C:\\Users\\Pilot\\Saved Games\\DCS';
+
+      try {
+        for (const kb of pkg.kneeboards) {
+          const writtenPath = await installAtcKneeboardCommand(targetBase, pkg, kb);
+          setInstalledAtc((prev) => {
+            const next: InstalledAtcState = {
+              ...prev,
+              installedKneeboardIds: {
+                ...prev.installedKneeboardIds,
+                [kb.id]: {
+                  installedPath: writtenPath,
+                  installedAt: new Date().toISOString(),
+                },
+              },
+            };
+            persistInstalledAtc(next);
+            return next;
+          });
+          addLog('success', 'ATC', `Installed Kneeboard "${kb.title}" -> ${writtenPath}`);
+        }
+      } catch (err) {
+        addLog('error', 'ATC', `Failed deploying Kneeboards for "${pkg.missionTitle}": ${String(err)}`);
+      }
+    },
+    [addLog, dcsEnv?.activeSavedGamesPath, persistInstalledAtc, settings.dcsSavedGamesPath]
+  );
+
+  const deployFullAtcPackage = useCallback(
+    async (pkg: AtcFlightPlanPackage) => {
+      addLog(
+        'info',
+        'ATC',
+        `Deploying complete ATC Flight Package "${pkg.operationName} // ${pkg.missionTitle}"...`
+      );
+      await deployAtcDtc(pkg);
+      await mergeAtcRoutePreset(pkg);
+      await deployAtcKneeboards(pkg);
+    },
+    [addLog, deployAtcDtc, deployAtcKneeboards, mergeAtcRoutePreset]
+  );
+
+  const inspectTheatreRouteLua = useCallback(
+    async (theatreFileName: string): Promise<RoutePresetManifestInfo> => {
+      const targetBase =
+        settings.dcsSavedGamesPath ||
+        dcsEnv?.activeSavedGamesPath ||
+        'C:\\Users\\Pilot\\Saved Games\\DCS';
+
+      return await inspectAtcRouteToolPresetsCommand(targetBase, theatreFileName);
+    },
+    [dcsEnv?.activeSavedGamesPath, settings.dcsSavedGamesPath]
+  );
+
+  const confirmDcsPath = useCallback(
+    (confirmedPath: string) => {
+      const clean = confirmedPath.trim();
+      setHasConfirmedDcsPath(true);
+      localStorage.setItem(STORAGE_KEYS.DCS_PATH_CONFIRMED, 'true');
+      updateSettings({
+        dcsSavedGamesPath: clean,
+        hasConfirmedDcsPath: true,
+      });
+      refreshDcsEnv(clean);
+      setPathOnboardingOpen(false);
+      addLog('success', 'SYSTEM', `DCS Saved Games directory confirmed: ${clean}`);
+    },
+    [addLog, refreshDcsEnv, updateSettings]
+  );
+
+  const loginWithDiscordOAuth = useCallback(async () => {
+    addLog('info', 'AUTH', 'Initiating Discord OAuth2 authentication...');
+    const session = await startDiscordOAuthCommand();
+    setUserSession(session);
+    localStorage.setItem(STORAGE_KEYS.SESSION, JSON.stringify(session));
+    const nextProfile = buildFallbackMemberProfile(session, session.tier);
+    setMemberProfile(nextProfile);
+    localStorage.setItem(STORAGE_KEYS.PORTAL_PROFILE, JSON.stringify(nextProfile));
+    addLog(
+      'success',
+      'AUTH',
+      `Authenticated as ${session.globalName} (@${session.username}) — Clearance: ${session.tier.toUpperCase()}`
+    );
+    if (!hasConfirmedDcsPath) {
+      setPathOnboardingOpen(true);
+    }
+  }, [addLog, hasConfirmedDcsPath]);
+
+  useEffect(() => {
+    const isVerifiedUser =
+      userSession &&
+      userSession.isGuildMember &&
+      userSession.tier !== 'guest';
+
+    if (isVerifiedUser && !hasConfirmedDcsPath) {
+      setPathOnboardingOpen(true);
+    }
+  }, [userSession, hasConfirmedDcsPath]);
+
+  const logoutDiscord = useCallback(() => {
+    setUserSession(null);
+    localStorage.removeItem(STORAGE_KEYS.SESSION);
+    addLog('info', 'AUTH', 'Signed out of Discord.');
+  }, [addLog]);
+
+  return (
+    <AppContext.Provider
+      value={{
+        activeTab,
+        setActiveTab,
+        manifest,
+        isSyncingManifest,
+        lastSyncedAt,
+        syncManifest,
+        installedAssets,
+        rescanLocalAssets,
+        activeDownloads,
+        dcsEnv,
+        refreshDcsEnv,
+        userSession,
+        effectiveTier,
+        memberProfile,
+        isPortalLive,
+        syncMemberPortal,
+        overrideMemberProfile,
+        atcPackages,
+        installedAtc,
+        deployAtcDtc,
+        mergeAtcRoutePreset,
+        deployAtcKneeboards,
+        deployFullAtcPackage,
+        inspectTheatreRouteLua,
+        loginModalOpen,
+        setLoginModalOpen,
+        selectedAsset,
+        setSelectedAsset,
+        settings,
+        updateSettings,
+        installAsset,
+        uninstallAsset,
+        verifyAsset,
+        verifyingAssetId,
+        lastVerifyResults,
+        repairPrompt,
+        setRepairPrompt,
+        updateAllOutdated,
+        installAllRequiredForUser,
+        outdatedAssets,
+        missingRequiredAssets,
+        canAccessAsset,
+        isRequiredForCurrentUser,
+        isUpdateAvailable,
+        loginWithDiscordOAuth,
+        logoutDiscord,
+        hasConfirmedDcsPath,
+        pathOnboardingOpen,
+        setPathOnboardingOpen,
+        confirmDcsPath,
+        logs,
+        clearLogs,
+        addLog,
+      }}
+    >
+      {children}
+    </AppContext.Provider>
+  );
+};
+
+export function useApp(): AppContextValue {
+  const ctx = useContext(AppContext);
+  if (!ctx) {
+    throw new Error('useApp must be used inside AppProvider');
+  }
+  return ctx;
+}

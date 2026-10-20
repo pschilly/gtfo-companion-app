@@ -1,0 +1,30 @@
+[package]
+name = "gtfo-companion-app"
+version = "1.0.0"
+description = "GTFO Companion App"
+authors = ["Global Task Force Overlord"]
+edition = "2021"
+
+[lib]
+name = "gtfo_companion_app_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+reqwest = { version = "0.12", default-features = false, features = ["json", "stream", "rustls-tls"] }
+tokio = { version = "1", features = ["full"] }
+futures-util = "0.3"
+zip = "2.2"
+sha1 = "0.10"
+sha2 = "0.10"
+hex = "0.4"
+base64 = "0.22"
+rand = "0.8"
+open = "5"
+chrono = { version = "0.4", features = ["serde"] }
+urlencoding = "2.1"
