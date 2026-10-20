@@ -74,7 +74,7 @@ export const Sidebar: React.FC = () => {
         },
         {
           id: 'qualifications',
-          label: 'Qualifications & HOPs',
+          label: 'Certifications',
           icon: <FileCheck2 className="w-4 h-4" />,
           badge: memberProfile?.certificates?.length || undefined,
         },

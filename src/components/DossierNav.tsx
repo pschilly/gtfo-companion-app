@@ -25,7 +25,7 @@ export const DossierNav: React.FC = () => {
     },
     {
       id: 'qualifications',
-      label: 'Qualifications & HOPs',
+      label: 'Certifications',
       icon: <FileCheck2 className="w-4 h-4" />,
       count: memberProfile.certificates?.length || 0,
     },

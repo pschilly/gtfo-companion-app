@@ -499,7 +499,7 @@ export const DashboardView: React.FC = () => {
           </div>
         </div>
 
-        {/* Qualifications Card */}
+        {/* Certifications Card */}
         <div
           onClick={() => setActiveTab('qualifications')}
           className="p-5 rounded-2xl bg-stone-900/90 border border-stone-800 hover:border-amber-500/50 cursor-pointer transition-all flex flex-col justify-between space-y-3 group shadow-lg hover:shadow-amber-500/5"
@@ -511,10 +511,10 @@ export const DashboardView: React.FC = () => {
               </div>
               <div className="min-w-0">
                 <h3 className="font-display font-bold text-stone-100 text-sm group-hover:text-amber-400 transition-colors truncate">
-                  Qualifications &amp; HOPs
+                  Certifications
                 </h3>
                 <p className="text-[11px] font-mono text-stone-400 truncate">
-                  Combat Syllabus &amp; Tests
+                  Earned Flight Credentials
                 </p>
               </div>
             </div>
@@ -525,7 +525,7 @@ export const DashboardView: React.FC = () => {
           <div className="flex items-center justify-between text-xs font-mono text-stone-400 pt-2.5 border-t border-stone-800/80">
             <span>+{totalCertXp.toLocaleString()} XP Earned</span>
             <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform flex items-center gap-1 font-semibold">
-              View Syllabus <ArrowRight className="w-3.5 h-3.5" />
+              View Certificates <ArrowRight className="w-3.5 h-3.5" />
             </span>
           </div>
         </div>
