@@ -292,7 +292,7 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
                 </div>
 
                 <p className="text-xs text-stone-400 leading-relaxed">
-                  Squadron flight modifications, airfield lighting packages, and mandatory server assets.
+                  Mandatory modifications required to access GTFO servers.
                 </p>
 
                 <div className="p-2.5 rounded-lg bg-stone-900/90 border border-stone-800/80 text-[11px] font-mono space-y-1">
@@ -378,16 +378,11 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
                 </div>
 
                 <p className="text-xs text-stone-400 leading-relaxed">
-                  Official squadron aircraft liveries and community paint schemes for your qualified airframes.
+                  Official squadron aircraft liveries and community paint schemes.
                 </p>
 
                 <div className="p-2.5 rounded-lg bg-stone-900/90 border border-stone-800/80 text-[11px] font-mono space-y-1">
-                  <div className="flex items-center justify-between text-stone-400">
-                    <span>Squadron:</span>
-                    <span className="text-stone-200 font-semibold truncate max-w-[120px]">
-                      {memberProfile?.squadronAssignment?.name || 'Community Wing'}
-                    </span>
-                  </div>
+                  
                   <div className="flex items-center justify-between text-stone-400">
                     <span>Installed Liveries:</span>
                     <span
@@ -397,7 +392,7 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
                     >
                       {missingRequiredLiveries.length > 0
                         ? `${missingRequiredLiveries.length} Required Missing`
-                        : `${installedLiveriesCount} package${installedLiveriesCount === 1 ? '' : 's'}`}
+                        : `${installedLiveriesCount}`}
                     </span>
                   </div>
                 </div>
@@ -466,7 +461,7 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
                 </div>
 
                 <p className="text-xs text-stone-400 leading-relaxed">
-                  Sets slot #1 in DCS <code className="text-stone-300 bg-stone-900 px-1 py-0.5 rounded">nicknames.lua</code> to match your official GTFO Discord server name.
+                  Automatically assigns your callsign in DCS in accordance with GTFO Charter.
                 </p>
 
                 {/* Nickname Comparison Card */}
@@ -558,7 +553,7 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
                 </div>
 
                 <p className="text-xs text-stone-400 leading-relaxed">
-                  Connects your DCS World account (UCID) to track server flight time, sortie logs, and check flight credentials.
+                  Connects your DCS World account (UCID) to track server flight time and sortie logs.
                 </p>
 
                 <div className="p-2.5 rounded-lg bg-stone-900/90 border border-stone-800/80 text-[11px] font-mono space-y-1">
