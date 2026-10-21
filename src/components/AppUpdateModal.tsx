@@ -99,7 +99,7 @@ export const AppUpdateModal: React.FC = () => {
         {/* Release Notes / Description */}
         <div className="space-y-3">
           <p className="text-xs text-stone-300">
-            A new version of the GTFO Companion App is ready to be installed with stability updates, tactical improvements, and simulator fixes.
+            A new version of the GTFO Companion App is ready to install.
           </p>
 
           {appUpdate.body && (
