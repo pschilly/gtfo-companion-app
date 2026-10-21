@@ -507,6 +507,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [addLog, dcsEnv?.activeSavedGamesPath, manifest.assets, persistInstalledMap, settings.dcsSavedGamesPath]);
 
+  const [appUpdate, setAppUpdate] = useState<AppUpdateInfo | null>(null);
+  const [isCheckingAppUpdate, setIsCheckingAppUpdate] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+
+  const checkForAppUpdateAction = useCallback(async (): Promise<AppUpdateInfo> => {
+    setIsCheckingAppUpdate(true);
+    try {
+      const info = await checkForAppUpdate();
+      setAppUpdate(info);
+      if (info.available) {
+        addLog('info', 'SYSTEM', `Companion App update v${info.version} available!`);
+      }
+      return info;
+    } finally {
+      setIsCheckingAppUpdate(false);
+    }
+  }, [addLog]);
+
   useEffect(() => {
     addLog('info', 'SYSTEM', `${STATIC_CONFIG.appTitle} initialized.`);
     refreshDcsEnv();
@@ -560,6 +578,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const intervalId = setInterval(() => {
       syncManifest();
       syncMemberPortal();
+      checkForAppUpdateAction();
     }, POLL_INTERVAL_MS);
 
     let lastFocusSync = Date.now();
@@ -569,6 +588,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         lastFocusSync = Date.now();
         syncManifest();
         syncMemberPortal();
+        checkForAppUpdateAction();
       }
     };
 
@@ -577,7 +597,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       clearInterval(intervalId);
       window.removeEventListener('focus', handleFocus);
     };
-  }, [syncManifest, syncMemberPortal]);
+  }, [syncManifest, syncMemberPortal, checkForAppUpdateAction]);
 
   useEffect(() => {
     const activePath = settings.dcsSavedGamesPath || dcsEnv?.activeSavedGamesPath;
@@ -648,24 +668,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       refreshDcsNickname();
     }
   }, [dcsEnv?.activeSavedGamesPath, settings.dcsSavedGamesPath, refreshDcsNickname]);
-
-  const [appUpdate, setAppUpdate] = useState<AppUpdateInfo | null>(null);
-  const [isCheckingAppUpdate, setIsCheckingAppUpdate] = useState(false);
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
-
-  const checkForAppUpdateAction = useCallback(async (): Promise<AppUpdateInfo> => {
-    setIsCheckingAppUpdate(true);
-    try {
-      const info = await checkForAppUpdate();
-      setAppUpdate(info);
-      if (info.available) {
-        addLog('info', 'SYSTEM', `Companion App update v${info.version} available!`);
-      }
-      return info;
-    } finally {
-      setIsCheckingAppUpdate(false);
-    }
-  }, [addLog]);
 
   const canAccessAsset = useCallback(
     (asset: AssetItem): boolean => {

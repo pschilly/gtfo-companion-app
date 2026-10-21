@@ -1,7 +1,7 @@
 {
   "name": "gtfo-companion-app",
   "private": true,
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "GTFO Companion App — DCS Asset Installer, Member Profile",
   "type": "module",
   "scripts": {
@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "tauri": "node --env-file-if-exists=.env ./node_modules/@tauri-apps/cli/tauri.js",
     "tauri:dev": "node --env-file-if-exists=.env ./node_modules/@tauri-apps/cli/tauri.js dev",
-    "tauri:build": "node --env-file-if-exists=.env ./node_modules/@tauri-apps/cli/tauri.js build"
+    "tauri:build": "node --env-file-if-exists=.env ./node_modules/@tauri-apps/cli/tauri.js build && node scripts/generate-updater-json.js"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",

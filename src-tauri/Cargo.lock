@@ -1288,7 +1288,7 @@ dependencies = [
 
 [[package]]
 name = "gtfo-companion-app"
-version = "0.0.2"
+version = "0.0.3"
 dependencies = [
  "base64 0.22.1",
  "chrono",
