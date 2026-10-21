@@ -26,7 +26,7 @@ try {
   // GitHub Releases action sanitizes spaces to dots in asset filenames
   const gitHubReleaseFile = rawInstallerFile.replace(/\s+/g, '.');
 
-  let version = '0.0.5';
+  let version = '0.0.6';
   if (fs.existsSync(pkgPath)) {
     const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
     version = pkg.version || version;

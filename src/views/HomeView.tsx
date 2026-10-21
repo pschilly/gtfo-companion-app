@@ -75,37 +75,7 @@ export const HomeView: React.FC = () => {
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-3 max-w-2xl">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 font-mono text-[11px] font-bold uppercase tracking-wider">
-                <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-                <span>GTFO Operations Hub</span>
-              </span>
-
-              {effectiveTier === 'core' ? (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 font-mono text-[11px] font-bold uppercase tracking-wider">
-                  <Sparkle className="w-3 h-3 text-amber-300" />
-                  CORE ROSTER
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-stone-800 border border-stone-700 text-stone-200 font-mono text-[11px] font-bold uppercase tracking-wider">
-                  COMMUNITY WING
-                </span>
-              )}
-
-              {missingRequiredAssets.length === 0 ? (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 font-mono text-[11px] font-bold uppercase tracking-wider">
-                  <CheckCircle className="w-3 h-3 text-emerald-400" />
-                  COMBAT READY
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-red-500/20 border border-red-500/40 text-red-300 font-mono text-[11px] font-bold uppercase tracking-wider animate-pulse">
-                  <Warning className="w-3 h-3 text-red-400" />
-                  {missingRequiredAssets.length} REQUIRED ASSETS MISSING
-                </span>
-              )}
-            </div>
-
-            <h1 className="font-display text-3xl sm:text-4xl font-extrabold text-stone-100 tracking-tight leading-tight">
+              <h1 className="font-display text-3xl sm:text-4xl font-extrabold text-stone-100 tracking-tight leading-tight">
               Welcome back,{' '}
               <span className="bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent">
                 {memberProfile.callsign || 'Pilot'}
