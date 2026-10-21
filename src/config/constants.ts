@@ -1,7 +1,7 @@
 import { AppSettings } from '../types';
 
 export const STATIC_CONFIG = {
-  appVersion: '0.0.4',
+  appVersion: '0.0.5',
   appTitle: 'Companion App',
   shortName: 'GTFO',
   fullName: 'GLOBAL TASK FORCE OVERLORD',

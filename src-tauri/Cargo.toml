@@ -1,6 +1,6 @@
 [package]
 name = "gtfo-companion-app"
-version = "0.0.4"
+version = "0.0.5"
 description = "GTFO Companion App"
 authors = ["Global Task Force Overlord"]
 edition = "2021"
