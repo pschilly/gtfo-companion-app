@@ -2,6 +2,7 @@ import React from 'react';
 import {
   AirplaneTilt,
   Certificate,
+  Check,
   ListChecks,
   Medal,
   SquaresFour,
@@ -16,7 +17,7 @@ export const DossierNav: React.FC = () => {
     id: NavigationTab;
     label: string;
     icon: React.ReactNode;
-    count?: number | string;
+    count?: React.ReactNode;
     badgeColor?: string;
   }[] = [
     {
@@ -28,7 +29,12 @@ export const DossierNav: React.FC = () => {
       id: 'checklist',
       label: 'Member Readiness',
       icon: <ListChecks className="w-4 h-4" />,
-      count: checklistSummary.pendingCount > 0 ? checklistSummary.pendingCount : '✓',
+      count:
+        checklistSummary.pendingCount > 0 ? (
+          checklistSummary.pendingCount
+        ) : (
+          <Check weight="bold" className="w-3 h-3" />
+        ),
       badgeColor:
         checklistSummary.pendingCount > 0
           ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
@@ -74,7 +80,7 @@ export const DossierNav: React.FC = () => {
             <span>{t.label}</span>
             {t.count !== undefined && (
               <span
-                className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+                className={`min-w-5 h-5 px-1.5 flex items-center justify-center rounded-full text-[10px] font-bold leading-none ${
                   isActive
                     ? 'bg-stone-950 text-amber-300'
                     : t.badgeColor || 'bg-stone-800 text-stone-300 border border-stone-700'

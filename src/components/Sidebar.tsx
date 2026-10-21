@@ -4,6 +4,7 @@ import {
   ArrowSquareOut,
   ArrowsClockwise,
   Certificate,
+  Check,
   Folder,
   Gear,
   HardDrive,
@@ -55,7 +56,7 @@ export const Sidebar: React.FC = () => {
       id: NavigationTab;
       label: string;
       icon: React.ReactNode;
-      badge?: number | string;
+      badge?: React.ReactNode;
       badgeColor?: string;
     }[];
   }[] = [
@@ -64,7 +65,7 @@ export const Sidebar: React.FC = () => {
       items: [
         {
           id: 'home',
-          label: 'House',
+          label: 'Home',
           icon: <House className="w-4 h-4" />,
         },
       ],
@@ -83,7 +84,12 @@ export const Sidebar: React.FC = () => {
           id: 'checklist',
           label: 'Member Readiness',
           icon: <ListChecks className="w-4 h-4" />,
-          badge: checklistSummary.pendingCount > 0 ? checklistSummary.pendingCount : '✓',
+          badge:
+            checklistSummary.pendingCount > 0 ? (
+              checklistSummary.pendingCount
+            ) : (
+              <Check weight="bold" className="w-2.5 h-2.5" />
+            ),
           badgeColor:
             checklistSummary.pendingCount > 0
               ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold'
@@ -203,7 +209,7 @@ export const Sidebar: React.FC = () => {
                         </div>
                         {item.badge !== undefined && item.badge !== 0 && (
                           <span
-                            className={`text-[10px] font-mono px-2 py-0.5 rounded-full ${
+                            className={`min-w-5 h-5 px-1.5 flex items-center justify-center text-[10px] font-mono leading-none rounded-full shrink-0 ${
                               item.badgeColor ||
                               (isActive
                                 ? 'bg-amber-500/20 text-amber-300'

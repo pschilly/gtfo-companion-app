@@ -27,14 +27,14 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
 
   return (
     <header className="h-16 bg-stone-950/85 backdrop-blur-md border-b border-stone-800/80 px-6 flex items-center justify-between gap-4 shrink-0">
-      {/* MagnifyingGlass Bar */}
+      {/* Search Bar */}
       <div className="relative flex-1 max-w-md">
         <MagnifyingGlass className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="MagnifyingGlass liveries, aircraft (F-16C, F/A-18C), mods, or tags..."
+          placeholder="Search liveries, aircraft (F-16C, F/A-18C), mods, or tags..."
           className="w-full pl-10 pr-4 py-2 rounded-xl bg-stone-900/90 border border-stone-800 text-sm text-stone-100 placeholder:text-stone-500 focus:outline-none focus:border-amber-500/60 focus:ring-1 focus:ring-amber-500/30 transition-all"
         />
         {searchQuery && (
