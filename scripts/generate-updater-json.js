@@ -21,7 +21,9 @@ try {
   }
 
   const sigContent = fs.readFileSync(path.join(nsisDir, sigFile), 'utf8').trim();
-  const installerFile = sigFile.replace(/\.sig$/, '');
+  const rawInstallerFile = sigFile.replace(/\.sig$/, '');
+  // GitHub Releases action sanitizes spaces to dots in asset filenames
+  const gitHubReleaseFile = rawInstallerFile.replace(/\s+/g, '.');
 
   let version = '0.0.3';
   if (fs.existsSync(pkgPath)) {
@@ -38,7 +40,7 @@ try {
     platforms: {
       'windows-x86_64': {
         signature: sigContent,
-        url: `https://github.com/pschilly/gtfo-companion-app/releases/download/${tag}/${installerFile}`,
+        url: `https://github.com/pschilly/gtfo-companion-app/releases/download/${tag}/${gitHubReleaseFile}`,
       },
     },
   };
