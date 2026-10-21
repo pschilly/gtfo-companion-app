@@ -11,6 +11,7 @@ import {
 } from '@phosphor-icons/react';
 import { useApp } from '../context/AppContext';
 import { downloadAndInstallUpdate, relaunchApp } from '../services/updaterService';
+import { STATIC_CONFIG } from '../config/constants';
 import { formatBytes } from '../utils/formatters';
 
 export const AppUpdateModal: React.FC = () => {
@@ -80,7 +81,7 @@ export const AppUpdateModal: React.FC = () => {
                 </span>
               </div>
               <p className="text-xs text-stone-400 mt-0.5">
-                Current: v{appUpdate.currentVersion || '1.0.0'} &bull; Published: {appUpdate.date || 'Recent'}
+                Current: v{appUpdate.currentVersion || STATIC_CONFIG.appVersion} &bull; Published: {appUpdate.date || 'Recent'}
               </p>
             </div>
           </div>

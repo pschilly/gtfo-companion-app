@@ -216,7 +216,7 @@ export const PathOnboardingModal: React.FC = () => {
             <p className="leading-relaxed">
               Your path choice is cached locally and will not prompt you on future logins. You can
               freely re-point or update this path at any time under{' '}
-              <span className="text-stone-200 font-semibold">System Gear</span>.
+              <span className="text-stone-200 font-semibold">System Settings</span>.
             </p>
           </div>
 

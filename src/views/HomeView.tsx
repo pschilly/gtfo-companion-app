@@ -238,47 +238,44 @@ export const HomeView: React.FC = () => {
         </div>
 
         <div
-          onClick={() => {
-            if (missingRequiredAssets.length > 0) {
-              installAllRequiredForUser();
-            } else {
-              setActiveTab('library');
-            }
-          }}
+          onClick={() => setActiveTab('checklist')}
           className={`p-4 rounded-2xl bg-stone-900/90 border transition-all cursor-pointer flex items-center justify-between shadow-md group ${
-            missingRequiredAssets.length > 0
-              ? 'border-red-500/40 hover:border-red-500/70 bg-red-950/10'
+            !checklistSummary.allComplete
+              ? 'border-amber-500/40 hover:border-amber-500/70 bg-amber-950/10'
               : 'border-stone-800 hover:border-emerald-500/40'
           }`}
+          title="View Member Readiness checklist"
         >
           <div>
             <p className="text-[11px] font-mono uppercase text-stone-400">Flight Readiness</p>
             <p
               className={`text-2xl font-bold font-display mt-1 ${
-                missingRequiredAssets.length > 0 ? 'text-red-400' : 'text-emerald-400'
+                !checklistSummary.allComplete ? 'text-amber-400' : 'text-emerald-400'
               }`}
             >
-              {missingRequiredAssets.length > 0
-                ? `${missingRequiredAssets.length} Missing`
+              {!checklistSummary.allComplete
+                ? `${checklistSummary.pendingCount} Pending`
                 : '100% Ready'}
             </p>
             <p className="text-[11px] font-mono text-stone-400 mt-0.5">
-              {missingRequiredAssets.length > 0 ? (
-                <span className="text-red-400/90 font-semibold group-hover:underline">Deploy Required Assets</span>
+              {!checklistSummary.allComplete ? (
+                <span className="text-amber-400/90 font-semibold group-hover:underline">
+                  Review Member Readiness
+                </span>
               ) : (
-                <span>All required assets active</span>
+                <span>All readiness checks passed</span>
               )}
             </p>
           </div>
           <div
             className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform ${
-              missingRequiredAssets.length > 0
-                ? 'bg-red-500/10 border border-red-500/30'
+              !checklistSummary.allComplete
+                ? 'bg-amber-500/10 border border-amber-500/30'
                 : 'bg-emerald-500/10 border border-emerald-500/30'
             }`}
           >
-            {missingRequiredAssets.length > 0 ? (
-              <Warning className="w-5 h-5 text-red-400 animate-pulse" />
+            {!checklistSummary.allComplete ? (
+              <ListChecks className="w-5 h-5 text-amber-400" />
             ) : (
               <ShieldCheck className="w-5 h-5 text-emerald-400" />
             )}

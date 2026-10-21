@@ -1,6 +1,8 @@
 import { check, Update } from '@tauri-apps/plugin-updater';
 import { relaunch } from '@tauri-apps/plugin-process';
+import { getVersion } from '@tauri-apps/api/app';
 import { isTauriRuntime } from './tauriBridge';
+import { STATIC_CONFIG } from '../config/constants';
 
 export interface AppUpdateInfo {
   available: boolean;
@@ -21,10 +23,19 @@ export type UpdateDownloadProgressCallback = (
  * Checks GitHub Releases endpoint for an available application update.
  */
 export async function checkForAppUpdate(): Promise<AppUpdateInfo> {
+  let runtimeVersion: string = STATIC_CONFIG.appVersion;
+  if (isTauriRuntime()) {
+    try {
+      runtimeVersion = await getVersion();
+    } catch {
+      // Fallback to STATIC_CONFIG
+    }
+  }
+
   if (!isTauriRuntime()) {
     return {
       available: false,
-      currentVersion: '1.0.0',
+      currentVersion: runtimeVersion,
     };
   }
 
@@ -33,14 +44,14 @@ export async function checkForAppUpdate(): Promise<AppUpdateInfo> {
     if (!update) {
       return {
         available: false,
-        currentVersion: '1.0.0',
+        currentVersion: runtimeVersion,
       };
     }
 
     return {
       available: true,
       version: update.version,
-      currentVersion: update.currentVersion,
+      currentVersion: update.currentVersion || runtimeVersion,
       body: update.body || undefined,
       date: update.date || undefined,
       rawUpdate: update,
