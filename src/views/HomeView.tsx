@@ -1,25 +1,26 @@
 import React, { useMemo } from 'react';
 import {
-  AlertTriangle,
+  AirplaneTilt,
+  ArrowCircleUp,
   ArrowRight,
-  ArrowUpCircle,
-  Award,
-  CheckCircle2,
-  Download,
-  ExternalLink,
-  FileCheck2,
-  FolderCheck,
+  ArrowSquareOut,
+  Certificate,
+  CheckCircle,
+  DownloadSimple,
+  Folder,
   HardDrive,
-  LayoutDashboard,
+  ListChecks,
+  Medal,
   Package,
-  Paintbrush,
-  Plane,
+  PaintBrush,
   Shield,
-  ShieldAlert,
   ShieldCheck,
-  Sparkles,
+  ShieldWarning,
+  Sparkle,
+  SquaresFour,
   Users,
-} from 'lucide-react';
+  Warning,
+} from '@phosphor-icons/react';
 import { AssetCard } from '../components/AssetCard';
 import { STATIC_CONFIG } from '../config/constants';
 import { useApp } from '../context/AppContext';
@@ -37,6 +38,7 @@ export const HomeView: React.FC = () => {
     updateAllOutdated,
     installAllRequiredForUser,
     dcsEnv,
+    checklistSummary,
   } = useApp();
 
   const totalAssets = manifest.assets.length;
@@ -81,7 +83,7 @@ export const HomeView: React.FC = () => {
 
               {effectiveTier === 'core' ? (
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 font-mono text-[11px] font-bold uppercase tracking-wider">
-                  <Sparkles className="w-3 h-3 text-amber-300" />
+                  <Sparkle className="w-3 h-3 text-amber-300" />
                   CORE ROSTER
                 </span>
               ) : (
@@ -92,12 +94,12 @@ export const HomeView: React.FC = () => {
 
               {missingRequiredAssets.length === 0 ? (
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 font-mono text-[11px] font-bold uppercase tracking-wider">
-                  <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                  <CheckCircle className="w-3 h-3 text-emerald-400" />
                   COMBAT READY
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-red-500/20 border border-red-500/40 text-red-300 font-mono text-[11px] font-bold uppercase tracking-wider animate-pulse">
-                  <AlertTriangle className="w-3 h-3 text-red-400" />
+                  <Warning className="w-3 h-3 text-red-400" />
                   {missingRequiredAssets.length} REQUIRED ASSETS MISSING
                 </span>
               )}
@@ -122,7 +124,7 @@ export const HomeView: React.FC = () => {
                 onClick={installAllRequiredForUser}
                 className="px-5 py-3 rounded-2xl bg-red-600 hover:bg-red-500 text-white font-mono font-bold text-xs flex items-center justify-center gap-2.5 transition-all shadow-lg shadow-red-950/50 hover:scale-[1.02]"
               >
-                <Download className="w-4 h-4 animate-bounce" />
+                <DownloadSimple className="w-4 h-4 animate-bounce" />
                 <span>Deploy {missingRequiredAssets.length} Required Assets</span>
               </button>
             ) : outdatedAssets.length > 0 ? (
@@ -130,7 +132,7 @@ export const HomeView: React.FC = () => {
                 onClick={updateAllOutdated}
                 className="px-5 py-3 rounded-2xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono font-bold text-xs flex items-center justify-center gap-2.5 transition-all shadow-lg shadow-amber-500/20 hover:scale-[1.02]"
               >
-                <ArrowUpCircle className="w-4 h-4" />
+                <ArrowCircleUp className="w-4 h-4" />
                 <span>Update {outdatedAssets.length} Packages</span>
               </button>
             ) : null}
@@ -140,7 +142,7 @@ export const HomeView: React.FC = () => {
                 onClick={() => setActiveTab('liveries')}
                 className="px-4 py-2.5 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-700 text-amber-400 font-mono text-xs font-semibold flex items-center gap-2 transition-colors"
               >
-                <Paintbrush className="w-4 h-4" />
+                <PaintBrush className="w-4 h-4" />
                 <span>Browse Hangar</span>
               </button>
 
@@ -148,13 +150,54 @@ export const HomeView: React.FC = () => {
                 onClick={() => setActiveTab('dashboard')}
                 className="px-4 py-2.5 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-700 text-stone-200 font-mono text-xs font-semibold flex items-center gap-2 transition-colors"
               >
-                <LayoutDashboard className="w-4 h-4 text-stone-400" />
+                <SquaresFour className="w-4 h-4 text-stone-400" />
                 <span>Pilot Dossier</span>
               </button>
             </div>
           </div>
         </div>
       </div>
+
+      {/* PENDING ONBOARDING ACTION NOTIFICATION (Only shown if checklist items require attention) */}
+      {!checklistSummary.allComplete && (
+        <div
+          onClick={() => setActiveTab('checklist')}
+          className="relative rounded-2xl p-4 sm:p-5 bg-gradient-to-r from-amber-500/15 via-stone-900/95 to-stone-900/90 border border-amber-500/40 shadow-xl hover:border-amber-400 cursor-pointer transition-all group flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+        >
+          <div className="flex items-start sm:items-center gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-md shadow-amber-500/10">
+              <ListChecks className="w-5 h-5 text-amber-400" />
+            </div>
+
+            <div className="space-y-0.5">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-display font-bold text-stone-100 text-sm sm:text-base">
+                  Member Readiness: Action Required
+                </span>
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono text-[10px] font-bold uppercase tracking-wider border border-amber-500/30">
+                  {checklistSummary.pendingCount} Item{checklistSummary.pendingCount === 1 ? '' : 's'} Pending
+                </span>
+              </div>
+              <p className="text-xs text-stone-300">
+                You have {checklistSummary.pendingCount} incomplete onboarding step{checklistSummary.pendingCount === 1 ? '' : 's'}. Review required flight mods, liveries, DCS callsign tag, and bot linkage.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveTab('checklist');
+              }}
+              className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono font-bold text-xs flex items-center gap-2 transition-all shadow-md shadow-amber-500/20 group-hover:translate-x-0.5"
+            >
+              <span>View Checklist</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* TELEMETRY & STATS STRIP */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -190,7 +233,7 @@ export const HomeView: React.FC = () => {
             </p>
           </div>
           <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center group-hover:scale-105 transition-transform">
-            <FolderCheck className="w-5 h-5 text-emerald-400" />
+            <Folder className="w-5 h-5 text-emerald-400" />
           </div>
         </div>
 
@@ -235,7 +278,7 @@ export const HomeView: React.FC = () => {
             }`}
           >
             {missingRequiredAssets.length > 0 ? (
-              <AlertTriangle className="w-5 h-5 text-red-400 animate-pulse" />
+              <Warning className="w-5 h-5 text-red-400 animate-pulse" />
             ) : (
               <ShieldCheck className="w-5 h-5 text-emerald-400" />
             )}
@@ -305,7 +348,7 @@ export const HomeView: React.FC = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                <LayoutDashboard className="w-5 h-5 text-amber-400" />
+                <SquaresFour className="w-5 h-5 text-amber-400" />
               </div>
               <div>
                 <h3 className="font-display font-bold text-stone-100 text-sm group-hover:text-amber-400 transition-colors">
@@ -335,7 +378,7 @@ export const HomeView: React.FC = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                <Paintbrush className="w-5 h-5 text-amber-400" />
+                <PaintBrush className="w-5 h-5 text-amber-400" />
               </div>
               <div>
                 <h3 className="font-display font-bold text-stone-100 text-sm group-hover:text-amber-400 transition-colors">
@@ -367,7 +410,7 @@ export const HomeView: React.FC = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                <ExternalLink className="w-5 h-5 text-amber-400" />
+                <ArrowSquareOut className="w-5 h-5 text-amber-400" />
               </div>
               <div>
                 <h3 className="font-display font-bold text-stone-100 text-sm group-hover:text-amber-400 transition-colors">
@@ -378,7 +421,7 @@ export const HomeView: React.FC = () => {
                 </p>
               </div>
             </div>
-            <ExternalLink className="w-4 h-4 text-stone-500 group-hover:text-amber-400 group-hover:translate-x-0.5 transition-all" />
+            <ArrowSquareOut className="w-4 h-4 text-stone-500 group-hover:text-amber-400 group-hover:translate-x-0.5 transition-all" />
           </div>
           <p className="text-xs text-stone-400 leading-relaxed">
             Access training materials, squadron SOPs, standard flight communications, and server connection guides.

@@ -1,13 +1,13 @@
 import React, { useMemo } from 'react';
 import {
-  ExternalLink,
+  AirplaneTilt,
+  ArrowSquareOut,
   GraduationCap,
-  Paintbrush,
-  Plane,
+  PaintBrush,
   ShieldCheck,
-  Sparkles,
+  Sparkle,
   Users,
-} from 'lucide-react';
+} from '@phosphor-icons/react';
 import { DossierNav } from '../components/DossierNav';
 import { STATIC_CONFIG } from '../config/constants';
 import { useApp } from '../context/AppContext';
@@ -111,7 +111,7 @@ export const AirframesView: React.FC = () => {
 
   return (
     <div className="space-y-6 pb-8 max-w-7xl mx-auto">
-      {/* Sub Navigation */}
+      {/* Sub NavigationArrow */}
       <DossierNav />
 
       {/* Header Banner */}
@@ -138,7 +138,7 @@ export const AirframesView: React.FC = () => {
           className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-amber-400 font-mono text-xs flex items-center gap-1.5 transition-colors shrink-0"
         >
           <span>Aviation SOP &amp; Syllabus</span>
-          <ExternalLink className="w-3.5 h-3.5" />
+          <ArrowSquareOut className="w-3.5 h-3.5" />
         </a>
       </div>
 
@@ -155,7 +155,7 @@ export const AirframesView: React.FC = () => {
             </p>
           </div>
           <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0">
-            <Plane className="w-5 h-5 text-amber-400" />
+            <AirplaneTilt className="w-5 h-5 text-amber-400" />
           </div>
         </div>
 
@@ -193,7 +193,7 @@ export const AirframesView: React.FC = () => {
       {/* Airframes Grid */}
       {airframes.length === 0 ? (
         <div className="p-12 rounded-2xl bg-stone-900/85 border border-stone-800 text-center space-y-4">
-          <Plane className="w-10 h-10 text-stone-500 mx-auto" />
+          <AirplaneTilt className="w-10 h-10 text-stone-500 mx-auto" />
           <div className="space-y-1">
             <h3 className="font-display text-base font-semibold text-stone-100">
               No Airframe Type Ratings Found
@@ -210,7 +210,7 @@ export const AirframesView: React.FC = () => {
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-bold text-xs shadow"
             >
               <span>View GTFO Syllabus in Knowledge Base</span>
-              <ExternalLink className="w-3.5 h-3.5" />
+              <ArrowSquareOut className="w-3.5 h-3.5" />
             </a>
           </div>
         </div>
@@ -271,7 +271,7 @@ export const AirframesView: React.FC = () => {
 
                       {airframe.isPrimary && (
                         <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500 text-stone-950 text-[10px] font-mono font-extrabold uppercase tracking-wider shrink-0 shadow-md">
-                          <Sparkles className="w-3 h-3 text-stone-950" />
+                          <Sparkle className="w-3 h-3 text-stone-950" />
                           PRIMARY
                         </span>
                       )}
@@ -304,7 +304,7 @@ export const AirframesView: React.FC = () => {
                     {matchingLivery && (
                       <div className="flex items-center justify-between text-xs font-mono text-stone-400 pt-1">
                         <span className="truncate max-w-[200px] text-stone-300/90 flex items-center gap-1.5 text-[11px]">
-                          <Paintbrush className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                          <PaintBrush className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                           <span className="truncate">{matchingLivery.name}</span>
                         </span>
                         <button
@@ -312,7 +312,7 @@ export const AirframesView: React.FC = () => {
                           className="text-amber-400 hover:text-amber-300 hover:underline flex items-center gap-1 text-[11px] shrink-0 font-semibold"
                         >
                           <span>Hangar</span>
-                          <ExternalLink className="w-3 h-3" />
+                          <ArrowSquareOut className="w-3 h-3" />
                         </button>
                       </div>
                     )}

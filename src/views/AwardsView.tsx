@@ -1,13 +1,12 @@
 import React, { useMemo, useState } from 'react';
 import {
-  Award,
-  CheckCircle2,
-  ExternalLink,
+  ArrowSquareOut,
+  CheckCircle,
   Medal,
   Shield,
-  Sparkles,
+  Sparkle,
   Star,
-} from 'lucide-react';
+} from '@phosphor-icons/react';
 import { DossierNav } from '../components/DossierNav';
 import { STATIC_CONFIG } from '../config/constants';
 import { useApp } from '../context/AppContext';
@@ -49,7 +48,7 @@ export const AwardsView: React.FC = () => {
 
   return (
     <div className="space-y-6 pb-8 max-w-7xl mx-auto">
-      {/* Sub Navigation */}
+      {/* Sub NavigationArrow */}
       <DossierNav />
 
       {/* Header Banner */}
@@ -76,7 +75,7 @@ export const AwardsView: React.FC = () => {
           className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-amber-400 font-mono text-xs flex items-center gap-1.5 transition-colors shrink-0"
         >
           <span>Awards Criteria</span>
-          <ExternalLink className="w-3.5 h-3.5" />
+          <ArrowSquareOut className="w-3.5 h-3.5" />
         </a>
       </div>
 
@@ -141,7 +140,7 @@ export const AwardsView: React.FC = () => {
             </p>
           </div>
           <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0">
-            <Award className="w-5 h-5 text-amber-400" />
+            <Medal className="w-5 h-5 text-amber-400" />
           </div>
         </div>
 
@@ -156,7 +155,7 @@ export const AwardsView: React.FC = () => {
             </p>
           </div>
           <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0">
-            <Sparkles className="w-5 h-5 text-emerald-400" />
+            <Sparkle className="w-5 h-5 text-emerald-400" />
           </div>
         </div>
 
@@ -176,7 +175,7 @@ export const AwardsView: React.FC = () => {
         </div>
       </div>
 
-      {/* Category Filter Tabs */}
+      {/* Category Funnel Tabs */}
       {categories.length > 0 && (
         <div className="flex items-center gap-2">
           <button
@@ -205,10 +204,10 @@ export const AwardsView: React.FC = () => {
         </div>
       )}
 
-      {/* Award Cards Grid */}
+      {/* Medal Cards Grid */}
       {filteredAwards.length === 0 ? (
         <div className="p-12 rounded-2xl bg-stone-900/85 border border-stone-800 text-center space-y-4">
-          <Award className="w-10 h-10 text-stone-500 mx-auto" />
+          <Medal className="w-10 h-10 text-stone-500 mx-auto" />
           <div className="space-y-1">
             <h3 className="font-display text-base font-semibold text-stone-100">
               No Awards Recorded
@@ -244,7 +243,7 @@ export const AwardsView: React.FC = () => {
                   </div>
                 ) : (
                   <div className="w-14 h-14 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0">
-                    <Award className="w-7 h-7 text-amber-400" />
+                    <Medal className="w-7 h-7 text-amber-400" />
                   </div>
                 )}
 

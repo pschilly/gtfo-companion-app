@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import {
-  AlertCircle,
-  ExternalLink,
-  Loader2,
+  ArrowSquareOut,
+  ArrowsClockwise,
+  CircleNotch,
   Lock,
-  LogOut,
-  RefreshCw,
   Shield,
-} from 'lucide-react';
+  SignOut,
+  WarningCircle,
+} from '@phosphor-icons/react';
 import { STATIC_CONFIG } from '../config/constants';
 import { useApp } from '../context/AppContext';
 
@@ -62,7 +62,7 @@ export const LoginGateView: React.FC = () => {
         <div className="p-7 space-y-5">
           {error && (
             <div className="p-3.5 rounded-xl bg-red-950/40 border border-red-500/40 flex items-start gap-2.5 text-xs text-red-200">
-              <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+              <WarningCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
               <div className="space-y-1">
                 <p className="font-semibold">Authentication Failed</p>
                 <p className="text-red-300/90 leading-relaxed">{error}</p>
@@ -98,12 +98,12 @@ export const LoginGateView: React.FC = () => {
                 >
                   {isLoading ? (
                     <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <CircleNotch className="w-4 h-4 animate-spin" />
                       <span>Checking Discord Roles...</span>
                     </>
                   ) : (
                     <>
-                      <RefreshCw className="w-4 h-4" />
+                      <ArrowsClockwise className="w-4 h-4" />
                       <span>Re-Verify Discord Roles</span>
                     </>
                   )}
@@ -113,7 +113,7 @@ export const LoginGateView: React.FC = () => {
                   onClick={logoutDiscord}
                   className="w-full py-2.5 px-4 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-800 text-stone-300 hover:text-red-300 text-xs font-mono flex items-center justify-center gap-2 transition-colors"
                 >
-                  <LogOut className="w-3.5 h-3.5" />
+                  <SignOut className="w-3.5 h-3.5" />
                   <span>Sign Out / Switch Discord Account</span>
                 </button>
               </div>
@@ -140,12 +140,12 @@ export const LoginGateView: React.FC = () => {
               >
                 {isLoading ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <CircleNotch className="w-4 h-4 animate-spin" />
                     <span>Waiting for Discord Browser Sign-In...</span>
                   </>
                 ) : (
                   <>
-                    <ExternalLink className="w-4 h-4" />
+                    <ArrowSquareOut className="w-4 h-4" />
                     <span>Sign in with Discord</span>
                   </>
                 )}

@@ -1,17 +1,17 @@
 import React from 'react';
 import {
-  AlertTriangle,
-  ArrowUpCircle,
-  CheckCircle2,
-  Download,
-  ExternalLink,
+  ArrowCircleUp,
+  ArrowSquareOut,
+  CheckCircle,
+  CircleNotch,
+  DownloadSimple,
   FolderOpen,
   Info,
-  Loader2,
   Lock,
-  Sparkles,
-  Trash2,
-} from 'lucide-react';
+  Sparkle,
+  Trash,
+  Warning,
+} from '@phosphor-icons/react';
 import { useApp } from '../context/AppContext';
 import { openExternalUrl } from '../services/tauriBridge';
 import { AssetItem } from '../types';
@@ -90,12 +90,12 @@ export const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
           <div className="shrink-0 flex justify-center">
             {asset.requirementLevel === 'required_all' ? (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-red-600/95 text-white font-mono font-bold text-[10px] uppercase tracking-wider shadow whitespace-nowrap">
-                <AlertTriangle className="w-3 h-3" />
+                <Warning className="w-3 h-3" />
                 REQUIRED FOR ALL
               </span>
             ) : asset.requirementLevel === 'required_core' ? (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/95 text-stone-950 font-mono font-bold text-[10px] uppercase tracking-wider shadow whitespace-nowrap">
-                <Sparkles className="w-3 h-3" />
+                <Sparkle className="w-3 h-3" />
                 REQUIRED FOR CORE
               </span>
             ) : (
@@ -130,12 +130,12 @@ export const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
 
           {needsUpdate ? (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500 text-stone-950 font-mono font-bold text-[10px] uppercase">
-              <ArrowUpCircle className="w-3 h-3" />
+              <ArrowCircleUp className="w-3 h-3" />
               UPDATE AVAILABLE
             </span>
           ) : installed ? (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 font-mono font-semibold text-[10px] uppercase">
-              <CheckCircle2 className="w-3 h-3" />
+              <CheckCircle className="w-3 h-3" />
               INSTALLED
             </span>
           ) : null}
@@ -172,7 +172,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
           <div className="space-y-1.5 pt-2 border-t border-stone-800/80">
             <div className="flex items-center justify-between text-[11px] font-mono">
               <span className="text-amber-300 flex items-center gap-1.5 truncate">
-                <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" />
+                <CircleNotch className="w-3.5 h-3.5 animate-spin shrink-0" />
                 {progress.stage.toUpperCase()}
               </span>
               <span className="text-stone-300">{progress.percent}%</span>
@@ -207,7 +207,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
                     onClick={() => setSelectedAsset(asset)}
                     className="flex-1 py-2 px-3 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 font-mono font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors"
                   >
-                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <CheckCircle className="w-3.5 h-3.5" />
                     <span>Installed</span>
                   </button>
                   {asset.externalUrl && (
@@ -216,7 +216,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
                       title="Open external releases page / documentation"
                       className="p-2 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-800 text-stone-400 hover:text-amber-300 transition-colors"
                     >
-                      <ExternalLink className="w-4 h-4" />
+                      <ArrowSquareOut className="w-4 h-4" />
                     </button>
                   )}
                 </>
@@ -231,7 +231,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
                   }}
                   className="flex-1 py-2 px-3 rounded-xl bg-amber-500/20 hover:bg-amber-500 border border-amber-500/50 text-amber-300 hover:text-stone-950 font-mono font-semibold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm"
                 >
-                  <ExternalLink className="w-3.5 h-3.5" />
+                  <ArrowSquareOut className="w-3.5 h-3.5" />
                   <span>External Installer</span>
                 </button>
               )
@@ -240,7 +240,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
                 onClick={() => installAsset(asset)}
                 className="flex-1 py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono font-bold text-xs flex items-center justify-center gap-1.5 transition-colors shadow-sm"
               >
-                <ArrowUpCircle className="w-4 h-4" />
+                <ArrowCircleUp className="w-4 h-4" />
                 <span>Update ({asset.version})</span>
               </button>
             ) : installed ? (
@@ -249,7 +249,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
                   onClick={() => setSelectedAsset(asset)}
                   className="flex-1 py-2 px-3 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 font-mono font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors"
                 >
-                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <CheckCircle className="w-3.5 h-3.5" />
                   <span>Installed</span>
                 </button>
                 <button
@@ -257,7 +257,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
                   title="Uninstall and clean files from DCS Saved Games"
                   className="p-2 rounded-xl bg-stone-950 hover:bg-red-500/20 border border-stone-800 hover:border-red-500/40 text-stone-400 hover:text-red-300 transition-colors"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash className="w-4 h-4" />
                 </button>
               </>
             ) : (
@@ -265,7 +265,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
                 onClick={() => installAsset(asset)}
                 className="flex-1 py-2 px-3 rounded-xl bg-amber-500/20 hover:bg-amber-500 border border-amber-500/50 text-amber-300 hover:text-stone-950 font-mono font-semibold text-xs flex items-center justify-center gap-1.5 transition-all"
               >
-                <Download className="w-3.5 h-3.5" />
+                <DownloadSimple className="w-3.5 h-3.5" />
                 <span>Deploy to DCS</span>
               </button>
             )}

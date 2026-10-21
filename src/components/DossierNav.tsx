@@ -1,38 +1,55 @@
 import React from 'react';
-import { Award, FileCheck2, LayoutDashboard, Plane } from 'lucide-react';
+import {
+  AirplaneTilt,
+  Certificate,
+  ListChecks,
+  Medal,
+  SquaresFour,
+} from '@phosphor-icons/react';
 import { useApp } from '../context/AppContext';
 import { NavigationTab } from '../types';
 
 export const DossierNav: React.FC = () => {
-  const { activeTab, setActiveTab, memberProfile } = useApp();
+  const { activeTab, setActiveTab, memberProfile, checklistSummary } = useApp();
 
   const tabs: {
     id: NavigationTab;
     label: string;
     icon: React.ReactNode;
-    count?: number;
+    count?: number | string;
+    badgeColor?: string;
   }[] = [
     {
       id: 'dashboard',
       label: 'Dossier Overview',
-      icon: <LayoutDashboard className="w-4 h-4" />,
+      icon: <SquaresFour className="w-4 h-4" />,
+    },
+    {
+      id: 'checklist',
+      label: 'Member Readiness',
+      icon: <ListChecks className="w-4 h-4" />,
+      count: checklistSummary.pendingCount > 0 ? checklistSummary.pendingCount : '✓',
+      badgeColor:
+        checklistSummary.pendingCount > 0
+          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+          : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40',
     },
     {
       id: 'airframes',
       label: 'Qualified Airframes',
-      icon: <Plane className="w-4 h-4" />,
+      icon: <AirplaneTilt className="w-4 h-4" />,
       count: memberProfile.qualifiedAirframes?.length || 0,
     },
     {
       id: 'qualifications',
       label: 'Certifications',
-      icon: <FileCheck2 className="w-4 h-4" />,
+      icon: <Certificate className="w-4 h-4" />,
       count: memberProfile.certificates?.length || 0,
     },
     {
       id: 'awards',
       label: 'Awards & Ribbons',
-      icon: <Award className="w-4 h-4" />,
+      icon: <Medal className="w-4 h-4" />,
       count: memberProfile.awards?.length || 0,
     },
   ];
@@ -60,7 +77,7 @@ export const DossierNav: React.FC = () => {
                 className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
                   isActive
                     ? 'bg-stone-950 text-amber-300'
-                    : 'bg-stone-800 text-stone-300 border border-stone-700'
+                    : t.badgeColor || 'bg-stone-800 text-stone-300 border border-stone-700'
                 }`}
               >
                 {t.count}

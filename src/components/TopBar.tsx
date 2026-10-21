@@ -1,5 +1,10 @@
 import React from 'react';
-import { ArrowUpCircle, RefreshCw, Search } from 'lucide-react';
+import {
+  ArrowCircleUp,
+  ArrowsClockwise,
+  MagnifyingGlass,
+  Sparkle,
+} from '@phosphor-icons/react';
 import { useApp } from '../context/AppContext';
 
 interface TopBarProps {
@@ -16,18 +21,20 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
     outdatedAssets,
     updateAllOutdated,
     setActiveTab,
+    appUpdate,
+    setIsUpdateModalOpen,
   } = useApp();
 
   return (
     <header className="h-16 bg-stone-950/85 backdrop-blur-md border-b border-stone-800/80 px-6 flex items-center justify-between gap-4 shrink-0">
-      {/* Search Bar */}
+      {/* MagnifyingGlass Bar */}
       <div className="relative flex-1 max-w-md">
-        <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+        <MagnifyingGlass className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="Search liveries, aircraft (F-16C, F/A-18C), mods, or tags..."
+          placeholder="MagnifyingGlass liveries, aircraft (F-16C, F/A-18C), mods, or tags..."
           className="w-full pl-10 pr-4 py-2 rounded-xl bg-stone-900/90 border border-stone-800 text-sm text-stone-100 placeholder:text-stone-500 focus:outline-none focus:border-amber-500/60 focus:ring-1 focus:ring-amber-500/30 transition-all"
         />
         {searchQuery && (
@@ -42,6 +49,17 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
 
       {/* Right Action Controls */}
       <div className="flex items-center gap-3">
+        {/* App Update Available Alert Button */}
+        {appUpdate?.available && (
+          <button
+            onClick={() => setIsUpdateModalOpen(true)}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-mono font-bold transition-all shadow-md shadow-amber-500/20"
+          >
+            <Sparkle className="w-3.5 h-3.5 text-stone-950" />
+            <span>APP v{appUpdate.version} READY</span>
+          </button>
+        )}
+
         {/* Outdated Assets Alert Button */}
         {outdatedAssets.length > 0 && (
           <button
@@ -51,7 +69,7 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
             }}
             className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/50 text-amber-300 text-xs font-mono font-semibold transition-all"
           >
-            <ArrowUpCircle className="w-4 h-4 text-amber-400 animate-bounce" />
+            <ArrowCircleUp className="w-4 h-4 text-amber-400 animate-bounce" />
             <span>{outdatedAssets.length} UPDATE(S) AVAILABLE</span>
           </button>
         )}
@@ -72,7 +90,7 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
             title="Sync remote manifest from Member Portal / CDN"
             className="p-1.5 rounded-lg bg-stone-800/80 hover:bg-stone-700 text-stone-300 hover:text-amber-400 transition-colors disabled:opacity-50"
           >
-            <RefreshCw
+            <ArrowsClockwise
               className={`w-4 h-4 ${isSyncingManifest ? 'animate-spin text-amber-400' : ''}`}
             />
           </button>

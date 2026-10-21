@@ -1,25 +1,26 @@
 import React, { useState } from 'react';
 import {
-  Award,
-  ExternalLink,
-  FileCheck2,
-  FolderCheck,
+  AirplaneTilt,
+  ArrowSquareOut,
+  ArrowsClockwise,
+  Certificate,
+  Folder,
+  Gear,
   HardDrive,
-  Home,
-  LayoutDashboard,
+  House,
+  ListChecks,
   Lock,
-  LogOut,
+  Medal,
   Package,
-  Paintbrush,
-  Plane,
-  RefreshCw,
-  Settings,
+  PaintBrush,
   Shield,
-  ShieldAlert,
   ShieldCheck,
-  Sparkles,
+  ShieldWarning,
+  SignOut,
+  Sparkle,
+  SquaresFour,
   UserCheck,
-} from 'lucide-react';
+} from '@phosphor-icons/react';
 import { STATIC_CONFIG } from '../config/constants';
 import { useApp } from '../context/AppContext';
 import { NavigationTab } from '../types';
@@ -39,6 +40,7 @@ export const Sidebar: React.FC = () => {
     logoutDiscord,
     dcsEnv,
     settings,
+    checklistSummary,
   } = useApp();
 
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -62,8 +64,8 @@ export const Sidebar: React.FC = () => {
       items: [
         {
           id: 'home',
-          label: 'Home',
-          icon: <Home className="w-4 h-4" />,
+          label: 'House',
+          icon: <House className="w-4 h-4" />,
         },
       ],
     },
@@ -73,26 +75,36 @@ export const Sidebar: React.FC = () => {
         {
           id: 'dashboard',
           label: 'Overview',
-          icon: <LayoutDashboard className="w-4 h-4" />,
+          icon: <SquaresFour className="w-4 h-4" />,
           badge: memberProfile?.grade,
           badgeColor: 'bg-amber-500/20 text-amber-300 border border-amber-500/40',
         },
         {
+          id: 'checklist',
+          label: 'Member Readiness',
+          icon: <ListChecks className="w-4 h-4" />,
+          badge: checklistSummary.pendingCount > 0 ? checklistSummary.pendingCount : '✓',
+          badgeColor:
+            checklistSummary.pendingCount > 0
+              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold'
+              : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40',
+        },
+        {
           id: 'airframes',
           label: 'Qualified Airframes',
-          icon: <Plane className="w-4 h-4" />,
+          icon: <AirplaneTilt className="w-4 h-4" />,
           badge: memberProfile?.qualifiedAirframes?.length || undefined,
         },
         {
           id: 'qualifications',
           label: 'Certifications',
-          icon: <FileCheck2 className="w-4 h-4" />,
+          icon: <Certificate className="w-4 h-4" />,
           badge: memberProfile?.certificates?.length || undefined,
         },
         {
           id: 'awards',
           label: 'Awards & Ribbons',
-          icon: <Award className="w-4 h-4" />,
+          icon: <Medal className="w-4 h-4" />,
           badge: memberProfile?.awards?.length || undefined,
         },
       ],
@@ -103,7 +115,7 @@ export const Sidebar: React.FC = () => {
         {
           id: 'library',
           label: 'Library',
-          icon: <FolderCheck className="w-4 h-4" />,
+          icon: <Folder className="w-4 h-4" />,
           badge: outdatedAssets.length > 0 ? outdatedAssets.length : installedCount,
           badgeColor:
             outdatedAssets.length > 0
@@ -113,7 +125,7 @@ export const Sidebar: React.FC = () => {
         {
           id: 'liveries',
           label: 'Airframe Liveries',
-          icon: <Paintbrush className="w-4 h-4" />,
+          icon: <PaintBrush className="w-4 h-4" />,
           badge: liveryCount,
         },
         {
@@ -129,8 +141,8 @@ export const Sidebar: React.FC = () => {
     //   items: [
     //     {
     //       id: 'settings',
-    //       label: 'System Settings',
-    //       icon: <Settings className="w-4 h-4" />,
+    //       label: 'System Gear',
+    //       icon: <Gear className="w-4 h-4" />,
     //     },
     //   ],
     // },
@@ -163,7 +175,7 @@ export const Sidebar: React.FC = () => {
           </div>
         </div>
 
-        {/* Navigation Links — Styled after kb.globaltaskforceoverlord.org left-border list */}
+        {/* NavigationArrow Links — Styled after kb.globaltaskforceoverlord.org left-border list */}
         <nav className="p-4 space-y-5">
           {navSections.map((section) => (
             <div key={section.title}>
@@ -218,7 +230,7 @@ export const Sidebar: React.FC = () => {
               className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-stone-900/60 hover:bg-stone-900 border border-stone-800/80 text-xs font-display text-stone-400 hover:text-amber-400 transition-colors"
             >
               <span>GTFO Knowledge Base</span>
-              <ExternalLink className="w-3.5 h-3.5" />
+              <ArrowSquareOut className="w-3.5 h-3.5" />
             </a>
           </div>
         </nav>
@@ -293,14 +305,14 @@ export const Sidebar: React.FC = () => {
                   title="Membership Clearance & Discord Role Sync"
                   className="p-1.5 rounded-lg text-stone-400 hover:text-amber-400 hover:bg-stone-800 transition-colors"
                 >
-                  <RefreshCw className="w-3.5 h-3.5" />
+                  <ArrowsClockwise className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={() => setShowLogoutConfirm(true)}
                   title="Sign out of Discord"
                   className="p-1.5 rounded-lg text-stone-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
                 >
-                  <LogOut className="w-3.5 h-3.5" />
+                  <SignOut className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
@@ -320,7 +332,7 @@ export const Sidebar: React.FC = () => {
               {effectiveTier === 'core' ? (
                 <>
                   <span className="flex items-center gap-1.5 truncate">
-                    <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                    <Sparkle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                     <span className="truncate">
                       CORE // {memberProfile.grade}
                       {memberProfile.squadronAssignment?.code
@@ -341,7 +353,7 @@ export const Sidebar: React.FC = () => {
               ) : (
                 <>
                   <span className="flex items-center gap-1.5 truncate">
-                    <ShieldAlert className="w-3.5 h-3.5 text-stone-400 shrink-0" />
+                    <ShieldWarning className="w-3.5 h-3.5 text-stone-400 shrink-0" />
                     <span>UNVERIFIED</span>
                   </span>
                   <span className="text-[10px] text-amber-400 font-normal shrink-0">Sync</span>

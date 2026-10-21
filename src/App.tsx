@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityConsole } from './components/ActivityConsole';
+import { AppUpdateModal } from './components/AppUpdateModal';
 import { AssetDetailsModal } from './components/AssetDetailsModal';
 import { LoginModal } from './components/LoginModal';
 import { PathOnboardingModal } from './components/PathOnboardingModal';
@@ -11,6 +12,7 @@ import { openExternalUrl } from './services/tauriBridge';
 import { AirframesView } from './views/AirframesView';
 import { AwardsView } from './views/AwardsView';
 import { CatalogView } from './views/CatalogView';
+import { ChecklistView } from './views/ChecklistView';
 import { DashboardView } from './views/DashboardView';
 import { HomeView } from './views/HomeView';
 import { LibraryView } from './views/LibraryView';
@@ -65,6 +67,7 @@ const MainShell: React.FC = () => {
         <main className="flex-1 overflow-y-auto p-6">
           {activeTab === 'home' && <HomeView />}
           {activeTab === 'dashboard' && <DashboardView />}
+          {activeTab === 'checklist' && <ChecklistView />}
           {activeTab === 'airframes' && <AirframesView />}
           {activeTab === 'qualifications' && <QualificationsView />}
           {activeTab === 'awards' && <AwardsView />}
@@ -85,6 +88,7 @@ const MainShell: React.FC = () => {
       <RepairPromptModal />
       <LoginModal />
       <PathOnboardingModal />
+      <AppUpdateModal />
     </div>
   );
 };

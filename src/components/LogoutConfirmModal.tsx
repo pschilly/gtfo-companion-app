@@ -1,5 +1,9 @@
 import React, { useEffect } from 'react';
-import { AlertTriangle, LogOut, X } from 'lucide-react';
+import {
+  SignOut,
+  Warning,
+  X,
+} from '@phosphor-icons/react';
 
 interface LogoutConfirmModalProps {
   isOpen: boolean;
@@ -42,7 +46,7 @@ export const LogoutConfirmModal: React.FC<LogoutConfirmModalProps> = ({
         <div className="px-5 py-4 bg-stone-950 border-b border-stone-800 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-red-500/15 border border-red-500/30 flex items-center justify-center text-red-400 shrink-0">
-              <LogOut className="w-4 h-4" />
+              <SignOut className="w-4 h-4" />
             </div>
             <div>
               <h3 className="font-display text-sm font-bold text-stone-100">
@@ -85,7 +89,7 @@ export const LogoutConfirmModal: React.FC<LogoutConfirmModalProps> = ({
           </div>
 
           <div className="flex items-start gap-2.5 text-xs text-stone-300 leading-relaxed bg-amber-500/10 border border-amber-500/20 p-3 rounded-xl">
-            <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+            <Warning className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
             <p>
               Are you sure you want to sign out? This will clear your Discord authorization token and cached membership profile from this client.
             </p>
@@ -107,7 +111,7 @@ export const LogoutConfirmModal: React.FC<LogoutConfirmModalProps> = ({
             }}
             className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-mono font-bold flex items-center gap-1.5 shadow-lg shadow-red-950 transition-all"
           >
-            <LogOut className="w-3.5 h-3.5" />
+            <SignOut className="w-3.5 h-3.5" />
             <span>Yes, Sign Out</span>
           </button>
         </div>

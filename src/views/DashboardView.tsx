@@ -1,23 +1,23 @@
 import React, { useState } from 'react';
 import {
-  AlertTriangle,
+  AirplaneTilt,
+  ArrowCircleUp,
   ArrowRight,
-  ArrowUpCircle,
-  Award,
-  CheckCircle2,
-  Download,
-  ExternalLink,
-  FileCheck2,
-  FolderCheck,
-  LayoutDashboard,
+  ArrowSquareOut,
+  ArrowsClockwise,
+  Certificate,
+  CheckCircle,
+  DownloadSimple,
+  Folder,
+  Medal,
   Package,
-  Paintbrush,
-  Plane,
-  RefreshCw,
+  PaintBrush,
   ShieldCheck,
-  Sparkles,
+  Sparkle,
+  SquaresFour,
   Users,
-} from 'lucide-react';
+  Warning,
+} from '@phosphor-icons/react';
 import { DossierNav } from '../components/DossierNav';
 import { STATIC_CONFIG } from '../config/constants';
 import { useApp } from '../context/AppContext';
@@ -41,6 +41,10 @@ export const DashboardView: React.FC = () => {
     dcsEnv,
     settings,
     userSession,
+    dcsNicknameInfo,
+    expectedDcsNickname,
+    isNicknameMatching,
+    updateDcsNickname,
   } = useApp();
 
   const [isSyncingPortal, setIsSyncingPortal] = useState(false);
@@ -82,7 +86,7 @@ export const DashboardView: React.FC = () => {
 
   return (
     <div className="space-y-6 pb-8 max-w-7xl mx-auto">
-      {/* Sub Navigation */}
+      {/* Sub NavigationArrow */}
       <DossierNav />
 
       {/* MEMBER DOSSIER HERO CARD (KB Theme) */}
@@ -95,7 +99,7 @@ export const DashboardView: React.FC = () => {
         <div className="relative z-10 px-6 py-3.5 bg-stone-950/80 border-b border-stone-800 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <span className="inline-flex items-center gap-1.5 text-xs font-display font-semibold uppercase tracking-wider text-amber-400">
-              <LayoutDashboard className="w-3.5 h-3.5" />
+              <SquaresFour className="w-3.5 h-3.5" />
               <span>Member Dossier</span>
             </span>
           </div>
@@ -106,7 +110,7 @@ export const DashboardView: React.FC = () => {
               disabled={isSyncingPortal}
               className="px-3 py-1 rounded-lg bg-stone-900 hover:bg-stone-800 border border-stone-800 text-stone-300 text-[11px] font-mono flex items-center gap-1.5 transition-all"
             >
-              <RefreshCw
+              <ArrowsClockwise
                 className={`w-3 h-3 text-amber-400 ${isSyncingPortal ? 'animate-spin' : ''}`}
               />
               <span>Sync Portal</span>
@@ -119,7 +123,7 @@ export const DashboardView: React.FC = () => {
               className="px-3 py-1 rounded-lg bg-stone-900 hover:bg-stone-800 border border-stone-800 text-amber-400 text-[11px] font-mono flex items-center gap-1 transition-all"
             >
               <span>Knowledge Base</span>
-              <ExternalLink className="w-3 h-3" />
+              <ArrowSquareOut className="w-3 h-3" />
             </a>
           </div>
         </div>
@@ -132,7 +136,7 @@ export const DashboardView: React.FC = () => {
               <div className="flex items-center gap-1.5">
                 {memberProfile.isCouncilMember && (
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/25 border border-amber-500/50 text-amber-300 text-[10px] font-mono font-bold uppercase tracking-wider shrink-0">
-                    <Sparkles className="w-3 h-3 text-amber-300" />
+                    <Sparkle className="w-3 h-3 text-amber-300" />
                     Council Member
                   </span>
                 )}
@@ -184,6 +188,31 @@ export const DashboardView: React.FC = () => {
                     ? `${memberProfile.adminPositions.filter((p) => p !== memberProfile.adminPosition)[0]}`
                     : ''}
                 </div>
+
+                <div className="flex items-center gap-1.5 pt-1 text-[11px] font-mono">
+                  <span className="text-stone-400">DCS Tag:</span>
+                  <span
+                    className={`font-semibold truncate max-w-[120px] ${
+                      isNicknameMatching ? 'text-emerald-400' : 'text-amber-400'
+                    }`}
+                    title={dcsNicknameInfo?.currentNickname || expectedDcsNickname}
+                  >
+                    {dcsNicknameInfo?.currentNickname || expectedDcsNickname}
+                  </span>
+                  {isNicknameMatching ? (
+                    <span title="DCS slot #1 matches GTFO tag" className="inline-flex">
+                      <CheckCircle className="w-3 h-3 text-emerald-400 shrink-0" />
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => updateDcsNickname(expectedDcsNickname)}
+                      className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30 transition-colors shrink-0"
+                      title="Set DCS Nickname in nicknames.lua slot #1"
+                    >
+                      Fix Tag
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -215,7 +244,7 @@ export const DashboardView: React.FC = () => {
                 className="px-2 py-0.5 rounded bg-stone-900 hover:bg-stone-800 border border-stone-800 text-[10px] font-mono text-stone-300 flex items-center gap-1 transition-colors hover:text-amber-300"
                 title="View Qualified Airframes"
               >
-                <Plane className="w-3 h-3 text-amber-400" />
+                <AirplaneTilt className="w-3 h-3 text-amber-400" />
                 <span>{airframes.length} Airframe{airframes.length === 1 ? '' : 's'}</span>
               </button>
               <button
@@ -223,7 +252,7 @@ export const DashboardView: React.FC = () => {
                 className="px-2 py-0.5 rounded bg-stone-900 hover:bg-stone-800 border border-stone-800 text-[10px] font-mono text-stone-300 flex items-center gap-1 transition-colors hover:text-amber-300"
                 title="View Combat Qualifications"
               >
-                <FileCheck2 className="w-3 h-3 text-amber-400" />
+                <Certificate className="w-3 h-3 text-amber-400" />
                 <span>{certificates.length} Cert{certificates.length === 1 ? '' : 's'}</span>
               </button>
               <button
@@ -231,8 +260,8 @@ export const DashboardView: React.FC = () => {
                 className="px-2 py-0.5 rounded bg-stone-900 hover:bg-stone-800 border border-stone-800 text-[10px] font-mono text-stone-300 flex items-center gap-1 transition-colors hover:text-amber-300"
                 title="View Awards & Ribbons"
               >
-                <Award className="w-3 h-3 text-amber-400" />
-                <span>{awards.length} Award{awards.length === 1 ? '' : 's'}</span>
+                <Medal className="w-3 h-3 text-amber-400" />
+                <span>{awards.length} Medal{awards.length === 1 ? '' : 's'}</span>
               </button>
             </div>
           </div>
@@ -241,7 +270,7 @@ export const DashboardView: React.FC = () => {
           <div className="lg:col-span-4 flex flex-col justify-between p-5 rounded-xl bg-stone-950/75 border border-stone-800/90 space-y-4">
             <div className="flex items-center justify-between gap-2">
               <span className="text-xs font-display font-semibold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
-                <Award className="w-4 h-4" />
+                <Medal className="w-4 h-4" />
                 <span>Service Grade &amp; Seniority</span>
               </span>
               <span className="px-2 py-0.5 rounded bg-stone-900 border border-stone-800 text-[11px] font-mono text-amber-300 font-bold shrink-0">
@@ -378,7 +407,7 @@ export const DashboardView: React.FC = () => {
               <>
                 <div className="p-3.5 rounded-xl bg-stone-900/60 border border-stone-800/80 text-xs text-stone-400 space-y-1.5">
                   <div className="flex items-center gap-2 text-stone-200 font-display font-semibold">
-                    <Plane className="w-4 h-4 text-amber-400" />
+                    <AirplaneTilt className="w-4 h-4 text-amber-400" />
                     <span>General Community Aviation Wing</span>
                   </div>
                   <p className="leading-relaxed">
@@ -402,7 +431,7 @@ export const DashboardView: React.FC = () => {
                 onClick={installAllRequiredForUser}
                 className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-mono font-bold text-xs flex items-center gap-2 transition-colors shadow"
               >
-                <Download className="w-4 h-4" />
+                <DownloadSimple className="w-4 h-4" />
                 <span>Deploy {missingRequiredAssets.length} Required Package(s)</span>
               </button>
             )}
@@ -410,7 +439,7 @@ export const DashboardView: React.FC = () => {
               onClick={() => setActiveTab('liveries')}
               className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-bold text-xs flex items-center gap-2 transition-colors shadow"
             >
-              <Paintbrush className="w-4 h-4" />
+              <PaintBrush className="w-4 h-4" />
               <span>Airframe Liveries</span>
             </button>
             <button
@@ -424,7 +453,7 @@ export const DashboardView: React.FC = () => {
               onClick={() => setActiveTab('library')}
               className="px-4 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 border border-stone-700 text-stone-200 font-display font-semibold text-xs flex items-center gap-2 transition-colors"
             >
-              <FolderCheck className="w-4 h-4 text-amber-400" />
+              <Folder className="w-4 h-4 text-amber-400" />
               <span>Installed Library ({installedCount})</span>
             </button>
           </div>
@@ -434,7 +463,7 @@ export const DashboardView: React.FC = () => {
               onClick={updateAllOutdated}
               className="px-4 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/50 text-amber-300 font-mono font-bold text-xs flex items-center gap-1.5"
             >
-              <ArrowUpCircle className="w-4 h-4" />
+              <ArrowCircleUp className="w-4 h-4" />
               <span>Update {outdatedAssets.length} Outdated Package(s)</span>
             </button>
           )}
@@ -451,7 +480,7 @@ export const DashboardView: React.FC = () => {
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                <Plane className="w-5 h-5 text-amber-400" />
+                <AirplaneTilt className="w-5 h-5 text-amber-400" />
               </div>
               <div className="min-w-0">
                 <h3 className="font-display font-bold text-stone-100 text-sm group-hover:text-amber-400 transition-colors truncate">
@@ -482,7 +511,7 @@ export const DashboardView: React.FC = () => {
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                <FileCheck2 className="w-5 h-5 text-amber-400" />
+                <Certificate className="w-5 h-5 text-amber-400" />
               </div>
               <div className="min-w-0">
                 <h3 className="font-display font-bold text-stone-100 text-sm group-hover:text-amber-400 transition-colors truncate">
@@ -513,7 +542,7 @@ export const DashboardView: React.FC = () => {
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                <Award className="w-5 h-5 text-amber-400" />
+                <Medal className="w-5 h-5 text-amber-400" />
               </div>
               <div className="min-w-0">
                 <h3 className="font-display font-bold text-stone-100 text-sm group-hover:text-amber-400 transition-colors truncate">

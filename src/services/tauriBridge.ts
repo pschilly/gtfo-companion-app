@@ -16,6 +16,7 @@ import {
   AtcKneeboardItem,
   DcsDtcData,
   DcsEnvironmentInfo,
+  DcsNicknameInfo,
   DiscordUserSession,
   DownloadProgressEvent,
   InstalledAssetRecord,
@@ -757,11 +758,15 @@ export async function verifyDiscordAccessToken(accessToken: string): Promise<Dis
 
   let isGuildMember = false;
   let roleIds: string[] = [];
+  let serverNickname: string | null = null;
 
   if (memberResp.ok) {
     isGuildMember = true;
     const memberData = await memberResp.json();
     roleIds = Array.isArray(memberData.roles) ? memberData.roles : [];
+    if (memberData.nick && typeof memberData.nick === 'string' && memberData.nick.trim()) {
+      serverNickname = memberData.nick.trim();
+    }
   }
 
   const hasCoreRole = roleIds.includes(STATIC_CONFIG.coreRoleId);
@@ -784,6 +789,7 @@ export async function verifyDiscordAccessToken(accessToken: string): Promise<Dis
     roleIds,
     tier,
     accessToken,
+    serverNickname,
     authenticatedAt: new Date().toISOString(),
   };
 }
@@ -796,4 +802,56 @@ export async function openExternalUrl(url: string): Promise<void> {
     window.open(url, '_blank', 'noopener,noreferrer');
   }
 }
+
+export async function getDcsNicknameCommand(
+  dcsSavedGamesPath: string
+): Promise<DcsNicknameInfo> {
+  if (isTauriRuntime()) {
+    return await invoke<DcsNicknameInfo>('get_dcs_nickname', {
+      dcsSavedGamesPath,
+    });
+  }
+
+  // Browser/Mock fallback
+  const mockSaved = localStorage.getItem('gtfo_mock_dcs_nicknames');
+  if (mockSaved) {
+    try {
+      return JSON.parse(mockSaved);
+    } catch {
+      // ignore
+    }
+  }
+
+  return {
+    currentNickname: 'GTFO | Pilot',
+    nicknames: ['GTFO | Pilot', 'Pilot'],
+    filePath: `${dcsSavedGamesPath}\\Config\\nicknames.lua`,
+    fileExists: true,
+  };
+}
+
+export async function updateDcsNicknameCommand(
+  newNickname: string,
+  dcsSavedGamesPath: string
+): Promise<DcsNicknameInfo> {
+  if (isTauriRuntime()) {
+    return await invoke<DcsNicknameInfo>('update_dcs_nickname', {
+      newNickname,
+      dcsSavedGamesPath,
+    });
+  }
+
+  // Browser/Mock fallback
+  const current = await getDcsNicknameCommand(dcsSavedGamesPath);
+  const updatedList = [newNickname, ...current.nicknames.filter((n) => n !== newNickname)];
+  const result: DcsNicknameInfo = {
+    currentNickname: newNickname,
+    nicknames: updatedList,
+    filePath: current.filePath,
+    fileExists: true,
+  };
+  localStorage.setItem('gtfo_mock_dcs_nicknames', JSON.stringify(result));
+  return result;
+}
+
 

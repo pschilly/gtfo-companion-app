@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import {
-  AlertCircle,
-  CheckCircle2,
-  ExternalLink,
-  Loader2,
+  ArrowSquareOut,
+  CheckCircle,
+  CircleNotch,
   Shield,
   ShieldCheck,
-  Sparkles,
+  Sparkle,
+  WarningCircle,
   X,
-} from 'lucide-react';
+} from '@phosphor-icons/react';
 import { STATIC_CONFIG } from '../config/constants';
 import { useApp } from '../context/AppContext';
 import { LogoutConfirmModal } from './LogoutConfirmModal';
@@ -96,7 +96,7 @@ export const LoginModal: React.FC = () => {
         <div className="p-6 space-y-5">
           {error && (
             <div className="p-3.5 rounded-xl bg-red-950/40 border border-red-500/40 flex items-start gap-2.5 text-xs text-red-200">
-              <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+              <WarningCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
               <div className="space-y-1">
                 <p className="font-semibold">Authentication Error</p>
                 <p className="text-red-300/90 leading-relaxed">{error}</p>
@@ -163,7 +163,7 @@ export const LoginModal: React.FC = () => {
                       : 'bg-stone-900 border-stone-800 text-stone-500'
                   }`}
                 >
-                  <Sparkles className="w-4 h-4 shrink-0" />
+                  <Sparkle className="w-4 h-4 shrink-0" />
                   <div>
                     <div className="font-bold">CORE Roster Role</div>
                     <div className="text-[10px]">{hasCoreRole ? 'VERIFIED' : 'NOT PRESENT'}</div>
@@ -192,12 +192,12 @@ export const LoginModal: React.FC = () => {
               >
                 {isLoading ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <CircleNotch className="w-4 h-4 animate-spin" />
                     <span>Waiting for Discord Authorization...</span>
                   </>
                 ) : (
                   <>
-                    <ExternalLink className="w-4 h-4" />
+                    <ArrowSquareOut className="w-4 h-4" />
                     <span>Sign in with Discord</span>
                   </>
                 )}
@@ -215,7 +215,7 @@ export const LoginModal: React.FC = () => {
                 disabled={isLoading}
                 className="text-xs font-mono text-amber-400 hover:underline flex items-center gap-1"
               >
-                <CheckCircle2 className="w-3.5 h-3.5" />
+                <CheckCircle className="w-3.5 h-3.5" />
                 Re-verify Roles
               </button>
               <button

@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import {
+  AirplaneTilt,
+  ArrowSquareOut,
   Calendar,
-  CheckCircle2,
-  ChevronDown,
-  ChevronUp,
-  ExternalLink,
-  FileCheck2,
-  Plane,
+  CaretDown,
+  CaretUp,
+  Certificate,
+  CheckCircle,
   ShieldCheck,
-  Sparkles,
+  Sparkle,
   UserCheck,
-} from 'lucide-react';
+} from '@phosphor-icons/react';
 import { DossierNav } from '../components/DossierNav';
 import { STATIC_CONFIG } from '../config/constants';
 import { useApp } from '../context/AppContext';
@@ -47,7 +47,7 @@ export const QualificationsView: React.FC = () => {
 
   return (
     <div className="space-y-6 pb-8 max-w-7xl mx-auto">
-      {/* Sub Navigation */}
+      {/* Sub NavigationArrow */}
       <DossierNav />
 
       {/* Header Banner */}
@@ -75,7 +75,7 @@ export const QualificationsView: React.FC = () => {
             className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-amber-400 font-mono text-xs flex items-center gap-1.5 transition-colors shrink-0"
           >
             <span>Training Syllabus</span>
-            <ExternalLink className="w-3.5 h-3.5" />
+            <ArrowSquareOut className="w-3.5 h-3.5" />
           </a>
         </div>
       </div>
@@ -93,7 +93,7 @@ export const QualificationsView: React.FC = () => {
             </p>
           </div>
           <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0">
-            <FileCheck2 className="w-5 h-5 text-amber-400" />
+            <Certificate className="w-5 h-5 text-amber-400" />
           </div>
         </div>
 
@@ -108,7 +108,7 @@ export const QualificationsView: React.FC = () => {
             </p>
           </div>
           <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0">
-            <Sparkles className="w-5 h-5 text-emerald-400" />
+            <Sparkle className="w-5 h-5 text-emerald-400" />
           </div>
         </div>
 
@@ -123,7 +123,7 @@ export const QualificationsView: React.FC = () => {
             </p>
           </div>
           <div className="w-10 h-10 rounded-xl bg-stone-800 border border-stone-700 flex items-center justify-center shrink-0">
-            <Plane className="w-5 h-5 text-stone-300" />
+            <AirplaneTilt className="w-5 h-5 text-stone-300" />
           </div>
         </div>
       </div>
@@ -131,7 +131,7 @@ export const QualificationsView: React.FC = () => {
       {/* Received Certificates List */}
       {certificates.length === 0 ? (
         <div className="p-12 rounded-2xl bg-stone-900/85 border border-stone-800 text-center space-y-4">
-          <FileCheck2 className="w-10 h-10 text-stone-500 mx-auto" />
+          <Certificate className="w-10 h-10 text-stone-500 mx-auto" />
           <div className="space-y-1">
             <h3 className="font-display text-base font-semibold text-stone-100">
               No Certificates Recorded
@@ -148,7 +148,7 @@ export const QualificationsView: React.FC = () => {
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-bold text-xs shadow"
             >
               <span>Explore Syllabus Requirements</span>
-              <ExternalLink className="w-3.5 h-3.5" />
+              <ArrowSquareOut className="w-3.5 h-3.5" />
             </a>
           </div>
         </div>
@@ -180,7 +180,7 @@ export const QualificationsView: React.FC = () => {
                         </h2>
                         {cert.isIssued && (
                           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 font-mono text-[10px] font-bold uppercase tracking-wider">
-                            <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                            <CheckCircle className="w-3 h-3 text-emerald-400" />
                             <span>ISSUED</span>
                           </span>
                         )}
@@ -190,7 +190,7 @@ export const QualificationsView: React.FC = () => {
                       <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs font-mono text-stone-400">
                         {cert.airframe && (
                           <span className="inline-flex items-center gap-1.5 text-stone-300">
-                            <Plane className="w-3.5 h-3.5 text-amber-400" />
+                            <AirplaneTilt className="w-3.5 h-3.5 text-amber-400" />
                             <span>{cert.airframe}</span>
                           </span>
                         )}
@@ -239,7 +239,7 @@ export const QualificationsView: React.FC = () => {
                           className="p-3.5 rounded-xl bg-stone-950/80 border border-stone-800/80 space-y-2 text-xs"
                         >
                           <div className="flex items-center gap-2 font-mono font-bold text-amber-300 text-xs">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                            <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                             <span>{req.skill}</span>
                           </div>
                           {req.benchmarks && (

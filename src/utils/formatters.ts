@@ -18,3 +18,29 @@ export function formatShortDate(iso: string): string {
     return iso;
   }
 }
+
+export function formatExpectedDcsNickname(
+  callsign: string,
+  discordServerNick?: string | null
+): string {
+  if (discordServerNick && discordServerNick.trim()) {
+    const nick = discordServerNick.trim();
+    if (nick.startsWith('GTFO | ')) {
+      return nick;
+    }
+    if (/^GTFO\s*\|\s*/i.test(nick)) {
+      return `GTFO | ${nick.replace(/^GTFO\s*\|\s*/i, '').trim()}`;
+    }
+    return `GTFO | ${nick}`;
+  }
+
+  const clean = (callsign || 'Aviator').trim();
+  if (clean.startsWith('GTFO | ')) {
+    return clean;
+  }
+  if (/^GTFO\s*\|\s*/i.test(clean)) {
+    return `GTFO | ${clean.replace(/^GTFO\s*\|\s*/i, '').trim()}`;
+  }
+  return `GTFO | ${clean}`;
+}
+

@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Loader2, Terminal, Trash2 } from 'lucide-react';
+import {
+  CaretDown,
+  CaretUp,
+  CircleNotch,
+  Terminal,
+  Trash,
+} from '@phosphor-icons/react';
 import { useApp } from '../context/AppContext';
 
 export const ActivityConsole: React.FC = () => {
@@ -24,7 +30,7 @@ export const ActivityConsole: React.FC = () => {
 
           {activeList.length > 0 ? (
             <span className="inline-flex items-center gap-1.5 text-xs font-mono text-emerald-300 truncate">
-              <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-400" />
+              <CircleNotch className="w-3.5 h-3.5 animate-spin text-amber-400" />
               {activeList[0].message} ({activeList[0].percent}%)
             </span>
           ) : latestLog ? (
@@ -40,9 +46,9 @@ export const ActivityConsole: React.FC = () => {
         <div className="flex items-center gap-3 shrink-0">
           <span className="text-[10px] font-mono text-stone-500">{logs.length} EVENTS</span>
           {expanded ? (
-            <ChevronDown className="w-4 h-4 text-stone-400" />
+            <CaretDown className="w-4 h-4 text-stone-400" />
           ) : (
-            <ChevronUp className="w-4 h-4 text-stone-400" />
+            <CaretUp className="w-4 h-4 text-stone-400" />
           )}
         </div>
       </div>
@@ -59,7 +65,7 @@ export const ActivityConsole: React.FC = () => {
               }}
               className="hover:text-stone-300 flex items-center gap-1"
             >
-              <Trash2 className="w-3 h-3" />
+              <Trash className="w-3 h-3" />
               Clear Console
             </button>
           </div>

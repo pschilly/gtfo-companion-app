@@ -24,13 +24,17 @@ import {
   uninstallAssetCommand,
   verifyAssetIntegrityCommand,
   verifyDiscordAccessToken,
+  getDcsNicknameCommand,
+  updateDcsNicknameCommand,
 } from '../services/tauriBridge';
 import {
   AppSettings,
   AssetItem,
   AssetManifest,
   AtcFlightPlanPackage,
+  ChecklistSummary,
   DcsEnvironmentInfo,
+  DcsNicknameInfo,
   DiscordUserSession,
   DownloadProgressEvent,
   InstalledAssetRecord,
@@ -42,6 +46,8 @@ import {
   TelemetryLogEntry,
   UserTier,
 } from '../types';
+import { formatExpectedDcsNickname } from '../utils/formatters';
+import { checkForAppUpdate, AppUpdateInfo } from '../services/updaterService';
 
 export interface MemberProfileOverridePatch {
   rosterTier?: 'CORE' | 'Community';
@@ -117,6 +123,20 @@ interface AppContextValue {
     source: TelemetryLogEntry['source'],
     message: string
   ) => void;
+  dcsNicknameInfo: DcsNicknameInfo | null;
+  isLoadingNickname: boolean;
+  refreshDcsNickname: () => Promise<void>;
+  updateDcsNickname: (newNickname: string) => Promise<DcsNicknameInfo>;
+  expectedDcsNickname: string;
+  isNicknameMatching: boolean;
+  installRequiredMods: () => Promise<void>;
+  installRequiredLiveries: () => Promise<void>;
+  checklistSummary: ChecklistSummary;
+  appUpdate: AppUpdateInfo | null;
+  isCheckingAppUpdate: boolean;
+  checkForAppUpdateAction: () => Promise<AppUpdateInfo>;
+  isUpdateModalOpen: boolean;
+  setIsUpdateModalOpen: (open: boolean) => void;
 }
 
 const AppContext = createContext<AppContextValue | undefined>(undefined);
@@ -493,6 +513,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     syncManifest();
     syncMemberPortal();
+    checkForAppUpdateAction();
 
     if (window.location.hash.includes('access_token=')) {
       const params = new URLSearchParams(window.location.hash.slice(1));
@@ -566,6 +587,85 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setInstalledAssets({});
     }
   }, [dcsEnv?.activeSavedGamesPath, settings.dcsSavedGamesPath, manifest.assets, rescanLocalAssets]);
+
+  const [dcsNicknameInfo, setDcsNicknameInfo] = useState<DcsNicknameInfo | null>(null);
+  const [isLoadingNickname, setIsLoadingNickname] = useState<boolean>(false);
+
+  const expectedDcsNickname = useMemo(() => {
+    return formatExpectedDcsNickname(
+      memberProfile?.callsign || userSession?.globalName || userSession?.username || 'Aviator',
+      userSession?.serverNickname
+    );
+  }, [
+    memberProfile?.callsign,
+    userSession?.globalName,
+    userSession?.username,
+    userSession?.serverNickname,
+  ]);
+
+  const isNicknameMatching = useMemo(() => {
+    if (!dcsNicknameInfo?.currentNickname) return false;
+    return dcsNicknameInfo.currentNickname.trim() === expectedDcsNickname.trim();
+  }, [dcsNicknameInfo?.currentNickname, expectedDcsNickname]);
+
+  const refreshDcsNickname = useCallback(async () => {
+    const activePath = settings.dcsSavedGamesPath || dcsEnv?.activeSavedGamesPath;
+    if (!activePath) return;
+    setIsLoadingNickname(true);
+    try {
+      const info = await getDcsNicknameCommand(activePath);
+      setDcsNicknameInfo(info);
+    } catch (err) {
+      console.error('Failed to get DCS nickname:', err);
+    } finally {
+      setIsLoadingNickname(false);
+    }
+  }, [settings.dcsSavedGamesPath, dcsEnv?.activeSavedGamesPath]);
+
+  const updateDcsNickname = useCallback(
+    async (newNickname: string) => {
+      const activePath = settings.dcsSavedGamesPath || dcsEnv?.activeSavedGamesPath;
+      if (!activePath) throw new Error('DCS Saved Games path not determined');
+      setIsLoadingNickname(true);
+      try {
+        const info = await updateDcsNicknameCommand(newNickname, activePath);
+        setDcsNicknameInfo(info);
+        addLog('success', 'SYSTEM', `DCS nickname updated in slot #1: "${newNickname}"`);
+        return info;
+      } catch (err: any) {
+        addLog('error', 'SYSTEM', `Failed to update DCS nickname: ${err?.message || err}`);
+        throw err;
+      } finally {
+        setIsLoadingNickname(false);
+      }
+    },
+    [settings.dcsSavedGamesPath, dcsEnv?.activeSavedGamesPath, addLog]
+  );
+
+  useEffect(() => {
+    const activePath = settings.dcsSavedGamesPath || dcsEnv?.activeSavedGamesPath;
+    if (activePath) {
+      refreshDcsNickname();
+    }
+  }, [dcsEnv?.activeSavedGamesPath, settings.dcsSavedGamesPath, refreshDcsNickname]);
+
+  const [appUpdate, setAppUpdate] = useState<AppUpdateInfo | null>(null);
+  const [isCheckingAppUpdate, setIsCheckingAppUpdate] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+
+  const checkForAppUpdateAction = useCallback(async (): Promise<AppUpdateInfo> => {
+    setIsCheckingAppUpdate(true);
+    try {
+      const info = await checkForAppUpdate();
+      setAppUpdate(info);
+      if (info.available) {
+        addLog('info', 'SYSTEM', `Companion App update v${info.version} available!`);
+      }
+      return info;
+    } finally {
+      setIsCheckingAppUpdate(false);
+    }
+  }, [addLog]);
 
   const canAccessAsset = useCallback(
     (asset: AssetItem): boolean => {
@@ -807,6 +907,83 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       await installAsset(asset);
     }
   }, [installAsset, missingRequiredAssets]);
+
+  const installRequiredMods = useCallback(async () => {
+    const requiredMods = missingRequiredAssets.filter((a) => a.category === 'mod');
+    for (const asset of requiredMods) {
+      await installAsset(asset);
+    }
+  }, [installAsset, missingRequiredAssets]);
+
+  const installRequiredLiveries = useCallback(async () => {
+    const requiredLiveries = missingRequiredAssets.filter((a) => a.category === 'livery');
+    for (const asset of requiredLiveries) {
+      await installAsset(asset);
+    }
+  }, [installAsset, missingRequiredAssets]);
+
+  const checklistSummary: ChecklistSummary = useMemo(() => {
+    const requiredMods = manifest.assets.filter(
+      (a) => a.category === 'mod' && isRequiredForCurrentUser(a) && canAccessAsset(a)
+    );
+    const missingRequiredMods = missingRequiredAssets.filter((a) => a.category === 'mod');
+    const installedModsCount = Object.values(installedAssets).filter(
+      (a) =>
+        a.category === 'mod' ||
+        manifest.assets.find((m) => m.id === a.assetId)?.category === 'mod'
+    ).length;
+    const isModsComplete =
+      requiredMods.length > 0
+        ? missingRequiredMods.length === 0
+        : installedModsCount > 0 || manifest.assets.filter((a) => a.category === 'mod').length === 0;
+
+    const requiredLiveries = manifest.assets.filter(
+      (a) => a.category === 'livery' && isRequiredForCurrentUser(a) && canAccessAsset(a)
+    );
+    const missingRequiredLiveries = missingRequiredAssets.filter((a) => a.category === 'livery');
+    const installedLiveriesCount = Object.values(installedAssets).filter(
+      (a) =>
+        a.category === 'livery' ||
+        manifest.assets.find((m) => m.id === a.assetId)?.category === 'livery'
+    ).length;
+    const isLiveriesComplete =
+      requiredLiveries.length > 0
+        ? missingRequiredLiveries.length === 0
+        : installedLiveriesCount > 0;
+
+    const isNickComplete = isNicknameMatching;
+    const isDcsBotLinked = Boolean(
+      memberProfile?.dcsUcid && memberProfile.dcsUcid.trim().length > 0
+    );
+
+    const totalSteps = 4;
+    const completedSteps =
+      (isModsComplete ? 1 : 0) +
+      (isLiveriesComplete ? 1 : 0) +
+      (isNickComplete ? 1 : 0) +
+      (isDcsBotLinked ? 1 : 0);
+    const pendingCount = totalSteps - completedSteps;
+    const allComplete = completedSteps === totalSteps;
+
+    return {
+      isModsComplete,
+      isLiveriesComplete,
+      isNickComplete,
+      isDcsBotLinked,
+      completedSteps,
+      totalSteps,
+      pendingCount,
+      allComplete,
+    };
+  }, [
+    manifest.assets,
+    isRequiredForCurrentUser,
+    canAccessAsset,
+    missingRequiredAssets,
+    installedAssets,
+    isNicknameMatching,
+    memberProfile?.dcsUcid,
+  ]);
 
   // --- ATC Deployment Actions ---
   const deployAtcDtc = useCallback(
@@ -1053,6 +1230,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         logs,
         clearLogs,
         addLog,
+        dcsNicknameInfo,
+        isLoadingNickname,
+        refreshDcsNickname,
+        updateDcsNickname,
+        expectedDcsNickname,
+        isNicknameMatching,
+        installRequiredMods,
+        installRequiredLiveries,
+        checklistSummary,
+        appUpdate,
+        isCheckingAppUpdate,
+        checkForAppUpdateAction,
+        isUpdateModalOpen,
+        setIsUpdateModalOpen,
       }}
     >
       {children}

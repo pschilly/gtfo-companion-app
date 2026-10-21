@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import {
-  AlertCircle,
-  CheckCircle2,
-  FolderCheck,
-  FolderSearch,
+  CheckCircle,
+  Folder,
+  FolderSimplePlus,
   HardDrive,
   Info,
   ShieldCheck,
-  Sparkles,
-} from 'lucide-react';
+  Sparkle,
+  WarningCircle,
+} from '@phosphor-icons/react';
 import { useApp } from '../context/AppContext';
 
 export const PathOnboardingModal: React.FC = () => {
@@ -60,7 +60,7 @@ export const PathOnboardingModal: React.FC = () => {
         <div className="px-6 py-5 border-b border-stone-800 bg-stone-950 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
-              <FolderCheck className="w-5 h-5" />
+              <Folder className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -92,7 +92,7 @@ export const PathOnboardingModal: React.FC = () => {
           {/* Introductory Notice */}
           <div className="p-4 rounded-xl bg-stone-950/80 border border-stone-800/90 text-xs text-stone-300 leading-relaxed space-y-1.5">
             <div className="flex items-center gap-2 text-amber-300 font-semibold font-display">
-              <Sparkles className="w-4 h-4 text-amber-400" />
+              <Sparkle className="w-4 h-4 text-amber-400" />
               Welcome to the GTFO Companion
             </div>
             <p>
@@ -115,7 +115,7 @@ export const PathOnboardingModal: React.FC = () => {
                 className="text-[11px] font-mono text-stone-400 hover:text-amber-300 flex items-center gap-1 transition-colors"
                 title="Scan system for DCS Saved Games directories"
               >
-                <FolderSearch className="w-3 h-3 text-amber-400" />
+                <FolderSimplePlus className="w-3 h-3 text-amber-400" />
                 Re-scan System
               </button>
             </div>
@@ -131,12 +131,12 @@ export const PathOnboardingModal: React.FC = () => {
               <div className="absolute right-2.5 top-1/2 -translate-y-1/2">
                 {pathExists ? (
                   <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-mono">
-                    <CheckCircle2 className="w-3 h-3" />
+                    <CheckCircle className="w-3 h-3" />
                     FOUND
                   </span>
                 ) : (
                   <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 text-[10px] font-mono">
-                    <AlertCircle className="w-3 h-3" />
+                    <WarningCircle className="w-3 h-3" />
                     NEW
                   </span>
                 )}
@@ -150,7 +150,7 @@ export const PathOnboardingModal: React.FC = () => {
               </span>
               {pathExists ? (
                 <span className="text-emerald-400 font-mono flex items-center gap-1">
-                  <CheckCircle2 className="w-3 h-3 inline" /> Verified folder on disk
+                  <CheckCircle className="w-3 h-3 inline" /> Verified folder on disk
                 </span>
               ) : (
                 <span className="text-amber-400/90 font-mono flex items-center gap-1">
@@ -216,7 +216,7 @@ export const PathOnboardingModal: React.FC = () => {
             <p className="leading-relaxed">
               Your path choice is cached locally and will not prompt you on future logins. You can
               freely re-point or update this path at any time under{' '}
-              <span className="text-stone-200 font-semibold">System Settings</span>.
+              <span className="text-stone-200 font-semibold">System Gear</span>.
             </p>
           </div>
 
@@ -227,7 +227,7 @@ export const PathOnboardingModal: React.FC = () => {
               disabled={!pathInput.trim()}
               className="w-full sm:w-auto px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:bg-stone-800 disabled:text-stone-500 text-stone-950 font-display font-bold text-xs flex items-center justify-center gap-2 shadow-lg transition-all"
             >
-              <CheckCircle2 className="w-4 h-4" />
+              <CheckCircle className="w-4 h-4" />
               Confirm Path &amp; Proceed to Companion
             </button>
           </div>

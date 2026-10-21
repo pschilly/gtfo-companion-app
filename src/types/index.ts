@@ -15,6 +15,7 @@ export type RequirementLevel = 'required_all' | 'required_core' | 'optional';
 export type NavigationTab =
   | 'home'
   | 'dashboard'
+  | 'checklist'
   | 'airframes'
   | 'qualifications'
   | 'awards'
@@ -329,6 +330,7 @@ export interface DiscordUserSession {
   roleIds: string[];
   tier: UserTier;
   accessToken?: string;
+  serverNickname?: string | null;
   authenticatedAt: string;
 }
 
@@ -377,4 +379,23 @@ export interface IntegrityCheckResult {
   modifiedFiles: string[];
   checkedCount: number;
 }
+
+export interface DcsNicknameInfo {
+  currentNickname: string | null;
+  nicknames: string[];
+  filePath: string;
+  fileExists: boolean;
+}
+
+export interface ChecklistSummary {
+  isModsComplete: boolean;
+  isLiveriesComplete: boolean;
+  isNickComplete: boolean;
+  isDcsBotLinked: boolean;
+  completedSteps: number;
+  totalSteps: number;
+  pendingCount: number;
+  allComplete: boolean;
+}
+
 

@@ -155,6 +155,7 @@ pub struct DiscordUserSession {
     pub role_ids: Vec<String>,
     pub tier: String,
     pub access_token: Option<String>,
+    pub server_nickname: Option<String>,
     pub authenticated_at: String,
 }
 
@@ -1270,10 +1271,16 @@ async fn fetch_discord_profile_and_guild(
 
     let mut is_guild_member = false;
     let mut role_ids: Vec<String> = Vec::new();
+    let mut server_nickname: Option<String> = None;
 
     if member_resp.status().is_success() {
         is_guild_member = true;
         if let Ok(member_json) = member_resp.json::<serde_json::Value>().await {
+            if let Some(nick) = member_json["nick"].as_str() {
+                if !nick.trim().is_empty() {
+                    server_nickname = Some(nick.trim().to_string());
+                }
+            }
             if let Some(arr) = member_json["roles"].as_array() {
                 for r in arr {
                     if let Some(s) = r.as_str() {
@@ -1306,6 +1313,7 @@ async fn fetch_discord_profile_and_guild(
         role_ids,
         tier: tier.to_string(),
         access_token: Some(access_token.to_string()),
+        server_nickname,
         authenticated_at: chrono::Utc::now().to_rfc3339(),
     })
 }
@@ -1679,9 +1687,157 @@ fn open_external_url(url: String) -> Result<(), String> {
     open::that(&url).map_err(|e| format!("Failed to open browser for {}: {}", url, e))
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct DcsNicknameInfo {
+    pub current_nickname: Option<String>,
+    pub nicknames: Vec<String>,
+    pub file_path: String,
+    pub file_exists: bool,
+}
+
+fn parse_nicknames_lua(content: &str) -> Vec<(usize, String)> {
+    let mut entries = Vec::new();
+    for line in content.lines() {
+        let trimmed = line.trim();
+        if !trimmed.starts_with('[') {
+            continue;
+        }
+        if let Some(close_bracket) = trimmed.find(']') {
+            let idx_str = trimmed[1..close_bracket].trim();
+            if let Ok(idx) = idx_str.parse::<usize>() {
+                if let Some(eq_pos) = trimmed[close_bracket..].find('=') {
+                    let after_eq = trimmed[close_bracket + eq_pos + 1..].trim();
+                    let quote_char = if after_eq.starts_with('"') {
+                        Some('"')
+                    } else if after_eq.starts_with('\'') {
+                        Some('\'')
+                    } else {
+                        None
+                    };
+                    if let Some(q) = quote_char {
+                        let rest = &after_eq[1..];
+                        if let Some(end_quote) = rest.find(q) {
+                            let name = &rest[..end_quote];
+                            entries.push((idx, name.to_string()));
+                        }
+                    }
+                }
+            }
+        }
+    }
+    entries.sort_by_key(|&(idx, _)| idx);
+    entries
+}
+
+fn serialize_nicknames_lua(names: &[String]) -> String {
+    let mut out = String::from("nicknames = \r\n{\r\n");
+    for (i, name) in names.iter().enumerate() {
+        let safe_name = name.replace('\\', "\\\\").replace('"', "\\\"");
+        out.push_str(&format!("\t[{}] = \"{}\",\r\n", i + 1, safe_name));
+    }
+    out.push_str("} -- end of nicknames\r\n");
+    out
+}
+
+fn resolve_nicknames_file(dcs_saved_games_path: &str) -> (PathBuf, Option<PathBuf>) {
+    let base_dcs = PathBuf::from(dcs_saved_games_path);
+    let config_file = base_dcs.join("Config").join("nicknames.lua");
+    let mission_file = base_dcs.join("MissionEditor").join("nicknames.lua");
+
+    if config_file.exists() && mission_file.exists() {
+        (config_file, Some(mission_file))
+    } else if config_file.exists() {
+        (config_file, None)
+    } else if mission_file.exists() {
+        (mission_file, None)
+    } else {
+        (config_file, None)
+    }
+}
+
+#[tauri::command]
+fn get_dcs_nickname(dcs_saved_games_path: String) -> Result<DcsNicknameInfo, String> {
+    let (primary_path, _) = resolve_nicknames_file(&dcs_saved_games_path);
+    if !primary_path.exists() {
+        return Ok(DcsNicknameInfo {
+            current_nickname: None,
+            nicknames: Vec::new(),
+            file_path: primary_path.to_string_lossy().to_string(),
+            file_exists: false,
+        });
+    }
+
+    let content = fs::read_to_string(&primary_path)
+        .map_err(|e| format!("Failed to read {:?}: {}", primary_path, e))?;
+
+    let entries = parse_nicknames_lua(&content);
+    let nicknames: Vec<String> = entries.into_iter().map(|(_, n)| n).collect();
+    let current_nickname = nicknames.first().cloned();
+
+    Ok(DcsNicknameInfo {
+        current_nickname,
+        nicknames,
+        file_path: primary_path.to_string_lossy().to_string(),
+        file_exists: true,
+    })
+}
+
+#[tauri::command]
+fn update_dcs_nickname(
+    dcs_saved_games_path: String,
+    new_nickname: String,
+) -> Result<DcsNicknameInfo, String> {
+    let trimmed = new_nickname.trim();
+    if trimmed.is_empty() {
+        return Err("Nickname cannot be empty.".to_string());
+    }
+
+    let (primary_path, secondary_path) = resolve_nicknames_file(&dcs_saved_games_path);
+
+    let mut existing_nicknames = Vec::new();
+    if primary_path.exists() {
+        if let Ok(content) = fs::read_to_string(&primary_path) {
+            let entries = parse_nicknames_lua(&content);
+            existing_nicknames = entries.into_iter().map(|(_, n)| n).collect();
+        }
+    }
+
+    // Remove any existing occurrences of trimmed to avoid duplicates
+    existing_nicknames.retain(|n| n != trimmed);
+
+    // Prepend to slot 1
+    existing_nicknames.insert(0, trimmed.to_string());
+
+    let formatted_lua = serialize_nicknames_lua(&existing_nicknames);
+
+    if let Some(parent) = primary_path.parent() {
+        fs::create_dir_all(parent)
+            .map_err(|e| format!("Failed to create directory {:?}: {}", parent, e))?;
+    }
+    fs::write(&primary_path, formatted_lua.as_bytes())
+        .map_err(|e| format!("Failed to write to {:?}: {}", primary_path, e))?;
+
+    if let Some(sec) = secondary_path {
+        if let Some(parent) = sec.parent() {
+            let _ = fs::create_dir_all(parent);
+        }
+        let _ = fs::write(&sec, formatted_lua.as_bytes());
+    }
+
+    Ok(DcsNicknameInfo {
+        current_nickname: Some(trimmed.to_string()),
+        nicknames: existing_nicknames,
+        file_path: primary_path.to_string_lossy().to_string(),
+        file_exists: true,
+    })
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_process::init())
         .invoke_handler(tauri::generate_handler![
             detect_dcs_paths,
             fetch_remote_manifest,
@@ -1697,8 +1853,64 @@ pub fn run() {
             inspect_route_tool_presets,
             merge_route_tool_preset,
             install_atc_kneeboard,
-            open_external_url
+            open_external_url,
+            get_dcs_nickname,
+            update_dcs_nickname
         ])
         .run(tauri::generate_context!())
         .expect("error while running GTFO Companion App");
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_parse_nicknames_lua() {
+        let sample = r#"
+nicknames = 
+{
+	[1] = "GTFO | Schilly",
+	[2] = "GTFO | Test",
+	[3] = "Logan 2 | GTFO | Schilly",
+} -- end of nicknames
+"#;
+        let entries = parse_nicknames_lua(sample);
+        assert_eq!(entries.len(), 3);
+        assert_eq!(entries[0], (1, "GTFO | Schilly".to_string()));
+        assert_eq!(entries[1], (2, "GTFO | Test".to_string()));
+        assert_eq!(entries[2], (3, "Logan 2 | GTFO | Schilly".to_string()));
+    }
+
+    #[test]
+    fn test_serialize_nicknames_lua() {
+        let names = vec![
+            "GTFO | Schilly".to_string(),
+            "GTFO | Test".to_string(),
+            "Logan 2 | GTFO | Schilly".to_string(),
+        ];
+        let out = serialize_nicknames_lua(&names);
+        assert!(out.starts_with("nicknames = \r\n{\r\n"));
+        assert!(out.contains("\t[1] = \"GTFO | Schilly\",\r\n"));
+        assert!(out.contains("\t[2] = \"GTFO | Test\",\r\n"));
+        assert!(out.contains("\t[3] = \"Logan 2 | GTFO | Schilly\",\r\n"));
+        assert!(out.ends_with("} -- end of nicknames\r\n"));
+    }
+
+    #[test]
+    fn test_prepend_and_deduplicate_nickname() {
+        let mut list = vec![
+            "GTFO | Test".to_string(),
+            "GTFO | Schilly".to_string(),
+            "Wank | Schilly".to_string(),
+        ];
+        let new_nick = "GTFO | Schilly";
+        list.retain(|n| n != new_nick);
+        list.insert(0, new_nick.to_string());
+
+        assert_eq!(list[0], "GTFO | Schilly");
+        assert_eq!(list[1], "GTFO | Test");
+        assert_eq!(list[2], "Wank | Schilly");
+        assert_eq!(list.len(), 3);
+    }
 }

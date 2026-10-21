@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import {
-  CheckCircle2,
-  FolderSearch,
+  ArrowCounterClockwise,
+  CheckCircle,
+  FloppyDisk,
+  FolderSimplePlus,
   HardDrive,
-  RotateCcw,
-  Save,
-} from 'lucide-react';
+} from '@phosphor-icons/react';
 import { DEFAULT_SETTINGS } from '../config/constants';
 import { useApp } from '../context/AppContext';
 
@@ -46,7 +46,7 @@ export const SettingsView: React.FC = () => {
       <div className="flex items-center justify-between pb-4 border-b border-stone-800/80">
         <div>
           <h1 className="font-display text-2xl font-bold bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent">
-            System Settings
+            System Gear
           </h1>
           <p className="text-xs text-stone-400 mt-0.5">
             Configure your local DCS World <code className="font-mono text-stone-300">Saved Games</code>{' '}
@@ -55,8 +55,8 @@ export const SettingsView: React.FC = () => {
         </div>
         {savedBanner && (
           <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-mono">
-            <CheckCircle2 className="w-4 h-4" />
-            Settings Saved
+            <CheckCircle className="w-4 h-4" />
+            Gear Saved
           </span>
         )}
       </div>
@@ -78,7 +78,7 @@ export const SettingsView: React.FC = () => {
             onClick={() => refreshDcsEnv()}
             className="px-3 py-1.5 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-700 text-xs font-mono text-stone-300 flex items-center gap-1.5 transition-colors"
           >
-            <FolderSearch className="w-3.5 h-3.5 text-amber-400" />
+            <FolderSimplePlus className="w-3.5 h-3.5 text-amber-400" />
             Auto-Detect Windows Paths
           </button>
         </div>
@@ -179,7 +179,7 @@ export const SettingsView: React.FC = () => {
               }}
               className="text-xs font-mono text-stone-400 hover:text-stone-200 flex items-center gap-1.5"
             >
-              <RotateCcw className="w-3.5 h-3.5" />
+              <ArrowCounterClockwise className="w-3.5 h-3.5" />
               Reset to Defaults
             </button>
             <button
@@ -187,7 +187,7 @@ export const SettingsView: React.FC = () => {
               onClick={() => setPathOnboardingOpen(true)}
               className="text-xs font-mono text-stone-400 hover:text-amber-300 flex items-center gap-1.5 transition-colors"
             >
-              <FolderSearch className="w-3.5 h-3.5 text-amber-400" />
+              <FolderSimplePlus className="w-3.5 h-3.5 text-amber-400" />
               Review Onboarding Prompt
             </button>
           </div>
@@ -196,8 +196,8 @@ export const SettingsView: React.FC = () => {
             type="submit"
             className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-bold text-xs flex items-center gap-2 shadow"
           >
-            <Save className="w-4 h-4" />
-            Save Settings
+            <FloppyDisk className="w-4 h-4" />
+            FloppyDisk Gear
           </button>
         </div>
       </form>

@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import {
-  AlertTriangle,
-  ArrowUpCircle,
-  CheckCircle2,
-  FolderCheck,
+  ArrowCircleUp,
+  ArrowsClockwise,
+  CheckCircle,
+  CircleNotch,
+  Folder,
   FolderOpen,
-  Loader2,
-  RefreshCw,
   ShieldCheck,
-  Trash2,
-} from 'lucide-react';
+  Trash,
+  Warning,
+} from '@phosphor-icons/react';
 import { useApp } from '../context/AppContext';
 import { formatShortDate } from '../utils/formatters';
 
@@ -74,7 +74,7 @@ export const LibraryView: React.FC = () => {
             onClick={rescanLocalAssets}
             className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-200 font-mono text-xs flex items-center gap-2 transition-colors"
           >
-            <RefreshCw className="w-3.5 h-3.5 text-amber-400" />
+            <ArrowsClockwise className="w-3.5 h-3.5 text-amber-400" />
             Rescan DCS Folder
           </button>
 
@@ -86,7 +86,7 @@ export const LibraryView: React.FC = () => {
               title="Verify local file integrity for all installed packages"
             >
               {isVerifyingAll ? (
-                <Loader2 className="w-3.5 h-3.5 text-amber-400 animate-spin" />
+                <CircleNotch className="w-3.5 h-3.5 text-amber-400 animate-spin" />
               ) : (
                 <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
               )}
@@ -99,7 +99,7 @@ export const LibraryView: React.FC = () => {
               onClick={updateAllOutdated}
               className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono font-bold text-xs flex items-center gap-2 shadow"
             >
-              <ArrowUpCircle className="w-4 h-4" />
+              <ArrowCircleUp className="w-4 h-4" />
               Update All ({outdatedAssets.length})
             </button>
           )}
@@ -108,14 +108,14 @@ export const LibraryView: React.FC = () => {
 
       {verifyAllFeedback && (
         <div className="p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 font-mono text-xs flex items-center gap-2 animate-fadeIn">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+          <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
           <span>{verifyAllFeedback}</span>
         </div>
       )}
 
       {installedList.length === 0 ? (
         <div className="p-12 rounded-2xl bg-stone-900/85 border border-stone-800 text-center space-y-4">
-          <FolderCheck className="w-10 h-10 text-stone-500 mx-auto" />
+          <Folder className="w-10 h-10 text-stone-500 mx-auto" />
           <div className="space-y-1">
             <h3 className="font-display text-base font-semibold text-stone-100">
               No Assets Installed Yet
@@ -179,12 +179,12 @@ export const LibraryView: React.FC = () => {
                       </h3>
                       {hasUpdate ? (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500 text-stone-950 font-mono font-bold text-[10px]">
-                          <ArrowUpCircle className="w-3 h-3" />
+                          <ArrowCircleUp className="w-3 h-3" />
                           UPDATE AVAILABLE: v{remoteItem.version}
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 font-mono text-[10px]">
-                          <CheckCircle2 className="w-3 h-3" />
+                          <CheckCircle className="w-3 h-3" />
                           v{record.installedVersion} (CURRENT)
                         </span>
                       )}
@@ -198,7 +198,7 @@ export const LibraryView: React.FC = () => {
 
                       {verifyRes && !verifyRes.valid && (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/50 text-amber-300 font-mono font-bold text-[10px]">
-                          <AlertTriangle className="w-3 h-3 text-amber-400" />
+                          <Warning className="w-3 h-3 text-amber-400" />
                           INTEGRITY ISSUE ({issueCount} FILE{issueCount === 1 ? '' : 'S'})
                         </span>
                       )}
@@ -220,7 +220,7 @@ export const LibraryView: React.FC = () => {
                         onClick={() => installAsset(remoteItem)}
                         className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono font-bold text-xs flex items-center gap-1.5"
                       >
-                        <ArrowUpCircle className="w-3.5 h-3.5" />
+                        <ArrowCircleUp className="w-3.5 h-3.5" />
                         Update to v{remoteItem.version}
                       </button>
                     )}
@@ -232,7 +232,7 @@ export const LibraryView: React.FC = () => {
                       className="px-3 py-2 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-800 text-stone-300 font-mono text-xs flex items-center gap-1.5 disabled:opacity-60"
                     >
                       {isVerifying ? (
-                        <Loader2 className="w-3.5 h-3.5 text-amber-400 animate-spin" />
+                        <CircleNotch className="w-3.5 h-3.5 text-amber-400 animate-spin" />
                       ) : (
                         <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
                       )}
@@ -250,7 +250,7 @@ export const LibraryView: React.FC = () => {
                             : 'bg-stone-950 hover:bg-stone-800 border border-stone-800 text-stone-300'
                         }`}
                       >
-                        <RefreshCw className="w-3.5 h-3.5" />
+                        <ArrowsClockwise className="w-3.5 h-3.5" />
                         Repair
                       </button>
                     )}
@@ -260,7 +260,7 @@ export const LibraryView: React.FC = () => {
                       disabled={Boolean(progress)}
                       className="px-3 py-2 rounded-xl bg-red-500/15 hover:bg-red-500/25 border border-red-500/40 text-red-300 font-mono text-xs flex items-center gap-1.5 disabled:opacity-60"
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
+                      <Trash className="w-3.5 h-3.5" />
                       Uninstall
                     </button>
                   </div>
@@ -270,7 +270,7 @@ export const LibraryView: React.FC = () => {
                   <div className="pt-2 border-t border-stone-800/80 space-y-1.5">
                     <div className="flex items-center justify-between text-xs font-mono">
                       <span className="text-amber-300 flex items-center gap-1.5 truncate">
-                        <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" />
+                        <CircleNotch className="w-3.5 h-3.5 animate-spin shrink-0" />
                         {progress.message}
                       </span>
                       <span className="text-stone-300 shrink-0">{progress.percent}%</span>

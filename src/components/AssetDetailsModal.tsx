@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import {
-  AlertTriangle,
-  ArrowUpCircle,
-  CheckCircle2,
-  Download,
-  ExternalLink,
-  FileCheck2,
+  ArrowCircleUp,
+  ArrowSquareOut,
+  ArrowsClockwise,
+  Certificate,
+  CheckCircle,
+  DownloadSimple,
   FolderOpen,
   GitBranch,
   Hash,
   Lock,
-  RefreshCw,
   ShieldCheck,
-  Sparkles,
-  Trash2,
+  Sparkle,
+  Trash,
   User,
+  Warning,
   X,
-} from 'lucide-react';
+} from '@phosphor-icons/react';
 import { useApp } from '../context/AppContext';
 import { openExternalUrl } from '../services/tauriBridge';
 import { formatBytes, formatShortDate } from '../utils/formatters';
@@ -131,12 +131,12 @@ export const AssetDetailsModal: React.FC = () => {
 
                 {selectedAsset.requirementLevel === 'required_all' ? (
                   <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded bg-red-600 text-white font-mono font-bold text-xs uppercase">
-                    <AlertTriangle className="w-3.5 h-3.5" />
+                    <Warning className="w-3.5 h-3.5" />
                     REQUIRED FOR ALL
                   </span>
                 ) : selectedAsset.requirementLevel === 'required_core' ? (
                   <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded bg-amber-500 text-stone-950 font-mono font-bold text-xs uppercase">
-                    <Sparkles className="w-3.5 h-3.5" />
+                    <Sparkle className="w-3.5 h-3.5" />
                     REQUIRED FOR CORE
                   </span>
                 ) : (
@@ -247,7 +247,7 @@ export const AssetDetailsModal: React.FC = () => {
                     className="text-xs font-mono text-amber-400 hover:underline inline-flex items-center gap-1"
                   >
                     {selectedAsset.githubRepo} ({selectedAsset.githubBranch || 'main'})
-                    <ExternalLink className="w-3 h-3" />
+                    <ArrowSquareOut className="w-3 h-3" />
                   </a>
                   <p className="text-[11px] font-mono text-stone-400 break-all">
                     Tree SHA: {selectedAsset.sha256}
@@ -304,7 +304,7 @@ export const AssetDetailsModal: React.FC = () => {
             <div className="p-3.5 rounded-xl bg-emerald-950/20 border border-emerald-500/30 space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono font-semibold text-emerald-300 flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <CheckCircle className="w-4 h-4 text-emerald-400" />
                   INSTALLED ON DISK (Rev {installed.installedVersion})
                 </span>
                 <button
@@ -312,13 +312,13 @@ export const AssetDetailsModal: React.FC = () => {
                   disabled={verifying}
                   className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-stone-950 hover:bg-stone-800 border border-stone-700 text-[11px] font-mono text-stone-200"
                 >
-                  <RefreshCw className={`w-3 h-3 ${verifying ? 'animate-spin' : ''}`} />
+                  <ArrowsClockwise className={`w-3 h-3 ${verifying ? 'animate-spin' : ''}`} />
                   Verify Local Files
                 </button>
               </div>
               {verifyStatus === 'ok' && (
                 <p className="text-xs font-mono text-emerald-400 flex items-center gap-1.5">
-                  <FileCheck2 className="w-3.5 h-3.5" /> All {installed.extractedFiles.length}{' '}
+                  <Certificate className="w-3.5 h-3.5" /> All {installed.extractedFiles.length}{' '}
                   tracked file(s) verified intact in DCS Saved Games.
                 </p>
               )}
@@ -378,12 +378,12 @@ export const AssetDetailsModal: React.FC = () => {
                           onClick={() => openExternalUrl(selectedAsset.externalUrl!)}
                           className="px-4 py-2.5 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-700 text-stone-300 hover:text-white font-mono font-semibold text-xs flex items-center gap-1.5 transition-colors"
                         >
-                          <ExternalLink className="w-4 h-4" />
+                          <ArrowSquareOut className="w-4 h-4" />
                           Releases &amp; Documentation
                         </button>
                       )}
                       <div className="px-5 py-2.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-mono font-semibold text-xs flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4" />
+                        <CheckCircle className="w-4 h-4" />
                         External Tool Active &amp; Verified
                       </div>
                     </>
@@ -396,7 +396,7 @@ export const AssetDetailsModal: React.FC = () => {
                       }}
                       className="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono font-bold text-xs flex items-center gap-2 shadow-lg shadow-amber-500/10 transition-all"
                     >
-                      <ExternalLink className="w-4 h-4" />
+                      <ArrowSquareOut className="w-4 h-4" />
                       Open External Installer ({selectedAsset.name})
                     </button>
                   )
@@ -406,7 +406,7 @@ export const AssetDetailsModal: React.FC = () => {
                       onClick={() => uninstallAsset(selectedAsset.id)}
                       className="px-4 py-2.5 rounded-xl bg-red-500/15 hover:bg-red-500/25 border border-red-500/40 text-red-300 font-mono font-semibold text-xs flex items-center gap-1.5"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash className="w-4 h-4" />
                       Uninstall Asset
                     </button>
                     <button
@@ -415,12 +415,12 @@ export const AssetDetailsModal: React.FC = () => {
                     >
                       {needsUpdate ? (
                         <>
-                          <ArrowUpCircle className="w-4 h-4" />
+                          <ArrowCircleUp className="w-4 h-4" />
                           Update to {selectedAsset.version}
                         </>
                       ) : (
                         <>
-                          <RefreshCw className="w-4 h-4" />
+                          <ArrowsClockwise className="w-4 h-4" />
                           Verify &amp; Repair from GitHub
                         </>
                       )}
@@ -431,7 +431,7 @@ export const AssetDetailsModal: React.FC = () => {
                     onClick={() => installAsset(selectedAsset)}
                     className="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono font-bold text-xs flex items-center gap-2 shadow-lg shadow-amber-500/10"
                   >
-                    <Download className="w-4 h-4" />
+                    <DownloadSimple className="w-4 h-4" />
                     Deploy to DCS Saved Games
                   </button>
                 )}

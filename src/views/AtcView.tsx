@@ -1,24 +1,24 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
+  AirplaneTilt,
+  ArrowsClockwise,
   BookOpen,
-  CheckCircle2,
-  Code2,
+  CheckCircle,
+  Code,
   Compass,
   Cpu,
-  Download,
+  DownloadSimple,
   FileCode,
-  FileSpreadsheet,
-  FolderGit2,
-  Layers,
+  FileXls,
+  FolderSimple,
   MapPin,
-  Navigation,
-  Plane,
+  NavigationArrow,
+  Path,
   Radio,
-  RefreshCw,
-  Route,
-  ShieldAlert,
-  Sparkles,
-} from 'lucide-react';
+  ShieldWarning,
+  Sparkle,
+  Stack,
+} from '@phosphor-icons/react';
 import { useApp } from '../context/AppContext';
 import {
   formatRoutePresetToLuaSnippet,
@@ -168,10 +168,10 @@ export const AtcView: React.FC = () => {
               <span>GTFO Air Traffic Control &amp; Mission Planning Dispatch</span>
             </div>
             <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent">
-              Air Traffic Control // Flight Plans, DTC &amp; Route Tool Presets
+              Air Traffic Control // Flight Plans, DTC &amp; Path Tool Presets
             </h1>
             <p className="text-sm text-stone-400 leading-relaxed">
-              Download authorized squadron flight plans from the GTFO Member Portal, deploy aircraft
+              DownloadSimple authorized squadron flight plans from the GTFO Member Portal, deploy aircraft
               Data Cartridges (<code className="text-amber-300 font-mono">.dtc</code> &amp;{' '}
               <code className="text-amber-300 font-mono">DCS-DTC .json</code>), and non-destructively
               append route presets into your per-theatre{' '}
@@ -188,7 +188,7 @@ export const AtcView: React.FC = () => {
               disabled={isSyncingPortal}
               className="px-4 py-2.5 rounded-xl bg-stone-800 hover:bg-stone-700 border border-stone-700 text-stone-200 text-xs font-mono font-semibold flex items-center gap-2 transition-all disabled:opacity-50"
             >
-              <RefreshCw
+              <ArrowsClockwise
                 className={`w-4 h-4 text-amber-400 ${isSyncingPortal ? 'animate-spin' : ''}`}
               />
               <span>SYNC PORTAL FLIGHT PLANS</span>
@@ -196,7 +196,7 @@ export const AtcView: React.FC = () => {
           </div>
         </div>
 
-        {/* Filter Bar */}
+        {/* Funnel Bar */}
         <div className="relative z-10 mt-6 pt-5 border-t border-stone-800/90 flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-[11px] font-mono uppercase tracking-wider text-stone-400 mr-1">
@@ -275,7 +275,7 @@ export const AtcView: React.FC = () => {
                       />
                     ) : (
                       <div className="w-9 h-9 rounded-lg bg-stone-950 border border-stone-800 flex items-center justify-center shrink-0">
-                        <Plane className="w-4 h-4 text-amber-400" />
+                        <AirplaneTilt className="w-4 h-4 text-amber-400" />
                       </div>
                     )}
                     <div className="min-w-0">
@@ -372,7 +372,7 @@ export const AtcView: React.FC = () => {
                     disabled={isDeploying}
                     className="px-5 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 transition-all shrink-0 disabled:opacity-50"
                   >
-                    <Download className="w-4 h-4" />
+                    <DownloadSimple className="w-4 h-4" />
                     <span>
                       {isDtcInstalled && isRouteMerged
                         ? 'Re-Deploy Full Flight Package'
@@ -451,7 +451,7 @@ export const AtcView: React.FC = () => {
                           Data Cartridge (DTC)
                         </span>
                         {isDtcInstalled && (
-                          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                          <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
                         )}
                       </div>
                       <p className="text-[11px] font-mono text-stone-400 break-all">
@@ -468,21 +468,21 @@ export const AtcView: React.FC = () => {
                       onClick={() => deployAtcDtc(activePkg)}
                       className="w-full py-2 px-3 rounded-lg bg-stone-800 hover:bg-amber-500 hover:text-stone-950 text-stone-200 font-mono font-semibold text-xs transition-all flex items-center justify-center gap-1.5"
                     >
-                      <Download className="w-3.5 h-3.5" />
+                      <DownloadSimple className="w-3.5 h-3.5" />
                       <span>{isDtcInstalled ? 'Update DTC File' : 'Install DTC File'}</span>
                     </button>
                   </div>
 
-                  {/* 2. Route Tool Preset Card */}
+                  {/* 2. Path Tool Preset Card */}
                   <div className="p-4 rounded-xl bg-stone-950/90 border border-stone-800 flex flex-col justify-between gap-3">
                     <div>
                       <div className="flex items-center justify-between gap-2 mb-1.5">
                         <span className="inline-flex items-center gap-1.5 text-xs font-display font-semibold text-stone-200">
-                          <Route className="w-4 h-4 text-amber-400" />
-                          Route Tool Preset
+                          <Path className="w-4 h-4 text-amber-400" />
+                          Path Tool Preset
                         </span>
                         {isRouteMerged && (
-                          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                          <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
                         )}
                       </div>
                       <p className="text-[11px] font-mono text-stone-400 break-all">
@@ -496,7 +496,7 @@ export const AtcView: React.FC = () => {
                       onClick={() => handleMergePreset(activePkg)}
                       className="w-full py-2 px-3 rounded-lg bg-stone-800 hover:bg-amber-500 hover:text-stone-950 text-stone-200 font-mono font-semibold text-xs transition-all flex items-center justify-center gap-1.5"
                     >
-                      <FolderGit2 className="w-3.5 h-3.5" />
+                      <FolderSimple className="w-3.5 h-3.5" />
                       <span>
                         {isRouteMerged
                           ? 'Update Preset in Theatre Lua'
@@ -514,21 +514,21 @@ export const AtcView: React.FC = () => {
                           Briefing Kneeboards
                         </span>
                         {areKneeboardsInstalled && (
-                          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                          <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
                         )}
                       </div>
                       <p className="text-[11px] font-mono text-stone-400 break-all">
                         Saved Games\DCS\Kneeboard\{activePkg.kneeboards[0]?.aircraftFolder || 'ALL'}
                       </p>
                       <span className="inline-block mt-1.5 px-2 py-0.5 rounded bg-stone-900 border border-stone-800 text-[10px] font-mono text-stone-300">
-                        {activePkg.kneeboards.length} Comms / Route Card(s)
+                        {activePkg.kneeboards.length} Comms / Path Card(s)
                       </span>
                     </div>
                     <button
                       onClick={() => deployAtcKneeboards(activePkg)}
                       className="w-full py-2 px-3 rounded-lg bg-stone-800 hover:bg-amber-500 hover:text-stone-950 text-stone-200 font-mono font-semibold text-xs transition-all flex items-center justify-center gap-1.5"
                     >
-                      <Download className="w-3.5 h-3.5" />
+                      <DownloadSimple className="w-3.5 h-3.5" />
                       <span>
                         {areKneeboardsInstalled ? 'Re-Install Kneeboards' : 'Install Kneeboards'}
                       </span>
@@ -537,7 +537,7 @@ export const AtcView: React.FC = () => {
                 </div>
               </div>
 
-              {/* Sub-Navigation Tabs for Detailed Inspection */}
+              {/* Sub-NavigationArrow Tabs for Detailed Inspection */}
               <div className="rounded-2xl border border-stone-800 bg-stone-900/90 overflow-hidden">
                 <div className="border-b border-stone-800 px-4 pt-3 flex flex-wrap items-center gap-2 bg-stone-950/60">
                   <button
@@ -548,7 +548,7 @@ export const AtcView: React.FC = () => {
                         : 'border-transparent text-stone-400 hover:text-stone-200'
                     }`}
                   >
-                    <Navigation className="w-3.5 h-3.5" />
+                    <NavigationArrow className="w-3.5 h-3.5" />
                     <span>Flight Plan Waypoints ({activePkg.dtcPackage.waypoints.length})</span>
                   </button>
 
@@ -572,7 +572,7 @@ export const AtcView: React.FC = () => {
                         : 'border-transparent text-stone-400 hover:text-stone-200'
                     }`}
                   >
-                    <Code2 className="w-3.5 h-3.5" />
+                    <Code className="w-3.5 h-3.5" />
                     <span>Theatre RouteToolPresets Manifest ({activeTheatreFileName})</span>
                   </button>
 
@@ -584,7 +584,7 @@ export const AtcView: React.FC = () => {
                         : 'border-transparent text-stone-400 hover:text-stone-200'
                     }`}
                   >
-                    <FileSpreadsheet className="w-3.5 h-3.5" />
+                    <FileXls className="w-3.5 h-3.5" />
                     <span>Kneeboard Preview</span>
                   </button>
                 </div>
@@ -600,7 +600,7 @@ export const AtcView: React.FC = () => {
                           </h3>
                           <p className="text-xs text-stone-400">
                             Synchronized across both the aircraft DTC cartridge and the DCS F10 Map
-                            Route Tool preset.
+                            Path Tool preset.
                           </p>
                         </div>
                       </div>
@@ -718,16 +718,16 @@ export const AtcView: React.FC = () => {
                       <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
-                            <Layers className="w-4 h-4 text-amber-400" />
+                            <Stack className="w-4 h-4 text-amber-400" />
                             <span className="font-display text-sm font-semibold text-stone-100">
-                              Per-Theatre Route Tool Manifest:{' '}
+                              Per-Theatre Path Tool Manifest:{' '}
                               <code className="text-amber-400 font-mono">
                                 Config\RouteToolPresets\{activeTheatreFileName}
                               </code>
                             </span>
                           </div>
                           <p className="text-xs text-stone-400">
-                            DCS stores all F10 Route Tool presets for a theatre inside a single Lua
+                            DCS stores all F10 Path Tool presets for a theatre inside a single Lua
                             table (
                             <code className="text-stone-300 font-mono">
                               presets = &#123; ... &#125;
@@ -780,7 +780,7 @@ export const AtcView: React.FC = () => {
                           </div>
                         ) : (
                           <div className="p-3 rounded-xl bg-stone-950/70 border border-stone-800 text-xs font-mono text-stone-400 flex items-center gap-2">
-                            <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0" />
+                            <ShieldWarning className="w-4 h-4 text-amber-400 shrink-0" />
                             <span>
                               No existing{' '}
                               <code className="text-stone-200">{activeTheatreFileName}</code> found
@@ -854,7 +854,7 @@ export const AtcView: React.FC = () => {
                                 onClick={() => deployAtcKneeboards(activePkg)}
                                 className="px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono font-bold text-xs uppercase tracking-wider inline-flex items-center gap-2 transition-all"
                               >
-                                <Sparkles className="w-3.5 h-3.5" />
+                                <Sparkle className="w-3.5 h-3.5" />
                                 <span>Deploy Kneeboard to Kneeboard\{kb.aircraftFolder}</span>
                               </button>
                             </div>

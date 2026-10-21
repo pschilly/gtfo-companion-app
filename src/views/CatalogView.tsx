@@ -1,5 +1,10 @@
 import React, { useMemo, useState } from 'react';
-import { AlertTriangle, Filter, Layers, Sparkles } from 'lucide-react';
+import {
+  Funnel,
+  Sparkle,
+  Stack,
+  Warning,
+} from '@phosphor-icons/react';
 import { AssetCard } from '../components/AssetCard';
 import { useApp } from '../context/AppContext';
 import { AssetCategory, RequirementLevel } from '../types';
@@ -58,7 +63,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({ category, searchQuery 
 
   return (
     <div className="space-y-6 pb-8 max-w-7xl mx-auto">
-      {/* Header & Filter Bar */}
+      {/* Header & Funnel Bar */}
       <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 pb-4 border-b border-stone-800/80">
         <div>
           <h1 className="font-display text-2xl font-bold bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent">
@@ -73,7 +78,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({ category, searchQuery 
           </p>
         </div>
 
-        {/* Requirement Level & Status Filter Pills */}
+        {/* Requirement Level & Status Funnel Pills */}
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center bg-stone-900 border border-stone-800 rounded-xl p-1 text-xs font-mono">
             <button
@@ -94,7 +99,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({ category, searchQuery 
                   : 'text-stone-400 hover:text-red-300'
               }`}
             >
-              <AlertTriangle className="w-3 h-3" />
+              <Warning className="w-3 h-3" />
               Required for All
             </button>
             <button
@@ -105,7 +110,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({ category, searchQuery 
                   : 'text-stone-400 hover:text-amber-300'
               }`}
             >
-              <Sparkles className="w-3 h-3" />
+              <Sparkle className="w-3 h-3" />
               Required for CORE
             </button>
             <button
@@ -151,10 +156,10 @@ export const CatalogView: React.FC<CatalogViewProps> = ({ category, searchQuery 
         </div>
       </div>
 
-      {/* Aircraft / Module Filter Chips */}
+      {/* Aircraft / Module Funnel Chips */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1">
         <span className="text-xs font-mono text-stone-500 flex items-center gap-1 shrink-0 mr-1">
-          <Layers className="w-3.5 h-3.5 text-amber-400" /> Module:
+          <Stack className="w-3.5 h-3.5 text-amber-400" /> Module:
         </span>
         {modules.map((mod) => (
           <button
@@ -174,7 +179,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({ category, searchQuery 
       {/* Asset Grid */}
       {filteredAssets.length === 0 ? (
         <div className="p-12 rounded-2xl bg-stone-900/80 border border-stone-800 text-center space-y-3">
-          <Filter className="w-8 h-8 text-stone-500 mx-auto" />
+          <Funnel className="w-8 h-8 text-stone-500 mx-auto" />
           <h3 className="font-display text-base font-semibold text-stone-200">
             No matching packages found
           </h3>
