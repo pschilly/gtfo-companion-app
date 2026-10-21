@@ -200,7 +200,7 @@ export const HomeView: React.FC = () => {
       )}
 
       {/* TELEMETRY & STATS STRIP */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div
           onClick={() => setActiveTab('liveries')}
           className="p-4 rounded-2xl bg-stone-900/90 border border-stone-800 hover:border-amber-500/40 cursor-pointer transition-all flex items-center justify-between shadow-md group"
@@ -279,25 +279,6 @@ export const HomeView: React.FC = () => {
             ) : (
               <ShieldCheck className="w-5 h-5 text-emerald-400" />
             )}
-          </div>
-        </div>
-
-        <div
-          onClick={() => setActiveTab('library')}
-          className="p-4 rounded-2xl bg-stone-900/90 border border-stone-800 hover:border-amber-500/40 cursor-pointer transition-all flex items-center justify-between shadow-md group"
-          title="View installed library"
-        >
-          <div>
-            <p className="text-[11px] font-mono uppercase text-stone-400">Storage Used</p>
-            <p className="text-2xl font-bold font-display text-amber-400 mt-1">
-              {formatBytes(totalInstalledBytes)}
-            </p>
-            <p className="text-[11px] font-mono text-stone-400 mt-0.5">
-              {installedCount} package{installedCount === 1 ? '' : 's'} on disk
-            </p>
-          </div>
-          <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-            <HardDrive className="w-5 h-5 text-amber-400" />
           </div>
         </div>
       </div>
