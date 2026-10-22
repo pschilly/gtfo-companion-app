@@ -1,6 +1,6 @@
-• Operations & ATC Dispatch: Dedicated REST API integration with permanent FP IDs (#FP-...), filed status indicators, read-only operational workbench, and active sortie packages
-• DCS Kneeboard PDF-to-Image Export: "To Folder" exports kneeboard PDF pages directly into PNG images (FP-<callsign> - Page <N>.png) with real-time export progress feedback
-• Global Omnisearch: Top search bar upgraded to search across flight plans, qualifications/certificates, awards, airframes, liveries, and mods with direct workbench dispatch
-• Notification Persistence & Deduplication: Persistent fingerprint tracking ensures cleared/dismissed notifications stay dismissed across app restarts unless underlying information changes
-• Qualifications View Enhancements: Added manual "View Syllabus" caret toggles, clickable card header rows, and an "Expand All / Collapse All" toolbar control
-• Operations Category: Reorganized sidebar with a dedicated Operations category and collapsible navigation groups
+• DCS World Core Installation Directory: Added auto-detection, candidate selection, and onboarding configuration for the core DCS World root folder (<DCS World>) supporting Standalone, OpenBeta, Steam, and custom multi-drive installs
+• JF-17 Custom Airspace Integration: Live integration with Member Portal API to fetch and deploy authentic Custom Airspace Lua definitions directly into <DCS World>\Mods\aircraft\JF-17\Customization\airspace\ with automated directory creation
+• Case-Sensitive Airspace Terrain Mapping: Authoritative campaign theatre resolution producing exact DCS module preset files (Custom_AirSpace_PersianGulf.lua, Custom_AirSpace_Syria.lua, etc.) with dedicated syntax viewer, download, and copy controls
+• Airframe-Specific ATC Detail Tabs: Tailored flight plan tabs to airframe capabilities (SA tab exclusive to F/A-18, MIDS datalink for F/A-18 and JF-17, Additional Points for F-14B/14BU, Airspace for JF-17)
+• Flight Plan Comms Ladder Normalization: Automatically groups live backend array frequencies into Task Force Common, Squadron Tactical Nets, and AWACS & Tanker Support categories with quick-copy clipboard buttons
+• Airfield Frequencies Normalization: Dynamically organizes airfield frequencies by base name (e.g. Al Dhafra AFB, Incirlik AB) with ATIS, Ground, Tower, and Approach channels instead of raw array indices
