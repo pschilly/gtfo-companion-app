@@ -803,6 +803,15 @@ export async function openExternalUrl(url: string): Promise<void> {
   }
 }
 
+export async function openLocalPath(path: string): Promise<void> {
+  if (!path) return;
+  if (isTauriRuntime()) {
+    await invoke('open_local_path', { path });
+  } else {
+    console.log('[Dev] openLocalPath:', path);
+  }
+}
+
 export async function getDcsNicknameCommand(
   dcsSavedGamesPath: string
 ): Promise<DcsNicknameInfo> {
@@ -852,6 +861,50 @@ export async function updateDcsNicknameCommand(
   };
   localStorage.setItem('gtfo_mock_dcs_nicknames', JSON.stringify(result));
   return result;
+}
+
+export async function sendPortalApiRequest<T = any>(
+  endpointUrl: string,
+  method: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE' = 'GET',
+  body?: any,
+  accessToken?: string
+): Promise<T> {
+  if (isTauriRuntime()) {
+    return await invoke<T>('send_portal_api_request', {
+      endpointUrl,
+      method,
+      body: body || null,
+      accessToken: accessToken || null,
+    });
+  }
+
+  const headers: Record<string, string> = {
+    Accept: 'application/json',
+  };
+  if (accessToken) {
+    headers['Authorization'] = `Bearer ${accessToken}`;
+  }
+  if (body) {
+    headers['Content-Type'] = 'application/json';
+  }
+
+  const resp = await fetch(endpointUrl, {
+    method,
+    headers,
+    body: body ? JSON.stringify(body) : undefined,
+  });
+
+  if (!resp.ok) {
+    const errorText = await resp.text();
+    try {
+      const errJson = JSON.parse(errorText);
+      throw new Error(errJson.message || errJson.error || `HTTP ${resp.status}`);
+    } catch {
+      throw new Error(`HTTP ${resp.status}: ${errorText}`);
+    }
+  }
+
+  return (await resp.json()) as T;
 }
 
 

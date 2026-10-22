@@ -87,7 +87,7 @@ export const HomeView: React.FC = () => {
             </h1>
 
             <p className="text-sm text-stone-300 leading-relaxed">
-              Your centralized station for DCS World airframe liveries, official squadron modifications, airfield lighting packages, and operational flight readiness.
+              
             </p>
           </div>
 

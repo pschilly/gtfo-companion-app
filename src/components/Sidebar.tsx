@@ -3,13 +3,16 @@ import {
   AirplaneTilt,
   ArrowSquareOut,
   ArrowsClockwise,
+  BookOpen,
   CaretDown,
   CaretRight,
   Certificate,
   Check,
   Compass,
+  Crosshair,
   Folder,
   Gear,
+  GraduationCap,
   HardDrive,
   House,
   ListChecks,
@@ -24,6 +27,8 @@ import {
   Sparkle,
   SquaresFour,
   UserCheck,
+  UsersFour,
+  Warehouse,
 } from '@phosphor-icons/react';
 import { STATIC_CONFIG } from '../config/constants';
 import { useApp } from '../context/AppContext';
@@ -49,13 +54,28 @@ export const Sidebar: React.FC = () => {
   } = useApp();
 
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
+  // User manual collapse/expand overrides (collapsed by default unless active tab is inside)
+  const [sectionOpenOverrides, setSectionOpenOverrides] = useState<Record<string, boolean>>({});
 
-  const toggleSection = (title: string) => {
-    setCollapsedSections((prev) => ({
-      ...prev,
-      [title]: !prev[title],
-    }));
+  const isSectionOpen = (sectionTitle: string, items: { id?: NavigationTab }[]) => {
+    if (sectionOpenOverrides[sectionTitle] !== undefined) {
+      return sectionOpenOverrides[sectionTitle];
+    }
+    // Collapsed by default; if activeTab is an item in this section, keep it expanded
+    return items.some((item) => item.id && item.id === activeTab);
+  };
+
+  const toggleSection = (title: string, items: { id?: NavigationTab }[]) => {
+    setSectionOpenOverrides((prev) => {
+      const currentlyOpen =
+        prev[title] !== undefined
+          ? prev[title]
+          : items.some((item) => item.id && item.id === activeTab);
+      return {
+        ...prev,
+        [title]: !currentlyOpen,
+      };
+    });
   };
 
   const liveryCount = manifest.assets.filter((a) => a.category === 'livery').length;
@@ -64,16 +84,19 @@ export const Sidebar: React.FC = () => {
 
   const navSections: {
     title: string;
+    icon: React.ReactNode;
     items: {
-      id: NavigationTab;
+      id?: NavigationTab;
       label: string;
       icon: React.ReactNode;
+      href?: string;
       badge?: React.ReactNode;
       badgeColor?: string;
     }[];
   }[] = [
     {
-      title: 'Member Dossier',
+      title: 'S1 - Personnel',
+      icon: <UsersFour className="w-4 h-4" />,
       items: [
         {
           id: 'dashboard',
@@ -115,6 +138,12 @@ export const Sidebar: React.FC = () => {
           icon: <Medal className="w-4 h-4" />,
           badge: memberProfile?.awards?.length || undefined,
         },
+      ],
+    },
+    {
+      title: 'S2 - Operations',
+      icon: <Crosshair className="w-4 h-4" />,
+      items: [
         {
           id: 'atc',
           label: 'Flight Plans & ATC',
@@ -125,7 +154,19 @@ export const Sidebar: React.FC = () => {
       ],
     },
     {
-      title: 'Assets',
+      title: 'S3 - Training',
+      icon: <GraduationCap className="w-4 h-4" />,
+      items: [
+        {
+          label: 'Knowledge Base',
+          icon: <BookOpen className="w-4 h-4" />,
+          href: STATIC_CONFIG.kbUrl,
+        },
+      ],
+    },
+    {
+      title: 'S4 - Logistics',
+      icon: <Warehouse className="w-4 h-4" />,
       items: [
         {
           id: 'library',
@@ -203,34 +244,69 @@ export const Sidebar: React.FC = () => {
 
           {/* Collapsible Category Sections */}
           {navSections.map((section) => {
-            const isCollapsed = !!collapsedSections[section.title];
+            const isOpen = isSectionOpen(section.title, section.items);
+            const isSectionActive = section.items.some((item) => item.id && item.id === activeTab);
             return (
               <div key={section.title} className="space-y-1">
                 <button
                   type="button"
-                  onClick={() => toggleSection(section.title)}
-                  className="w-full flex items-center justify-between px-2 py-1 text-xs font-semibold text-amber-400/90 hover:text-amber-300 tracking-wide rounded hover:bg-stone-900/60 transition-colors group cursor-pointer"
+                  onClick={() => toggleSection(section.title, section.items)}
+                  className={`w-full flex items-center justify-between px-2.5 py-1.5 text-xs font-semibold tracking-wide rounded-lg hover:bg-stone-900/60 transition-all group cursor-pointer ${
+                    isSectionActive
+                      ? 'text-amber-400 bg-amber-500/5'
+                      : 'text-stone-400 hover:text-stone-200'
+                  }`}
                 >
-                  <span className="font-display uppercase tracking-wider text-[11px]">
-                    {section.title}
-                  </span>
-                  <span className="text-stone-500 group-hover:text-amber-400 transition-colors">
-                    {isCollapsed ? (
-                      <CaretRight className="w-3.5 h-3.5" />
-                    ) : (
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="text-amber-400/80 group-hover:text-amber-300 transition-colors shrink-0">
+                      {section.icon}
+                    </span>
+                    <span className="font-display uppercase tracking-wider text-[11px] truncate">
+                      {section.title}
+                    </span>
+                    {!isOpen && isSectionActive && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_6px_#fbbf24] shrink-0" />
+                    )}
+                  </div>
+                  <span className="text-stone-500 group-hover:text-amber-400 transition-colors shrink-0">
+                    {isOpen ? (
                       <CaretDown className="w-3.5 h-3.5" />
+                    ) : (
+                      <CaretRight className="w-3.5 h-3.5" />
                     )}
                   </span>
                 </button>
 
-                {!isCollapsed && (
+                {isOpen && (
                   <ul className="space-y-1 border-l-2 border-stone-800 ml-2 pl-3 pt-0.5">
                     {section.items.map((item) => {
-                      const isActive = activeTab === item.id;
+                      if (item.href) {
+                        return (
+                          <li key={item.label} className="relative">
+                            <a
+                              href={item.href}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-all duration-150 text-stone-400 hover:text-stone-200 hover:bg-stone-900/70 group"
+                            >
+                              <div className="flex items-center gap-2.5">
+                                <span className="text-stone-400 group-hover:text-amber-400 transition-colors">
+                                  {item.icon}
+                                </span>
+                                <span className="font-display text-[13px] group-hover:text-amber-300 transition-colors">
+                                  {item.label}
+                                </span>
+                              </div>
+                              <ArrowSquareOut className="w-3.5 h-3.5 text-stone-500 group-hover:text-amber-400 transition-colors" />
+                            </a>
+                          </li>
+                        );
+                      }
+                      const isActive = item.id ? activeTab === item.id : false;
                       return (
                         <li key={item.id} className="relative">
                           <button
-                            onClick={() => setActiveTab(item.id)}
+                            onClick={() => item.id && setActiveTab(item.id)}
                             className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-all duration-150 relative ${
                               isActive
                                 ? 'font-semibold text-amber-400 bg-amber-500/10 before:content-[""] before:absolute before:-left-[17px] before:top-1/2 before:-translate-y-1/2 before:h-2 before:w-2 before:rounded-full before:bg-amber-400 before:shadow-[0_0_8px_#fbbf24]'
@@ -264,19 +340,6 @@ export const Sidebar: React.FC = () => {
               </div>
             );
           })}
-
-          {/* Quick External KB Link */}
-          <div className="pt-1 px-2">
-            <a
-              href={STATIC_CONFIG.kbUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-stone-900/60 hover:bg-stone-900 border border-stone-800/80 text-xs font-display text-stone-400 hover:text-amber-400 transition-colors"
-            >
-              <span>GTFO Knowledge Base</span>
-              <ArrowSquareOut className="w-3.5 h-3.5" />
-            </a>
-          </div>
         </nav>
       </div>
 

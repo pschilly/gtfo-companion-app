@@ -6,15 +6,17 @@ import {
   SAMPLE_FLIGHT_PLAN_PRIVATE,
   SAMPLE_FLIGHT_PLAN_VIPER,
   SAMPLE_MEMBER_FLIGHT_PLANS_RESPONSE,
-  buildDtcJsonPayload,
   formatFlightPlanToLuaPreset,
 } from '../data/sampleFlightPlans';
 import {
   ActiveSortieResponse,
+  FileAtcResponse,
+  FiledFlightPlansResponse,
   FlightPlanDetail,
+  FlightPlanSummary,
   MemberFlightPlansResponse,
 } from '../types';
-import { isTauriRuntime } from './tauriBridge';
+import { isTauriRuntime, sendPortalApiRequest } from './tauriBridge';
 
 export interface RoutePresetInstallResult {
   filePath: string;
@@ -128,6 +130,125 @@ export async function fetchActiveSortieFlightPlans(
   return SAMPLE_ACTIVE_SORTIE_RESPONSE;
 }
 
+export interface FetchFiledFlightPlansOptions {
+  sortie_id?: number;
+  mission_id?: number;
+  discord_id?: string;
+  detailed?: boolean;
+  limit?: number;
+}
+
+/**
+ * C. GET /api/v1/companion/flight-plans/filed
+ * Pull all filed flight plans with optional filters.
+ */
+export async function fetchFiledFlightPlans(
+  baseUrl: string,
+  options: FetchFiledFlightPlansOptions = {},
+  token?: string
+): Promise<FiledFlightPlansResponse> {
+  const cleanBase = normalizeCompanionBaseUrl(baseUrl);
+  const params = new URLSearchParams();
+  if (options.sortie_id !== undefined) params.set('sortie_id', String(options.sortie_id));
+  if (options.mission_id !== undefined) params.set('mission_id', String(options.mission_id));
+  if (options.discord_id) params.set('discord_id', options.discord_id);
+  if (options.detailed) params.set('detailed', '1');
+  if (options.limit !== undefined) params.set('limit', String(options.limit));
+
+  const query = params.toString() ? `?${params.toString()}` : '';
+  const endpoint = `${cleanBase}/flight-plans/filed${query}`;
+
+  try {
+    const res = await sendPortalApiRequest<FiledFlightPlansResponse>(
+      endpoint,
+      'GET',
+      undefined,
+      token
+    );
+    if (res && Array.isArray(res.plans)) {
+      return res;
+    }
+  } catch (err) {
+    console.warn('Native/fetch filed flight-plans failed, using fallback:', err);
+  }
+
+  // Fallback to active plans marked filed or sample data
+  const samplePlans = [
+    ...(SAMPLE_MEMBER_FLIGHT_PLANS_RESPONSE.plans || []),
+    ...(SAMPLE_ACTIVE_SORTIE_RESPONSE.plans || []),
+  ];
+  const filed = samplePlans.filter((p) => p.is_filed);
+  return {
+    total: filed.length,
+    plans:
+      filed.length > 0
+        ? filed
+        : samplePlans.slice(0, 2).map((p) => ({
+            ...p,
+            is_filed: true,
+            filed_at: p.filed_at || new Date().toISOString(),
+          })),
+  };
+}
+
+/**
+ * D. POST /api/v1/companion/flight-plans/{id}/file-atc
+ * Files (or refiles) a flight plan with ATC and broadcasts to Discord ATC channel.
+ */
+export async function fileFlightPlanWithAtc(
+  baseUrl: string,
+  idOrIdentifier: string | number,
+  discordId?: string,
+  token?: string
+): Promise<FileAtcResponse> {
+  const cleanBase = normalizeCompanionBaseUrl(baseUrl);
+  const endpoint = `${cleanBase}/flight-plans/${encodeURIComponent(String(idOrIdentifier))}/file-atc`;
+  const body = discordId ? { discord_id: discordId } : {};
+
+  try {
+    const res = await sendPortalApiRequest<FileAtcResponse>(
+      endpoint,
+      'POST',
+      body,
+      token
+    );
+    return res;
+  } catch (err: any) {
+    console.error('fileFlightPlanWithAtc API error:', err);
+    throw new Error(err.message || 'Failed to file flight plan with ATC');
+  }
+}
+
+/**
+ * E. PATCH /api/v1/companion/flight-plans/{id}
+ * Renames or appends a suffix to an existing flight plan.
+ * Note: FP identifier is permanent and cannot be modified.
+ */
+export async function updateFlightPlanName(
+  baseUrl: string,
+  idOrIdentifier: string | number,
+  payload: { name?: string; append?: string },
+  token?: string
+): Promise<{ success: boolean; plan: FlightPlanSummary | FlightPlanDetail }> {
+  const cleanBase = normalizeCompanionBaseUrl(baseUrl);
+  const endpoint = `${cleanBase}/flight-plans/${encodeURIComponent(String(idOrIdentifier))}`;
+
+  try {
+    const res = await sendPortalApiRequest<{
+      success?: boolean;
+      plan?: FlightPlanSummary | FlightPlanDetail;
+    }>(endpoint, 'PATCH', payload, token);
+    const plan = res.plan || (res as any);
+    return {
+      success: true,
+      plan,
+    };
+  } catch (err: any) {
+    console.error('updateFlightPlanName API error:', err);
+    throw new Error(err.message || 'Failed to update flight plan name');
+  }
+}
+
 /**
  * C. GET /api/v1/companion/flight-plans/{id_or_identifier}
  */
@@ -199,8 +320,10 @@ export async function downloadFlightPlanDtc(
   idOrIdentifier: string | number,
   token?: string
 ): Promise<{ success: boolean; data?: any; rawText?: string; error?: string }> {
-  const cleanBase = normalizeCompanionBaseUrl(baseUrl);
-  const endpoint = `${cleanBase}/flight-plans/${encodeURIComponent(String(idOrIdentifier))}/dtc`;
+  const endpoint =
+    typeof idOrIdentifier === 'string' && (idOrIdentifier.startsWith('http://') || idOrIdentifier.startsWith('https://'))
+      ? idOrIdentifier
+      : `${normalizeCompanionBaseUrl(baseUrl)}/flight-plans/${encodeURIComponent(String(idOrIdentifier))}/dtc`;
 
   if (isTauriRuntime()) {
     try {

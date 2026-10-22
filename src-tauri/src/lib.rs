@@ -2123,6 +2123,73 @@ async fn fetch_portal_api(
 }
 
 #[tauri::command]
+async fn send_portal_api_request(
+    endpoint_url: String,
+    method: Option<String>,
+    body: Option<serde_json::Value>,
+    access_token: Option<String>,
+) -> Result<serde_json::Value, String> {
+    let client = reqwest::Client::builder()
+        .user_agent("GTFO-Companion-App")
+        .timeout(std::time::Duration::from_secs(20))
+        .build()
+        .map_err(|e| e.to_string())?;
+
+    let method_str = method.unwrap_or_else(|| "GET".to_string()).to_uppercase();
+    let http_method = match method_str.as_str() {
+        "POST" => reqwest::Method::POST,
+        "PATCH" => reqwest::Method::PATCH,
+        "PUT" => reqwest::Method::PUT,
+        "DELETE" => reqwest::Method::DELETE,
+        _ => reqwest::Method::GET,
+    };
+
+    let mut req = client
+        .request(http_method, &endpoint_url)
+        .header("Accept", "application/json");
+
+    if let Some(token) = access_token {
+        if !token.trim().is_empty() {
+            req = req.bearer_auth(token.trim());
+        }
+    }
+
+    if let Some(b) = body {
+        req = req.json(&b);
+    }
+
+    let resp = req
+        .send()
+        .await
+        .map_err(|e| format!("Failed to reach portal endpoint: {}", e))?;
+
+    let status = resp.status();
+    let body_text = resp
+        .text()
+        .await
+        .map_err(|e| format!("Failed to read response body: {}", e))?;
+
+    if !status.is_success() {
+        if let Ok(err_json) = serde_json::from_str::<serde_json::Value>(&body_text) {
+            if let Some(msg) = err_json.get("message").and_then(|m| m.as_str()) {
+                return Err(msg.to_string());
+            }
+            if let Some(err) = err_json.get("error").and_then(|m| m.as_str()) {
+                return Err(err.to_string());
+            }
+        }
+        return Err(format!("Portal returned HTTP {}: {}", status, body_text));
+    }
+
+    if body_text.trim().is_empty() {
+        return Ok(serde_json::json!({ "success": true }));
+    }
+
+    serde_json::from_str::<serde_json::Value>(&body_text)
+        .map_err(|e| format!("Failed to parse JSON response: {}", e))
+}
+
+#[tauri::command]
 async fn fetch_portal_text(
     endpoint_url: String,
     access_token: Option<String>,
@@ -2151,6 +2218,48 @@ async fn fetch_portal_text(
     }
 
     resp.text().await.map_err(|e| format!("Failed to read response body: {}", e))
+}
+
+#[tauri::command]
+async fn fetch_portal_binary(
+    endpoint_url: String,
+    access_token: Option<String>,
+) -> Result<String, String> {
+    let client = reqwest::Client::builder()
+        .user_agent("GTFO-Companion-App")
+        .timeout(std::time::Duration::from_secs(30))
+        .build()
+        .map_err(|e| e.to_string())?;
+
+    let mut req = client.get(&endpoint_url);
+
+    if let Some(token) = access_token {
+        if !token.trim().is_empty() {
+            req = req.bearer_auth(token.trim());
+        }
+    }
+
+    let resp = req
+        .send()
+        .await
+        .map_err(|e| format!("Failed to fetch binary data: {}", e))?;
+
+    if !resp.status().is_success() {
+        return Err(format!("Portal returned HTTP {}", resp.status()));
+    }
+
+    let bytes = resp
+        .bytes()
+        .await
+        .map_err(|e| format!("Failed to read response body bytes: {}", e))?;
+
+    use base64::Engine;
+    Ok(base64::engine::general_purpose::STANDARD.encode(&bytes))
+}
+
+#[tauri::command]
+fn open_local_path(path: String) -> Result<(), String> {
+    open::that(&path).map_err(|e| format!("Failed to open path: {}", e))
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
@@ -2608,8 +2717,11 @@ pub fn run() {
             open_pdf_kneeboard,
             save_binary_file,
             fetch_portal_api,
+            send_portal_api_request,
             fetch_portal_text,
+            fetch_portal_binary,
             open_external_url,
+            open_local_path,
             get_dcs_nickname,
             update_dcs_nickname,
             get_window_preferences,

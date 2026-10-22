@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   AirplaneTilt,
   ArrowSquareOut,
@@ -27,8 +27,20 @@ const HtmlRenderer: React.FC<{ html: string; className?: string }> = ({ html, cl
 };
 
 export const QualificationsView: React.FC = () => {
-  const { memberProfile } = useApp();
+  const { memberProfile, highlightedCertId } = useApp();
   const [expandedCertIds, setExpandedCertIds] = useState<Record<number, boolean>>({});
+
+  useEffect(() => {
+    if (highlightedCertId) {
+      setExpandedCertIds((prev) => ({ ...prev, [highlightedCertId]: true }));
+      setTimeout(() => {
+        const el = document.getElementById(`cert-card-${highlightedCertId}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 150);
+    }
+  }, [highlightedCertId]);
 
   const certificates = memberProfile.certificates || [];
   const totalCertXp = certificates.reduce((sum, c) => sum + (c.xpValue || 0), 0);
@@ -44,6 +56,20 @@ export const QualificationsView: React.FC = () => {
       [id]: !prev[id],
     }));
   };
+
+  const expandAll = () => {
+    const all: Record<number, boolean> = {};
+    certificates.forEach((c) => {
+      all[c.id] = true;
+    });
+    setExpandedCertIds(all);
+  };
+
+  const collapseAll = () => {
+    setExpandedCertIds({});
+  };
+
+  const isAllExpanded = certificates.length > 0 && certificates.every((c) => expandedCertIds[c.id]);
 
   return (
     <div className="space-y-6 pb-8 max-w-7xl mx-auto">
@@ -68,6 +94,25 @@ export const QualificationsView: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
+          {certificates.length > 0 && (
+            <button
+              onClick={isAllExpanded ? collapseAll : expandAll}
+              className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-800 text-stone-300 hover:text-amber-300 font-mono text-xs flex items-center gap-1.5 transition-colors shrink-0"
+            >
+              {isAllExpanded ? (
+                <>
+                  <CaretUp className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Collapse All</span>
+                </>
+              ) : (
+                <>
+                  <CaretDown className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Expand All</span>
+                </>
+              )}
+            </button>
+          )}
+
           <a
             href={STATIC_CONFIG.kbUrl}
             target="_blank"
@@ -161,12 +206,22 @@ export const QualificationsView: React.FC = () => {
             return (
               <div
                 key={cert.id}
-                className="p-6 rounded-2xl bg-stone-900/90 border border-stone-800 hover:border-stone-700 transition-all space-y-4 shadow-xl"
+                id={`cert-card-${cert.id}`}
+                className={`p-6 rounded-2xl bg-stone-900/90 border transition-all space-y-4 shadow-xl ${
+                  highlightedCertId === cert.id
+                    ? 'border-amber-500 ring-2 ring-amber-500/50 shadow-amber-500/10'
+                    : 'border-stone-800 hover:border-stone-700'
+                }`}
               >
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div
+                  onClick={() => hasRequirements && toggleCert(cert.id)}
+                  className={`flex flex-col lg:flex-row lg:items-center justify-between gap-4 select-none ${
+                    hasRequirements ? 'cursor-pointer group' : ''
+                  }`}
+                >
                   {/* Left: Certificate Crest & Core Identity */}
                   <div className="flex items-start gap-4">
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500/20 via-amber-500/10 to-stone-950 border border-amber-500/30 flex items-center justify-center shrink-0 shadow-inner">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500/20 via-amber-500/10 to-stone-950 border border-amber-500/30 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-105 transition-transform">
                       <ShieldCheck className="w-7 h-7 text-amber-400" />
                     </div>
 
@@ -175,7 +230,7 @@ export const QualificationsView: React.FC = () => {
                         <span className="px-2.5 py-0.5 rounded bg-stone-950 border border-stone-800 font-mono text-xs font-bold text-amber-300">
                           {cert.code}
                         </span>
-                        <h2 className="font-display font-bold text-stone-100 text-lg">
+                        <h2 className="font-display font-bold text-stone-100 text-lg group-hover:text-amber-200 transition-colors">
                           {cert.name}
                         </h2>
                         {cert.isIssued && (
@@ -218,11 +273,36 @@ export const QualificationsView: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Right: XP Earned Badge */}
+                  {/* Right: XP Earned Badge & Expand/Collapse Toggle Button */}
                   <div className="flex items-center gap-3 shrink-0 self-start lg:self-center">
                     <span className="px-3.5 py-1.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 font-mono text-xs font-bold shadow-sm">
                       +{cert.xpValue?.toLocaleString() || 0} XP
                     </span>
+
+                    {hasRequirements && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleCert(cert.id);
+                        }}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-mono font-semibold transition-all shadow-sm ${
+                          isExpanded
+                            ? 'bg-amber-500/20 border-amber-500/40 text-amber-300'
+                            : 'bg-stone-950/80 hover:bg-stone-800 border-stone-800 text-stone-400 hover:text-stone-200'
+                        }`}
+                        title={isExpanded ? 'Collapse syllabus benchmarks' : 'Expand syllabus benchmarks'}
+                      >
+                        <span className="text-[11px] hidden sm:inline">
+                          {isExpanded ? 'Hide Syllabus' : 'View Syllabus'}
+                        </span>
+                        {isExpanded ? (
+                          <CaretUp className="w-3.5 h-3.5 text-amber-400" />
+                        ) : (
+                          <CaretDown className="w-3.5 h-3.5 text-stone-400" />
+                        )}
+                      </button>
+                    )}
                   </div>
                 </div>
 

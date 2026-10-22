@@ -15,6 +15,8 @@ import {
   fetchMemberFlightPlans,
   fetchActiveSortieFlightPlans,
   fetchFlightPlanDetail,
+  fetchFiledFlightPlans,
+  FetchFiledFlightPlansOptions,
   installDcsRoutePresetCommand,
   getDcsRoutePresetsPath,
   installDtcCartridgeDirect,
@@ -120,8 +122,10 @@ interface AppContextValue {
   memberFlightPlansMeta: { total: number; missions_count: number; authored_count: number; private_count: number };
   activeSortie: ActiveSortie | null;
   activeSortieFlightPlans: FlightPlanSummary[];
+  filedFlightPlans: FlightPlanSummary[];
   isLoadingFlightPlans: boolean;
   syncFlightPlans: () => Promise<void>;
+  fetchFiledPlans: (options?: FetchFiledFlightPlansOptions) => Promise<FlightPlanSummary[]>;
   loadFlightPlanDetail: (idOrIdentifier: string | number) => Promise<FlightPlanDetail>;
   saveRouteToDcs: (theatre: string, luaContent: string) => Promise<RoutePresetInstallResult>;
   copyDcsRoutePresetsPathToClipboard: () => Promise<string>;
@@ -149,6 +153,10 @@ interface AppContextValue {
   isUpdateAvailable: (asset: AssetItem) => boolean;
   loginWithDiscordOAuth: () => Promise<void>;
   logoutDiscord: () => void;
+  selectedFlightPlanId: string | number | null;
+  setSelectedFlightPlanId: (id: string | number | null) => void;
+  highlightedCertId: number | null;
+  setHighlightedCertId: (id: number | null) => void;
   hasConfirmedDcsPath: boolean;
   pathOnboardingOpen: boolean;
   setPathOnboardingOpen: (open: boolean) => void;
@@ -194,6 +202,7 @@ const STORAGE_KEYS = {
   PORTAL_PROFILE: 'gtfo_member_profile_v5',
   DCS_PATH_CONFIRMED: 'gtfo_dcs_path_confirmed_v1',
   NOTIFICATIONS: 'gtfo_notifications_v1',
+  DISMISSED_NOTIFICATIONS: 'gtfo_dismissed_notifications_v1',
 };
 
 const DEFAULT_INSTALLED_ATC: InstalledAtcState = {
@@ -212,6 +221,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [dcsEnv, setDcsEnv] = useState<DcsEnvironmentInfo | null>(null);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState<AssetItem | null>(null);
+  const [selectedFlightPlanId, setSelectedFlightPlanId] = useState<string | number | null>(null);
+  const [highlightedCertId, setHighlightedCertId] = useState<number | null>(null);
   const [logs, setLogs] = useState<TelemetryLogEntry[]>([]);
   const [isPortalLive, setIsPortalLive] = useState(false);
   const [atcPackages, setAtcPackages] = useState<AtcFlightPlanPackage[]>(SAMPLE_ATC_PACKAGES);
@@ -237,6 +248,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [activeSortieFlightPlans, setActiveSortieFlightPlans] = useState<FlightPlanSummary[]>(
     SAMPLE_ACTIVE_SORTIE_RESPONSE.plans
   );
+  const [filedFlightPlans, setFiledFlightPlans] = useState<FlightPlanSummary[]>(() => {
+    return [
+      ...SAMPLE_MEMBER_FLIGHT_PLANS_RESPONSE.plans,
+      ...SAMPLE_ACTIVE_SORTIE_RESPONSE.plans,
+    ].filter((p) => p.is_filed);
+  });
   const [isLoadingFlightPlans, setIsLoadingFlightPlans] = useState(false);
 
   const [installedAtc, setInstalledAtc] = useState<InstalledAtcState>(() => {
@@ -579,13 +596,39 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const saved = localStorage.getItem(STORAGE_KEYS.NOTIFICATIONS);
     if (saved) {
       try {
-        return JSON.parse(saved) as AppNotification[];
+        const parsed = JSON.parse(saved) as AppNotification[];
+        return parsed.map((n) => ({
+          ...n,
+          fingerprint: n.fingerprint || `${n.category}:${n.title}:${n.message}`,
+        }));
       } catch {
         return [];
       }
     }
     return [];
   });
+
+  const [dismissedFingerprints, setDismissedFingerprints] = useState<Record<string, number>>(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.DISMISSED_NOTIFICATIONS);
+    if (saved) {
+      try {
+        return JSON.parse(saved) as Record<string, number>;
+      } catch {
+        return {};
+      }
+    }
+    return {};
+  });
+
+  const activeFingerprintsRef = useRef<Set<string>>(
+    new Set(notifications.map((n) => n.fingerprint || `${n.category}:${n.title}:${n.message}`))
+  );
+
+  useEffect(() => {
+    activeFingerprintsRef.current = new Set(
+      notifications.map((n) => n.fingerprint || `${n.category}:${n.title}:${n.message}`)
+    );
+  }, [notifications]);
 
   const unreadNotificationsCount = useMemo(() => {
     return notifications.filter((n) => !n.read).length;
@@ -595,28 +638,56 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(items.slice(0, 50)));
   }, []);
 
+  const persistDismissedFingerprints = useCallback((map: Record<string, number>) => {
+    const entries = Object.entries(map);
+    if (entries.length > 500) {
+      const trimmed = Object.fromEntries(
+        entries.sort((a, b) => b[1] - a[1]).slice(0, 500)
+      );
+      localStorage.setItem(STORAGE_KEYS.DISMISSED_NOTIFICATIONS, JSON.stringify(trimmed));
+    } else {
+      localStorage.setItem(STORAGE_KEYS.DISMISSED_NOTIFICATIONS, JSON.stringify(map));
+    }
+  }, []);
+
   const addNotification = useCallback(
     (item: Omit<AppNotification, 'id' | 'timestamp' | 'read'>) => {
+      const fingerprint = item.fingerprint || `${item.category}:${item.title}:${item.message}`;
+
+      // 1. If previously cleared/dismissed by user and the info has not changed, do not re-add
+      if (dismissedFingerprints[fingerprint]) {
+        return;
+      }
+
+      // 2. If already active in the notifications tray, do not duplicate
+      if (activeFingerprintsRef.current.has(fingerprint)) {
+        return;
+      }
+
+      // Mark active immediately to prevent duplication during synchronous loops
+      activeFingerprintsRef.current.add(fingerprint);
+
+      const newNotification: AppNotification = {
+        ...item,
+        fingerprint,
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        timestamp: new Date().toISOString(),
+        read: false,
+      };
+
       setNotifications((prev) => {
-        // Deduplicate recent notifications with identical title & message
         const isDuplicate = prev.some(
-          (n) => n.title === item.title && n.message === item.message
+          (n) => (n.fingerprint && n.fingerprint === fingerprint) ||
+                 (n.title === item.title && n.message === item.message)
         );
         if (isDuplicate) return prev;
-
-        const newNotification: AppNotification = {
-          ...item,
-          id: `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-          timestamp: new Date().toISOString(),
-          read: false,
-        };
 
         const next = [newNotification, ...prev].slice(0, 50);
         persistNotifications(next);
         return next;
       });
 
-      // Desktop OS Toast check
+      // Desktop OS Toast check - only dispatched for genuinely new, non-dismissed notifications
       if (settings.enableDesktopNotifications) {
         let shouldToast = true;
         if (item.category === 'app' && !settings.notifyAppUpdates) shouldToast = false;
@@ -630,6 +701,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     },
     [
+      dismissedFingerprints,
       persistNotifications,
       settings.enableDesktopNotifications,
       settings.notifyAppUpdates,
@@ -660,32 +732,51 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const clearNotification = useCallback(
     (id: string) => {
       setNotifications((prev) => {
+        const target = prev.find((n) => n.id === id);
+        if (target) {
+          const fp = target.fingerprint || `${target.category}:${target.title}:${target.message}`;
+          setDismissedFingerprints((dPrev) => {
+            const next = { ...dPrev, [fp]: Date.now() };
+            persistDismissedFingerprints(next);
+            return next;
+          });
+          activeFingerprintsRef.current.delete(fp);
+        }
         const next = prev.filter((n) => n.id !== id);
         persistNotifications(next);
         return next;
       });
     },
-    [persistNotifications]
+    [persistDismissedFingerprints, persistNotifications]
   );
 
   const clearAllNotifications = useCallback(() => {
-    setNotifications([]);
-    localStorage.removeItem(STORAGE_KEYS.NOTIFICATIONS);
-  }, []);
+    setNotifications((prev) => {
+      setDismissedFingerprints((dPrev) => {
+        const next = { ...dPrev };
+        const now = Date.now();
+        prev.forEach((n) => {
+          const fp = n.fingerprint || `${n.category}:${n.title}:${n.message}`;
+          next[fp] = now;
+        });
+        persistDismissedFingerprints(next);
+        return next;
+      });
+      activeFingerprintsRef.current.clear();
+      localStorage.removeItem(STORAGE_KEYS.NOTIFICATIONS);
+      return [];
+    });
+  }, [persistDismissedFingerprints]);
 
   const sendTestNotification = useCallback(async () => {
+    const testFp = `test_notification:${Date.now()}`;
     addNotification({
       title: 'Tactical Uplink Connected',
       message: 'Desktop and in-app notifications are functioning properly. Ready for flight ops.',
       category: 'announcement',
+      fingerprint: testFp,
     });
-    if (settings.enableDesktopNotifications) {
-      await dispatchDesktopToast(
-        'GTFO Companion App',
-        'Test notification: Desktop notifications are active!'
-      );
-    }
-  }, [addNotification, settings.enableDesktopNotifications]);
+  }, [addNotification]);
 
   // Synchronize window minimization & tray preferences to Rust backend
   useEffect(() => {
@@ -714,6 +805,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           title: `App Update Available: v${info.version}`,
           message: `A new version of GTFO Companion App is available. Click to review release notes and install.`,
           category: 'app',
+          fingerprint: `app_update:v${info.version}`,
         });
       }
       return info;
@@ -819,52 +911,45 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [settings.pollingIntervalMinutes, syncManifest, syncMemberPortal, checkForAppUpdateAction]);
 
   // Notify when new remote announcements are broadcast in manifest
-  const notifiedAnnouncements = useRef<Set<string>>(new Set());
   useEffect(() => {
     if (manifest.announcement?.message) {
-      const annKey = `${manifest.announcement.title}-${manifest.announcement.message}`;
-      if (!notifiedAnnouncements.current.has(annKey)) {
-        notifiedAnnouncements.current.add(annKey);
-        addNotification({
-          title: manifest.announcement.title || 'GTFO Announcement',
-          message: manifest.announcement.message,
-          category: 'announcement',
-          actionTab: 'home',
-        });
-      }
+      const annKey = `announcement:${manifest.announcement.title || ''}:${manifest.announcement.message}`;
+      addNotification({
+        title: manifest.announcement.title || 'GTFO Announcement',
+        message: manifest.announcement.message,
+        category: 'announcement',
+        actionTab: 'home',
+        fingerprint: annKey,
+      });
     }
   }, [manifest.announcement, addNotification]);
 
   // Notify on new flight plans / ATC packages
-  const notifiedFlightPlans = useRef<Set<string>>(new Set());
   useEffect(() => {
     if (settings.notifyFlightPlans && lastSyncedAt) {
       atcPackages.forEach((pkg) => {
-        if (!notifiedFlightPlans.current.has(pkg.id)) {
-          notifiedFlightPlans.current.add(pkg.id);
-          addNotification({
-            title: `Flight Plan: ${pkg.operationName || pkg.missionTitle}`,
-            message: `${pkg.aircraft} package at ${pkg.theatre}. Callsign: ${pkg.callsign}.`,
-            category: 'flight_plan',
-            actionTab: 'atc',
-          });
-        }
+        const pkgKey = `atc_pkg:${pkg.id}:${pkg.operationName || pkg.missionTitle || ''}:${pkg.theatre || ''}`;
+        addNotification({
+          title: `Flight Plan: ${pkg.operationName || pkg.missionTitle}`,
+          message: `${pkg.aircraft} package at ${pkg.theatre}. Callsign: ${pkg.callsign}.`,
+          category: 'flight_plan',
+          actionTab: 'atc',
+          fingerprint: pkgKey,
+        });
       });
 
       memberFlightPlans.forEach((plan) => {
-        const planKey = `member-${plan.identifier || plan.id}`;
-        if (!notifiedFlightPlans.current.has(planKey)) {
-          notifiedFlightPlans.current.add(planKey);
-          const cleanTitle = plan.callsign && plan.name && plan.callsign !== plan.name
-            ? `${plan.callsign} (${plan.name})`
-            : plan.callsign || plan.name || plan.identifier;
-          addNotification({
-            title: cleanTitle,
-            message: `${plan.airframe?.name || 'Aircraft'} — ${plan.departure_airfield || 'DEP'} to ${plan.destination_airfield || 'ARR'}${plan.description ? ` • ${plan.description}` : ''}`,
-            category: 'flight_plan',
-            actionTab: 'atc',
-          });
-        }
+        const planKey = `flight_plan:${plan.identifier || plan.id}:${plan.updated_at || plan.filed_at || 'v1'}:${plan.is_filed ? '1' : '0'}:${plan.name || ''}`;
+        const cleanTitle = plan.callsign && plan.name && plan.callsign !== plan.name
+          ? `${plan.callsign} (${plan.name})`
+          : plan.callsign || plan.name || plan.identifier;
+        addNotification({
+          title: cleanTitle,
+          message: `${plan.airframe?.name || 'Aircraft'} — ${plan.departure_airfield || 'DEP'} to ${plan.destination_airfield || 'ARR'}${plan.description ? ` • ${plan.description}` : ''}`,
+          category: 'flight_plan',
+          actionTab: 'atc',
+          fingerprint: planKey,
+        });
       });
     }
   }, [atcPackages, memberFlightPlans, settings.notifyFlightPlans, addNotification, lastSyncedAt]);
@@ -979,21 +1064,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [manifest.assets, isUpdateAvailable]);
 
   // Notify when new updates for installed assets become available
-  const notifiedAssetVersions = useRef<Set<string>>(new Set());
   useEffect(() => {
     if (outdatedAssets.length > 0 && settings.notifyAssetUpdates) {
       outdatedAssets.forEach((asset) => {
-        const key = `${asset.id}:${asset.version}`;
-        if (!notifiedAssetVersions.current.has(key)) {
-          notifiedAssetVersions.current.add(key);
-          addNotification({
-            title: `Update Ready: ${asset.name}`,
-            message: `Version v${asset.version} is now available in the GTFO manifest.`,
-            category: asset.category === 'livery' ? 'livery' : 'mod',
-            actionTab: 'library',
-            actionAssetId: asset.id,
-          });
-        }
+        const key = `asset_update:${asset.id}:${asset.version}`;
+        addNotification({
+          title: `Update Ready: ${asset.name}`,
+          message: `Version v${asset.version} is now available in the GTFO manifest.`,
+          category: asset.category === 'livery' ? 'livery' : 'mod',
+          actionTab: 'library',
+          actionAssetId: asset.id,
+          fingerprint: key,
+        });
       });
     }
   }, [outdatedAssets, settings.notifyAssetUpdates, addNotification]);
@@ -1416,17 +1498,36 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   );
 
   // --- Flight Plans API & Integrations Handlers ---
+  const fetchFiledPlans = useCallback(
+    async (options?: FetchFiledFlightPlansOptions): Promise<FlightPlanSummary[]> => {
+      const baseUrl = settings.memberPortalApiUrl || STATIC_CONFIG.portalBaseUrl;
+      const token = userSession?.accessToken;
+      try {
+        const res = await fetchFiledFlightPlans(baseUrl, options || { limit: 50 }, token);
+        if (res && Array.isArray(res.plans)) {
+          setFiledFlightPlans(res.plans);
+          return res.plans;
+        }
+      } catch (err) {
+        console.warn('fetchFiledPlans error:', err);
+      }
+      return [];
+    },
+    [settings.memberPortalApiUrl, userSession?.accessToken]
+  );
+
   const syncFlightPlans = useCallback(async () => {
     setIsLoadingFlightPlans(true);
-    addLog('info', 'ATC', 'Fetching Member & Sortie Package Flight Plans from Portal...');
+    addLog('info', 'ATC', 'Fetching Member, Sortie Package & Filed Flight Plans from Portal...');
     const baseUrl = settings.memberPortalApiUrl || STATIC_CONFIG.portalBaseUrl;
     const discordId = userSession?.id || memberProfile.discordId || '112233445566778899';
     const token = userSession?.accessToken;
 
     try {
-      const [memberRes, sortieRes] = await Promise.all([
+      const [memberRes, sortieRes, filedRes] = await Promise.all([
         fetchMemberFlightPlans(baseUrl, discordId, true, token),
         fetchActiveSortieFlightPlans(baseUrl, token),
+        fetchFiledFlightPlans(baseUrl, { limit: 50 }, token),
       ]);
 
       setMemberFlightPlans(memberRes.plans);
@@ -1439,11 +1540,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       setActiveSortie(sortieRes.active_sortie);
       setActiveSortieFlightPlans(sortieRes.plans);
+      if (filedRes && Array.isArray(filedRes.plans)) {
+        setFiledFlightPlans(filedRes.plans);
+      }
 
       addLog(
         'success',
         'ATC',
-        `Flight Plans synchronized: ${memberRes.plans.length} member plan(s), ${sortieRes.plans.length} in active sortie.`
+        `Flight Plans synchronized: ${memberRes.plans.length} member plan(s), ${sortieRes.plans.length} sortie plan(s), ${filedRes?.plans?.length || 0} filed with ATC.`
       );
     } catch (err) {
       addLog('warn', 'ATC', `Flight Plans sync warning: ${String(err)}`);
@@ -1607,8 +1711,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         memberFlightPlansMeta,
         activeSortie,
         activeSortieFlightPlans,
+        filedFlightPlans,
         isLoadingFlightPlans,
         syncFlightPlans,
+        fetchFiledPlans,
         loadFlightPlanDetail,
         saveRouteToDcs,
         copyDcsRoutePresetsPathToClipboard,
@@ -1618,6 +1724,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setLoginModalOpen,
         selectedAsset,
         setSelectedAsset,
+        selectedFlightPlanId,
+        setSelectedFlightPlanId,
+        highlightedCertId,
+        setHighlightedCertId,
         settings,
         updateSettings,
         installAsset,

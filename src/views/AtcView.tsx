@@ -1,26 +1,34 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
+  AirplaneLanding,
   AirplaneTilt,
   ArrowsClockwise,
   BookOpen,
+  Broadcast,
   Check,
   CheckCircle,
+  Clock,
   Code,
   Compass,
   Copy,
   Cpu,
+  Crosshair,
   DownloadSimple,
   Eye,
   FileCode,
   FilePdf,
   FolderSimple,
+  Gauge,
   ListChecks,
   MapPin,
   NavigationArrow,
+  Notepad,
   Path,
   Radio,
+  ShieldCheck,
   ShieldWarning,
   Sparkle,
+  Target,
   Terminal,
   User,
   UsersFour,
@@ -29,7 +37,6 @@ import {
 import { useApp } from '../context/AppContext';
 import {
   formatFlightPlanToLuaPreset,
-  buildDtcJsonPayload,
 } from '../data/sampleFlightPlans';
 import {
   downloadFlightPlanDcsRoute,
@@ -40,9 +47,33 @@ import {
   triggerBrowserFileDownload,
 } from '../services/flightPlanService';
 import {
+  exportFlightPlanKneeboardPages,
+  ExportKneeboardResult,
+} from '../services/pdfKneeboardService';
+import { openLocalPath } from '../services/tauriBridge';
+import {
   FlightPlanDetail,
+  FlightPlanDivert,
   FlightPlanSummary,
 } from '../types';
+
+function formatFiledTime(isoString?: string | null): string {
+  if (!isoString) return '';
+  try {
+    const d = new Date(isoString);
+    if (isNaN(d.getTime())) return isoString;
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) + 'Z';
+  } catch {
+    return isoString;
+  }
+}
+
+function formatDiverts(diverts?: Array<FlightPlanDivert | string>): string {
+  if (!diverts || diverts.length === 0) return 'None assigned';
+  return diverts
+    .map((d) => (typeof d === 'string' ? d : d.icao ? `${d.name} (${d.icao})` : d.name))
+    .join(', ');
+}
 
 export const AtcView: React.FC = () => {
   const {
@@ -50,8 +81,10 @@ export const AtcView: React.FC = () => {
     memberFlightPlansMeta,
     activeSortie,
     activeSortieFlightPlans,
+    filedFlightPlans,
     isLoadingFlightPlans,
     syncFlightPlans,
+    fetchFiledPlans,
     loadFlightPlanDetail,
     saveRouteToDcs,
     copyDcsRoutePresetsPathToClipboard,
@@ -59,10 +92,15 @@ export const AtcView: React.FC = () => {
     openPdfKneeboardViewer,
     dcsEnv,
     settings,
+    addNotification,
+    addLog,
+    userSession,
+    selectedFlightPlanId,
+    setSelectedFlightPlanId,
   } = useApp();
 
-  // Mode: 'member' (Assigned/Private plans) or 'sortie' (Active Sortie Package View)
-  const [viewMode, setViewMode] = useState<'member' | 'sortie'>('member');
+  // Mode: 'member' (Assigned/Private plans), 'sortie' (Active Sortie Package), or 'filed' (ATC Filed Feed)
+  const [viewMode, setViewMode] = useState<'member' | 'sortie' | 'filed'>('member');
   const [selectedPlanId, setSelectedPlanId] = useState<number | string>(
     memberFlightPlans[0]?.id || 14
   );
@@ -74,16 +112,41 @@ export const AtcView: React.FC = () => {
   const [selectedSquadron, setSelectedSquadron] = useState<string>('ALL');
   const [selectedAirframe, setSelectedAirframe] = useState<string>('ALL');
 
-  // Active sub-tab in workbench
-  const [activeTab, setActiveTab] = useState<'waypoints' | 'comms' | 'avionics' | 'route_lua' | 'dtc'>(
-    'waypoints'
-  );
+  // Active sub-tab in workbench (mirrors GTFO Flight Planner)
+  const [activeTab, setActiveTab] = useState<
+    'summary' | 'routes' | 'targets' | 'loadouts' | 'comms' | 'mids' | 'sa' | 'destpts' | 'cmds' | 'notes'
+  >('summary');
+
+  // Synchronize with external selectedFlightPlanId (e.g. from Global Search)
+  useEffect(() => {
+    if (selectedFlightPlanId !== null && selectedFlightPlanId !== undefined) {
+      const idStr = String(selectedFlightPlanId).toLowerCase();
+      const inMember = memberFlightPlans.some(
+        (p) => String(p.id).toLowerCase() === idStr || p.identifier?.toLowerCase() === idStr
+      );
+      const inSortie = activeSortieFlightPlans.some(
+        (p) => String(p.id).toLowerCase() === idStr || p.identifier?.toLowerCase() === idStr
+      );
+      const inFiled = filedFlightPlans.some(
+        (p) => String(p.id).toLowerCase() === idStr || p.identifier?.toLowerCase() === idStr
+      );
+
+      if (inMember) setViewMode('member');
+      else if (inSortie) setViewMode('sortie');
+      else if (inFiled) setViewMode('filed');
+
+      setSelectedPlanId(selectedFlightPlanId);
+    }
+  }, [selectedFlightPlanId, memberFlightPlans, activeSortieFlightPlans, filedFlightPlans]);
 
   // Action status states
   const [isSavingRoute, setIsSavingRoute] = useState(false);
   const [isSavingDtc, setIsSavingDtc] = useState(false);
   const [isOpeningPdf, setIsOpeningPdf] = useState(false);
   const [isExportingKneeboard, setIsExportingKneeboard] = useState(false);
+  const [exportKneeboardStatus, setExportKneeboardStatus] = useState<string | null>(null);
+  const [kneeboardExportResult, setKneeboardExportResult] = useState<ExportKneeboardResult | null>(null);
+  const [hasExportedKneeboard, setHasExportedKneeboard] = useState(false);
   const [routeSavedPath, setRouteSavedPath] = useState<string | null>(null);
   const [dtcSavedPath, setDtcSavedPath] = useState<string | null>(null);
   const [hasCopiedPath, setHasCopiedPath] = useState(false);
@@ -91,10 +154,17 @@ export const AtcView: React.FC = () => {
   const [hasCopiedDtc, setHasCopiedDtc] = useState(false);
   const [copiedWptIdx, setCopiedWptIdx] = useState<number | null>(null);
 
+  // Fetch filed flight plans on mount
+  useEffect(() => {
+    fetchFiledPlans({ limit: 50 });
+  }, [fetchFiledPlans]);
+
   // Active source list based on mode
   const currentPlans = useMemo(() => {
-    return viewMode === 'member' ? memberFlightPlans : activeSortieFlightPlans;
-  }, [viewMode, memberFlightPlans, activeSortieFlightPlans]);
+    if (viewMode === 'member') return memberFlightPlans;
+    if (viewMode === 'sortie') return activeSortieFlightPlans;
+    return filedFlightPlans;
+  }, [viewMode, memberFlightPlans, activeSortieFlightPlans, filedFlightPlans]);
 
   // Filtered list
   const filteredPlans = useMemo(() => {
@@ -141,6 +211,8 @@ export const AtcView: React.FC = () => {
       setIsLoadingDetail(true);
       setRouteSavedPath(null);
       setDtcSavedPath(null);
+      setKneeboardExportResult(null);
+      setHasExportedKneeboard(false);
       try {
         const detail = await loadFlightPlanDetail(activeSummary.id || activeSummary.identifier);
         if (!isCancelled) {
@@ -204,11 +276,24 @@ export const AtcView: React.FC = () => {
     return formatFlightPlanToLuaPreset(selectedDetail);
   }, [selectedDetail]);
 
-  // Formatted DTC JSON payload
-  const activeDtcJson = useMemo(() => {
-    if (!selectedDetail) return '';
-    return JSON.stringify(buildDtcJsonPayload(selectedDetail), null, 2);
-  }, [selectedDetail]);
+  // Designated target points from route (matching Flight Planner Targets tab)
+  const targetPoints = useMemo(() => {
+    if (!selectedDetail?.route_points) return [];
+    return selectedDetail.route_points.filter((wp) => {
+      const act = (wp.action || '').toLowerCase();
+      const tp = (wp.type || '').toLowerCase();
+      const nm = (wp.name || '').toUpperCase();
+      return (
+        act.includes('strike') ||
+        act.includes('target') ||
+        act.includes('attack') ||
+        tp.includes('target') ||
+        nm.startsWith('TGT') ||
+        nm.includes('TARGET') ||
+        nm.includes('STRIKE')
+      );
+    });
+  }, [selectedDetail?.route_points]);
 
   // Squadrons and airframes options for filter
   const squadronFilterOptions = useMemo(() => {
@@ -251,27 +336,79 @@ export const AtcView: React.FC = () => {
     setTimeout(() => setHasCopiedPath(false), 2500);
   };
 
-  // 3. Save DTC Cartridge Directly
+  // 3. Save DTC Cartridge Directly (fetches authentic 840KB DTC built by the portal's FlightPlanExportService)
   const handleSaveDtcToDcs = async () => {
     if (!selectedDetail || !selectedDetail.is_dtc_compatible) return;
     setIsSavingDtc(true);
     setDtcSavedPath(null);
     try {
+      const targetUrlOrId = selectedDetail.download_urls?.dtc || selectedDetail.identifier || selectedDetail.id;
+      const token = userSession?.accessToken;
+      const res = await downloadFlightPlanDtc(
+        settings.memberPortalApiUrl,
+        targetUrlOrId,
+        token
+      );
+
+      const dtcContent = res.rawText || (res.data ? JSON.stringify(res.data, null, 2) : '');
+      if (!res.success || !dtcContent) {
+        throw new Error(res.error || 'Failed to download DTC from portal');
+      }
+
       const fileName = `${selectedDetail.callsign.replace(/[^a-zA-Z0-9_-]/g, '_')}.dtc`;
-      const path = await saveDtcCartridgeDirect(fileName, activeDtcJson, 'DTC');
+      const path = await saveDtcCartridgeDirect(fileName, dtcContent, 'DTC');
       setDtcSavedPath(path);
-    } catch (err) {
+      addNotification({
+        title: 'Saved DTC Cartridge',
+        message: `Saved DTC to ${path}`,
+        category: 'flight_plan',
+        actionTab: 'atc',
+      });
+    } catch (err: any) {
       console.error(err);
+      addLog('error', 'ATC', `Failed saving DTC: ${err?.message || err}`);
+      addNotification({
+        title: 'DTC Save Failed',
+        message: String(err?.message || err),
+        category: 'flight_plan',
+        actionTab: 'atc',
+      });
     } finally {
       setIsSavingDtc(false);
     }
   };
 
-  // 4. Download DTC File
-  const handleDownloadDtc = () => {
+  // 4. Download DTC File (downloads authentic DTC built by the portal)
+  const handleDownloadDtc = async () => {
     if (!selectedDetail) return;
-    const fileName = `${selectedDetail.callsign.replace(/[^a-zA-Z0-9_-]/g, '_')}.dtc`;
-    triggerBrowserFileDownload(fileName, activeDtcJson, 'application/json');
+    setIsSavingDtc(true);
+    try {
+      const targetUrlOrId = selectedDetail.download_urls?.dtc || selectedDetail.identifier || selectedDetail.id;
+      const token = userSession?.accessToken;
+      const res = await downloadFlightPlanDtc(
+        settings.memberPortalApiUrl,
+        targetUrlOrId,
+        token
+      );
+
+      const dtcContent = res.rawText || (res.data ? JSON.stringify(res.data, null, 2) : '');
+      if (!res.success || !dtcContent) {
+        throw new Error(res.error || 'Failed to download DTC from portal');
+      }
+
+      const fileName = `${selectedDetail.callsign.replace(/[^a-zA-Z0-9_-]/g, '_')}.dtc`;
+      triggerBrowserFileDownload(fileName, dtcContent, 'application/json');
+    } catch (err: any) {
+      console.error(err);
+      addNotification({
+        title: 'DTC Download Failed',
+        message: String(err?.message || err),
+        category: 'flight_plan',
+        actionTab: 'atc',
+      });
+    } finally {
+      setIsSavingDtc(false);
+    }
   };
 
   // 5. Open PDF Kneeboard
@@ -300,34 +437,53 @@ export const AtcView: React.FC = () => {
   const handleExportToKneeboardFolder = async () => {
     if (!selectedDetail) return;
     setIsExportingKneeboard(true);
-    try {
-      const aircraftFolder = selectedDetail.airframe.dcs_entity || 'ALL';
-      const fileName = `GTFO_${selectedDetail.callsign.replace(/[^a-zA-Z0-9_-]/g, '_')}_BRIEF.txt`;
-      const briefContent = [
-        `=== GTFO FLIGHT PLAN BRIEF: ${selectedDetail.callsign} (${selectedDetail.identifier}) ===`,
-        `Mission: ${selectedDetail.mission?.name || (selectedDetail.is_private ? 'Private / Standalone Flight Plan' : 'Unassigned')} | Sortie: ${selectedDetail.sortie?.name || 'None'}`,
-        `Airframe: ${selectedDetail.airframe.name} (${selectedDetail.airframe.dcs_entity})`,
-        `Squadron: ${selectedDetail.squadron.name}`,
-        `Departure: ${selectedDetail.departure_airfield || 'N/A'} | Arrival: ${selectedDetail.destination_airfield || 'N/A'}`,
-        `Launch Time: ${selectedDetail.launch_time || 'N/A'} | Fuel: ${selectedDetail.fuel_amount || 'N/A'}`,
-        `Remarks: ${selectedDetail.remarks || 'None'}`,
-        ``,
-        `=== WAYPOINTS ===`,
-        ...(selectedDetail.route_points || []).map(
-          (wp) => `[${wp.index}] ${wp.name.padEnd(20)} Alt: ${wp.alt}ft  Spd: ${wp.speed}kts  MGRS: ${wp.mgrs || 'N/A'}  ${wp.remarks || ''}`
-        ),
-      ].join('\n');
+    setExportKneeboardStatus('Preparing PDF...');
+    setKneeboardExportResult(null);
 
-      const customDcsPath = settings.dcsSavedGamesPath || dcsEnv?.activeSavedGamesPath;
-      await installAircraftKneeboardPageCommand(
-        aircraftFolder,
-        fileName,
-        briefContent,
-        false,
-        customDcsPath
+    const customDcsPath = settings.dcsSavedGamesPath || dcsEnv?.activeSavedGamesPath;
+    const baseUrl = settings.memberPortalApiUrl;
+    const token = userSession?.accessToken;
+
+    try {
+      addLog('info', 'ATC', `Exporting kneeboard pages for ${selectedDetail.callsign}...`);
+
+      const result = await exportFlightPlanKneeboardPages(
+        selectedDetail,
+        baseUrl,
+        customDcsPath,
+        token,
+        (progress) => setExportKneeboardStatus(progress)
       );
+
+      setKneeboardExportResult(result);
+      setHasExportedKneeboard(true);
+
+      addLog(
+        'success',
+        'ATC',
+        `Successfully saved ${result.pageCount} kneeboard image(s) to Kneeboard/${result.folderName}/ (${result.fileNames.join(', ')})`
+      );
+
+      addNotification({
+        title: 'Kneeboard Export Complete',
+        message: `Saved ${result.pageCount} page(s) (${result.prefix}) to DCS Kneeboard/${result.folderName}/`,
+        category: 'flight_plan',
+        actionTab: 'atc',
+      });
+
+      setTimeout(() => setHasExportedKneeboard(false), 5000);
+    } catch (err: any) {
+      console.error('Kneeboard export failed:', err);
+      addLog('error', 'ATC', `Failed to export kneeboard pages: ${String(err?.message || err)}`);
+      addNotification({
+        title: 'Kneeboard Export Failed',
+        message: String(err?.message || err),
+        category: 'flight_plan',
+        actionTab: 'atc',
+      });
     } finally {
       setIsExportingKneeboard(false);
+      setExportKneeboardStatus(null);
     }
   };
 
@@ -347,9 +503,24 @@ export const AtcView: React.FC = () => {
 
   // Copy DTC JSON to clipboard
   const handleCopyDtc = async () => {
-    await navigator.clipboard.writeText(activeDtcJson);
-    setHasCopiedDtc(true);
-    setTimeout(() => setHasCopiedDtc(false), 2000);
+    if (!selectedDetail) return;
+    try {
+      const targetUrlOrId = selectedDetail.download_urls?.dtc || selectedDetail.identifier || selectedDetail.id;
+      const token = userSession?.accessToken;
+      const res = await downloadFlightPlanDtc(
+        settings.memberPortalApiUrl,
+        targetUrlOrId,
+        token
+      );
+      const dtcContent = res.rawText || (res.data ? JSON.stringify(res.data, null, 2) : '');
+      if (dtcContent) {
+        await navigator.clipboard.writeText(dtcContent);
+        setHasCopiedDtc(true);
+        setTimeout(() => setHasCopiedDtc(false), 2000);
+      }
+    } catch (err) {
+      console.error('Failed to copy DTC', err);
+    }
   };
 
   // Copy single waypoint coordinates
@@ -367,20 +538,11 @@ export const AtcView: React.FC = () => {
         <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
           <div className="space-y-2 max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono uppercase tracking-wider">
-              <Compass className="w-3.5 h-3.5" />
-              <span>GTFO Air Traffic Control &amp; Mission Planning Dispatch</span>
-            </div>
             <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent">
-              Air Traffic Control // Flight Plans, DTC &amp; Path Tool Presets
+              Operational Air Traffic Control
             </h1>
             <p className="text-sm text-stone-400 leading-relaxed">
-              Connect to the GTFO Laravel REST API to inspect member flight plans and package sorties.
-              One-click append route presets directly into{' '}
-              <code className="text-stone-300 font-mono">
-                Saved Games\DCS\Config\RouteToolPresets\&lt;Theatre&gt;.lua
-              </code>
-              , save native DTC cartridges, and export briefing kneeboards.
+              Centralized hub for filed flight plans, data cartridges, and route presets.
             </p>
           </div>
 
@@ -406,14 +568,14 @@ export const AtcView: React.FC = () => {
                 setViewMode('member');
                 if (memberFlightPlans[0]) setSelectedPlanId(memberFlightPlans[0].id);
               }}
-              className={`px-4 py-2 rounded-lg text-xs font-display font-semibold transition-all flex items-center gap-2 ${
+              className={`px-3.5 py-2 rounded-lg text-xs font-display font-semibold transition-all flex items-center gap-2 ${
                 viewMode === 'member'
                   ? 'bg-amber-500 text-stone-950 shadow-md font-bold'
                   : 'text-stone-400 hover:text-stone-200'
               }`}
             >
               <User className="w-4 h-4" />
-              <span>My Assigned &amp; Private Plans</span>
+              <span>My Plans</span>
               <span className="px-1.5 py-0.2 rounded-full bg-stone-900/60 text-[10px] font-mono">
                 {memberFlightPlans.length}
               </span>
@@ -424,22 +586,40 @@ export const AtcView: React.FC = () => {
                 setViewMode('sortie');
                 if (activeSortieFlightPlans[0]) setSelectedPlanId(activeSortieFlightPlans[0].id);
               }}
-              className={`px-4 py-2 rounded-lg text-xs font-display font-semibold transition-all flex items-center gap-2 ${
+              className={`px-3.5 py-2 rounded-lg text-xs font-display font-semibold transition-all flex items-center gap-2 ${
                 viewMode === 'sortie'
                   ? 'bg-amber-500 text-stone-950 shadow-md font-bold'
                   : 'text-stone-400 hover:text-stone-200'
               }`}
             >
               <UsersFour className="w-4 h-4" />
-              <span>Active Sortie Package</span>
+              <span>Sortie Package</span>
               <span className="px-1.5 py-0.2 rounded-full bg-stone-900/60 text-[10px] font-mono">
                 {activeSortieFlightPlans.length}
+              </span>
+            </button>
+
+            <button
+              onClick={() => {
+                setViewMode('filed');
+                if (filedFlightPlans[0]) setSelectedPlanId(filedFlightPlans[0].id);
+              }}
+              className={`px-3.5 py-2 rounded-lg text-xs font-display font-semibold transition-all flex items-center gap-2 ${
+                viewMode === 'filed'
+                  ? 'bg-emerald-500 text-stone-950 shadow-md font-bold'
+                  : 'text-stone-400 hover:text-stone-200'
+              }`}
+            >
+              <Broadcast className="w-4 h-4" />
+              <span>ATC Filed Feed</span>
+              <span className="px-1.5 py-0.2 rounded-full bg-stone-900/60 text-[10px] font-mono">
+                {filedFlightPlans.length}
               </span>
             </button>
           </div>
 
           {/* Stat Badges for Active Mode */}
-          {viewMode === 'member' ? (
+          {viewMode === 'member' && (
             <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono">
               <span className="px-2.5 py-1 rounded-lg bg-stone-950 border border-stone-800 text-stone-300">
                 Missions: <strong className="text-amber-400">{memberFlightPlansMeta.missions_count}</strong>
@@ -451,20 +631,32 @@ export const AtcView: React.FC = () => {
                 Private: <strong className="text-purple-400">{memberFlightPlansMeta.private_count}</strong>
               </span>
             </div>
-          ) : (
-            activeSortie && (
-              <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono">
-                <span className="px-2.5 py-1 rounded-lg bg-stone-950 border border-stone-800 text-amber-300 font-semibold">
-                  {activeSortie.name} (Sortie #{activeSortie.sortie_number})
-                </span>
-                <span className="px-2.5 py-1 rounded-lg bg-stone-950 border border-stone-800 text-stone-300">
-                  Campaign: <strong className="text-stone-100">{activeSortie.campaign_name}</strong>
-                </span>
-                <span className="px-2.5 py-1 rounded-lg bg-stone-950 border border-stone-800 text-stone-300">
-                  Theatre: <strong className="text-amber-400">{activeSortie.theatre}</strong>
-                </span>
-              </div>
-            )
+          )}
+
+          {viewMode === 'sortie' && activeSortie && (
+            <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono">
+              <span className="px-2.5 py-1 rounded-lg bg-stone-950 border border-stone-800 text-amber-300 font-semibold">
+                {activeSortie.name} (Sortie #{activeSortie.sortie_number})
+              </span>
+              <span className="px-2.5 py-1 rounded-lg bg-stone-950 border border-stone-800 text-stone-300">
+                Campaign: <strong className="text-stone-100">{activeSortie.campaign_name}</strong>
+              </span>
+              <span className="px-2.5 py-1 rounded-lg bg-stone-950 border border-stone-800 text-stone-300">
+                Theatre: <strong className="text-amber-400">{activeSortie.theatre}</strong>
+              </span>
+            </div>
+          )}
+
+          {viewMode === 'filed' && (
+            <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono">
+              <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-semibold flex items-center gap-1.5">
+                <Broadcast className="w-3.5 h-3.5" />
+                <span>Live ATC Broadcast Feed</span>
+              </span>
+              <span className="px-2.5 py-1 rounded-lg bg-stone-950 border border-stone-800 text-stone-300">
+                Total Filed: <strong className="text-emerald-400">{filedFlightPlans.length}</strong>
+              </span>
+            </div>
           )}
         </div>
       </div>
@@ -564,7 +756,10 @@ export const AtcView: React.FC = () => {
               return (
                 <div
                   key={plan.id || plan.identifier}
-                  onClick={() => setSelectedPlanId(plan.id || plan.identifier)}
+                  onClick={() => {
+                    setSelectedPlanId(plan.id || plan.identifier);
+                    setSelectedFlightPlanId(plan.id || plan.identifier);
+                  }}
                   style={{ borderLeftColor: isSelected ? '#f59e0b' : hasColor, borderLeftWidth: 4 }}
                   className={`p-4 rounded-xl border transition-all cursor-pointer ${
                     isSelected
@@ -586,10 +781,23 @@ export const AtcView: React.FC = () => {
                         </div>
                       )}
                       <div className="min-w-0">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-[10px] font-mono uppercase tracking-wider text-amber-400 font-bold block truncate">
-                            {plan.identifier || `FP-${plan.id}`}
+                        <div className="flex flex-wrap items-center gap-1.5 mb-0.5">
+                          <span
+                            className="font-mono bg-stone-950 border border-stone-800 text-amber-400 px-2 py-0.5 rounded text-[11px] font-bold shrink-0 select-all"
+                            title="Permanent Immutable FP Identifier"
+                          >
+                            #{plan.identifier || `FP-${plan.id}`}
                           </span>
+                          {plan.is_filed ? (
+                            <span className="px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[10px] font-mono font-bold flex items-center gap-1 shrink-0">
+                              <CheckCircle className="w-3 h-3 text-emerald-400 shrink-0" />
+                              <span>Filed with ATC • {formatFiledTime(plan.filed_at)}</span>
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 rounded bg-stone-950 text-stone-500 border border-stone-800 text-[10px] font-mono shrink-0">
+                              Draft / Unfiled
+                            </span>
+                          )}
                           {plan.is_private && (
                             <span className="px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-300 border border-purple-500/40 text-[9px] font-mono">
                               PRIVATE
@@ -648,7 +856,53 @@ export const AtcView: React.FC = () => {
                     )}
                   </div>
 
-                  <div className="mt-3 pt-2.5 border-t border-stone-800/80 flex items-center justify-between text-[11px] font-mono">
+                  {/* Quick Export Actions */}
+                  {plan.download_urls && (
+                    <div className="flex items-center gap-1.5 mt-2.5 pt-2 border-t border-stone-800/60 text-[10px] font-mono">
+                      <span className="text-stone-500 mr-0.5">Quick Export:</span>
+                      {plan.download_urls.pdf && (
+                        <a
+                          href={plan.download_urls.pdf}
+                          target="_blank"
+                          rel="noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          title="Download PDF Kneeboard"
+                          className="px-1.5 py-0.5 rounded bg-stone-950 hover:bg-stone-800 text-stone-300 hover:text-rose-400 border border-stone-800 transition-all flex items-center gap-1"
+                        >
+                          <FilePdf className="w-3 h-3 text-rose-400" />
+                          <span>PDF</span>
+                        </a>
+                      )}
+                      {plan.download_urls.dcs_route && (
+                        <a
+                          href={plan.download_urls.dcs_route}
+                          target="_blank"
+                          rel="noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          title="Download DCS Route .lua Preset"
+                          className="px-1.5 py-0.5 rounded bg-stone-950 hover:bg-stone-800 text-stone-300 hover:text-cyan-400 border border-stone-800 transition-all flex items-center gap-1"
+                        >
+                          <FileCode className="w-3 h-3 text-cyan-400" />
+                          <span>.lua</span>
+                        </a>
+                      )}
+                      {plan.is_dtc_compatible && plan.download_urls.dtc && (
+                        <a
+                          href={plan.download_urls.dtc}
+                          target="_blank"
+                          rel="noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          title="Download DTC Cartridge (.dtc JSON)"
+                          className="px-1.5 py-0.5 rounded bg-stone-950 hover:bg-stone-800 text-stone-300 hover:text-emerald-400 border border-stone-800 transition-all flex items-center gap-1"
+                        >
+                          <DownloadSimple className="w-3 h-3 text-emerald-400" />
+                          <span>.dtc</span>
+                        </a>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="mt-2.5 pt-2 border-t border-stone-800/80 flex items-center justify-between text-[11px] font-mono">
                     <span className="text-stone-400 truncate">
                       {plan.departure_airfield || 'DEP'} → {plan.destination_airfield || 'ARR'}
                     </span>
@@ -692,8 +946,11 @@ export const AtcView: React.FC = () => {
                     )}
                     <div className="space-y-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-300 text-[11px] font-mono font-semibold uppercase">
-                          {selectedDetail.identifier}
+                        <span
+                          className="font-mono bg-stone-950 border border-amber-500/40 text-amber-300 px-2.5 py-0.5 rounded-lg text-xs font-bold tracking-wide select-all"
+                          title="Permanent Flight Plan Identifier (Immutable)"
+                        >
+                          #{selectedDetail.identifier}
                         </span>
                         <span className="px-2.5 py-0.5 rounded-full bg-stone-800 text-stone-300 text-[11px] font-mono">
                           {selectedDetail.squadron?.name}
@@ -707,44 +964,51 @@ export const AtcView: React.FC = () => {
                           </span>
                         )}
                       </div>
-                      <h2 className="font-display text-xl font-bold text-stone-100">
+                      <h2 className="font-display text-xl font-bold text-stone-100 truncate">
                         {selectedDetail.callsign} // {selectedDetail.name}
                       </h2>
                       <p className="text-xs font-mono text-stone-400">
                         Launch:{' '}
                         <span className="text-stone-200 font-semibold">
-                          {selectedDetail.launch_time || '18:00Z'}
+                          {selectedDetail.launch_time || '—'}
                         </span>{' '}
                         &bull; Fuel:{' '}
-                        <span className="text-amber-400 font-semibold">{selectedDetail.fuel_amount || '7,100 lbs'}</span>{' '}
+                        <span className="text-amber-400 font-semibold">
+                          {selectedDetail.fuel_amount ? `${selectedDetail.fuel_amount} lbs` : 'Standard'}
+                        </span>{' '}
                         &bull; Theatre:{' '}
                         <span className="text-stone-200">{activeTheatre}</span>
                       </p>
                     </div>
                   </div>
 
-                  {/* Top Action Badges / Status */}
-                  <div className="flex flex-col items-end gap-1.5 shrink-0">
-                    {selectedDetail.mission ? (
-                      <span className="text-[11px] font-mono text-amber-400 font-semibold flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                        Mission: {selectedDetail.mission.name}
+                  {/* Top Action Badges & ATC Filing Status (Read-Only) */}
+                  <div className="flex flex-col items-end gap-2 shrink-0">
+                    {/* Read-Only ATC Filing Badge */}
+                    {selectedDetail.is_filed ? (
+                      <span className="px-3 py-1.5 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold flex items-center gap-1.5 shadow-sm">
+                        <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
+                        <span>Filed with ATC • {formatFiledTime(selectedDetail.filed_at)}</span>
                       </span>
                     ) : (
-                      <span className="text-[10px] font-mono text-purple-300 bg-purple-500/15 border border-purple-500/30 px-2 py-0.5 rounded">
-                        Standalone / Private Plan
+                      <span className="px-3 py-1.5 rounded-lg bg-stone-950 border border-stone-800 text-stone-400 text-xs font-mono flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-stone-600" />
+                        <span>Draft / Unfiled</span>
                       </span>
                     )}
 
-                    {selectedDetail.sortie ? (
-                      <span className="text-[11px] font-mono text-stone-400">
-                        Sortie: {selectedDetail.sortie.name} (Sortie #{selectedDetail.sortie.sortie_number})
-                      </span>
-                    ) : (
-                      <span className="text-[11px] font-mono text-stone-500 italic">
-                        Not Assigned to Mission Sortie
-                      </span>
-                    )}
+                    <div className="flex items-center gap-2 text-[11px] font-mono">
+                      {selectedDetail.mission ? (
+                        <span className="text-amber-400 font-semibold flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                          Mission: {selectedDetail.mission.name}
+                        </span>
+                      ) : (
+                        <span className="text-purple-300 bg-purple-500/15 border border-purple-500/30 px-2 py-0.5 rounded text-[10px]">
+                          Standalone / Private Plan
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -755,10 +1019,10 @@ export const AtcView: React.FC = () => {
                       Departure / Destination
                     </div>
                     <div className="text-xs font-mono font-semibold text-stone-200 mt-1 truncate">
-                      {selectedDetail.departure_airfield || 'Nellis AFB'}
+                      {selectedDetail.departure_airfield || '—'}
                     </div>
                     <div className="text-[11px] font-mono text-stone-400 truncate">
-                      ARR: {selectedDetail.destination_airfield || 'Creech AFB'}
+                      ARR: {selectedDetail.destination_airfield || '—'}
                     </div>
                   </div>
 
@@ -767,7 +1031,7 @@ export const AtcView: React.FC = () => {
                       Diverts &amp; Alternates
                     </div>
                     <div className="text-xs font-mono font-semibold text-stone-200 mt-1 truncate">
-                      {selectedDetail.diverts?.join(', ') || 'Primary Recovery'}
+                      {formatDiverts(selectedDetail.diverts)}
                     </div>
                     <div className="text-[11px] font-mono text-amber-400/90 truncate">
                       {selectedDetail.diverts?.length || 0} Alternate(s)
@@ -933,7 +1197,7 @@ export const AtcView: React.FC = () => {
                         </span>
                       </div>
                       <p className="text-[11px] font-mono text-stone-400 break-all">
-                        Saved Games\DCS\Kneeboard\{selectedDetail.airframe.dcs_entity}
+                        Saved Games\DCS\Kneeboard\{selectedDetail.airframe?.dcs_entity || 'FA-18C_hornet'}
                       </p>
                       <span className="inline-block mt-1.5 px-2 py-0.5 rounded bg-stone-900 border border-stone-800 text-[10px] font-mono text-stone-300">
                         Aircraft Briefing Card
@@ -961,84 +1225,393 @@ export const AtcView: React.FC = () => {
                         <button
                           onClick={handleExportToKneeboardFolder}
                           disabled={isExportingKneeboard}
-                          className="w-1/2 py-1.5 px-2 rounded-lg bg-stone-900 hover:bg-stone-800 text-stone-300 font-mono text-[11px] transition-all flex items-center justify-center gap-1 border border-stone-800 disabled:opacity-50"
+                          className={`w-1/2 py-1.5 px-2 rounded-lg font-mono text-[11px] transition-all flex items-center justify-center gap-1 border disabled:opacity-50 ${
+                            hasExportedKneeboard
+                              ? 'bg-emerald-500/25 text-emerald-300 border-emerald-500/60 shadow-sm shadow-emerald-500/20 font-bold'
+                              : isExportingKneeboard
+                              ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 animate-pulse'
+                              : 'bg-stone-900 hover:bg-stone-800 text-stone-300 border-stone-800 hover:text-amber-400'
+                          }`}
+                          title="Convert flight plan PDF into DCS kneeboard PNG images"
                         >
-                          <FolderSimple className="w-3.5 h-3.5 text-stone-400" />
-                          <span>{isExportingKneeboard ? 'Exporting...' : 'To Folder'}</span>
+                          {isExportingKneeboard ? (
+                            <>
+                              <ArrowsClockwise className="w-3.5 h-3.5 animate-spin text-amber-400" />
+                              <span className="truncate">{exportKneeboardStatus || 'Exporting...'}</span>
+                            </>
+                          ) : hasExportedKneeboard ? (
+                            <>
+                              <Check className="w-3.5 h-3.5 text-emerald-400" weight="bold" />
+                              <span>Saved!</span>
+                            </>
+                          ) : (
+                            <>
+                              <FolderSimple className="w-3.5 h-3.5 text-stone-400" />
+                              <span>To Folder</span>
+                            </>
+                          )}
                         </button>
                       </div>
+
+                      {kneeboardExportResult && (
+                        <div className="p-2.5 rounded-lg bg-emerald-950/40 border border-emerald-500/40 space-y-1.5">
+                          <div className="flex items-center justify-between gap-1 text-[11px] font-mono font-semibold text-emerald-300">
+                            <span className="flex items-center gap-1.5">
+                              <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0" weight="bold" />
+                              <span>Exported {kneeboardExportResult.pageCount} Page(s)</span>
+                            </span>
+                            <button
+                              onClick={() => openLocalPath(kneeboardExportResult.targetDirectory)}
+                              className="px-1.5 py-0.5 rounded bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-[10px] font-mono border border-emerald-500/30 hover:border-emerald-500/50 transition-colors flex items-center gap-1"
+                              title="Open kneeboard directory in Windows Explorer"
+                            >
+                              <FolderSimple className="w-3 h-3" />
+                              <span>Open Folder</span>
+                            </button>
+                          </div>
+                          <div className="text-[10px] font-mono text-stone-400 space-y-0.5">
+                            {kneeboardExportResult.fileNames.map((name) => (
+                              <div key={name} className="truncate text-stone-300 flex items-center gap-1">
+                                <span className="text-emerald-500 font-bold">•</span>
+                                <span className="truncate">{name}</span>
+                              </div>
+                            ))}
+                            <p className="text-[9px] text-stone-500 truncate pt-0.5" title={kneeboardExportResult.targetDirectory}>
+                              {kneeboardExportResult.targetDirectory}
+                            </p>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Sub-Navigation Tabs */}
+              {/* Sub-Navigation Tabs (Mirrors GTFO Flight Planner) */}
               <div className="rounded-2xl border border-stone-800 bg-stone-900/90 overflow-hidden">
-                <div className="border-b border-stone-800 px-4 pt-3 flex flex-wrap items-center gap-2 bg-stone-950/60">
+                <div className="border-b border-stone-800 px-4 pt-3 flex flex-wrap items-center gap-1.5 bg-stone-950/60 overflow-x-auto">
+                  {/* 1. Summary */}
                   <button
-                    onClick={() => setActiveTab('waypoints')}
-                    className={`px-4 py-2.5 text-xs font-display font-semibold border-b-2 transition-all flex items-center gap-2 ${
-                      activeTab === 'waypoints'
+                    onClick={() => setActiveTab('summary')}
+                    className={`px-3 py-2 text-xs font-display font-semibold border-b-2 transition-all flex items-center gap-1.5 shrink-0 ${
+                      activeTab === 'summary'
                         ? 'border-amber-400 text-amber-400'
                         : 'border-transparent text-stone-400 hover:text-stone-200'
                     }`}
                   >
-                    <NavigationArrow className="w-3.5 h-3.5" />
-                    <span>Waypoints ({selectedDetail.route_points?.length || 0})</span>
+                    <Gauge className="w-3.5 h-3.5" />
+                    <span>Summary</span>
                   </button>
 
+                  {/* 2. Routes */}
+                  <button
+                    onClick={() => setActiveTab('routes')}
+                    className={`px-3 py-2 text-xs font-display font-semibold border-b-2 transition-all flex items-center gap-1.5 shrink-0 ${
+                      activeTab === 'routes'
+                        ? 'border-amber-400 text-amber-400'
+                        : 'border-transparent text-stone-400 hover:text-stone-200'
+                    }`}
+                  >
+                    <Path className="w-3.5 h-3.5" />
+                    <span>Routes</span>
+                    <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-stone-800 text-stone-300">
+                      {selectedDetail.route_points?.length || 0}
+                    </span>
+                  </button>
+
+                  {/* 3. Targets */}
+                  <button
+                    onClick={() => setActiveTab('targets')}
+                    className={`px-3 py-2 text-xs font-display font-semibold border-b-2 transition-all flex items-center gap-1.5 shrink-0 ${
+                      activeTab === 'targets'
+                        ? 'border-red-500 text-red-400'
+                        : 'border-transparent text-stone-400 hover:text-stone-200'
+                    }`}
+                  >
+                    <Target className="w-3.5 h-3.5 text-red-400" />
+                    <span>Targets</span>
+                    {targetPoints.length > 0 && (
+                      <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-red-500/20 text-red-300 border border-red-500/30">
+                        {targetPoints.length}
+                      </span>
+                    )}
+                  </button>
+
+                  {/* 4. Loadout */}
+                  {(selectedDetail.station_loadout || selectedDetail.formatted_loadout) && (
+                    <button
+                      onClick={() => setActiveTab('loadouts')}
+                      className={`px-3 py-2 text-xs font-display font-semibold border-b-2 transition-all flex items-center gap-1.5 shrink-0 ${
+                        activeTab === 'loadouts'
+                          ? 'border-amber-400 text-amber-400'
+                          : 'border-transparent text-stone-400 hover:text-stone-200'
+                      }`}
+                    >
+                      <Crosshair className="w-3.5 h-3.5" />
+                      <span>Loadout</span>
+                    </button>
+                  )}
+
+                  {/* 5. COMMS */}
                   <button
                     onClick={() => setActiveTab('comms')}
-                    className={`px-4 py-2.5 text-xs font-display font-semibold border-b-2 transition-all flex items-center gap-2 ${
+                    className={`px-3 py-2 text-xs font-display font-semibold border-b-2 transition-all flex items-center gap-1.5 shrink-0 ${
                       activeTab === 'comms'
                         ? 'border-amber-400 text-amber-400'
                         : 'border-transparent text-stone-400 hover:text-stone-200'
                     }`}
                   >
                     <Radio className="w-3.5 h-3.5" />
-                    <span>Comms &amp; Frequencies</span>
+                    <span>COMMS</span>
                   </button>
 
+                  {/* 6. MIDS */}
+                  {selectedDetail.mids_settings && (
+                    <button
+                      onClick={() => setActiveTab('mids')}
+                      className={`px-3 py-2 text-xs font-display font-semibold border-b-2 transition-all flex items-center gap-1.5 shrink-0 ${
+                        activeTab === 'mids'
+                          ? 'border-cyan-400 text-cyan-400'
+                          : 'border-transparent text-stone-400 hover:text-stone-200'
+                      }`}
+                    >
+                      <Broadcast className="w-3.5 h-3.5 text-cyan-400" />
+                      <span>MIDS</span>
+                      <span className="text-[9px] px-1 py-0.2 rounded bg-cyan-500/20 text-cyan-300 font-mono">L16</span>
+                    </button>
+                  )}
+
+                  {/* 7. SA (F-18) */}
+                  {selectedDetail.sa_settings && (
+                    <button
+                      onClick={() => setActiveTab('sa')}
+                      className={`px-3 py-2 text-xs font-display font-semibold border-b-2 transition-all flex items-center gap-1.5 shrink-0 ${
+                        activeTab === 'sa'
+                          ? 'border-emerald-400 text-emerald-400'
+                          : 'border-transparent text-stone-400 hover:text-stone-200'
+                    }`}
+                  >
+                    <Compass className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>SA</span>
+                    <span className="text-[9px] px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-mono">DTC</span>
+                  </button>
+                  )}
+
+                  {/* 8. DEST PTS (F-16) */}
+                  {selectedDetail.dest_points_settings && (
+                    <button
+                      onClick={() => setActiveTab('destpts')}
+                      className={`px-3 py-2 text-xs font-display font-semibold border-b-2 transition-all flex items-center gap-1.5 shrink-0 ${
+                        activeTab === 'destpts'
+                          ? 'border-indigo-400 text-indigo-400'
+                          : 'border-transparent text-stone-400 hover:text-stone-200'
+                      }`}
+                    >
+                      <AirplaneLanding className="w-3.5 h-3.5 text-indigo-400" />
+                      <span>DEST PTS</span>
+                      <span className="text-[9px] px-1 py-0.2 rounded bg-indigo-500/20 text-indigo-300 font-mono">DTC</span>
+                    </button>
+                  )}
+
+                  {/* 9. CMDS */}
+                  {selectedDetail.cmds_settings && (
+                    <button
+                      onClick={() => setActiveTab('cmds')}
+                      className={`px-3 py-2 text-xs font-display font-semibold border-b-2 transition-all flex items-center gap-1.5 shrink-0 ${
+                        activeTab === 'cmds'
+                          ? 'border-rose-400 text-rose-400'
+                          : 'border-transparent text-stone-400 hover:text-stone-200'
+                      }`}
+                    >
+                      <ShieldCheck className="w-3.5 h-3.5 text-rose-400" />
+                      <span>CMDS</span>
+                      <span className="text-[9px] px-1 py-0.2 rounded bg-rose-500/20 text-rose-300 font-mono">EW</span>
+                    </button>
+                  )}
+
+                  {/* 10. Notes */}
                   <button
-                    onClick={() => setActiveTab('avionics')}
-                    className={`px-4 py-2.5 text-xs font-display font-semibold border-b-2 transition-all flex items-center gap-2 ${
-                      activeTab === 'avionics'
+                    onClick={() => setActiveTab('notes')}
+                    className={`px-3 py-2 text-xs font-display font-semibold border-b-2 transition-all flex items-center gap-1.5 shrink-0 ${
+                      activeTab === 'notes'
                         ? 'border-amber-400 text-amber-400'
                         : 'border-transparent text-stone-400 hover:text-stone-200'
                     }`}
                   >
-                    <Cpu className="w-3.5 h-3.5" />
-                    <span>Avionics &amp; Loadout</span>
-                  </button>
-
-                  <button
-                    onClick={() => setActiveTab('route_lua')}
-                    className={`px-4 py-2.5 text-xs font-display font-semibold border-b-2 transition-all flex items-center gap-2 ${
-                      activeTab === 'route_lua'
-                        ? 'border-amber-400 text-amber-400'
-                        : 'border-transparent text-stone-400 hover:text-stone-200'
-                    }`}
-                  >
-                    <Code className="w-3.5 h-3.5" />
-                    <span>DCS Route Lua</span>
-                  </button>
-
-                  <button
-                    onClick={() => setActiveTab('dtc')}
-                    className={`px-4 py-2.5 text-xs font-display font-semibold border-b-2 transition-all flex items-center gap-2 ${
-                      activeTab === 'dtc'
-                        ? 'border-amber-400 text-amber-400'
-                        : 'border-transparent text-stone-400 hover:text-stone-200'
-                    }`}
-                  >
-                    <Terminal className="w-3.5 h-3.5" />
-                    <span>DTC JSON Payload</span>
+                    <Notepad className="w-3.5 h-3.5" />
+                    <span>Notes</span>
                   </button>
                 </div>
 
                 <div className="p-5">
-                  {/* TAB 1: WAYPOINTS TABLE */}
-                  {activeTab === 'waypoints' && (
+                  {/* TAB 1: SUMMARY */}
+                  {activeTab === 'summary' && (
+                    <div className="space-y-6">
+                      {/* Top Metrics Grid */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                        {/* Callsign & Rules */}
+                        <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-2">
+                          <span className="text-[10px] font-mono uppercase tracking-wider text-stone-500 block">
+                            Flight Identity
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <span
+                              className="w-3.5 h-3.5 rounded-full shrink-0 border border-stone-700"
+                              style={{ backgroundColor: selectedDetail.color || '#3b82f6' }}
+                            />
+                            <span className="font-display font-bold text-stone-100 text-base">
+                              {selectedDetail.callsign || selectedDetail.name}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2 pt-1 text-[11px] font-mono">
+                            <span
+                              className={`px-2 py-0.5 rounded font-bold ${
+                                selectedDetail.is_opfor
+                                  ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                                  : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                              }`}
+                            >
+                              {selectedDetail.is_opfor ? 'OPFOR' : 'BLUFOR'}
+                            </span>
+                            <span className="px-2 py-0.5 rounded bg-stone-900 border border-stone-800 text-stone-300">
+                              {selectedDetail.flight_rules || 'VFR'}
+                            </span>
+                            <span className="text-stone-500 font-mono text-[10px] truncate">
+                              ID: {selectedDetail.identifier || `#${selectedDetail.id}`}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Airframe & Squadron */}
+                        <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-2">
+                          <span className="text-[10px] font-mono uppercase tracking-wider text-stone-500 block">
+                            Airframe &amp; Squadron
+                          </span>
+                          <div className="font-display font-bold text-stone-100 text-sm truncate">
+                            {selectedDetail.airframe?.name || 'Standard Airframe'}
+                          </div>
+                          <div className="text-[11px] font-mono text-stone-400 space-y-0.5">
+                            <div className="text-amber-400/90 font-semibold truncate">
+                              {selectedDetail.squadron?.name || selectedDetail.squadron?.abbreviation || 'Tactical Wing'}
+                            </div>
+                            <div className="text-stone-500 text-[10px]">
+                              DCS: {selectedDetail.airframe?.dcs_entity || 'N/A'}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Mission & Sortie */}
+                        <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-2">
+                          <span className="text-[10px] font-mono uppercase tracking-wider text-stone-500 block">
+                            Mission Tasking
+                          </span>
+                          <div className="font-display font-bold text-stone-100 text-sm truncate">
+                            {selectedDetail.mission?.name || 'Assigned Campaign Mission'}
+                          </div>
+                          <div className="text-[11px] font-mono text-stone-400 space-y-0.5">
+                            <div className="text-stone-300">
+                              Sortie: {selectedDetail.sortie?.name || 'General Sortie'}
+                            </div>
+                            {selectedDetail.launch_time && (
+                              <div className="text-stone-500 text-[10px]">
+                                Launch: {selectedDetail.launch_time}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Route Summary */}
+                        <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-2">
+                          <span className="text-[10px] font-mono uppercase tracking-wider text-stone-500 block">
+                            Route Nav Profile
+                          </span>
+                          <div className="flex items-baseline gap-2">
+                            <span className="font-mono font-bold text-amber-400 text-base">
+                              {(selectedDetail.route_summary as any)?.total_distance_nm
+                                ? `${(selectedDetail.route_summary as any).total_distance_nm} NM`
+                                : `${selectedDetail.route_summary?.waypoint_count || selectedDetail.route_points?.length || 0} pts`}
+                            </span>
+                            {(selectedDetail.route_summary as any)?.estimated_flight_time_formatted && (
+                              <span className="text-xs font-mono text-stone-400">
+                                ~{(selectedDetail.route_summary as any).estimated_flight_time_formatted}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-3 text-[10px] font-mono text-stone-400 pt-0.5">
+                            <span>
+                              Waypoints:{' '}
+                              <strong className="text-stone-200">
+                                {selectedDetail.route_summary?.waypoint_count || selectedDetail.route_points?.length || 0}
+                              </strong>
+                            </span>
+                            {(selectedDetail.route_summary?.max_altitude_feet || (selectedDetail.route_summary as any)?.max_altitude_ft) && (
+                              <span>
+                                Max:{' '}
+                                <strong className="text-stone-200">
+                                  {(
+                                    selectedDetail.route_summary?.max_altitude_feet ||
+                                    (selectedDetail.route_summary as any)?.max_altitude_ft
+                                  ).toLocaleString()}{' '}
+                                  ft
+                                </strong>
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Aerodromes & Operational Plan */}
+                      <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-4">
+                        <h4 className="font-display text-xs font-semibold uppercase tracking-wider text-amber-400">
+                          Operational Aerodromes &amp; Fuel Planning
+                        </h4>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs font-mono">
+                          <div className="p-3 rounded-lg bg-stone-900/60 border border-stone-800/80">
+                            <span className="text-[10px] text-stone-500 uppercase block">Departure</span>
+                            <span className="font-bold text-stone-200">{selectedDetail.departure_airfield || '—'}</span>
+                          </div>
+                          <div className="p-3 rounded-lg bg-stone-900/60 border border-stone-800/80">
+                            <span className="text-[10px] text-stone-500 uppercase block">Destination</span>
+                            <span className="font-bold text-stone-200">{selectedDetail.destination_airfield || '—'}</span>
+                          </div>
+                          <div className="p-3 rounded-lg bg-stone-900/60 border border-stone-800/80">
+                            <span className="text-[10px] text-stone-500 uppercase block">Planned Fuel</span>
+                            <span className="font-bold text-stone-200">
+                              {selectedDetail.fuel_amount ? `${selectedDetail.fuel_amount} lbs` : 'Standard'}
+                            </span>
+                          </div>
+                          <div className="p-3 rounded-lg bg-stone-900/60 border border-stone-800/80">
+                            <span className="text-[10px] text-stone-500 uppercase block">Diverts</span>
+                            <span className="font-bold text-stone-200">
+                              {formatDiverts(selectedDetail.diverts)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Remarks & Description Preview */}
+                      {(selectedDetail.remarks || selectedDetail.description) && (
+                        <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-2">
+                          <h4 className="font-display text-xs font-semibold uppercase tracking-wider text-amber-400">
+                            Briefing Remarks &amp; Objectives
+                          </h4>
+                          {selectedDetail.description && (
+                            <p className="text-xs font-mono text-stone-300 leading-relaxed">
+                              {selectedDetail.description}
+                            </p>
+                          )}
+                          {selectedDetail.remarks && (
+                            <p className="text-xs font-mono text-stone-400 border-t border-stone-800/80 pt-2 italic">
+                              {selectedDetail.remarks}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* TAB 2: ROUTES TABLE */}
+                  {activeTab === 'routes' && (
                     <div className="space-y-4">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                         <div>
@@ -1109,7 +1682,135 @@ export const AtcView: React.FC = () => {
                     </div>
                   )}
 
-                  {/* TAB 2: COMMS & FREQUENCIES */}
+                  {/* TAB 3: TARGETS */}
+                  {activeTab === 'targets' && (
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="font-display text-sm font-semibold text-stone-200 flex items-center gap-2">
+                          <Target className="w-4 h-4 text-red-400" />
+                          <span>Designated Strike Targets</span>
+                          {targetPoints.length > 0 && (
+                            <span className="px-2 py-0.5 rounded-full text-xs font-mono bg-red-500/20 text-red-300 border border-red-500/30">
+                              {targetPoints.length} target{targetPoints.length === 1 ? '' : 's'}
+                            </span>
+                          )}
+                        </h3>
+                        <p className="text-xs font-mono text-stone-400">
+                          Target points and attack ingress/egress waypoints designated for ground strikes and CAS.
+                        </p>
+                      </div>
+
+                      {targetPoints.length > 0 ? (
+                        <div className="rounded-xl border border-stone-800 bg-stone-950 overflow-hidden">
+                          <table className="w-full text-left border-collapse text-xs font-mono">
+                            <thead>
+                              <tr className="border-b border-stone-800 bg-stone-900/80 text-[11px] text-stone-400 uppercase tracking-wider">
+                                <th className="py-2.5 px-3">#</th>
+                                <th className="py-2.5 px-3">Target Name</th>
+                                <th className="py-2.5 px-3">Coordinates (DD / DDM)</th>
+                                <th className="py-2.5 px-3">MGRS</th>
+                                <th className="py-2.5 px-3">Target Elev / Alt</th>
+                                <th className="py-2.5 px-3">Mission Action / Remarks</th>
+                                <th className="py-2.5 px-3 text-right">Copy</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-stone-800/60">
+                              {targetPoints.map((wp, idx) => (
+                                <tr key={wp.index ?? idx} className="hover:bg-stone-900/50 transition-colors">
+                                  <td className="py-2.5 px-3 text-red-400 font-bold">{wp.index ?? idx}</td>
+                                  <td className="py-2.5 px-3 font-semibold text-stone-200 flex items-center gap-1.5">
+                                    <Target className="w-3.5 h-3.5 text-red-400 shrink-0" />
+                                    <span>{wp.name}</span>
+                                  </td>
+                                  <td className="py-2.5 px-3 text-stone-300">
+                                    <div>{wp.ddm || `${wp.lat.toFixed(4)}°, ${wp.lng.toFixed(4)}°`}</div>
+                                    <div className="text-[10px] text-stone-400">
+                                      {wp.lat.toFixed(4)}, {wp.lng.toFixed(4)}
+                                    </div>
+                                  </td>
+                                  <td className="py-2.5 px-3 text-amber-300 font-bold">{wp.mgrs || '—'}</td>
+                                  <td className="py-2.5 px-3 text-stone-300">
+                                    {wp.alt} ft <span className="text-stone-400">({Math.round(wp.alt * 0.3048)}m)</span>
+                                  </td>
+                                  <td className="py-2.5 px-3 text-stone-400">
+                                    <span className="px-1.5 py-0.5 rounded bg-red-500/10 text-red-300 border border-red-500/20 text-[10px] mr-1.5 font-bold">
+                                      {wp.action || wp.type || 'STRIKE'}
+                                    </span>
+                                    {wp.remarks || '—'}
+                                  </td>
+                                  <td className="py-2.5 px-3 text-right">
+                                    <button
+                                      onClick={() => handleCopyCoordinates(wp, idx)}
+                                      title="Copy Target MGRS / Decimal coordinates"
+                                      className="p-1 rounded bg-stone-900 hover:bg-stone-800 text-stone-400 hover:text-red-400 transition-all border border-stone-800"
+                                    >
+                                      {copiedWptIdx === idx ? (
+                                        <Check className="w-3.5 h-3.5 text-emerald-400" />
+                                      ) : (
+                                        <Copy className="w-3.5 h-3.5" />
+                                      )}
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      ) : (
+                        <div className="p-8 rounded-xl border border-stone-800 bg-stone-950 text-center space-y-2">
+                          <Target className="w-8 h-8 text-stone-600 mx-auto" />
+                          <h4 className="font-display text-sm font-semibold text-stone-300">
+                            No Specific Target Waypoints Designated
+                          </h4>
+                          <p className="text-xs font-mono text-stone-500 max-w-md mx-auto">
+                            This flight plan does not have dedicated ground strike target steerpoints flagged.
+                            All navigation waypoints and legs can be inspected in the Routes tab.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* TAB 4: LOADOUT */}
+                  {activeTab === 'loadouts' && (
+                    <div className="space-y-6">
+                      <div className="space-y-2">
+                        <h4 className="font-display text-xs font-semibold uppercase tracking-wider text-amber-400">
+                          Aircraft Station Weapons Loadout
+                        </h4>
+                        {selectedDetail.station_loadout && Object.keys(selectedDetail.station_loadout).length > 0 ? (
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5">
+                            {Object.entries(selectedDetail.station_loadout).map(([station, weapon]) => (
+                              <div key={station} className="p-3 rounded-xl bg-stone-950 border border-stone-800 space-y-1">
+                                <span className="text-[10px] font-mono uppercase text-amber-400 font-bold">
+                                  Station {station}
+                                </span>
+                                <p className="text-xs font-mono text-stone-200 truncate">{weapon}</p>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="p-4 rounded-xl bg-stone-950 border border-stone-800">
+                            <p className="text-xs font-mono text-stone-300">
+                              {selectedDetail.formatted_loadout || 'Standard configuration.'}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Formatted Loadout Remarks if present */}
+                      {selectedDetail.formatted_loadout && selectedDetail.station_loadout && (
+                        <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-1 text-xs font-mono">
+                          <span className="text-[10px] uppercase font-bold text-stone-400 block">
+                            Loadout Summary
+                          </span>
+                          <p className="text-stone-300">{selectedDetail.formatted_loadout}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* TAB 5: COMMS */}
                   {activeTab === 'comms' && (
                     <div className="space-y-6">
                       {/* Custom Comms Ladder */}
@@ -1218,171 +1919,237 @@ export const AtcView: React.FC = () => {
                           </div>
                         </div>
                       )}
-
-                      {/* MIDS Settings */}
-                      {selectedDetail.mids_settings && (
-                        <div className="p-3.5 rounded-xl bg-stone-950 border border-stone-800 flex flex-wrap items-center gap-6 text-xs font-mono">
-                          <span className="text-amber-400 font-bold uppercase">MIDS Datalink:</span>
-                          <span>MIDS A: <strong className="text-stone-100">{selectedDetail.mids_settings.mids_a_channel || 'N/A'}</strong></span>
-                          <span>MIDS B: <strong className="text-stone-100">{selectedDetail.mids_settings.mids_b_channel || 'N/A'}</strong></span>
-                          <span>Net Label: <strong className="text-stone-100">{selectedDetail.mids_settings.net_label || 'STRIKE'}</strong></span>
-                        </div>
-                      )}
                     </div>
                   )}
 
-                  {/* TAB 3: AVIONICS & LOADOUT */}
-                  {activeTab === 'avionics' && (
+                  {/* TAB 6: MIDS */}
+                  {activeTab === 'mids' && (
                     <div className="space-y-6">
-                      {/* Station Loadout Grid */}
-                      <div className="space-y-2">
-                        <h4 className="font-display text-xs font-semibold uppercase tracking-wider text-amber-400">
-                          Aircraft Station Weapons Loadout
-                        </h4>
-                        {selectedDetail.station_loadout ? (
-                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5">
-                            {Object.entries(selectedDetail.station_loadout).map(([station, weapon]) => (
-                              <div key={station} className="p-3 rounded-xl bg-stone-950 border border-stone-800 space-y-1">
-                                <span className="text-[10px] font-mono uppercase text-amber-400 font-bold">
-                                  Station {station}
-                                </span>
-                                <p className="text-xs font-mono text-stone-200 truncate">{weapon}</p>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <p className="text-xs font-mono text-stone-400">
-                            {selectedDetail.formatted_loadout || 'Standard clean configuration.'}
-                          </p>
-                        )}
+                      <div>
+                        <h3 className="font-display text-sm font-semibold text-stone-200 flex items-center gap-2">
+                          <Broadcast className="w-4 h-4 text-cyan-400" />
+                          <span>Link 16 / MIDS Datalink Network Configuration</span>
+                        </h3>
+                        <p className="text-xs font-mono text-stone-400">
+                          Tactical digital information link settings and channel assignments.
+                        </p>
                       </div>
 
-                      {/* CMDS Dispenser Programs */}
-                      {selectedDetail.cmds_settings && (
-                        <div className="space-y-2">
-                          <h4 className="font-display text-xs font-semibold uppercase tracking-wider text-amber-400">
-                            CMDS Chaff / Flare Dispenser Programs
-                          </h4>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5">
-                            {Object.entries(selectedDetail.cmds_settings).map(([progKey, prog]: [string, any]) => (
-                              <div key={progKey} className="p-3 rounded-xl bg-stone-950 border border-stone-800 space-y-1 text-xs font-mono">
-                                <span className="text-[10px] uppercase font-bold text-amber-400 block">
-                                  {prog?.label || progKey}
-                                </span>
-                                {typeof prog === 'object' ? (
-                                  <div className="text-stone-300 space-y-0.5 text-[11px]">
-                                    <div>Chaff: {prog.chaff} / Flare: {prog.flare}</div>
-                                    <div className="text-stone-400">Int: {prog.interval}s | Cyc: {prog.cycles}</div>
+                      {selectedDetail.mids_settings ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                          <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-1 text-xs font-mono">
+                            <span className="text-[10px] uppercase font-bold text-stone-500 block">MIDS A Channel</span>
+                            <span className="text-base font-bold text-cyan-300">
+                              {selectedDetail.mids_settings.mids_a_channel || 'N/A'}
+                            </span>
+                            {selectedDetail.mids_settings.mids_a_notes && (
+                              <p className="text-[11px] text-stone-400 pt-1">{selectedDetail.mids_settings.mids_a_notes}</p>
+                            )}
+                          </div>
+                          <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-1 text-xs font-mono">
+                            <span className="text-[10px] uppercase font-bold text-stone-500 block">MIDS B Channel</span>
+                            <span className="text-base font-bold text-cyan-300">
+                              {selectedDetail.mids_settings.mids_b_channel || 'N/A'}
+                            </span>
+                            {selectedDetail.mids_settings.mids_b_notes && (
+                              <p className="text-[11px] text-stone-400 pt-1">{selectedDetail.mids_settings.mids_b_notes}</p>
+                            )}
+                          </div>
+                          <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-1 text-xs font-mono">
+                            <span className="text-[10px] uppercase font-bold text-stone-500 block">Network Label</span>
+                            <span className="text-base font-bold text-cyan-300">
+                              {selectedDetail.mids_settings.net_label || 'STRIKE'}
+                            </span>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="p-8 rounded-xl border border-stone-800 bg-stone-950 text-center space-y-2">
+                          <Broadcast className="w-8 h-8 text-stone-600 mx-auto" />
+                          <p className="text-xs font-mono text-stone-400">
+                            No Link 16 / MIDS parameters configured for this flight plan.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* TAB 7: SA (F-18) */}
+                  {activeTab === 'sa' && (
+                    <div className="space-y-6">
+                      <div>
+                        <h3 className="font-display text-sm font-semibold text-stone-200 flex items-center gap-2">
+                          <Compass className="w-4 h-4 text-emerald-400" />
+                          <span>Situational Awareness &amp; Navigation Avionics</span>
+                        </h3>
+                        <p className="text-xs font-mono text-stone-400">
+                          Hornet SA display presets, TACAN, ILS beacons, and laser designator PRF codes.
+                        </p>
+                      </div>
+
+                      {selectedDetail.sa_settings ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-1 text-xs font-mono">
+                            <span className="text-[10px] uppercase font-bold text-stone-500 block">TACAN Channel</span>
+                            <span className="text-base font-bold text-emerald-300">
+                              {selectedDetail.sa_settings.tacan_channel || 'N/A'}
+                            </span>
+                          </div>
+                          <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-1 text-xs font-mono">
+                            <span className="text-[10px] uppercase font-bold text-stone-500 block">ILS Frequency</span>
+                            <span className="text-base font-bold text-emerald-300">
+                              {selectedDetail.sa_settings.ils_frequency || 'N/A'}
+                            </span>
+                          </div>
+                          <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-1 text-xs font-mono">
+                            <span className="text-[10px] uppercase font-bold text-stone-500 block">Laser PRF Code</span>
+                            <span className="text-base font-bold text-emerald-300">
+                              {selectedDetail.sa_settings.laser_code || '1688'}
+                            </span>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="p-8 rounded-xl border border-stone-800 bg-stone-950 text-center space-y-2">
+                          <Compass className="w-8 h-8 text-stone-600 mx-auto" />
+                          <p className="text-xs font-mono text-stone-400">
+                            No SA avionics overrides configured for this airframe.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* TAB 8: DEST PTS (F-16) */}
+                  {activeTab === 'destpts' && (
+                    <div className="space-y-6">
+                      <div>
+                        <h3 className="font-display text-sm font-semibold text-stone-200 flex items-center gap-2">
+                          <AirplaneLanding className="w-4 h-4 text-indigo-400" />
+                          <span>Destination &amp; Alternate Recovery Points</span>
+                        </h3>
+                        <p className="text-xs font-mono text-stone-400">
+                          Bullseye reference coordinates and Viper alternate recovery points.
+                        </p>
+                      </div>
+
+                      {selectedDetail.dest_points_settings ? (
+                        <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-3 font-mono text-xs">
+                          <pre className="text-stone-300 whitespace-pre-wrap">
+                            {typeof selectedDetail.dest_points_settings === 'string'
+                              ? selectedDetail.dest_points_settings
+                              : JSON.stringify(selectedDetail.dest_points_settings, null, 2)}
+                          </pre>
+                        </div>
+                      ) : (
+                        <div className="p-8 rounded-xl border border-stone-800 bg-stone-950 text-center space-y-2">
+                          <AirplaneLanding className="w-8 h-8 text-stone-600 mx-auto" />
+                          <p className="text-xs font-mono text-stone-400">
+                            No custom destination points loaded for this airframe.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* TAB 9: CMDS */}
+                  {activeTab === 'cmds' && (
+                    <div className="space-y-6">
+                      <div>
+                        <h3 className="font-display text-sm font-semibold text-stone-200 flex items-center gap-2">
+                          <ShieldCheck className="w-4 h-4 text-rose-400" />
+                          <span>Countermeasures Dispenser Programs (CMDS)</span>
+                        </h3>
+                        <p className="text-xs font-mono text-stone-400">
+                          Chaff and flare expenditure bursts, dispense intervals, and cycle presets.
+                        </p>
+                      </div>
+
+                      {selectedDetail.cmds_settings ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                          {Object.entries(selectedDetail.cmds_settings).map(([progKey, prog]: [string, any]) => (
+                            <div key={progKey} className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-2 text-xs font-mono">
+                              <span className="text-[11px] uppercase font-bold text-rose-400 block border-b border-stone-800 pb-1">
+                                {prog?.label || progKey}
+                              </span>
+                              {typeof prog === 'object' && prog !== null ? (
+                                <div className="text-stone-300 space-y-1 text-xs">
+                                  <div className="flex justify-between">
+                                    <span className="text-stone-500">Chaff:</span>
+                                    <span className="font-bold text-stone-200">{prog.chaff ?? '—'}</span>
                                   </div>
-                                ) : (
-                                  <div className="text-stone-300">{String(prog)}</div>
-                                )}
-                              </div>
-                            ))}
+                                  <div className="flex justify-between">
+                                    <span className="text-stone-500">Flare:</span>
+                                    <span className="font-bold text-stone-200">{prog.flare ?? '—'}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-stone-500">Interval:</span>
+                                    <span className="font-bold text-stone-200">{prog.interval ?? '—'}s</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-stone-500">Cycles:</span>
+                                    <span className="font-bold text-stone-200">{prog.cycles ?? '—'}</span>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="text-stone-300">{String(prog)}</div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="p-8 rounded-xl border border-stone-800 bg-stone-950 text-center space-y-2">
+                          <ShieldCheck className="w-8 h-8 text-stone-600 mx-auto" />
+                          <p className="text-xs font-mono text-stone-400">
+                            No CMDS presets defined for this airframe.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* TAB 10: NOTES */}
+                  {activeTab === 'notes' && (
+                    <div className="space-y-6">
+                      <div>
+                        <h3 className="font-display text-sm font-semibold text-stone-200 flex items-center gap-2">
+                          <Notepad className="w-4 h-4 text-amber-400" />
+                          <span>Flight Plan Notes &amp; Dispatch Remarks</span>
+                        </h3>
+                        <p className="text-xs font-mono text-stone-400">
+                          Special instructions, mission objectives, and operational dispatch notes.
+                        </p>
+                      </div>
+
+                      <div className="space-y-4">
+                        {selectedDetail.remarks && (
+                          <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-1.5 font-mono text-xs">
+                            <span className="text-[10px] uppercase font-bold text-amber-400 block">
+                              Dispatch Remarks
+                            </span>
+                            <p className="text-stone-300 leading-relaxed whitespace-pre-wrap">
+                              {selectedDetail.remarks}
+                            </p>
                           </div>
-                        </div>
-                      )}
+                        )}
 
-                      {/* SA / Navigation Avionics */}
-                      {selectedDetail.sa_settings && (
-                        <div className="p-3.5 rounded-xl bg-stone-950 border border-stone-800 flex flex-wrap items-center gap-6 text-xs font-mono">
-                          <span className="text-amber-400 font-bold uppercase">Avionics Sensors:</span>
-                          <span>TACAN: <strong className="text-stone-100">{selectedDetail.sa_settings.tacan_channel || 'N/A'}</strong></span>
-                          <span>ILS: <strong className="text-stone-100">{selectedDetail.sa_settings.ils_frequency || 'N/A'}</strong></span>
-                          <span>Laser Code: <strong className="text-stone-100">{selectedDetail.sa_settings.laser_code || '1688'}</strong></span>
-                        </div>
-                      )}
-                    </div>
-                  )}
+                        {selectedDetail.description && (
+                          <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-1.5 font-mono text-xs">
+                            <span className="text-[10px] uppercase font-bold text-stone-400 block">
+                              Mission Objective / Description
+                            </span>
+                            <p className="text-stone-300 leading-relaxed whitespace-pre-wrap">
+                              {selectedDetail.description}
+                            </p>
+                          </div>
+                        )}
 
-                  {/* TAB 4: DCS ROUTE LUA SCRIPT */}
-                  {activeTab === 'route_lua' && (
-                    <div className="space-y-4">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div>
-                          <h4 className="font-display text-xs font-semibold uppercase tracking-wider text-amber-400">
-                            DCS Route Tool Lua Manifest Preset
-                          </h4>
-                          <p className="text-xs font-mono text-stone-400">
-                            Auto-prepended to{' '}
-                            <code className="text-stone-200">Saved Games\DCS\Config\RouteToolPresets\{activeTheatreFileName}</code>
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2 shrink-0">
-                          <button
-                            onClick={handleCopyLua}
-                            className="px-3 py-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-mono flex items-center gap-1.5 border border-stone-700 transition-all"
-                          >
-                            {hasCopiedLua ? (
-                              <>
-                                <Check className="w-3.5 h-3.5 text-emerald-400" />
-                                <span className="text-emerald-400">Copied!</span>
-                              </>
-                            ) : (
-                              <>
-                                <Copy className="w-3.5 h-3.5 text-amber-400" />
-                                <span>Copy Lua</span>
-                              </>
-                            )}
-                          </button>
-                          <button
-                            onClick={handleDownloadLua}
-                            className="px-3 py-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-mono flex items-center gap-1.5 border border-stone-700 transition-all"
-                          >
-                            <DownloadSimple className="w-3.5 h-3.5 text-amber-400" />
-                            <span>Download .lua</span>
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="relative rounded-xl border border-stone-800 bg-stone-950 p-4 font-mono text-xs text-stone-300 max-h-96 overflow-y-auto leading-relaxed">
-                        <pre className="whitespace-pre">{activeLuaSnippet}</pre>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* TAB 5: DTC JSON PAYLOAD */}
-                  {activeTab === 'dtc' && (
-                    <div className="space-y-4">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div>
-                          <h4 className="font-display text-xs font-semibold uppercase tracking-wider text-amber-400">
-                            Data Cartridge (.dtc) JSON Structure
-                          </h4>
-                          <p className="text-xs font-mono text-stone-400">
-                            Compatible with DCS native DTC cartridge readers and DCS-DTC software.
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2 shrink-0">
-                          <button
-                            onClick={handleCopyDtc}
-                            className="px-3 py-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-mono flex items-center gap-1.5 border border-stone-700 transition-all"
-                          >
-                            {hasCopiedDtc ? (
-                              <>
-                                <Check className="w-3.5 h-3.5 text-emerald-400" />
-                                <span className="text-emerald-400">Copied!</span>
-                              </>
-                            ) : (
-                              <>
-                                <Copy className="w-3.5 h-3.5 text-amber-400" />
-                                <span>Copy JSON</span>
-                              </>
-                            )}
-                          </button>
-                          <button
-                            onClick={handleDownloadDtc}
-                            disabled={!selectedDetail.is_dtc_compatible}
-                            className="px-3 py-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 disabled:opacity-40 text-stone-200 text-xs font-mono flex items-center gap-1.5 border border-stone-700 transition-all"
-                          >
-                            <DownloadSimple className="w-3.5 h-3.5 text-amber-400" />
-                            <span>Download .dtc</span>
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="relative rounded-xl border border-stone-800 bg-stone-950 p-4 font-mono text-xs text-stone-300 max-h-96 overflow-y-auto leading-relaxed">
-                        <pre className="whitespace-pre">{activeDtcJson}</pre>
+                        {!selectedDetail.remarks && !selectedDetail.description && (
+                          <div className="p-8 rounded-xl border border-stone-800 bg-stone-950 text-center space-y-2">
+                            <Notepad className="w-8 h-8 text-stone-600 mx-auto" />
+                            <p className="text-xs font-mono text-stone-400">
+                              No special dispatch remarks or notes recorded for this flight plan.
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}

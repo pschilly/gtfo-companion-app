@@ -216,12 +216,28 @@ export interface FlightPlanSquadron {
   patch_url?: string | null;
 }
 
-export interface FlightPlanRouteSummary {
+export interface RouteSummary {
   waypoint_count: number;
-  min_altitude_feet: number;
-  max_altitude_feet: number;
-  min_speed_knots: number;
-  max_speed_knots: number;
+  min_altitude_feet: number | null;
+  max_altitude_feet: number | null;
+  min_speed_knots: number | null;
+  max_speed_knots: number | null;
+  total_distance_nm?: number | null;
+  estimated_flight_time_formatted?: string | null;
+  leg_count?: number | null;
+}
+
+export type FlightPlanRouteSummary = RouteSummary;
+
+export interface FlightPlanDownloadUrls {
+  dtc: string | null;       // null if airframe is not DTC-compatible
+  dcs_route: string;        // .lua route preset file
+  pdf: string;              // PDF kneeboard packet
+}
+
+export interface FlightPlanDivert {
+  name: string;
+  icao?: string;
 }
 
 export interface FlightPlanRoutePoint {
@@ -235,14 +251,15 @@ export interface FlightPlanRoutePoint {
   mgrs?: string | null;
   ddm?: string | null;
   remarks?: string | null;
+  notes?: string | null;
   action?: string | null;
   type?: string | null;
 }
 
 export interface FlightPlanSummary {
   id: number;
-  identifier: string;
-  name: string;
+  identifier: string;             // Permanent FP ID (e.g. "FP-B7K9Q") - READ ONLY
+  name: string;                   // Display / custom name or callsign
   callsign: string;
   description: string | null;
   color: string;
@@ -252,36 +269,73 @@ export interface FlightPlanSummary {
   is_creator: boolean;
   is_slotted: boolean;
   is_signed_up: boolean;
+  is_filed: boolean;              // true if filed with ATC
+  filed_at: string | null;        // ISO 8601 timestamp (e.g. "2026-10-22T14:02:18+00:00")
   departure_airfield: string | null;
   destination_airfield: string | null;
-  diverts: string[];
+  diverts: Array<FlightPlanDivert | string>;
   launch_time: string | null;
   fuel_amount: string | null;
-  flight_rules: string | null;
+  flight_rules: 'VFR' | 'IFR' | string;
+  coordinate_format?: 'LATLON' | 'MGRS' | string;
   remarks: string | null;
-  route_summary: FlightPlanRouteSummary;
   formatted_loadout: string | null;
-  airframe: FlightPlanAirframe;
-  squadron: FlightPlanSquadron;
+  route_summary: RouteSummary;
+  airframe_id?: number | null;
+  airframe: {
+    id: number;
+    name: string;
+    abbreviation: string;
+    dcs_entity: string;
+    image_url?: string | null;
+    is_dtc_compatible: boolean;
+  } | null;
+  squadron_id?: number | null;
+  squadron: {
+    id: number;
+    name: string;
+    abbreviation: string;
+    patch_url?: string | null;
+  } | null;
+  campaign_id?: number | null;
+  campaign?: {
+    id: number;
+    name: string;
+    slug?: string;
+    theatre?: string | null;
+  } | null;
+  mission_id?: number | null;
   mission?: {
     id: number;
     name: string;
     status: string;
+    start_time?: string | null;
     mission_time?: string | null;
   } | null;
+  sortie_id?: number | null;
   sortie?: {
     id: number;
     name: string;
     sortie_number: number;
     scheduled_at?: string | null;
   } | null;
+  flight_id?: number | null;
+  flight?: {
+    id: number;
+    callsign: string;
+  } | null;
+  creator?: {
+    id: number;
+    name: string;
+    callsign: string;
+    discord_id: string | null;
+  } | null;
   is_dtc_compatible: boolean;
   detail_url?: string;
-  download_urls: {
-    dtc?: string;
-    dcs_route?: string;
-    pdf?: string;
-  };
+  download_urls: FlightPlanDownloadUrls;
+  file_atc_url?: string;
+  created_at?: string | null;
+  updated_at?: string | null;
 }
 
 export interface FlightPlanCommsEntry {
@@ -296,8 +350,10 @@ export interface FlightPlanCommsEntry {
 }
 
 export interface FlightPlanDetail extends FlightPlanSummary {
-  route_points: FlightPlanRoutePoint[];
-  comms_ladder?: FlightPlanCommsEntry[] | Record<string, any>;
+  route_points: Array<FlightPlanRoutePoint>;
+  loadout?: Record<string, unknown> | null;
+  station_loadout?: Record<string, string>;
+  comms_ladder?: FlightPlanCommsEntry[] | Record<string, any> | null;
   default_comms_ladder?: {
     task_force?: FlightPlanCommsEntry[] | Record<string, any>;
     squadron?: FlightPlanCommsEntry[] | Record<string, any>;
@@ -307,17 +363,36 @@ export interface FlightPlanDetail extends FlightPlanSummary {
     [key: string]: any;
   };
   airfield_frequencies?: Record<string, FlightPlanCommsEntry[]> | Array<any>;
+  avionics?: {
+    mids: Record<string, unknown> | null;
+    cmds: Record<string, unknown> | null;
+    sa: Record<string, unknown> | null;
+    geolines: Record<string, unknown> | null;
+    dest_points: Record<string, unknown> | null;
+  };
   mids_settings?: {
     mids_a_channel?: string | number | null;
     mids_b_channel?: string | number | null;
     net_label?: string | null;
     [key: string]: any;
   } | null;
-  station_loadout?: Record<string, string>;
   cmds_settings?: Record<string, any> | Array<any> | null;
   sa_settings?: Record<string, any> | null;
   geo_lines_settings?: Record<string, any> | null;
   dest_points_settings?: Record<string, any> | null;
+  metadata?: Record<string, unknown> | null;
+}
+
+export interface FiledFlightPlansResponse {
+  total: number;
+  plans: FlightPlanSummary[];
+}
+
+export interface FileAtcResponse {
+  success: boolean;
+  message: string;
+  filed_at?: string | null;
+  plan?: FlightPlanSummary | FlightPlanDetail;
 }
 
 export interface ActiveSortie {
@@ -528,6 +603,7 @@ export type NotificationCategory = 'app' | 'livery' | 'mod' | 'flight_plan' | 'a
 
 export interface AppNotification {
   id: string;
+  fingerprint?: string;
   title: string;
   message: string;
   category: NotificationCategory;

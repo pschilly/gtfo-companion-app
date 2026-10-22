@@ -53,9 +53,6 @@ const MainShell: React.FC = () => {
 
   const handleSearchChange = (q: string) => {
     setSearchQuery(q);
-    if (q.trim() && activeTab !== 'liveries' && activeTab !== 'mods') {
-      setActiveTab('liveries');
-    }
   };
 
   return (

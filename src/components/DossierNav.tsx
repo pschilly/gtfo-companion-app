@@ -3,7 +3,6 @@ import {
   AirplaneTilt,
   Certificate,
   Check,
-  Compass,
   ListChecks,
   Medal,
   SquaresFour,
@@ -12,7 +11,7 @@ import { useApp } from '../context/AppContext';
 import { NavigationTab } from '../types';
 
 export const DossierNav: React.FC = () => {
-  const { activeTab, setActiveTab, memberProfile, checklistSummary, memberFlightPlans } = useApp();
+  const { activeTab, setActiveTab, memberProfile, checklistSummary } = useApp();
 
   const tabs: {
     id: NavigationTab;
@@ -25,13 +24,6 @@ export const DossierNav: React.FC = () => {
       id: 'dashboard',
       label: 'Dossier Overview',
       icon: <SquaresFour className="w-4 h-4" />,
-    },
-    {
-      id: 'atc',
-      label: 'Flight Plans & ATC',
-      icon: <Compass className="w-4 h-4" />,
-      count: memberFlightPlans?.length || 0,
-      badgeColor: 'bg-sky-500/20 text-sky-300 border border-sky-500/40',
     },
     {
       id: 'checklist',
