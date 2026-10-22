@@ -6,6 +6,7 @@ import {
   Sparkle,
 } from '@phosphor-icons/react';
 import { useApp } from '../context/AppContext';
+import { NotificationCenterDropdown } from './NotificationCenterDropdown';
 
 interface TopBarProps {
   searchQuery: string;
@@ -95,6 +96,9 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
             />
           </button>
         </div>
+
+        {/* Tactical In-App & OS Notification Center */}
+        <NotificationCenterDropdown />
       </div>
     </header>
   );

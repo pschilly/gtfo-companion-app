@@ -7,7 +7,11 @@ use sha2::{Digest, Sha256};
 use std::fs::{self, File};
 use std::io::{self, Read, Seek, SeekFrom, Write};
 use std::path::{Path, PathBuf};
-use tauri::{AppHandle, Emitter};
+use tauri::{
+    menu::{Menu, MenuItem},
+    tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
+    AppHandle, Emitter, Manager,
+};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpListener;
 
@@ -1833,11 +1837,293 @@ fn update_dcs_nickname(
     })
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase", default)]
+pub struct WindowPreferences {
+    pub start_minimized: bool,
+    pub minimize_to_tray: bool,
+    pub close_to_tray: bool,
+}
+
+impl Default for WindowPreferences {
+    fn default() -> Self {
+        Self {
+            start_minimized: false,
+            minimize_to_tray: true,
+            close_to_tray: true,
+        }
+    }
+}
+
+fn get_window_prefs_file() -> PathBuf {
+    get_portable_data_dir().join("window_preferences.json")
+}
+
+fn load_window_preferences() -> WindowPreferences {
+    let p = get_window_prefs_file();
+    if let Ok(data) = fs::read_to_string(p) {
+        if let Ok(prefs) = serde_json::from_str::<WindowPreferences>(&data) {
+            return prefs;
+        }
+    }
+    WindowPreferences::default()
+}
+
+fn save_window_preferences_file(prefs: &WindowPreferences) -> Result<(), String> {
+    let p = get_window_prefs_file();
+    let data = serde_json::to_string_pretty(prefs).map_err(|e| e.to_string())?;
+    fs::write(p, data).map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+#[tauri::command]
+fn get_window_preferences() -> Result<WindowPreferences, String> {
+    Ok(load_window_preferences())
+}
+
+#[tauri::command]
+fn set_window_preferences(preferences: WindowPreferences) -> Result<(), String> {
+    save_window_preferences_file(&preferences)
+}
+
+#[tauri::command]
+fn show_main_window(app: AppHandle) -> Result<(), String> {
+    if let Some(window) = app.get_webview_window("main") {
+        let _ = window.show();
+        let _ = window.unminimize();
+        let _ = window.set_focus();
+    }
+    Ok(())
+}
+
+#[tauri::command]
+fn hide_main_window(app: AppHandle) -> Result<(), String> {
+    if let Some(window) = app.get_webview_window("main") {
+        let _ = window.hide();
+    }
+    Ok(())
+}
+
+#[tauri::command]
+fn minimize_main_window(app: AppHandle) -> Result<(), String> {
+    if let Some(window) = app.get_webview_window("main") {
+        let prefs = load_window_preferences();
+        if prefs.minimize_to_tray {
+            let _ = window.hide();
+        } else {
+            let _ = window.minimize();
+        }
+    }
+    Ok(())
+}
+
+fn create_badged_tray_icon(base: &tauri::image::Image) -> tauri::image::Image<'static> {
+    let mut rgba = base.rgba().to_vec();
+    let width = base.width();
+    let height = base.height();
+
+    // Scale badge radius and position to icon dimensions
+    let r = (width as f32 * 0.22).round() as i32;
+    let cx = width as i32 - r - 1;
+    let cy = r + 1;
+
+    for y in (cy - r - 2)..=(cy + r + 2) {
+        for x in (cx - r - 2)..=(cx + r + 2) {
+            if x >= 0 && x < width as i32 && y >= 0 && y < height as i32 {
+                let dist_sq = (x - cx) * (x - cx) + (y - cy) * (y - cy);
+                let idx = ((y as usize * width as usize) + x as usize) * 4;
+                if dist_sq <= r * r {
+                    // Vibrant Amber notification badge: #F59E0B (245, 158, 11)
+                    rgba[idx] = 245;
+                    rgba[idx + 1] = 158;
+                    rgba[idx + 2] = 11;
+                    rgba[idx + 3] = 255;
+                } else if dist_sq <= (r + 2) * (r + 2) {
+                    // Contrast border: #0C0A09 (12, 10, 9)
+                    rgba[idx] = 12;
+                    rgba[idx + 1] = 10;
+                    rgba[idx + 2] = 9;
+                    rgba[idx + 3] = 255;
+                }
+            }
+        }
+    }
+
+    tauri::image::Image::new_owned(rgba, width, height)
+}
+
+#[tauri::command]
+fn update_tray_notification_badge(app: AppHandle, unread_count: u32) -> Result<(), String> {
+    if let Some(tray) = app.tray_by_id("main-tray") {
+        if unread_count > 0 {
+            // Set informative tooltip
+            let tooltip_text = format!(
+                "GTFO Companion App ({} unread notification{})",
+                unread_count,
+                if unread_count > 1 { "s" } else { "" }
+            );
+            let _ = tray.set_tooltip(Some(tooltip_text));
+
+            // Set badged tray icon
+            if let Some(default_icon) = app.default_window_icon() {
+                let badged = create_badged_tray_icon(default_icon);
+                let _ = tray.set_icon(Some(badged));
+            }
+
+            // Rebuild context menu with prominent notification item at top
+            let notif_label = format!(
+                "🔔 {} New Notification{}",
+                unread_count,
+                if unread_count > 1 { "s" } else { "" }
+            );
+            let notif_i = MenuItem::with_id(&app, "open_notifications", &notif_label, true, None::<&str>)
+                .map_err(|e| e.to_string())?;
+            let show_i = MenuItem::with_id(&app, "show", "Show GTFO Companion App", true, None::<&str>)
+                .map_err(|e| e.to_string())?;
+            let updates_i = MenuItem::with_id(&app, "check_updates", "Check for Updates...", true, None::<&str>)
+                .map_err(|e| e.to_string())?;
+            let quit_i = MenuItem::with_id(&app, "quit", "Quit", true, None::<&str>)
+                .map_err(|e| e.to_string())?;
+            let menu = Menu::with_items(&app, &[&notif_i, &show_i, &updates_i, &quit_i])
+                .map_err(|e| e.to_string())?;
+            let _ = tray.set_menu(Some(menu));
+        } else {
+            // Reset tooltip
+            let _ = tray.set_tooltip(Some("GTFO Companion App"));
+
+            // Reset icon
+            if let Some(default_icon) = app.default_window_icon() {
+                let _ = tray.set_icon(Some(default_icon.clone()));
+            }
+
+            // Standard menu
+            let show_i = MenuItem::with_id(&app, "show", "Show GTFO Companion App", true, None::<&str>)
+                .map_err(|e| e.to_string())?;
+            let updates_i = MenuItem::with_id(&app, "check_updates", "Check for Updates...", true, None::<&str>)
+                .map_err(|e| e.to_string())?;
+            let quit_i = MenuItem::with_id(&app, "quit", "Quit", true, None::<&str>)
+                .map_err(|e| e.to_string())?;
+            let menu = Menu::with_items(&app, &[&show_i, &updates_i, &quit_i])
+                .map_err(|e| e.to_string())?;
+            let _ = tray.set_menu(Some(menu));
+        }
+    }
+    Ok(())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_process::init())
+        .setup(|app| {
+            let show_i = MenuItem::with_id(app, "show", "Show GTFO Companion App", true, None::<&str>)?;
+            let updates_i = MenuItem::with_id(app, "check_updates", "Check for Updates...", true, None::<&str>)?;
+            let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
+            let menu = Menu::with_items(app, &[&show_i, &updates_i, &quit_i])?;
+
+            let mut tray_builder = TrayIconBuilder::with_id("main-tray")
+                .tooltip("GTFO Companion App")
+                .menu(&menu)
+                .show_menu_on_left_click(false)
+                .on_menu_event(|app, event| {
+                    match event.id.as_ref() {
+                        "open_notifications" => {
+                            if let Some(window) = app.get_webview_window("main") {
+                                let _ = window.show();
+                                let _ = window.unminimize();
+                                let _ = window.set_focus();
+                                let _ = window.emit("open-notifications", ());
+                            }
+                        }
+                        "show" => {
+                            if let Some(window) = app.get_webview_window("main") {
+                                let _ = window.show();
+                                let _ = window.unminimize();
+                                let _ = window.set_focus();
+                            }
+                        }
+                        "check_updates" => {
+                            if let Some(window) = app.get_webview_window("main") {
+                                let _ = window.show();
+                                let _ = window.unminimize();
+                                let _ = window.set_focus();
+                                let _ = window.emit("trigger-check-updates", ());
+                            }
+                        }
+                        "quit" => {
+                            app.exit(0);
+                        }
+                        _ => {}
+                    }
+                })
+                .on_tray_icon_event(|tray, event| {
+                    if let TrayIconEvent::Click {
+                        button: MouseButton::Left,
+                        button_state: MouseButtonState::Up,
+                        ..
+                    } = event {
+                        let app = tray.app_handle();
+                        if let Some(window) = app.get_webview_window("main") {
+                            if window.is_visible().unwrap_or(false) && !window.is_minimized().unwrap_or(false) {
+                                let _ = window.hide();
+                            } else {
+                                let _ = window.show();
+                                let _ = window.unminimize();
+                                let _ = window.set_focus();
+                            }
+                        }
+                    }
+                });
+
+            if let Some(icon) = app.default_window_icon() {
+                tray_builder = tray_builder.icon(icon.clone());
+            }
+
+            let _tray = tray_builder.build(app)?;
+
+            let prefs = load_window_preferences();
+            if let Some(window) = app.get_webview_window("main") {
+                if prefs.start_minimized {
+                    if prefs.minimize_to_tray {
+                        let _ = window.hide();
+                    } else {
+                        let _ = window.minimize();
+                    }
+                }
+
+                let window_clone = window.clone();
+                window.on_window_event(move |event| {
+                    match event {
+                        tauri::WindowEvent::CloseRequested { api, .. } => {
+                            let current_prefs = load_window_preferences();
+                            if current_prefs.close_to_tray {
+                                api.prevent_close();
+                                let _ = window_clone.hide();
+                            }
+                        }
+                        tauri::WindowEvent::Resized(_) => {
+                            let current_prefs = load_window_preferences();
+                            if current_prefs.minimize_to_tray && window_clone.is_minimized().unwrap_or(false) {
+                                let _ = window_clone.hide();
+                            }
+                        }
+                        tauri::WindowEvent::Focused(focused) => {
+                            if !focused {
+                                let current_prefs = load_window_preferences();
+                                if current_prefs.minimize_to_tray && window_clone.is_minimized().unwrap_or(false) {
+                                    let _ = window_clone.hide();
+                                }
+                            }
+                        }
+                        _ => {}
+                    }
+                });
+            }
+
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             detect_dcs_paths,
             fetch_remote_manifest,
@@ -1855,7 +2141,13 @@ pub fn run() {
             install_atc_kneeboard,
             open_external_url,
             get_dcs_nickname,
-            update_dcs_nickname
+            update_dcs_nickname,
+            get_window_preferences,
+            set_window_preferences,
+            show_main_window,
+            hide_main_window,
+            minimize_main_window,
+            update_tray_notification_badge
         ])
         .run(tauri::generate_context!())
         .expect("error while running GTFO Companion App");

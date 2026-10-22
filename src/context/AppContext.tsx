@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { DEFAULT_SETTINGS, STATIC_CONFIG } from '../config/constants';
 import { SAMPLE_MANIFEST } from '../data/sampleManifest';
 import {
@@ -48,6 +48,14 @@ import {
 } from '../types';
 import { formatExpectedDcsNickname } from '../utils/formatters';
 import { checkForAppUpdate, AppUpdateInfo } from '../services/updaterService';
+import {
+  dispatchDesktopToast,
+  setWindowPreferencesCommand,
+  updateTrayNotificationBadgeCommand,
+} from '../services/notificationService';
+import { isTauriRuntime } from '../services/tauriBridge';
+import { listen } from '@tauri-apps/api/event';
+import { AppNotification } from '../types';
 
 export interface MemberProfileOverridePatch {
   rosterTier?: 'CORE' | 'Community';
@@ -137,6 +145,14 @@ interface AppContextValue {
   checkForAppUpdateAction: () => Promise<AppUpdateInfo>;
   isUpdateModalOpen: boolean;
   setIsUpdateModalOpen: (open: boolean) => void;
+  notifications: AppNotification[];
+  unreadNotificationsCount: number;
+  addNotification: (notification: Omit<AppNotification, 'id' | 'timestamp' | 'read'>) => void;
+  markNotificationAsRead: (id: string) => void;
+  markAllNotificationsAsRead: () => void;
+  clearNotification: (id: string) => void;
+  clearAllNotifications: () => void;
+  sendTestNotification: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextValue | undefined>(undefined);
@@ -148,6 +164,7 @@ const STORAGE_KEYS = {
   INSTALLED_ATC: 'gtfo_installed_atc_v2',
   PORTAL_PROFILE: 'gtfo_member_profile_v5',
   DCS_PATH_CONFIRMED: 'gtfo_dcs_path_confirmed_v1',
+  NOTIFICATIONS: 'gtfo_notifications_v1',
 };
 
 const DEFAULT_INSTALLED_ATC: InstalledAtcState = {
@@ -511,6 +528,134 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isCheckingAppUpdate, setIsCheckingAppUpdate] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
 
+  const [notifications, setNotifications] = useState<AppNotification[]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.NOTIFICATIONS);
+    if (saved) {
+      try {
+        return JSON.parse(saved) as AppNotification[];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  });
+
+  const unreadNotificationsCount = useMemo(() => {
+    return notifications.filter((n) => !n.read).length;
+  }, [notifications]);
+
+  const persistNotifications = useCallback((items: AppNotification[]) => {
+    localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(items.slice(0, 50)));
+  }, []);
+
+  const addNotification = useCallback(
+    (item: Omit<AppNotification, 'id' | 'timestamp' | 'read'>) => {
+      setNotifications((prev) => {
+        // Deduplicate recent notifications with identical title & message
+        const isDuplicate = prev.some(
+          (n) => n.title === item.title && n.message === item.message
+        );
+        if (isDuplicate) return prev;
+
+        const newNotification: AppNotification = {
+          ...item,
+          id: `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+          timestamp: new Date().toISOString(),
+          read: false,
+        };
+
+        const next = [newNotification, ...prev].slice(0, 50);
+        persistNotifications(next);
+        return next;
+      });
+
+      // Desktop OS Toast check
+      if (settings.enableDesktopNotifications) {
+        let shouldToast = true;
+        if (item.category === 'app' && !settings.notifyAppUpdates) shouldToast = false;
+        if ((item.category === 'livery' || item.category === 'mod') && !settings.notifyAssetUpdates)
+          shouldToast = false;
+        if (item.category === 'flight_plan' && !settings.notifyFlightPlans) shouldToast = false;
+
+        if (shouldToast) {
+          dispatchDesktopToast(`GTFO: ${item.title}`, item.message);
+        }
+      }
+    },
+    [
+      persistNotifications,
+      settings.enableDesktopNotifications,
+      settings.notifyAppUpdates,
+      settings.notifyAssetUpdates,
+      settings.notifyFlightPlans,
+    ]
+  );
+
+  const markNotificationAsRead = useCallback(
+    (id: string) => {
+      setNotifications((prev) => {
+        const next = prev.map((n) => (n.id === id ? { ...n, read: true } : n));
+        persistNotifications(next);
+        return next;
+      });
+    },
+    [persistNotifications]
+  );
+
+  const markAllNotificationsAsRead = useCallback(() => {
+    setNotifications((prev) => {
+      const next = prev.map((n) => ({ ...n, read: true }));
+      persistNotifications(next);
+      return next;
+    });
+  }, [persistNotifications]);
+
+  const clearNotification = useCallback(
+    (id: string) => {
+      setNotifications((prev) => {
+        const next = prev.filter((n) => n.id !== id);
+        persistNotifications(next);
+        return next;
+      });
+    },
+    [persistNotifications]
+  );
+
+  const clearAllNotifications = useCallback(() => {
+    setNotifications([]);
+    localStorage.removeItem(STORAGE_KEYS.NOTIFICATIONS);
+  }, []);
+
+  const sendTestNotification = useCallback(async () => {
+    addNotification({
+      title: 'Tactical Uplink Connected',
+      message: 'Desktop and in-app notifications are functioning properly. Ready for flight ops.',
+      category: 'announcement',
+    });
+    if (settings.enableDesktopNotifications) {
+      await dispatchDesktopToast(
+        'GTFO Companion App',
+        'Test notification: Desktop notifications are active!'
+      );
+    }
+  }, [addNotification, settings.enableDesktopNotifications]);
+
+  // Synchronize window minimization & tray preferences to Rust backend
+  useEffect(() => {
+    setWindowPreferencesCommand({
+      startMinimized: settings.startMinimized,
+      minimizeToTray: settings.minimizeToTray,
+      closeToTray: settings.closeToTray,
+    }).catch((err) => {
+      console.warn('Failed to sync window preferences with Rust:', err);
+    });
+  }, [settings.startMinimized, settings.minimizeToTray, settings.closeToTray]);
+
+  // Synchronize unread notifications badge to System Tray icon
+  useEffect(() => {
+    updateTrayNotificationBadgeCommand(unreadNotificationsCount);
+  }, [unreadNotificationsCount]);
+
   const checkForAppUpdateAction = useCallback(async (): Promise<AppUpdateInfo> => {
     setIsCheckingAppUpdate(true);
     try {
@@ -518,12 +663,34 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setAppUpdate(info);
       if (info.available) {
         addLog('info', 'SYSTEM', `Companion App update v${info.version} available!`);
+        addNotification({
+          title: `App Update Available: v${info.version}`,
+          message: `A new version of GTFO Companion App is available. Click to review release notes and install.`,
+          category: 'app',
+        });
       }
       return info;
     } finally {
       setIsCheckingAppUpdate(false);
     }
-  }, [addLog]);
+  }, [addLog, addNotification]);
+
+  // Listen for Tray "Check for Updates..." trigger
+  useEffect(() => {
+    let unlisten: (() => void) | undefined;
+    if (isTauriRuntime()) {
+      listen('trigger-check-updates', () => {
+        checkForAppUpdateAction().then(() => {
+          setIsUpdateModalOpen(true);
+        });
+      }).then((fn) => {
+        unlisten = fn;
+      });
+    }
+    return () => {
+      if (unlisten) unlisten();
+    };
+  }, [checkForAppUpdateAction]);
 
   useEffect(() => {
     addLog('info', 'SYSTEM', `${STATIC_CONFIG.appTitle} initialized.`);
@@ -572,14 +739,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [userSession?.id, syncMemberPortal, syncManifest]);
 
-  // Periodic background polling (every 10 minutes) & window refocus sync
+  // Configurable periodic background polling & window refocus sync
   useEffect(() => {
-    const POLL_INTERVAL_MS = 10 * 60 * 1000; // 10 minutes
+    if (settings.pollingIntervalMinutes <= 0) return;
+
+    const pollIntervalMs = settings.pollingIntervalMinutes * 60 * 1000;
     const intervalId = setInterval(() => {
       syncManifest();
       syncMemberPortal();
       checkForAppUpdateAction();
-    }, POLL_INTERVAL_MS);
+    }, pollIntervalMs);
 
     let lastFocusSync = Date.now();
     const handleFocus = () => {
@@ -597,7 +766,42 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       clearInterval(intervalId);
       window.removeEventListener('focus', handleFocus);
     };
-  }, [syncManifest, syncMemberPortal, checkForAppUpdateAction]);
+  }, [settings.pollingIntervalMinutes, syncManifest, syncMemberPortal, checkForAppUpdateAction]);
+
+  // Notify when new remote announcements are broadcast in manifest
+  const notifiedAnnouncements = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    if (manifest.announcement?.message) {
+      const annKey = `${manifest.announcement.title}-${manifest.announcement.message}`;
+      if (!notifiedAnnouncements.current.has(annKey)) {
+        notifiedAnnouncements.current.add(annKey);
+        addNotification({
+          title: manifest.announcement.title || 'GTFO Announcement',
+          message: manifest.announcement.message,
+          category: 'announcement',
+          actionTab: 'home',
+        });
+      }
+    }
+  }, [manifest.announcement, addNotification]);
+
+  // Notify on new flight plans / ATC packages
+  const notifiedFlightPlans = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    if (atcPackages.length > 0 && settings.notifyFlightPlans && lastSyncedAt) {
+      atcPackages.forEach((pkg) => {
+        if (!notifiedFlightPlans.current.has(pkg.id)) {
+          notifiedFlightPlans.current.add(pkg.id);
+          addNotification({
+            title: `Flight Plan: ${pkg.operationName || pkg.missionTitle}`,
+            message: `${pkg.aircraft} package at ${pkg.theatre}. Callsign: ${pkg.callsign}.`,
+            category: 'flight_plan',
+            actionTab: 'atc',
+          });
+        }
+      });
+    }
+  }, [atcPackages, settings.notifyFlightPlans, addNotification, lastSyncedAt]);
 
   useEffect(() => {
     const activePath = settings.dcsSavedGamesPath || dcsEnv?.activeSavedGamesPath;
@@ -707,6 +911,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const outdatedAssets = useMemo(() => {
     return manifest.assets.filter((asset) => isUpdateAvailable(asset));
   }, [manifest.assets, isUpdateAvailable]);
+
+  // Notify when new updates for installed assets become available
+  const notifiedAssetVersions = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    if (outdatedAssets.length > 0 && settings.notifyAssetUpdates) {
+      outdatedAssets.forEach((asset) => {
+        const key = `${asset.id}:${asset.version}`;
+        if (!notifiedAssetVersions.current.has(key)) {
+          notifiedAssetVersions.current.add(key);
+          addNotification({
+            title: `Update Ready: ${asset.name}`,
+            message: `Version v${asset.version} is now available in the GTFO manifest.`,
+            category: asset.category === 'livery' ? 'livery' : 'mod',
+            actionTab: 'library',
+            actionAssetId: asset.id,
+          });
+        }
+      });
+    }
+  }, [outdatedAssets, settings.notifyAssetUpdates, addNotification]);
 
   const missingRequiredAssets = useMemo(() => {
     return manifest.assets.filter(
@@ -1246,6 +1470,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         checkForAppUpdateAction,
         isUpdateModalOpen,
         setIsUpdateModalOpen,
+        notifications,
+        unreadNotificationsCount,
+        addNotification,
+        markNotificationAsRead,
+        markAllNotificationsAsRead,
+        clearNotification,
+        clearAllNotifications,
+        sendTestNotification,
       }}
     >
       {children}

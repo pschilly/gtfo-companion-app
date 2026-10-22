@@ -1,7 +1,7 @@
 import { AppSettings } from '../types';
 
 export const STATIC_CONFIG = {
-  appVersion: '0.0.6',
+  appVersion: '0.0.7',
   appTitle: 'Companion App',
   shortName: 'GTFO',
   fullName: 'GLOBAL TASK FORCE OVERLORD',
@@ -24,4 +24,12 @@ export const DEFAULT_SETTINGS: AppSettings = {
   verifyFileHash: true,
   memberPortalApiUrl: import.meta.env.VITE_PORTAL_BASE_URL || 'https://members.globaltaskforceoverlord.org/api/v1/companion',
   hasConfirmedDcsPath: false,
+  startMinimized: false,
+  minimizeToTray: true,
+  closeToTray: true,
+  enableDesktopNotifications: true,
+  notifyAppUpdates: true,
+  notifyAssetUpdates: true,
+  notifyFlightPlans: true,
+  pollingIntervalMinutes: 30,
 };

@@ -364,6 +364,26 @@ export interface TelemetryLogEntry {
   message: string;
 }
 
+export interface WindowPreferences {
+  startMinimized: boolean;
+  minimizeToTray: boolean;
+  closeToTray: boolean;
+}
+
+export type NotificationCategory = 'app' | 'livery' | 'mod' | 'flight_plan' | 'announcement';
+
+export interface AppNotification {
+  id: string;
+  title: string;
+  message: string;
+  category: NotificationCategory;
+  timestamp: string; // ISO string
+  read: boolean;
+  actionTab?: NavigationTab;
+  actionAssetId?: string;
+  metadata?: Record<string, unknown>;
+}
+
 export interface AppSettings {
   dcsSavedGamesPath: string;
   autoDetectDcsPath: boolean;
@@ -371,6 +391,14 @@ export interface AppSettings {
   verifyFileHash: boolean;
   memberPortalApiUrl: string;
   hasConfirmedDcsPath?: boolean;
+  startMinimized: boolean;
+  minimizeToTray: boolean;
+  closeToTray: boolean;
+  enableDesktopNotifications: boolean;
+  notifyAppUpdates: boolean;
+  notifyAssetUpdates: boolean;
+  notifyFlightPlans: boolean;
+  pollingIntervalMinutes: number;
 }
 
 export interface IntegrityCheckResult {

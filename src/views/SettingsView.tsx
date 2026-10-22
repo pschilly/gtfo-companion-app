@@ -3,19 +3,24 @@ import {
   ArrowCounterClockwise,
   ArrowSquareOut,
   ArrowsClockwise,
+  Bell,
   CheckCircle,
+  Clock,
+  Desktop,
   FloppyDisk,
   FolderSimplePlus,
   HardDrive,
   Info,
+  PaperPlaneTilt,
   ShieldCheck,
   Sliders,
   Sparkle,
 } from '@phosphor-icons/react';
 import { DEFAULT_SETTINGS, STATIC_CONFIG } from '../config/constants';
 import { useApp } from '../context/AppContext';
+import { minimizeMainWindowCommand } from '../services/notificationService';
 
-type SettingsSubTab = 'general' | 'updates' | 'about';
+type SettingsSubTab = 'general' | 'window' | 'notifications' | 'updates' | 'about';
 
 export const SettingsView: React.FC = () => {
   const {
@@ -29,6 +34,8 @@ export const SettingsView: React.FC = () => {
     isCheckingAppUpdate,
     checkForAppUpdateAction,
     setIsUpdateModalOpen,
+    sendTestNotification,
+    unreadNotificationsCount,
   } = useApp();
 
   const [activeSubTab, setActiveSubTab] = useState<SettingsSubTab>('general');
@@ -37,6 +44,7 @@ export const SettingsView: React.FC = () => {
   );
   const [savedBanner, setSavedBanner] = useState(false);
   const [manualCheckFeedback, setManualCheckFeedback] = useState<string | null>(null);
+  const [testNotificationFeedback, setTestNotificationFeedback] = useState<string | null>(null);
 
   const handleSavePaths = (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,11 +77,37 @@ export const SettingsView: React.FC = () => {
     }
   };
 
+  const handleTestNotification = async () => {
+    setTestNotificationFeedback('Sending notification test...');
+    try {
+      await sendTestNotification();
+      setTestNotificationFeedback('Notification dispatched successfully!');
+      setTimeout(() => setTestNotificationFeedback(null), 3500);
+    } catch {
+      setTestNotificationFeedback('Failed to dispatch test notification.');
+    }
+  };
+
   const tabs: { id: SettingsSubTab; label: string; icon: React.ReactNode; badge?: React.ReactNode }[] = [
     {
       id: 'general',
       label: 'General & DCS',
       icon: <Sliders className="w-4 h-4" />,
+    },
+    {
+      id: 'window',
+      label: 'Window & Tray',
+      icon: <Desktop className="w-4 h-4" />,
+    },
+    {
+      id: 'notifications',
+      label: 'Notifications',
+      icon: <Bell className="w-4 h-4" />,
+      badge: unreadNotificationsCount > 0 ? (
+        <span className="px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[9px] font-mono font-bold">
+          {unreadNotificationsCount}
+        </span>
+      ) : undefined,
     },
     {
       id: 'updates',
@@ -276,6 +310,240 @@ export const SettingsView: React.FC = () => {
             </button>
           </div>
         </form>
+      )}
+
+      {/* ============================================================ */}
+      {/* SUB-PAGE: WINDOW & SYSTEM TRAY                               */}
+      {/* ============================================================ */}
+      {activeSubTab === 'window' && (
+        <div className="space-y-6">
+          <div className="p-6 rounded-2xl bg-stone-900/90 border border-stone-800 space-y-6 shadow-xl">
+            <div>
+              <h2 className="font-display text-lg font-bold text-stone-100 flex items-center gap-2">
+                <Desktop className="w-5 h-5 text-amber-400" />
+                <span>Window &amp; Background Behavior</span>
+              </h2>
+              <p className="text-xs text-stone-400 mt-1 leading-relaxed">
+                Configure how the GTFO Companion App behaves when launched, minimized, or closed during flight simulation sessions.
+              </p>
+            </div>
+
+            <div className="space-y-4 divide-y divide-stone-800/80">
+              {/* Start Minimized */}
+              <div className="pt-2 flex items-start justify-between gap-4">
+                <div className="space-y-0.5">
+                  <label htmlFor="startMinimizedToggle" className="text-xs font-semibold text-stone-200 cursor-pointer">
+                    Start Minimized
+                  </label>
+                  <p className="text-[11px] text-stone-400 leading-relaxed">
+                    Automatically launch the companion app minimized to the background/system tray on startup, ready for mission checks without covering your desktop or DCS screens.
+                  </p>
+                </div>
+                <input
+                  id="startMinimizedToggle"
+                  type="checkbox"
+                  checked={settings.startMinimized}
+                  onChange={(e) => updateSettings({ startMinimized: e.target.checked })}
+                  className="mt-1 h-4 w-4 rounded border-stone-700 bg-stone-950 text-amber-500 focus:ring-amber-500 cursor-pointer"
+                />
+              </div>
+
+              {/* Minimize to Tray */}
+              <div className="pt-4 flex items-start justify-between gap-4">
+                <div className="space-y-0.5">
+                  <label htmlFor="minimizeToTrayToggle" className="text-xs font-semibold text-stone-200 cursor-pointer">
+                    Minimize to System Tray
+                  </label>
+                  <p className="text-[11px] text-stone-400 leading-relaxed">
+                    Clicking the minimize button hides the window into the Windows notification tray area rather than cluttering your Windows taskbar.
+                  </p>
+                </div>
+                <input
+                  id="minimizeToTrayToggle"
+                  type="checkbox"
+                  checked={settings.minimizeToTray}
+                  onChange={(e) => updateSettings({ minimizeToTray: e.target.checked })}
+                  className="mt-1 h-4 w-4 rounded border-stone-700 bg-stone-950 text-amber-500 focus:ring-amber-500 cursor-pointer"
+                />
+              </div>
+
+              {/* Close to Tray */}
+              <div className="pt-4 flex items-start justify-between gap-4">
+                <div className="space-y-0.5">
+                  <label htmlFor="closeToTrayToggle" className="text-xs font-semibold text-stone-200 cursor-pointer">
+                    Close to System Tray
+                  </label>
+                  <p className="text-[11px] text-stone-400 leading-relaxed">
+                    Clicking the window close (X) button keeps the app running quietly in the tray so background updates and flight plans continue monitoring. Use the tray menu &apos;Quit&apos; option to exit completely.
+                  </p>
+                </div>
+                <input
+                  id="closeToTrayToggle"
+                  type="checkbox"
+                  checked={settings.closeToTray}
+                  onChange={(e) => updateSettings({ closeToTray: e.target.checked })}
+                  className="mt-1 h-4 w-4 rounded border-stone-700 bg-stone-950 text-amber-500 focus:ring-amber-500 cursor-pointer"
+                />
+              </div>
+            </div>
+
+            {/* Test Minimize Action Button */}
+            <div className="pt-4 border-t border-stone-800/80 flex items-center justify-between">
+              <span className="text-[11px] font-mono text-stone-500">
+                Left-click the GTFO icon in your Windows system tray to toggle window visibility at any time.
+              </span>
+              <button
+                type="button"
+                onClick={() => minimizeMainWindowCommand()}
+                className="px-3.5 py-1.5 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-700 text-xs font-mono text-stone-300 hover:text-amber-300 transition-colors cursor-pointer shrink-0"
+              >
+                Test Minimize to Tray
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================ */}
+      {/* SUB-PAGE: NOTIFICATIONS                                      */}
+      {/* ============================================================ */}
+      {activeSubTab === 'notifications' && (
+        <div className="space-y-6">
+          <div className="p-6 rounded-2xl bg-stone-900/90 border border-stone-800 space-y-6 shadow-xl">
+            <div className="flex items-start sm:items-center justify-between gap-4 flex-col sm:flex-row">
+              <div>
+                <h2 className="font-display text-lg font-bold text-stone-100 flex items-center gap-2">
+                  <Bell className="w-5 h-5 text-amber-400" />
+                  <span>Notification Center Settings</span>
+                </h2>
+                <p className="text-xs text-stone-400 mt-1 leading-relaxed">
+                  Configure alerts for new application updates, livery releases, squadron mods, and tactical flight plan packages.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleTestNotification}
+                className="px-3.5 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 font-mono text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer shrink-0"
+              >
+                <PaperPlaneTilt className="w-3.5 h-3.5 text-amber-400" />
+                <span>Send Test Notification</span>
+              </button>
+            </div>
+
+            {testNotificationFeedback && (
+              <div className="p-3 rounded-xl bg-stone-950 border border-amber-500/30 text-xs font-mono text-amber-300 flex items-center gap-2">
+                <Info className="w-4 h-4 text-amber-400 shrink-0" />
+                <span>{testNotificationFeedback}</span>
+              </div>
+            )}
+
+            <div className="space-y-4 divide-y divide-stone-800/80">
+              {/* Master Desktop Toast Toggle */}
+              <div className="pt-2 flex items-start justify-between gap-4">
+                <div className="space-y-0.5">
+                  <label htmlFor="desktopNotifToggle" className="text-xs font-semibold text-stone-200 cursor-pointer">
+                    Windows Desktop Toast Notifications
+                  </label>
+                  <p className="text-[11px] text-stone-400 leading-relaxed">
+                    Trigger native Windows notifications in the Windows Action Center when important updates are detected, even while the app is minimized to the system tray.
+                  </p>
+                </div>
+                <input
+                  id="desktopNotifToggle"
+                  type="checkbox"
+                  checked={settings.enableDesktopNotifications}
+                  onChange={(e) => updateSettings({ enableDesktopNotifications: e.target.checked })}
+                  className="mt-1 h-4 w-4 rounded border-stone-700 bg-stone-950 text-amber-500 focus:ring-amber-500 cursor-pointer"
+                />
+              </div>
+
+              {/* Notify on App Updates */}
+              <div className="pt-4 flex items-start justify-between gap-4">
+                <div className="space-y-0.5">
+                  <label htmlFor="notifyAppUpdatesToggle" className="text-xs font-semibold text-stone-200 cursor-pointer">
+                    Companion App Versions
+                  </label>
+                  <p className="text-[11px] text-stone-400 leading-relaxed">
+                    Receive notifications whenever a new version of the GTFO Companion App is published and ready for auto-updating.
+                  </p>
+                </div>
+                <input
+                  id="notifyAppUpdatesToggle"
+                  type="checkbox"
+                  checked={settings.notifyAppUpdates}
+                  onChange={(e) => updateSettings({ notifyAppUpdates: e.target.checked })}
+                  className="mt-1 h-4 w-4 rounded border-stone-700 bg-stone-950 text-amber-500 focus:ring-amber-500 cursor-pointer"
+                />
+              </div>
+
+              {/* Notify on Livery & Mod Updates */}
+              <div className="pt-4 flex items-start justify-between gap-4">
+                <div className="space-y-0.5">
+                  <label htmlFor="notifyAssetUpdatesToggle" className="text-xs font-semibold text-stone-200 cursor-pointer">
+                    Liveries &amp; Mods Updates
+                  </label>
+                  <p className="text-[11px] text-stone-400 leading-relaxed">
+                    Receive notifications when new versions of your installed aircraft liveries or DCS technical mods become available in the manifest.
+                  </p>
+                </div>
+                <input
+                  id="notifyAssetUpdatesToggle"
+                  type="checkbox"
+                  checked={settings.notifyAssetUpdates}
+                  onChange={(e) => updateSettings({ notifyAssetUpdates: e.target.checked })}
+                  className="mt-1 h-4 w-4 rounded border-stone-700 bg-stone-950 text-amber-500 focus:ring-amber-500 cursor-pointer"
+                />
+              </div>
+
+              {/* Notify on Flight Plans */}
+              <div className="pt-4 flex items-start justify-between gap-4">
+                <div className="space-y-0.5">
+                  <label htmlFor="notifyFlightPlansToggle" className="text-xs font-semibold text-stone-200 cursor-pointer">
+                    Tactical Flight Plans &amp; DTC Cartridges
+                  </label>
+                  <p className="text-[11px] text-stone-400 leading-relaxed">
+                    Receive alerts when new squadron flight packages, ATC route presets, or Data Cartridge files are uploaded to the GTFO portal.
+                  </p>
+                </div>
+                <input
+                  id="notifyFlightPlansToggle"
+                  type="checkbox"
+                  checked={settings.notifyFlightPlans}
+                  onChange={(e) => updateSettings({ notifyFlightPlans: e.target.checked })}
+                  className="mt-1 h-4 w-4 rounded border-stone-700 bg-stone-950 text-amber-500 focus:ring-amber-500 cursor-pointer"
+                />
+              </div>
+
+              {/* Polling Frequency */}
+              <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="space-y-0.5">
+                  <label htmlFor="pollingIntervalSelect" className="text-xs font-semibold text-stone-200">
+                    Background Polling Frequency
+                  </label>
+                  <p className="text-[11px] text-stone-400 leading-relaxed">
+                    How frequently the background companion process polls the member portal and manifest for new updates.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <Clock className="w-4 h-4 text-stone-400" />
+                  <select
+                    id="pollingIntervalSelect"
+                    value={settings.pollingIntervalMinutes}
+                    onChange={(e) => updateSettings({ pollingIntervalMinutes: Number(e.target.value) })}
+                    className="px-3 py-1.5 rounded-xl bg-stone-950 border border-stone-800 text-xs font-mono text-stone-200 focus:outline-none focus:border-amber-500 cursor-pointer"
+                  >
+                    <option value={0}>Disabled (Manual Only)</option>
+                    <option value={15}>Every 15 minutes</option>
+                    <option value={30}>Every 30 minutes (Recommended)</option>
+                    <option value={60}>Every 60 minutes</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* ============================================================ */}
