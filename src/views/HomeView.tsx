@@ -25,6 +25,7 @@ import {
 import { AssetCard } from '../components/AssetCard';
 import { STATIC_CONFIG } from '../config/constants';
 import { useApp } from '../context/AppContext';
+import { GTFO_GRADE_META } from '../data/samplePortalData';
 import { formatBytes } from '../utils/formatters';
 
 export const HomeView: React.FC = () => {
@@ -42,8 +43,10 @@ export const HomeView: React.FC = () => {
     checklistSummary,
     memberFlightPlans,
     activeSortie,
-    activeSortieFlightPlans,
+    filedFlightPlans,
   } = useApp();
+
+  const currentGradeMeta = GTFO_GRADE_META[memberProfile.grade] || GTFO_GRADE_META.G1;
 
   const totalAssets = manifest.assets.length;
   const installedCount = Object.keys(installedAssets).length;
@@ -85,57 +88,15 @@ export const HomeView: React.FC = () => {
                 {memberProfile.callsign || 'Pilot'}
               </span>
             </h1>
-
-            <p className="text-sm text-stone-300 leading-relaxed">
-              
-            </p>
           </div>
 
           {/* Quick Action CTA Controls */}
           <div className="flex flex-col sm:flex-row lg:flex-col gap-3 shrink-0 self-start lg:self-center">
-            {missingRequiredAssets.length > 0 ? (
-              <button
-                onClick={installAllRequiredForUser}
-                className="px-5 py-3 rounded-2xl bg-red-600 hover:bg-red-500 text-white font-mono font-bold text-xs flex items-center justify-center gap-2.5 transition-all shadow-lg shadow-red-950/50 hover:scale-[1.02]"
-              >
-                <DownloadSimple className="w-4 h-4 animate-bounce" />
-                <span>Deploy {missingRequiredAssets.length} Required Assets</span>
-              </button>
-            ) : outdatedAssets.length > 0 ? (
-              <button
-                onClick={updateAllOutdated}
-                className="px-5 py-3 rounded-2xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono font-bold text-xs flex items-center justify-center gap-2.5 transition-all shadow-lg shadow-amber-500/20 hover:scale-[1.02]"
-              >
-                <ArrowCircleUp className="w-4 h-4" />
-                <span>Update {outdatedAssets.length} Packages</span>
-              </button>
-            ) : null}
-
-            <div className="flex flex-wrap items-center gap-2.5">
-              <button
-                onClick={() => setActiveTab('atc')}
-                className="px-4 py-2.5 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/40 text-sky-300 font-mono text-xs font-semibold flex items-center gap-2 transition-colors shadow-sm"
-              >
-                <Compass className="w-4 h-4 text-sky-400" />
-                <span>Flight Plans &amp; ATC</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('liveries')}
-                className="px-4 py-2.5 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-700 text-amber-400 font-mono text-xs font-semibold flex items-center gap-2 transition-colors"
-              >
-                <PaintBrush className="w-4 h-4" />
-                <span>Browse Hangar</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('dashboard')}
-                className="px-4 py-2.5 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-700 text-stone-200 font-mono text-xs font-semibold flex items-center gap-2 transition-colors"
-              >
-                <SquaresFour className="w-4 h-4 text-stone-400" />
-                <span>Pilot Dossier</span>
-              </button>
-            </div>
+            <img
+                src={memberProfile.gradeIconUrl || currentGradeMeta.iconUrl}
+                alt={memberProfile.gradeTitle}
+                className="size-24 object-contain"
+              />
           </div>
         </div>
       </div>
@@ -315,7 +276,7 @@ export const HomeView: React.FC = () => {
                   Flight Plans &amp; ATC
                 </h3>
                 <p className="text-[11px] font-mono text-stone-400">
-                  {memberFlightPlans.length} Plan{memberFlightPlans.length === 1 ? '' : 's'} • {activeSortieFlightPlans.length} in Package
+                  {memberFlightPlans.length} My Plan{memberFlightPlans.length === 1 ? '' : 's'} • {filedFlightPlans.length} ATC Filed
                 </p>
               </div>
             </div>

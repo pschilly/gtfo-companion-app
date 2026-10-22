@@ -46,16 +46,23 @@ export function isTauriRuntime(): boolean {
   return typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
 }
 
-export async function detectDcsPaths(customOverride?: string): Promise<DcsEnvironmentInfo> {
+export async function detectDcsPaths(
+  customOverride?: string,
+  customWorldOverride?: string
+): Promise<DcsEnvironmentInfo> {
   if (isTauriRuntime()) {
     return await invoke<DcsEnvironmentInfo>('detect_dcs_paths', {
       customOverride: customOverride || null,
+      customWorldOverride: customWorldOverride || null,
     });
   }
 
   const defaultRoot = 'C:\\Users\\Pilot\\Saved Games';
   const dcsPath = `${defaultRoot}\\DCS`;
   const openbetaPath = `${defaultRoot}\\DCS.openbeta`;
+  const defaultWorldRoot = 'C:\\Program Files\\Eagle Dynamics\\DCS World';
+  const defaultWorldOpenBeta = 'C:\\Program Files\\Eagle Dynamics\\DCS World OpenBeta';
+  const defaultSteam = 'C:\\Program Files (x86)\\Steam\\steamapps\\common\\DCSWorld';
 
   return {
     savedGamesRoot: defaultRoot,
@@ -72,6 +79,27 @@ export async function detectDcsPaths(customOverride?: string): Promise<DcsEnviro
         path: openbetaPath,
         exists: false,
         variant: 'openbeta',
+      },
+    ],
+    activeWorldRootPath: customWorldOverride || defaultWorldRoot,
+    detectedWorldCandidates: [
+      {
+        label: 'DCS World (Standard)',
+        path: defaultWorldRoot,
+        exists: true,
+        variant: 'release',
+      },
+      {
+        label: 'DCS World OpenBeta',
+        path: defaultWorldOpenBeta,
+        exists: false,
+        variant: 'openbeta',
+      },
+      {
+        label: 'DCS World (Steam)',
+        path: defaultSteam,
+        exists: false,
+        variant: 'release',
       },
     ],
   };
@@ -603,6 +631,44 @@ export async function installAtcKneeboardCommand(
   }
 
   return `${dcsSavedGamesPath}\\${targetFolder}\\${kneeboard.fileName}`;
+}
+
+/**
+ * Installs JF-17 Custom Airspace (.ini) directly into
+ * <dcsWorldRootPath>\Mods\aircraft\JF-17\Customization\airspace\<fileName>
+ */
+export async function installJf17CustomAirspaceCommand(
+  dcsWorldRootPath: string | undefined,
+  fileName: string,
+  content: string
+): Promise<string> {
+  if (isTauriRuntime()) {
+    return await invoke<string>('install_jf17_custom_airspace', {
+      dcsWorldRootPath: dcsWorldRootPath || null,
+      fileName,
+      content,
+    });
+  }
+
+  const baseRoot = dcsWorldRootPath || 'C:\\Program Files\\Eagle Dynamics\\DCS World';
+  const fullPath = `${baseRoot}\\Mods\\aircraft\\JF-17\\Customization\\airspace\\${fileName}`;
+  localStorage.setItem(`gtfo_sim_jf17_airspace_${fileName}`, content);
+  return fullPath;
+}
+
+/**
+ * Gets the JF-17 Custom Airspace directory path for copying to clipboard
+ */
+export async function getJf17CustomAirspacePathCommand(
+  dcsWorldRootPath?: string
+): Promise<string> {
+  if (isTauriRuntime()) {
+    return await invoke<string>('get_jf17_custom_airspace_path', {
+      dcsWorldRootPath: dcsWorldRootPath || null,
+    });
+  }
+  const baseRoot = dcsWorldRootPath || 'C:\\Program Files\\Eagle Dynamics\\DCS World';
+  return `${baseRoot}\\Mods\\aircraft\\JF-17\\Customization\\airspace`;
 }
 
 export async function loadInstalledAssets(): Promise<InstalledAssetRecord[]> {

@@ -196,13 +196,20 @@ export const SAMPLE_FLIGHT_PLAN_VIPER: FlightPlanDetail = {
       type: 'Airfield',
     },
   ],
-  comms_ladder: [
-    { label: 'Tactical (Pri)', frequency: '254.000', channel: '1', modulation: 'UHF AM', notes: 'Flight Lead Net' },
-    { label: 'Strike Common', frequency: '351.500', channel: '2', modulation: 'UHF AM', notes: 'Package Check-In' },
-    { label: 'AWACS MAGIC', frequency: '268.000', channel: '3', modulation: 'UHF AM', notes: 'E-3A AWACS Radar Control' },
-    { label: 'Tanker ARCO', frequency: '291.500', channel: '4', modulation: 'UHF AM', notes: 'Boom KC-135 TACAN 64X' },
-    { label: 'Guard', frequency: '243.000', channel: 'G', modulation: 'UHF AM', notes: 'Emergency Distress' },
-  ],
+  comms_ladder: {
+    comm1: [
+      { channel: 1, name: 'Tactical (Pri)', frequency: '254.000', modulation: 'AM', band: 'UHF', source: 'Squadron', notes: 'Flight Lead Net' },
+      { channel: 2, name: 'Strike Common', frequency: '351.500', modulation: 'AM', band: 'UHF', source: 'Task Force', notes: 'Package Check-In' },
+      { channel: 3, name: 'AWACS MAGIC', frequency: '268.000', modulation: 'AM', band: 'UHF', source: 'Support Asset', notes: 'E-3A AWACS Radar Control' },
+      { channel: 4, name: 'Tanker ARCO', frequency: '291.500', modulation: 'AM', band: 'UHF', source: 'Support Asset', notes: 'Boom KC-135 TACAN 64X' },
+      { channel: 'G', name: 'Guard', frequency: '243.000', modulation: 'AM', band: 'UHF', source: 'Emergency', notes: 'Emergency Distress' },
+    ],
+    comm2: [
+      { channel: 1, name: 'Tactical (Sec)', frequency: '255.200', modulation: 'AM', band: 'UHF', source: 'Squadron', notes: 'Element Secondary' },
+      { channel: 2, name: 'CTAF Sector North', frequency: '132.550', modulation: 'AM', band: 'VHF', source: 'Task Force', notes: 'Common Air Traffic Advisory' },
+      { channel: 3, name: 'Al Dhafra Dep', frequency: '124.300', modulation: 'AM', band: 'VHF', source: 'Airfield', notes: 'Al Dhafra Departure' },
+    ],
+  },
   default_comms_ladder: {
     task_force: [
       { label: 'TF Strike Net', frequency: '351.500', channel: 'Pri', modulation: 'UHF AM', notes: 'All package elements' },
@@ -264,16 +271,37 @@ export const SAMPLE_FLIGHT_PLAN_VIPER: FlightPlanDetail = {
     '9': 'AIM-9X Sidewinder',
   },
   cmds_settings: {
-    program_1: { label: 'General Threat', chaff: 1, flare: 1, interval: 0.5, cycles: 10 },
-    program_2: { label: 'IR SAM Break', chaff: 0, flare: 2, interval: 0.25, cycles: 8 },
-    program_3: { label: 'Radar Break (Pop-Up)', chaff: 4, flare: 0, interval: 1.0, cycles: 6 },
-    program_4: { label: 'High Density SEAD', chaff: 2, flare: 2, interval: 0.3, cycles: 12 },
-  },
-  sa_settings: {
-    datalink_enabled: true,
-    tacan_channel: '64X',
-    ils_frequency: '109.50',
-    laser_code: '1688',
+    type: 'F_16C',
+    delay_between_programs: 2,
+    bingo: {
+      ChaffNum: 10,
+      FlaresNum: 10,
+      BINGO: true,
+      FDBK: true,
+      REQCTR: true,
+    },
+    programs: {
+      MAN1: {
+        label: 'MAN 1 (Standard Mixed)',
+        chaff: { burst_qty: 1, burst_interval: 0.02, salvo_qty: 10, salvo_interval: 1.0 },
+        flare: { burst_qty: 1, burst_interval: 0.02, salvo_qty: 10, salvo_interval: 1.0 },
+      },
+      MAN2: {
+        label: 'MAN 2 (Rapid Mixed)',
+        chaff: { burst_qty: 1, burst_interval: 0.02, salvo_qty: 10, salvo_interval: 0.5 },
+        flare: { burst_qty: 1, burst_interval: 0.02, salvo_qty: 10, salvo_interval: 0.5 },
+      },
+      MAN3: {
+        label: 'MAN 3 (Burst Burst)',
+        chaff: { burst_qty: 2, burst_interval: 0.1, salvo_qty: 5, salvo_interval: 1.0 },
+        flare: { burst_qty: 2, burst_interval: 0.1, salvo_qty: 5, salvo_interval: 1.0 },
+      },
+      MAN4: {
+        label: 'MAN 4 (Continuous High Density)',
+        chaff: { burst_qty: 2, burst_interval: 0.05, salvo_qty: 10, salvo_interval: 0.5 },
+        flare: { burst_qty: 2, burst_interval: 0.05, salvo_qty: 10, salvo_interval: 0.5 },
+      },
+    },
   },
   geo_lines_settings: {
     line_1: 'FLOT-NORTH',
@@ -347,6 +375,7 @@ export const SAMPLE_FLIGHT_PLAN_HORNET: FlightPlanDetail = {
     dtc: 'https://members.globaltaskforceoverlord.org/api/v1/companion/flight-plans/FP-HT449/dtc',
     dcs_route: 'https://members.globaltaskforceoverlord.org/api/v1/companion/flight-plans/FP-HT449/dcs-route',
     pdf: 'https://members.globaltaskforceoverlord.org/api/v1/companion/flight-plans/FP-HT449/pdf',
+    custom_airspace: 'https://members.globaltaskforceoverlord.org/api/v1/companion/flight-plans/FP-HT449/custom-airspace',
   },
   route_points: [
     {
@@ -420,11 +449,27 @@ export const SAMPLE_FLIGHT_PLAN_HORNET: FlightPlanDetail = {
       type: 'Approach',
     },
   ],
-  comms_ladder: [
-    { label: 'Tactical (Pri)', frequency: '305.000', channel: '1', modulation: 'UHF AM', notes: 'Hornet Intraflight' },
-    { label: 'Strike Common', frequency: '344.000', channel: '2', modulation: 'UHF AM', notes: 'Hammer Package Common' },
-    { label: 'AWACS FOCUS', frequency: '251.000', channel: '3', modulation: 'UHF AM', notes: 'E-3A AWACS Control' },
-  ],
+  comms_ladder: {
+    comm1: [
+      { channel: 1, name: 'Strike', frequency: '344.000', modulation: 'AM', band: 'UHF', source: 'Task Force', notes: 'Hammer Package Common' },
+      { channel: 2, name: 'Tactical (Pri)', frequency: '305.000', modulation: 'AM', band: 'UHF', source: 'Squadron', notes: 'Hornet Intraflight' },
+      { channel: 3, name: 'AWACS FOCUS', frequency: '251.000', modulation: 'AM', band: 'UHF', source: 'Support Asset', notes: 'E-3A AWACS Control' },
+      { channel: 4, name: 'Texaco 1-1', frequency: '353.500', modulation: 'AM', band: 'UHF', source: 'Support Asset', notes: 'Boom KC-135 TACAN 65Y' },
+    ],
+    comm2: [
+      { channel: 1, name: 'Tactical (Sec)', frequency: '306.200', modulation: 'AM', band: 'UHF', source: 'Squadron', notes: 'Element Secondary' },
+      { channel: 2, name: 'CTAF Sector North', frequency: '132.550', modulation: 'AM', band: 'VHF', source: 'Task Force', notes: 'Common Air Traffic Advisory' },
+      { channel: 3, name: 'Carrier Strike CVN-73', frequency: '127.500', modulation: 'AM', band: 'VHF', source: 'Task Force', notes: 'Strike Control' },
+    ],
+    mids: {
+      mids_a_channel: '44',
+      mids_a_name: '449th TFS Interflight',
+      mids_a_notes: 'MIDS A Datalink Interflight',
+      mids_b_channel: '49',
+      mids_b_name: '449th TFS Interflight',
+      mids_b_notes: 'MIDS B Datalink Interflight',
+    },
+  },
   default_comms_ladder: {
     task_force: [
       { label: 'TF Strike Net', frequency: '344.000', channel: 'Pri', modulation: 'UHF AM' },
@@ -461,8 +506,81 @@ export const SAMPLE_FLIGHT_PLAN_HORNET: FlightPlanDetail = {
     '8': 'AIM-120C AMRAAM',
     '9': 'AIM-9X Sidewinder',
   },
+  sa_settings: {
+    default_flot: 1,
+    default_faor: 1,
+    default_cap: 1,
+    default_corridor: 1,
+    flot: [
+      { name: 'FLOT 1', lat: 36.215, lng: 37.125 },
+      { name: 'FLOT 2', lat: 36.450, lng: 37.450 },
+      { name: 'FLOT 3', lat: 36.780, lng: 37.890 },
+      { name: 'FLOT 4', lat: 36.950, lng: 38.350 },
+    ],
+    faor: [
+      { name: 'FAOR ALPHA 1', lat: 36.100, lng: 36.800 },
+      { name: 'FAOR ALPHA 2', lat: 36.900, lng: 36.800 },
+      { name: 'FAOR ALPHA 3', lat: 36.900, lng: 37.600 },
+      { name: 'FAOR ALPHA 4', lat: 36.100, lng: 37.600 },
+    ],
+    cap_points: [
+      { name: 'CAP STATION CHARLIE', lat: 35.800, lng: 37.200, alt: 28000, speed: 440, leg_distance: 25, leg_time: '4m' },
+      { name: 'CAP STATION DELTA', lat: 36.250, lng: 37.750, alt: 26000, speed: 420, leg_distance: 20, leg_time: '3.5m' },
+    ],
+    corridors: [
+      { name: 'SAFE CORRIDOR INGRESS', lat: 36.650, lng: 36.150, width_nm: 10, min_alt: 18000, max_alt: 26000 },
+      { name: 'SAFE CORRIDOR EGRESS', lat: 36.200, lng: 36.500, width_nm: 10, min_alt: 16000, max_alt: 24000 },
+    ],
+  },
   cmds_settings: {
-    chaff_flare: '60 Chaff / 30 Flare',
+    type: 'FA_18C',
+    delay_between_programs: 0,
+    bingo: {
+      ChaffNum: 10,
+      FlaresNum: 10,
+      Other1Num: 0,
+      Other2Num: 0,
+      BINGO: true,
+      FDBK: true,
+      REQCTR: true,
+    },
+    programs: {
+      BYP: {
+        label: 'BYPASS (Emergency Dual)',
+        chaff: { quantity: 2, repeat: 1, interval: 1 },
+        flare: { quantity: 2, repeat: 1, interval: 1 },
+      },
+      MAN_1: {
+        label: 'MAN 1 (Standard Radar Defeat)',
+        chaff: { quantity: 1, repeat: 10, interval: 1 },
+        flare: { quantity: 1, repeat: 1, interval: 1 },
+      },
+      MAN_2: {
+        label: 'MAN 2 (Rapid Chaff / Flare)',
+        chaff: { quantity: 1, repeat: 10, interval: 0.5 },
+        flare: { quantity: 1, repeat: 1, interval: 0.5 },
+      },
+      MAN_3: {
+        label: 'MAN 3 (Dual Burst 5 Rep)',
+        chaff: { quantity: 2, repeat: 5, interval: 1 },
+        flare: { quantity: 2, repeat: 5, interval: 1 },
+      },
+      MAN_4: {
+        label: 'MAN 4 (Dual Rapid 10 Rep)',
+        chaff: { quantity: 2, repeat: 10, interval: 0.5 },
+        flare: { quantity: 2, repeat: 10, interval: 0.5 },
+      },
+      MAN_5: {
+        label: 'MAN 5 (Preemptive Pop 2 Rep)',
+        chaff: { quantity: 1, repeat: 2, interval: 1 },
+        flare: { quantity: 1, repeat: 2, interval: 1 },
+      },
+      MAN_6: {
+        label: 'MAN 6 (Panic / SAM Break 20 Rep)',
+        chaff: { quantity: 2, repeat: 20, interval: 0.75 },
+        flare: { quantity: 2, repeat: 20, interval: 0.75 },
+      },
+    },
   },
 };
 
@@ -527,6 +645,278 @@ export const SAMPLE_FLIGHT_PLAN_PRIVATE: FlightPlanDetail = {
   ],
 };
 
+export const SAMPLE_FLIGHT_PLAN_TOMCAT: FlightPlanDetail = {
+  id: 20,
+  identifier: 'FP-TOM14',
+  name: 'GHOST 1-1',
+  callsign: 'GHOST 1-1',
+  description: 'Fleet Air Defense & Strike Escort // LANTIRN CAS',
+  color: '#f97316',
+  is_opfor: false,
+  is_private: false,
+  is_assigned_to_mission: true,
+  is_creator: true,
+  is_slotted: true,
+  is_signed_up: true,
+  is_filed: true,
+  filed_at: '2026-10-22T14:40:00+00:00',
+  departure_airfield: 'CVN-73 George Washington',
+  destination_airfield: 'CVN-73 George Washington',
+  diverts: ['Al Dhafra AB', 'Fujairah Intl'],
+  launch_time: '18:45Z',
+  fuel_amount: '16,200 lbs',
+  flight_rules: 'VFR',
+  remarks: 'Case I departure. Point options AP/XL loaded for LANTIRN targeting pod. Check in on Strike net 351.500.',
+  route_summary: {
+    waypoint_count: 8,
+    min_altitude_feet: 1500,
+    max_altitude_feet: 25000,
+    min_speed_knots: 250,
+    max_speed_knots: 480,
+  },
+  formatted_loadout: '2x AIM-54C Phoenix, 2x AIM-7M Sparrow, 2x AIM-9M, 2x GBU-12, 2x 267 Gal Drop Tanks, LANTIRN Pod',
+  airframe: {
+    id: 3,
+    name: 'F-14B Tomcat',
+    abbreviation: 'F-14B',
+    dcs_entity: 'F-14B',
+    image_url: 'https://cdn.globaltaskforceoverlord.org/assets/airframes/f14b.png',
+    is_dtc_compatible: false,
+  },
+  squadron: {
+    id: 3,
+    name: 'VF-141 Ghostriders',
+    abbreviation: 'VF-141',
+    patch_url: 'https://cdn.globaltaskforceoverlord.org/assets/squadrons/vf141.png',
+  },
+  mission: {
+    id: 10,
+    name: 'Operation Vigilant Shield',
+    status: 'active',
+    mission_time: '08:00:00',
+  },
+  sortie: {
+    id: 4,
+    name: 'Sortie 1 - Alpha Strike',
+    sortie_number: 1,
+    scheduled_at: '2026-10-24T18:00:00+00:00',
+  },
+  is_dtc_compatible: false,
+  detail_url: 'https://members.globaltaskforceoverlord.org/api/v1/companion/flight-plans/FP-TOM14',
+  download_urls: {
+    dtc: null,
+    dcs_route: 'https://members.globaltaskforceoverlord.org/api/v1/companion/flight-plans/FP-TOM14/dcs-route',
+    pdf: 'https://members.globaltaskforceoverlord.org/api/v1/companion/flight-plans/FP-TOM14/pdf',
+  },
+  route_points: [
+    { index: 0, name: 'DEP - CVN-73 Washington', lat: 25.150, lng: 55.050, alt: 100, speed: 250, tot: '00:00', remarks: 'Catapult 1 launch, Case I departure' },
+    { index: 1, name: 'MARSHAL', lat: 25.400, lng: 55.450, alt: 8000, speed: 350, tot: '00:06', remarks: 'Rendezvous with wingman' },
+    { index: 2, name: 'INGRESS CHOKEPOINT', lat: 26.050, lng: 56.100, alt: 22000, speed: 420, tot: '00:15', remarks: 'Fence in, LANTIRN laser arm' },
+    { index: 3, name: 'XL 1 - EARLY WARNING RADAR', lat: 26.350, lng: 56.420, alt: 1500, speed: 460, tot: '00:22', mgrs: '40RFV442589', ddm: "N26°21.00' E056°25.20'", type: 'LANTIRN', action: 'Target', remarks: 'Primary LANTIRN laser target (Code 1688)' },
+    { index: 4, name: 'XL 2 - COMMAND BUNKER', lat: 26.410, lng: 56.480, alt: 2200, speed: 460, tot: '00:25', mgrs: '40RFV512658', ddm: "N26°24.60' E056°28.80'", type: 'LANTIRN', action: 'Target', remarks: 'Hardened shelter, GBU-12 strike' },
+    { index: 5, name: 'EGRESS CORRIDOR', lat: 26.150, lng: 56.600, alt: 18000, speed: 450, tot: '00:30', remarks: 'Southward egress into friendly sector' },
+    { index: 6, name: 'HOLDING - CASE I', lat: 25.250, lng: 55.150, alt: 4000, speed: 280, tot: '00:42', remarks: 'Enter carrier holding pattern' },
+    { index: 7, name: 'ARR - CVN-73 Trap', lat: 25.150, lng: 55.050, alt: 60, speed: 140, tot: '00:48', remarks: 'Case I recovery, 3-wire target' },
+  ],
+  metadata: {
+    additional_points: [
+      { index: 1, name: 'XL 1 - EARLY WARNING RADAR', lat: 26.350, lng: 56.420, alt: 1500, mgrs: '40RFV442589', ddm: "N26°21.00' E056°25.20'", type: 'LANTIRN', remarks: 'Primary LANTIRN laser target (Code 1688)' },
+      { index: 2, name: 'XL 2 - COMMAND BUNKER', lat: 26.410, lng: 56.480, alt: 2200, mgrs: '40RFV512658', ddm: "N26°24.60' E056°28.80'", type: 'LANTIRN', remarks: 'Hardened shelter, GBU-12 strike' },
+      { index: 3, name: 'AP 3 - INGRESS CHOKEPOINT', lat: 26.180, lng: 56.310, alt: 18000, mgrs: '40RFQ342318', ddm: "N26°10.80' E056°18.60'", type: 'ADDITIONAL', remarks: 'Initial point for run-in' },
+      { index: 4, name: 'AP 4 - ALTERNATE EGRESS', lat: 26.100, lng: 56.550, alt: 15000, mgrs: '40RFQ582232', ddm: "N26°06.00' E056°33.00'", type: 'ADDITIONAL', remarks: 'Secondary egress corridor' },
+    ],
+  },
+  comms_ladder: {
+    comm1: [
+      { channel: 1, name: 'VF-141 Tactical 1', frequency: '315.500', modulation: 'AM', band: 'UHF', source: 'Squadron', notes: 'Lead / Wing Net' },
+      { channel: 2, name: 'Strike Common', frequency: '351.500', modulation: 'AM', band: 'UHF', source: 'Task Force', notes: 'Package Common' },
+      { channel: 3, name: 'CVN-73 Marshall', frequency: '305.000', modulation: 'AM', band: 'UHF', source: 'Carrier', notes: 'Recovery Control' },
+      { channel: 4, name: 'Texaco 1-1', frequency: '298.200', modulation: 'AM', band: 'UHF', source: 'Support', notes: 'Drogue KC-135' },
+    ],
+    comm2: [
+      { channel: 1, name: 'VF-141 Interflight', frequency: '138.450', modulation: 'AM', band: 'VHF', source: 'Squadron', notes: 'Intraflight Aux' },
+      { channel: 2, name: 'AWACS MAGIC', frequency: '268.000', modulation: 'AM', band: 'UHF', source: 'Support', notes: 'E-3A AWACS' },
+      { channel: 3, name: 'Carrier Tower', frequency: '127.500', modulation: 'AM', band: 'VHF', source: 'Carrier', notes: 'CVN Tower / Departure' },
+    ],
+  },
+  default_comms_ladder: {
+    task_force: [
+      { label: 'TF Strike Net', frequency: '351.500', channel: 'Pri', modulation: 'UHF AM' },
+      { label: 'Carrier Strike CVN-73', frequency: '127.500', channel: 'Sec', modulation: 'VHF AM' },
+    ],
+    squadron: [
+      { label: 'VF-141 Tactical 1', frequency: '315.500', channel: '1', modulation: 'UHF AM' },
+      { label: 'VF-141 Ops', frequency: '295.400', channel: '2', modulation: 'UHF AM' },
+    ],
+    support: [
+      { label: 'AWACS MAGIC', frequency: '268.000', channel: 'Pri', modulation: 'UHF AM' },
+      { label: 'Texaco 1-1 (Drogue)', frequency: '298.200', channel: 'Sec', modulation: 'UHF AM' },
+    ],
+  },
+  airfield_frequencies: {
+    'CVN-73 George Washington': [
+      { type: 'TWR', frequency: '127.500', name: 'Tower / Flyco' },
+      { type: 'MARSHALL', frequency: '305.000', name: 'Carrier Marshall' },
+      { type: 'TACAN', frequency: '73X', name: 'TACAN 73X' },
+      { type: 'ICLS', frequency: '11', name: 'ICLS Channel 11' },
+    ],
+    'Al Dhafra AB (OMAM)': [
+      { type: 'TWR', frequency: '126.500', name: 'Al Dhafra Tower' },
+      { type: 'APP', frequency: '124.300', name: 'Al Dhafra Approach' },
+    ],
+  },
+  cmds_settings: {
+    type: 'F_14B',
+    delay_between_programs: 1,
+    bingo: {
+      ChaffNum: 10,
+      FlaresNum: 6,
+      BINGO: true,
+      FDBK: false,
+    },
+    programs: {
+      PRGM_1: {
+        label: 'PRGM 1 (Single Chaff)',
+        chaff: { quantity: 1, repeat: 10, interval: 1 },
+        flare: { quantity: 0, repeat: 0, interval: 0 },
+      },
+      PRGM_2: {
+        label: 'PRGM 2 (Dual Chaff / Flare)',
+        chaff: { quantity: 1, repeat: 5, interval: 0.5 },
+        flare: { quantity: 1, repeat: 5, interval: 0.5 },
+      },
+      PRGM_3: {
+        label: 'PRGM 3 (IR Defense Flare Burst)',
+        chaff: { quantity: 0, repeat: 0, interval: 0 },
+        flare: { quantity: 2, repeat: 4, interval: 0.25 },
+      },
+      PRGM_4: {
+        label: 'PRGM 4 (Emergency Panic)',
+        chaff: { quantity: 2, repeat: 10, interval: 0.5 },
+        flare: { quantity: 2, repeat: 10, interval: 0.5 },
+      },
+    },
+  },
+};
+
+export const SAMPLE_FLIGHT_PLAN_JF17: FlightPlanDetail = {
+  id: 21,
+  identifier: 'FP-JF170',
+  name: 'THUNDER 3-1',
+  callsign: 'THUNDER 3-1',
+  description: 'Maritime Strike & Air Superiority Escort',
+  color: '#06b6d4',
+  is_opfor: false,
+  is_private: false,
+  is_assigned_to_mission: true,
+  is_creator: false,
+  is_slotted: true,
+  is_signed_up: true,
+  is_filed: true,
+  filed_at: '2026-10-22T14:50:00+00:00',
+  departure_airfield: 'Khasab AB',
+  destination_airfield: 'Khasab AB',
+  diverts: ['Fujairah Intl', 'Al Dhafra AB'],
+  launch_time: '18:15Z',
+  fuel_amount: '5,800 lbs',
+  flight_rules: 'VFR',
+  remarks: 'Link 16 fighter net check-in on Net 16. Ingress via Strait of Hormuz patrol zone.',
+  route_summary: {
+    waypoint_count: 5,
+    min_altitude_feet: 1200,
+    max_altitude_feet: 24000,
+    min_speed_knots: 260,
+    max_speed_knots: 500,
+  },
+  formatted_loadout: '2x SD-10, 2x PL-5EII, 2x C-802AK Anti-Ship, 1x 800L Centerline Fuel Tank',
+  airframe: {
+    id: 4,
+    name: 'JF-17 Thunder',
+    abbreviation: 'JF-17',
+    dcs_entity: 'JF-17',
+    image_url: 'https://cdn.globaltaskforceoverlord.org/assets/airframes/jf17.png',
+    is_dtc_compatible: true,
+  },
+  squadron: {
+    id: 4,
+    name: '19th Air Attack Brigade',
+    abbreviation: '19th AAB',
+    patch_url: 'https://cdn.globaltaskforceoverlord.org/assets/squadrons/19th.png',
+  },
+  campaign: {
+    id: 1,
+    name: 'Khorasan Dominion',
+    theatre: 'Persian Gulf',
+  },
+  mission: {
+    id: 10,
+    name: 'Operation Vigilant Shield',
+    status: 'active',
+    mission_time: '08:00:00',
+  },
+  sortie: {
+    id: 4,
+    name: 'Sortie 1 - Alpha Strike',
+    sortie_number: 1,
+    scheduled_at: '2026-10-24T18:00:00+00:00',
+  },
+  is_dtc_compatible: true,
+  detail_url: 'https://members.globaltaskforceoverlord.org/api/v1/companion/flight-plans/FP-JF170',
+  download_urls: {
+    dtc: 'https://members.globaltaskforceoverlord.org/api/v1/companion/flight-plans/FP-JF170/dtc',
+    dcs_route: 'https://members.globaltaskforceoverlord.org/api/v1/companion/flight-plans/FP-JF170/dcs-route',
+    pdf: 'https://members.globaltaskforceoverlord.org/api/v1/companion/flight-plans/FP-JF170/pdf',
+    custom_airspace: 'https://members.globaltaskforceoverlord.org/api/v1/companion/flight-plans/FP-JF170/custom-airspace',
+    jf17_airspace: 'https://members.globaltaskforceoverlord.org/api/v1/companion/flight-plans/FP-JF170/jf17-airspace',
+  },
+  route_points: [
+    { index: 0, name: 'DEP - Khasab', lat: 26.171, lng: 56.241, alt: 1200, speed: 260, tot: '00:00', remarks: 'Climb 24,000 ft, contact Tower 118.900' },
+    { index: 1, name: 'PATROL NORTH', lat: 26.650, lng: 56.350, alt: 24000, speed: 440, tot: '00:08', remarks: 'Maritime radar surface sweep' },
+    { index: 2, name: 'TGT - CORVETTE', lat: 26.900, lng: 56.550, alt: 18000, speed: 480, tot: '00:16', action: 'Target', type: 'Target', remarks: 'C-802AK ASM launch profile' },
+    { index: 3, name: 'EGRESS SOUTH', lat: 26.400, lng: 56.300, alt: 16000, speed: 460, tot: '00:24', remarks: 'Descend to recovery stack' },
+    { index: 4, name: 'ARR - Khasab Runway 01', lat: 26.171, lng: 56.241, alt: 100, speed: 150, tot: '00:32', remarks: 'Touchdown RWY 01' },
+  ],
+  comms_ladder: {
+    comm1: [
+      { channel: 1, name: '19th AAB Tactical 1', frequency: '245.500', modulation: 'AM', band: 'UHF', source: 'Squadron', notes: 'Flight Intraflight' },
+      { channel: 2, name: 'Strike Common', frequency: '351.500', modulation: 'AM', band: 'UHF', source: 'Task Force', notes: 'Package Net' },
+      { channel: 3, name: 'AWACS MAGIC', frequency: '268.000', modulation: 'AM', band: 'UHF', source: 'Support Asset', notes: 'E-3A AWACS' },
+    ],
+    comm2: [
+      { channel: 1, name: '19th AAB Sec', frequency: '246.200', modulation: 'AM', band: 'UHF', source: 'Squadron', notes: 'Auxiliary Net' },
+      { channel: 2, name: 'Khasab Tower', frequency: '118.900', modulation: 'AM', band: 'VHF', source: 'Airfield', notes: 'Tower / Departure' },
+    ],
+  },
+  default_comms_ladder: {
+    task_force: [
+      { label: 'TF Strike Net', frequency: '351.500', channel: 'Pri', modulation: 'UHF AM' },
+    ],
+    squadron: [
+      { label: '19th AAB Tactical', frequency: '245.500', channel: '1', modulation: 'UHF AM' },
+    ],
+    support: [
+      { label: 'AWACS MAGIC', frequency: '268.000', channel: 'Pri', modulation: 'UHF AM' },
+    ],
+  },
+  airfield_frequencies: {
+    'Khasab AB (OOKB)': [
+      { type: 'TWR', frequency: '118.900', name: 'Khasab Tower' },
+      { type: 'APP', frequency: '120.400', name: 'Khasab Approach' },
+    ],
+    'Fujairah Intl (OMFJ)': [
+      { type: 'TWR', frequency: '119.600', name: 'Tower' },
+    ],
+  },
+  mids_settings: {
+    mids_a_channel: 16,
+    mids_b_channel: 22,
+    net_label: 'THUNDER-LINK',
+    voice_1: 'NET 16',
+    voice_2: 'NET 22',
+    crypto: 'ACTIVE',
+  },
+};
+
 export const SAMPLE_MEMBER_FLIGHT_PLANS_RESPONSE: MemberFlightPlansResponse = {
   member: {
     id: 1,
@@ -534,13 +924,15 @@ export const SAMPLE_MEMBER_FLIGHT_PLANS_RESPONSE: MemberFlightPlansResponse = {
     discord_id: '112233445566778899',
     dcs_ucid: 'UCID_12345',
   },
-  total: 3,
-  missions_count: 2,
-  authored_count: 2,
+  total: 5,
+  missions_count: 4,
+  authored_count: 3,
   private_count: 1,
   plans: [
     SAMPLE_FLIGHT_PLAN_VIPER,
     SAMPLE_FLIGHT_PLAN_HORNET,
+    SAMPLE_FLIGHT_PLAN_TOMCAT,
+    SAMPLE_FLIGHT_PLAN_JF17,
     SAMPLE_FLIGHT_PLAN_PRIVATE,
   ],
 };
@@ -625,6 +1017,8 @@ export const SAMPLE_ACTIVE_SORTIE_RESPONSE: ActiveSortieResponse = {
         scheduled_at: '2026-10-24T18:00:00+00:00',
       },
     },
+    SAMPLE_FLIGHT_PLAN_TOMCAT,
+    SAMPLE_FLIGHT_PLAN_JF17,
   ],
 };
 
@@ -669,24 +1063,45 @@ export function formatFlightPlanToLuaPreset(plan: FlightPlanDetail): string {
  * Builds DTC JSON structure for .dtc export
  */
 export function buildDtcJsonPayload(plan: FlightPlanDetail): Record<string, unknown> {
+  const comm1List = (() => {
+    if (!plan.comms_ladder) return [];
+    if (Array.isArray(plan.comms_ladder)) {
+      return plan.comms_ladder.map((c: any, i: number) => ({
+        channel: c.channel || i + 1,
+        frequency: c.frequency,
+        name: c.label || c.name || `CH ${i + 1}`,
+      }));
+    }
+    const c1 = Array.isArray((plan.comms_ladder as any).comm1) ? (plan.comms_ladder as any).comm1 : [];
+    return c1.map((c: any, i: number) => ({
+      channel: c.channel || i + 1,
+      frequency: c.frequency,
+      name: c.label || c.name || `CH ${i + 1}`,
+    }));
+  })();
+
+  const comm2List = (() => {
+    if (!plan.comms_ladder || Array.isArray(plan.comms_ladder)) return [];
+    const c2 = Array.isArray((plan.comms_ladder as any).comm2) ? (plan.comms_ladder as any).comm2 : [];
+    return c2.map((c: any, i: number) => ({
+      channel: c.channel || i + 1,
+      frequency: c.frequency,
+      name: c.label || c.name || `CH ${i + 1}`,
+    }));
+  })();
+
+  const radioPresets: any[] = [{ radio: 'COMM1', channels: comm1List }];
+  if (comm2List.length > 0) {
+    radioPresets.push({ radio: 'COMM2', channels: comm2List });
+  }
+
   return {
     version: '1.2',
     aircraft: plan.airframe?.dcs_entity || 'FA-18C_hornet',
     callsign: plan.callsign,
     flight_plan_id: plan.identifier,
     created_at: new Date().toISOString(),
-    radio_presets: [
-      {
-        radio: 'COMM1',
-        channels: plan.comms_ladder
-          ? (Array.isArray(plan.comms_ladder) ? plan.comms_ladder : []).map((c: any, i: number) => ({
-              channel: c.channel || i + 1,
-              frequency: c.frequency,
-              name: c.label || c.name || `CH ${i + 1}`,
-            }))
-          : [],
-      },
-    ],
+    radio_presets: radioPresets,
     waypoints: plan.route_points.map((wp) => ({
       index: wp.index,
       name: wp.name,

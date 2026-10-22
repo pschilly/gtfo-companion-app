@@ -124,6 +124,10 @@ pub struct DcsEnvironmentInfo {
     pub active_saved_games_path: String,
     pub detected_candidates: Vec<DcsPathCandidate>,
     pub saved_games_root: String,
+    #[serde(default)]
+    pub active_world_root_path: String,
+    #[serde(default)]
+    pub detected_world_candidates: Vec<DcsPathCandidate>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -236,7 +240,10 @@ fn compute_git_blob_sha1(path: &Path, expected_size: u64) -> Option<String> {
 }
 
 #[tauri::command]
-fn detect_dcs_paths(custom_override: Option<String>) -> Result<DcsEnvironmentInfo, String> {
+fn detect_dcs_paths(
+    custom_override: Option<String>,
+    custom_world_override: Option<String>,
+) -> Result<DcsEnvironmentInfo, String> {
     let user_profile = std::env::var("USERPROFILE").unwrap_or_else(|_| "C:\\Users\\Default".into());
     let saved_games_root = PathBuf::from(&user_profile).join("Saved Games");
 
@@ -282,10 +289,62 @@ fn detect_dcs_paths(custom_override: Option<String>) -> Result<DcsEnvironmentInf
         dcs_path.to_string_lossy().to_string()
     };
 
+    // Detect DCS World Core / Root Installation Directories
+    let potential_world_roots = [
+        ("C:\\Program Files\\Eagle Dynamics\\DCS World", "DCS World (Standard)", "release"),
+        ("C:\\Program Files\\Eagle Dynamics\\DCS World OpenBeta", "DCS World OpenBeta", "openbeta"),
+        ("C:\\Program Files (x86)\\Steam\\steamapps\\common\\DCSWorld", "DCS World (Steam)", "release"),
+        ("D:\\Program Files\\Eagle Dynamics\\DCS World", "DCS World (D: Program Files)", "release"),
+        ("D:\\DCS World", "DCS World (D:\\DCS World)", "release"),
+        ("D:\\DCS World OpenBeta", "DCS World OpenBeta (D:)", "openbeta"),
+        ("D:\\DCSWorld", "DCS World (D:\\DCSWorld)", "release"),
+        ("D:\\SteamLibrary\\steamapps\\common\\DCSWorld", "DCS World (Steam D:)", "release"),
+        ("E:\\Program Files\\Eagle Dynamics\\DCS World", "DCS World (E: Program Files)", "release"),
+        ("E:\\DCS World", "DCS World (E:\\DCS World)", "release"),
+        ("E:\\DCS World OpenBeta", "DCS World OpenBeta (E:)", "openbeta"),
+        ("E:\\DCSWorld", "DCS World (E:\\DCSWorld)", "release"),
+        ("E:\\SteamLibrary\\steamapps\\common\\DCSWorld", "DCS World (Steam E:)", "release"),
+        ("F:\\DCS World", "DCS World (F:\\DCS World)", "release"),
+        ("F:\\DCSWorld", "DCS World (F:\\DCSWorld)", "release"),
+        ("G:\\DCS World", "DCS World (G:\\DCS World)", "release"),
+        ("G:\\DCSWorld", "DCS World (G:\\DCSWorld)", "release"),
+    ];
+
+    let mut world_candidates = Vec::new();
+    let mut first_existing_world: Option<String> = None;
+
+    for (cand_path, label, variant) in potential_world_roots.iter() {
+        let p = PathBuf::from(cand_path);
+        let exists = p.exists();
+        if exists && first_existing_world.is_none() {
+            first_existing_world = Some(cand_path.to_string());
+        }
+        if exists || cand_path.starts_with("C:\\Program Files") {
+            world_candidates.push(DcsPathCandidate {
+                label: label.to_string(),
+                path: cand_path.to_string(),
+                exists,
+                variant: variant.to_string(),
+            });
+        }
+    }
+
+    let active_world = if let Some(custom_world) = custom_world_override {
+        if !custom_world.trim().is_empty() {
+            custom_world
+        } else {
+            first_existing_world.unwrap_or_else(|| "C:\\Program Files\\Eagle Dynamics\\DCS World".to_string())
+        }
+    } else {
+        first_existing_world.unwrap_or_else(|| "C:\\Program Files\\Eagle Dynamics\\DCS World".to_string())
+    };
+
     Ok(DcsEnvironmentInfo {
         active_saved_games_path: active_path,
         detected_candidates: candidates,
         saved_games_root: saved_games_root.to_string_lossy().to_string(),
+        active_world_root_path: active_world,
+        detected_world_candidates: world_candidates,
     })
 }
 
@@ -1879,7 +1938,7 @@ fn install_dcs_route_preset(
     let base_dcs = match custom_dcs_path {
         Some(ref p) if !p.trim().is_empty() => PathBuf::from(p.trim()),
         _ => {
-            let env = detect_dcs_paths(None)?;
+            let env = detect_dcs_paths(None, None)?;
             PathBuf::from(env.active_saved_games_path)
         }
     };
@@ -1943,7 +2002,7 @@ fn get_dcs_route_presets_path(custom_dcs_path: Option<String>) -> Result<String,
     let base_dcs = match custom_dcs_path {
         Some(ref p) if !p.trim().is_empty() => PathBuf::from(p.trim()),
         _ => {
-            let env = detect_dcs_paths(None)?;
+            let env = detect_dcs_paths(None, None)?;
             PathBuf::from(env.active_saved_games_path)
         }
     };
@@ -1961,7 +2020,7 @@ fn install_dtc_cartridge(
     let base_dcs = match dcs_saved_games_path {
         Some(ref p) if !p.trim().is_empty() => PathBuf::from(p.trim()),
         _ => {
-            let env = detect_dcs_paths(None)?;
+            let env = detect_dcs_paths(None, None)?;
             PathBuf::from(env.active_saved_games_path)
         }
     };
@@ -2059,7 +2118,7 @@ fn install_aircraft_kneeboard_page(
     let base_dcs = match dcs_saved_games_path {
         Some(ref p) if !p.trim().is_empty() => PathBuf::from(p.trim()),
         _ => {
-            let env = detect_dcs_paths(None)?;
+            let env = detect_dcs_paths(None, None)?;
             PathBuf::from(env.active_saved_games_path)
         }
     };
@@ -2087,6 +2146,63 @@ fn install_aircraft_kneeboard_page(
     }
 
     Ok(target_file.to_string_lossy().to_string())
+}
+
+#[tauri::command]
+fn install_jf17_custom_airspace(
+    dcs_world_root_path: Option<String>,
+    file_name: String,
+    content: String,
+) -> Result<String, String> {
+    let base_root = match dcs_world_root_path {
+        Some(ref p) if !p.trim().is_empty() => PathBuf::from(p.trim()),
+        _ => {
+            let env = detect_dcs_paths(None, None)?;
+            PathBuf::from(env.active_world_root_path)
+        }
+    };
+
+    let target_dir = base_root
+        .join("Mods")
+        .join("aircraft")
+        .join("JF-17")
+        .join("Customization")
+        .join("airspace");
+
+    fs::create_dir_all(&target_dir)
+        .map_err(|e| format!("Failed to create JF-17 Custom Airspace directory {:?}: {}", target_dir, e))?;
+
+    let clean_file_name = if file_name.trim().is_empty() {
+        "Custom_AirSpace_Syria.lua".to_string()
+    } else {
+        file_name
+    };
+
+    let target_file = target_dir.join(&clean_file_name);
+    fs::write(&target_file, content.as_bytes())
+        .map_err(|e| format!("Failed to write JF-17 Custom Airspace file {:?}: {}", target_file, e))?;
+
+    Ok(target_file.to_string_lossy().to_string())
+}
+
+#[tauri::command]
+fn get_jf17_custom_airspace_path(dcs_world_root_path: Option<String>) -> Result<String, String> {
+    let base_root = match dcs_world_root_path {
+        Some(ref p) if !p.trim().is_empty() => PathBuf::from(p.trim()),
+        _ => {
+            let env = detect_dcs_paths(None, None)?;
+            PathBuf::from(env.active_world_root_path)
+        }
+    };
+
+    let target_dir = base_root
+        .join("Mods")
+        .join("aircraft")
+        .join("JF-17")
+        .join("Customization")
+        .join("airspace");
+
+    Ok(target_dir.to_string_lossy().to_string())
 }
 
 #[tauri::command]
@@ -2218,6 +2334,65 @@ async fn fetch_portal_text(
     }
 
     resp.text().await.map_err(|e| format!("Failed to read response body: {}", e))
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Clone, Debug)]
+pub struct PortalDownloadResponse {
+    pub content: String,
+    pub filename: Option<String>,
+}
+
+#[tauri::command]
+async fn fetch_portal_download(
+    endpoint_url: String,
+    access_token: Option<String>,
+) -> Result<PortalDownloadResponse, String> {
+    let client = reqwest::Client::builder()
+        .user_agent("GTFO-Companion-App")
+        .timeout(std::time::Duration::from_secs(20))
+        .build()
+        .map_err(|e| e.to_string())?;
+
+    let mut req = client.get(&endpoint_url);
+
+    if let Some(token) = access_token {
+        if !token.trim().is_empty() {
+            req = req.bearer_auth(token.trim());
+        }
+    }
+
+    let resp = req
+        .send()
+        .await
+        .map_err(|e| format!("Failed to fetch download from portal: {}", e))?;
+
+    if !resp.status().is_success() {
+        return Err(format!("Portal returned HTTP {}", resp.status()));
+    }
+
+    let filename = resp
+        .headers()
+        .get("content-disposition")
+        .and_then(|h| h.to_str().ok())
+        .and_then(|cd| {
+            for part in cd.split(';') {
+                let p = part.trim();
+                if p.starts_with("filename=") {
+                    let raw = p.trim_start_matches("filename=").trim_matches('"').trim_matches('\'').trim();
+                    if !raw.is_empty() {
+                        return Some(raw.to_string());
+                    }
+                }
+            }
+            None
+        });
+
+    let content = resp
+        .text()
+        .await
+        .map_err(|e| format!("Failed to read response body: {}", e))?;
+
+    Ok(PortalDownloadResponse { content, filename })
 }
 
 #[tauri::command]
@@ -2714,11 +2889,14 @@ pub fn run() {
             get_dcs_route_presets_path,
             install_atc_kneeboard,
             install_aircraft_kneeboard_page,
+            install_jf17_custom_airspace,
+            get_jf17_custom_airspace_path,
             open_pdf_kneeboard,
             save_binary_file,
             fetch_portal_api,
             send_portal_api_request,
             fetch_portal_text,
+            fetch_portal_download,
             fetch_portal_binary,
             open_external_url,
             open_local_path,

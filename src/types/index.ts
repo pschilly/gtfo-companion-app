@@ -233,6 +233,8 @@ export interface FlightPlanDownloadUrls {
   dtc: string | null;       // null if airframe is not DTC-compatible
   dcs_route: string;        // .lua route preset file
   pdf: string;              // PDF kneeboard packet
+  custom_airspace?: string | null; // JF-17 Custom Airspace (.ini)
+  jf17_airspace?: string | null;   // alias
 }
 
 export interface FlightPlanDivert {
@@ -574,6 +576,15 @@ export interface DcsEnvironmentInfo {
   activeSavedGamesPath: string;
   detectedCandidates: DcsPathCandidate[];
   savedGamesRoot: string;
+  activeWorldRootPath: string;
+  detectedWorldCandidates: DcsPathCandidate[];
+}
+
+export interface Jf17AirspaceInstallResult {
+  filePath: string;
+  directoryPath: string;
+  fileName: string;
+  fileSizeBytes?: number;
 }
 
 export interface DownloadProgressEvent {
@@ -616,6 +627,7 @@ export interface AppNotification {
 
 export interface AppSettings {
   dcsSavedGamesPath: string;
+  dcsWorldRootPath: string;
   autoDetectDcsPath: boolean;
   autoSyncOnStartup: boolean;
   verifyFileHash: boolean;

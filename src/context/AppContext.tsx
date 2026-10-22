@@ -42,6 +42,8 @@ import {
   verifyDiscordAccessToken,
   getDcsNicknameCommand,
   updateDcsNicknameCommand,
+  installJf17CustomAirspaceCommand,
+  getJf17CustomAirspacePathCommand,
 } from '../services/tauriBridge';
 import {
   ActiveSortie,
@@ -103,7 +105,7 @@ interface AppContextValue {
   rescanLocalAssets: () => Promise<void>;
   activeDownloads: Record<string, DownloadProgressEvent>;
   dcsEnv: DcsEnvironmentInfo | null;
-  refreshDcsEnv: (overridePath?: string) => Promise<void>;
+  refreshDcsEnv: (overridePath?: string, overrideWorldPath?: string) => Promise<void>;
   userSession: DiscordUserSession | null;
   effectiveTier: UserTier;
   memberProfile: MemberPortalProfile;
@@ -130,6 +132,8 @@ interface AppContextValue {
   saveRouteToDcs: (theatre: string, luaContent: string) => Promise<RoutePresetInstallResult>;
   copyDcsRoutePresetsPathToClipboard: () => Promise<string>;
   saveDtcCartridgeDirect: (fileName: string, content: string, subfolder?: string) => Promise<string>;
+  saveJf17AirspaceDirect: (fileName: string, content: string) => Promise<string>;
+  copyJf17AirspacePathToClipboard: () => Promise<string>;
   openPdfKneeboardViewer: (pdfUrl: string, fileName?: string) => Promise<string>;
   loginModalOpen: boolean;
   setLoginModalOpen: (open: boolean) => void;
@@ -160,7 +164,7 @@ interface AppContextValue {
   hasConfirmedDcsPath: boolean;
   pathOnboardingOpen: boolean;
   setPathOnboardingOpen: (open: boolean) => void;
-  confirmDcsPath: (confirmedPath: string) => void;
+  confirmDcsPath: (confirmedPath: string, confirmedWorldPath?: string) => void;
   logs: TelemetryLogEntry[];
   clearLogs: () => void;
   addLog: (
@@ -393,7 +397,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, []);
 
   const refreshDcsEnv = useCallback(
-    async (overridePath?: string) => {
+    async (overridePath?: string, overrideWorldPath?: string) => {
       try {
         const custom =
           overridePath !== undefined
@@ -402,11 +406,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             ? settings.dcsSavedGamesPath
             : undefined;
 
-        const envInfo = await detectDcsPaths(custom);
+        const customWorld =
+          overrideWorldPath !== undefined
+            ? overrideWorldPath
+            : !settings.autoDetectDcsPath && settings.dcsWorldRootPath
+            ? settings.dcsWorldRootPath
+            : undefined;
+
+        const envInfo = await detectDcsPaths(custom, customWorld);
         setDcsEnv(envInfo);
+
+        const patch: Partial<AppSettings> = {};
         if (!settings.dcsSavedGamesPath && envInfo.activeSavedGamesPath) {
+          patch.dcsSavedGamesPath = envInfo.activeSavedGamesPath;
+        }
+        if (!settings.dcsWorldRootPath && envInfo.activeWorldRootPath) {
+          patch.dcsWorldRootPath = envInfo.activeWorldRootPath;
+        }
+        if (Object.keys(patch).length > 0) {
           setSettings((prev) => {
-            const next = { ...prev, dcsSavedGamesPath: envInfo.activeSavedGamesPath };
+            const next = { ...prev, ...patch };
             localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(next));
             return next;
           });
@@ -414,13 +433,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         addLog(
           'info',
           'SYSTEM',
-          `Active DCS Saved Games directory: ${envInfo.activeSavedGamesPath}`
+          `Active DCS directories: Saved Games (${envInfo.activeSavedGamesPath}) | World Root (${envInfo.activeWorldRootPath})`
         );
       } catch (err) {
-        addLog('error', 'SYSTEM', `Failed to detect DCS Saved Games directory: ${String(err)}`);
+        addLog('error', 'SYSTEM', `Failed to detect DCS directories: ${String(err)}`);
       }
     },
-    [addLog, settings.autoDetectDcsPath, settings.dcsSavedGamesPath]
+    [addLog, settings.autoDetectDcsPath, settings.dcsSavedGamesPath, settings.dcsWorldRootPath]
   );
 
   const syncMemberPortal = useCallback(async () => {
@@ -1518,7 +1537,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const syncFlightPlans = useCallback(async () => {
     setIsLoadingFlightPlans(true);
-    addLog('info', 'ATC', 'Fetching Member, Sortie Package & Filed Flight Plans from Portal...');
+    addLog('info', 'ATC', 'Fetching Member & Filed Flight Plans from Portal...');
     const baseUrl = settings.memberPortalApiUrl || STATIC_CONFIG.portalBaseUrl;
     const discordId = userSession?.id || memberProfile.discordId || '112233445566778899';
     const token = userSession?.accessToken;
@@ -1547,7 +1566,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       addLog(
         'success',
         'ATC',
-        `Flight Plans synchronized: ${memberRes.plans.length} member plan(s), ${sortieRes.plans.length} sortie plan(s), ${filedRes?.plans?.length || 0} filed with ATC.`
+        `Flight Plans synchronized: ${memberRes.plans.length} member plan(s), ${filedRes?.plans?.length || 0} filed with ATC.`
       );
     } catch (err) {
       addLog('warn', 'ATC', `Flight Plans sync warning: ${String(err)}`);
@@ -1629,18 +1648,52 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     [addLog, userSession?.accessToken]
   );
 
+  const saveJf17AirspaceDirect = useCallback(
+    async (fileName: string, content: string): Promise<string> => {
+      const worldPath = settings.dcsWorldRootPath || dcsEnv?.activeWorldRootPath;
+      addLog('info', 'ATC', `Deploying JF-17 Custom Airspace "${fileName}" to DCS World core directory...`);
+      try {
+        const fullPath = await installJf17CustomAirspaceCommand(worldPath, fileName, content);
+        addLog('success', 'ATC', `Saved JF-17 Custom Airspace -> ${fullPath}`);
+        return fullPath;
+      } catch (err: any) {
+        addLog('error', 'ATC', `Failed to save JF-17 Custom Airspace: ${String(err)}`);
+        throw err;
+      }
+    },
+    [addLog, dcsEnv?.activeWorldRootPath, settings.dcsWorldRootPath]
+  );
+
+  const copyJf17AirspacePathToClipboard = useCallback(async (): Promise<string> => {
+    const worldPath = settings.dcsWorldRootPath || dcsEnv?.activeWorldRootPath;
+    const dir = await getJf17CustomAirspacePathCommand(worldPath);
+    try {
+      await navigator.clipboard.writeText(dir);
+      addLog('info', 'ATC', `Copied JF-17 Custom Airspace path to clipboard: ${dir}`);
+    } catch {
+      // fallback
+    }
+    return dir;
+  }, [addLog, dcsEnv?.activeWorldRootPath, settings.dcsWorldRootPath]);
+
   const confirmDcsPath = useCallback(
-    (confirmedPath: string) => {
+    (confirmedPath: string, confirmedWorldPath?: string) => {
       const clean = confirmedPath.trim();
+      const cleanWorld = confirmedWorldPath?.trim();
       setHasConfirmedDcsPath(true);
       localStorage.setItem(STORAGE_KEYS.DCS_PATH_CONFIRMED, 'true');
       updateSettings({
         dcsSavedGamesPath: clean,
+        ...(cleanWorld ? { dcsWorldRootPath: cleanWorld } : {}),
         hasConfirmedDcsPath: true,
       });
-      refreshDcsEnv(clean);
+      refreshDcsEnv(clean, cleanWorld);
       setPathOnboardingOpen(false);
-      addLog('success', 'SYSTEM', `DCS Saved Games directory confirmed: ${clean}`);
+      addLog(
+        'success',
+        'SYSTEM',
+        `DCS paths confirmed: Saved Games (${clean})${cleanWorld ? ` | World Root (${cleanWorld})` : ''}`
+      );
     },
     [addLog, refreshDcsEnv, updateSettings]
   );
@@ -1719,6 +1772,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         saveRouteToDcs,
         copyDcsRoutePresetsPathToClipboard,
         saveDtcCartridgeDirect,
+        saveJf17AirspaceDirect,
+        copyJf17AirspacePathToClipboard,
         openPdfKneeboardViewer,
         loginModalOpen,
         setLoginModalOpen,

@@ -19,6 +19,7 @@ export const STATIC_CONFIG = {
 
 export const DEFAULT_SETTINGS: AppSettings = {
   dcsSavedGamesPath: '',
+  dcsWorldRootPath: '',
   autoDetectDcsPath: true,
   autoSyncOnStartup: true,
   verifyFileHash: true,

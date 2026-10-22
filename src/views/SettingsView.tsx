@@ -42,6 +42,9 @@ export const SettingsView: React.FC = () => {
   const [pathInput, setPathInput] = useState(
     settings.dcsSavedGamesPath || dcsEnv?.activeSavedGamesPath || ''
   );
+  const [worldPathInput, setWorldPathInput] = useState(
+    settings.dcsWorldRootPath || dcsEnv?.activeWorldRootPath || ''
+  );
   const [savedBanner, setSavedBanner] = useState(false);
   const [manualCheckFeedback, setManualCheckFeedback] = useState<string | null>(null);
   const [testNotificationFeedback, setTestNotificationFeedback] = useState<string | null>(null);
@@ -50,9 +53,10 @@ export const SettingsView: React.FC = () => {
     e.preventDefault();
     updateSettings({
       dcsSavedGamesPath: pathInput.trim(),
+      dcsWorldRootPath: worldPathInput.trim(),
       hasConfirmedDcsPath: true,
     });
-    refreshDcsEnv(pathInput.trim());
+    refreshDcsEnv(pathInput.trim(), worldPathInput.trim());
     setSavedBanner(true);
     setTimeout(() => setSavedBanner(false), 2500);
   };
@@ -60,7 +64,13 @@ export const SettingsView: React.FC = () => {
   const handleSelectCandidate = (candidatePath: string) => {
     setPathInput(candidatePath);
     updateSettings({ dcsSavedGamesPath: candidatePath, autoDetectDcsPath: false });
-    refreshDcsEnv(candidatePath);
+    refreshDcsEnv(candidatePath, worldPathInput.trim());
+  };
+
+  const handleSelectWorldCandidate = (candidatePath: string) => {
+    setWorldPathInput(candidatePath);
+    updateSettings({ dcsWorldRootPath: candidatePath, autoDetectDcsPath: false });
+    refreshDcsEnv(pathInput.trim(), candidatePath);
   };
 
   const handleManualCheck = async () => {
@@ -253,6 +263,76 @@ export const SettingsView: React.FC = () => {
             </div>
           )}
 
+          {/* Section 2: DCS World Root / Core Install Directory */}
+          <div className="pt-4 border-t border-stone-800/80 space-y-4">
+            <div className="flex items-center gap-2.5">
+              <HardDrive className="w-5 h-5 text-amber-400" />
+              <h2 className="font-display text-base font-bold text-stone-100">
+                DCS World Core Installation Directory Mapping
+              </h2>
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-xs font-mono uppercase text-stone-400">
+                Active Target DCS World Root Directory (Game Install Folder)
+              </label>
+              <input
+                type="text"
+                value={worldPathInput}
+                onChange={(e) => setWorldPathInput(e.target.value)}
+                placeholder="C:\Program Files\Eagle Dynamics\DCS World"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-xs font-mono text-stone-100 focus:outline-none focus:border-amber-500"
+              />
+              <p className="text-[11px] text-stone-400 leading-relaxed">
+                Aircraft core customizations and navigation databases (such as{' '}
+                <strong className="text-stone-300">JF-17 Custom Airspaces</strong>) are deployed into{' '}
+                <code className="font-mono text-stone-300">&lt;DCS World&gt;\Mods\aircraft\JF-17\Customization\airspace</code>.
+              </p>
+            </div>
+
+            {/* Detected DCS World Candidates */}
+            {dcsEnv && dcsEnv.detectedWorldCandidates && dcsEnv.detectedWorldCandidates.length > 0 && (
+              <div className="space-y-2">
+                <span className="text-[11px] font-mono uppercase text-stone-400">
+                  Detected DCS World Core Installations:
+                </span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                  {dcsEnv.detectedWorldCandidates.map((cand) => {
+                    const isSelected = worldPathInput === cand.path;
+                    return (
+                      <button
+                        type="button"
+                        key={cand.path}
+                        onClick={() => handleSelectWorldCandidate(cand.path)}
+                        className={`p-3 rounded-xl border text-left transition-all flex items-center justify-between cursor-pointer ${
+                          isSelected
+                            ? 'bg-amber-500/15 border-amber-500/50 text-amber-200'
+                            : 'bg-stone-950/90 border-stone-800 text-stone-300 hover:border-stone-700'
+                        }`}
+                      >
+                        <div className="min-w-0 pr-2">
+                          <div className="text-xs font-display font-semibold">{cand.label}</div>
+                          <div className="text-[11px] font-mono text-stone-400 truncate">
+                            {cand.path}
+                          </div>
+                        </div>
+                        <span
+                          className={`text-[10px] font-mono px-2 py-0.5 rounded shrink-0 ${
+                            cand.exists
+                              ? 'bg-emerald-500/20 text-emerald-300'
+                              : 'bg-stone-800 text-stone-400'
+                          }`}
+                        >
+                          {cand.exists ? 'FOUND' : 'CUSTOM'}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Verification & Sync Toggles */}
           <div className="pt-4 border-t border-stone-800/80 space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center gap-6">
@@ -285,6 +365,7 @@ export const SettingsView: React.FC = () => {
                 onClick={() => {
                   updateSettings(DEFAULT_SETTINGS);
                   setPathInput(dcsEnv?.activeSavedGamesPath || '');
+                  setWorldPathInput(dcsEnv?.activeWorldRootPath || '');
                 }}
                 className="text-xs font-mono text-stone-400 hover:text-stone-200 flex items-center gap-1.5 cursor-pointer"
               >
