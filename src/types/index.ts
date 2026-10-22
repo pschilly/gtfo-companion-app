@@ -200,6 +200,160 @@ export interface RouteWaypoint {
   notes?: string;
 }
 
+export interface FlightPlanAirframe {
+  id: number;
+  name: string;
+  abbreviation: string;
+  dcs_entity: string;
+  image_url?: string | null;
+  is_dtc_compatible?: boolean;
+}
+
+export interface FlightPlanSquadron {
+  id: number;
+  name: string;
+  abbreviation: string;
+  patch_url?: string | null;
+}
+
+export interface FlightPlanRouteSummary {
+  waypoint_count: number;
+  min_altitude_feet: number;
+  max_altitude_feet: number;
+  min_speed_knots: number;
+  max_speed_knots: number;
+}
+
+export interface FlightPlanRoutePoint {
+  index: number;
+  name: string;
+  lat: number;
+  lng: number;
+  alt: number;
+  speed: number;
+  tot?: string | null;
+  mgrs?: string | null;
+  ddm?: string | null;
+  remarks?: string | null;
+  action?: string | null;
+  type?: string | null;
+}
+
+export interface FlightPlanSummary {
+  id: number;
+  identifier: string;
+  name: string;
+  callsign: string;
+  description: string | null;
+  color: string;
+  is_opfor: boolean;
+  is_private: boolean;
+  is_assigned_to_mission: boolean;
+  is_creator: boolean;
+  is_slotted: boolean;
+  is_signed_up: boolean;
+  departure_airfield: string | null;
+  destination_airfield: string | null;
+  diverts: string[];
+  launch_time: string | null;
+  fuel_amount: string | null;
+  flight_rules: string | null;
+  remarks: string | null;
+  route_summary: FlightPlanRouteSummary;
+  formatted_loadout: string | null;
+  airframe: FlightPlanAirframe;
+  squadron: FlightPlanSquadron;
+  mission?: {
+    id: number;
+    name: string;
+    status: string;
+    mission_time?: string | null;
+  } | null;
+  sortie?: {
+    id: number;
+    name: string;
+    sortie_number: number;
+    scheduled_at?: string | null;
+  } | null;
+  is_dtc_compatible: boolean;
+  detail_url?: string;
+  download_urls: {
+    dtc?: string;
+    dcs_route?: string;
+    pdf?: string;
+  };
+}
+
+export interface FlightPlanCommsEntry {
+  type?: string;
+  label?: string;
+  name?: string;
+  frequency: string;
+  channel?: string | number;
+  modulation?: string;
+  notes?: string;
+  [key: string]: any;
+}
+
+export interface FlightPlanDetail extends FlightPlanSummary {
+  route_points: FlightPlanRoutePoint[];
+  comms_ladder?: FlightPlanCommsEntry[] | Record<string, any>;
+  default_comms_ladder?: {
+    task_force?: FlightPlanCommsEntry[] | Record<string, any>;
+    squadron?: FlightPlanCommsEntry[] | Record<string, any>;
+    support?: FlightPlanCommsEntry[] | Record<string, any>;
+    tankers?: FlightPlanCommsEntry[] | Record<string, any>;
+    awacs?: FlightPlanCommsEntry[] | Record<string, any>;
+    [key: string]: any;
+  };
+  airfield_frequencies?: Record<string, FlightPlanCommsEntry[]> | Array<any>;
+  mids_settings?: {
+    mids_a_channel?: string | number | null;
+    mids_b_channel?: string | number | null;
+    net_label?: string | null;
+    [key: string]: any;
+  } | null;
+  station_loadout?: Record<string, string>;
+  cmds_settings?: Record<string, any> | Array<any> | null;
+  sa_settings?: Record<string, any> | null;
+  geo_lines_settings?: Record<string, any> | null;
+  dest_points_settings?: Record<string, any> | null;
+}
+
+export interface ActiveSortie {
+  id: number;
+  name: string;
+  sortie_number: number;
+  scheduled_at: string;
+  signup_cutoff_at?: string | null;
+  is_signup_open: boolean;
+  has_aar: boolean;
+  mission_name: string;
+  campaign_name: string;
+  theatre: string;
+  notes?: string | null;
+}
+
+export interface ActiveSortieResponse {
+  active_sortie: ActiveSortie | null;
+  total: number;
+  plans: FlightPlanSummary[];
+}
+
+export interface MemberFlightPlansResponse {
+  member: {
+    id: number;
+    callsign: string;
+    discord_id: string;
+    dcs_ucid?: string | null;
+  };
+  total: number;
+  missions_count: number;
+  authored_count: number;
+  private_count: number;
+  plans: FlightPlanSummary[];
+}
+
 export interface DcsDtcData {
   format: 'dcs_native_dtc' | 'dcs_dtc_mod';
   fileName: string;

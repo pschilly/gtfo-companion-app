@@ -7,6 +7,7 @@ import {
   CaretRight,
   Certificate,
   Check,
+  Compass,
   Folder,
   Gear,
   HardDrive,
@@ -44,6 +45,7 @@ export const Sidebar: React.FC = () => {
     dcsEnv,
     settings,
     checklistSummary,
+    memberFlightPlans,
   } = useApp();
 
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -112,6 +114,13 @@ export const Sidebar: React.FC = () => {
           label: 'Awards & Ribbons',
           icon: <Medal className="w-4 h-4" />,
           badge: memberProfile?.awards?.length || undefined,
+        },
+        {
+          id: 'atc',
+          label: 'Flight Plans & ATC',
+          icon: <Compass className="w-4 h-4" />,
+          badge: memberFlightPlans?.length || undefined,
+          badgeColor: 'bg-amber-500/20 text-amber-300 border border-amber-500/40',
         },
       ],
     },

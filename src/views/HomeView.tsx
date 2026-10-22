@@ -6,6 +6,7 @@ import {
   ArrowSquareOut,
   Certificate,
   CheckCircle,
+  Compass,
   DownloadSimple,
   Folder,
   HardDrive,
@@ -39,6 +40,9 @@ export const HomeView: React.FC = () => {
     installAllRequiredForUser,
     dcsEnv,
     checklistSummary,
+    memberFlightPlans,
+    activeSortie,
+    activeSortieFlightPlans,
   } = useApp();
 
   const totalAssets = manifest.assets.length;
@@ -107,7 +111,15 @@ export const HomeView: React.FC = () => {
               </button>
             ) : null}
 
-            <div className="flex items-center gap-2.5">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <button
+                onClick={() => setActiveTab('atc')}
+                className="px-4 py-2.5 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/40 text-sky-300 font-mono text-xs font-semibold flex items-center gap-2 transition-colors shadow-sm"
+              >
+                <Compass className="w-4 h-4 text-sky-400" />
+                <span>Flight Plans &amp; ATC</span>
+              </button>
+
               <button
                 onClick={() => setActiveTab('liveries')}
                 className="px-4 py-2.5 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-700 text-amber-400 font-mono text-xs font-semibold flex items-center gap-2 transition-colors"
@@ -287,7 +299,37 @@ export const HomeView: React.FC = () => {
       </div>
 
       {/* QUICK OPERATIONS PORTALS */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pt-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 pt-2">
+        {/* Air Traffic Control & Flight Plans Shortcut */}
+        <div
+          onClick={() => setActiveTab('atc')}
+          className="p-5 rounded-2xl bg-stone-900/90 border border-stone-800 hover:border-sky-500/50 cursor-pointer transition-all space-y-3 group shadow-lg"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <Compass className="w-5 h-5 text-sky-400" />
+              </div>
+              <div>
+                <h3 className="font-display font-bold text-stone-100 text-sm group-hover:text-sky-400 transition-colors">
+                  Flight Plans &amp; ATC
+                </h3>
+                <p className="text-[11px] font-mono text-stone-400">
+                  {memberFlightPlans.length} Plan{memberFlightPlans.length === 1 ? '' : 's'} • {activeSortieFlightPlans.length} in Package
+                </p>
+              </div>
+            </div>
+            <ArrowRight className="w-4 h-4 text-stone-500 group-hover:text-sky-400 group-hover:translate-x-0.5 transition-all" />
+          </div>
+          <p className="text-xs text-stone-400 leading-relaxed">
+            Dispatch routes, DTC cartridges, comms ladders, and DCS Route Tool presets for assigned sorties.
+          </p>
+          <div className="pt-2 border-t border-stone-800/80 flex items-center justify-between text-[11px] font-mono text-stone-400">
+            <span>Sortie: {activeSortie?.name || 'Active Package'}</span>
+            <span className="text-sky-400">Dispatch &rarr;</span>
+          </div>
+        </div>
+
         {/* Pilot Dossier Shortcut */}
         <div
           onClick={() => setActiveTab('dashboard')}

@@ -2,6 +2,7 @@ import React from 'react';
 import {
   ArrowCircleUp,
   ArrowsClockwise,
+  Compass,
   MagnifyingGlass,
   Sparkle,
 } from '@phosphor-icons/react';
@@ -15,6 +16,7 @@ interface TopBarProps {
 
 export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) => {
   const {
+    activeTab,
     manifest,
     isSyncingManifest,
     lastSyncedAt,
@@ -24,10 +26,11 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
     setActiveTab,
     appUpdate,
     setIsUpdateModalOpen,
+    memberFlightPlans,
   } = useApp();
 
   return (
-    <header className="h-16 bg-stone-950/85 backdrop-blur-md border-b border-stone-800/80 px-6 flex items-center justify-between gap-4 shrink-0">
+    <header className="relative z-40 h-16 bg-stone-950/95 backdrop-blur-md border-b border-stone-800/80 px-6 flex items-center justify-between gap-4 shrink-0">
       {/* Search Bar */}
       <div className="relative flex-1 max-w-md">
         <MagnifyingGlass className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -74,6 +77,25 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
             <span>{outdatedAssets.length} UPDATE(S) AVAILABLE</span>
           </button>
         )}
+
+        {/* Flight Plans & ATC Navigation Button */}
+        <button
+          onClick={() => setActiveTab('atc')}
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-mono font-semibold transition-all ${
+            activeTab === 'atc'
+              ? 'bg-amber-500/20 border-amber-500/60 text-amber-300 shadow-sm shadow-amber-500/10'
+              : 'bg-stone-900/90 hover:bg-stone-800 border-stone-800 text-stone-300 hover:text-amber-400'
+          }`}
+          title="Air Traffic Control & Flight Plans"
+        >
+          <Compass className="w-4 h-4 text-amber-400" />
+          <span className="hidden sm:inline">ATC DISPATCH</span>
+          {memberFlightPlans && memberFlightPlans.length > 0 && (
+            <span className="px-1.5 py-0.2 rounded-full bg-amber-500 text-stone-950 font-bold text-[10px]">
+              {memberFlightPlans.length}
+            </span>
+          )}
+        </button>
 
         {/* Manifest Version & Sync Button */}
         <div className="flex items-center gap-2 bg-stone-900/90 border border-stone-800 rounded-xl px-3 py-1.5">

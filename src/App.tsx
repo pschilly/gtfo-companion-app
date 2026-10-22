@@ -19,6 +19,7 @@ import { LibraryView } from './views/LibraryView';
 import { LoginGateView } from './views/LoginGateView';
 import { QualificationsView } from './views/QualificationsView';
 import { SettingsView } from './views/SettingsView';
+import { AtcView } from './views/AtcView';
 
 const MainShell: React.FC = () => {
   const { activeTab, setActiveTab, userSession } = useApp();
@@ -71,6 +72,7 @@ const MainShell: React.FC = () => {
           {activeTab === 'airframes' && <AirframesView />}
           {activeTab === 'qualifications' && <QualificationsView />}
           {activeTab === 'awards' && <AwardsView />}
+          {activeTab === 'atc' && <AtcView />}
           {activeTab === 'liveries' && (
             <CatalogView category="livery" searchQuery={searchQuery} />
           )}

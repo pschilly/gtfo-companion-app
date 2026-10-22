@@ -8,6 +8,20 @@ import {
   SAMPLE_ATC_PACKAGES,
 } from '../data/samplePortalData';
 import {
+  SAMPLE_ACTIVE_SORTIE_RESPONSE,
+  SAMPLE_MEMBER_FLIGHT_PLANS_RESPONSE,
+} from '../data/sampleFlightPlans';
+import {
+  fetchMemberFlightPlans,
+  fetchActiveSortieFlightPlans,
+  fetchFlightPlanDetail,
+  installDcsRoutePresetCommand,
+  getDcsRoutePresetsPath,
+  installDtcCartridgeDirect,
+  openPdfExternalViewer,
+  RoutePresetInstallResult,
+} from '../services/flightPlanService';
+import {
   detectDcsPaths,
   fetchMemberPortalProfile,
   fetchStaticManifest,
@@ -28,6 +42,7 @@ import {
   updateDcsNicknameCommand,
 } from '../services/tauriBridge';
 import {
+  ActiveSortie,
   AppSettings,
   AssetItem,
   AssetManifest,
@@ -37,6 +52,8 @@ import {
   DcsNicknameInfo,
   DiscordUserSession,
   DownloadProgressEvent,
+  FlightPlanDetail,
+  FlightPlanSummary,
   InstalledAssetRecord,
   InstalledAtcState,
   IntegrityCheckResult,
@@ -98,6 +115,18 @@ interface AppContextValue {
   deployAtcKneeboards: (pkg: AtcFlightPlanPackage) => Promise<void>;
   deployFullAtcPackage: (pkg: AtcFlightPlanPackage) => Promise<void>;
   inspectTheatreRouteLua: (theatreFileName: string) => Promise<RoutePresetManifestInfo>;
+  // Flight Plans API & Integrations
+  memberFlightPlans: FlightPlanSummary[];
+  memberFlightPlansMeta: { total: number; missions_count: number; authored_count: number; private_count: number };
+  activeSortie: ActiveSortie | null;
+  activeSortieFlightPlans: FlightPlanSummary[];
+  isLoadingFlightPlans: boolean;
+  syncFlightPlans: () => Promise<void>;
+  loadFlightPlanDetail: (idOrIdentifier: string | number) => Promise<FlightPlanDetail>;
+  saveRouteToDcs: (theatre: string, luaContent: string) => Promise<RoutePresetInstallResult>;
+  copyDcsRoutePresetsPathToClipboard: () => Promise<string>;
+  saveDtcCartridgeDirect: (fileName: string, content: string, subfolder?: string) => Promise<string>;
+  openPdfKneeboardViewer: (pdfUrl: string, fileName?: string) => Promise<string>;
   loginModalOpen: boolean;
   setLoginModalOpen: (open: boolean) => void;
   selectedAsset: AssetItem | null;
@@ -191,6 +220,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     {}
   );
   const [repairPrompt, setRepairPrompt] = useState<RepairPromptState | null>(null);
+
+  // Flight Plans State
+  const [memberFlightPlans, setMemberFlightPlans] = useState<FlightPlanSummary[]>(
+    SAMPLE_MEMBER_FLIGHT_PLANS_RESPONSE.plans
+  );
+  const [memberFlightPlansMeta, setMemberFlightPlansMeta] = useState({
+    total: SAMPLE_MEMBER_FLIGHT_PLANS_RESPONSE.total,
+    missions_count: SAMPLE_MEMBER_FLIGHT_PLANS_RESPONSE.missions_count,
+    authored_count: SAMPLE_MEMBER_FLIGHT_PLANS_RESPONSE.authored_count,
+    private_count: SAMPLE_MEMBER_FLIGHT_PLANS_RESPONSE.private_count,
+  });
+  const [activeSortie, setActiveSortie] = useState<ActiveSortie | null>(
+    SAMPLE_ACTIVE_SORTIE_RESPONSE.active_sortie
+  );
+  const [activeSortieFlightPlans, setActiveSortieFlightPlans] = useState<FlightPlanSummary[]>(
+    SAMPLE_ACTIVE_SORTIE_RESPONSE.plans
+  );
+  const [isLoadingFlightPlans, setIsLoadingFlightPlans] = useState(false);
 
   const [installedAtc, setInstalledAtc] = useState<InstalledAtcState>(() => {
     const raw = localStorage.getItem(STORAGE_KEYS.INSTALLED_ATC);
@@ -698,6 +745,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     syncManifest();
     syncMemberPortal();
+    syncFlightPlans();
     checkForAppUpdateAction();
 
     if (window.location.hash.includes('access_token=')) {
@@ -747,6 +795,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const intervalId = setInterval(() => {
       syncManifest();
       syncMemberPortal();
+      syncFlightPlans();
       checkForAppUpdateAction();
     }, pollIntervalMs);
 
@@ -757,6 +806,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         lastFocusSync = Date.now();
         syncManifest();
         syncMemberPortal();
+        syncFlightPlans();
         checkForAppUpdateAction();
       }
     };
@@ -788,7 +838,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Notify on new flight plans / ATC packages
   const notifiedFlightPlans = useRef<Set<string>>(new Set());
   useEffect(() => {
-    if (atcPackages.length > 0 && settings.notifyFlightPlans && lastSyncedAt) {
+    if (settings.notifyFlightPlans && lastSyncedAt) {
       atcPackages.forEach((pkg) => {
         if (!notifiedFlightPlans.current.has(pkg.id)) {
           notifiedFlightPlans.current.add(pkg.id);
@@ -800,8 +850,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           });
         }
       });
+
+      memberFlightPlans.forEach((plan) => {
+        const planKey = `member-${plan.identifier || plan.id}`;
+        if (!notifiedFlightPlans.current.has(planKey)) {
+          notifiedFlightPlans.current.add(planKey);
+          const cleanTitle = plan.callsign && plan.name && plan.callsign !== plan.name
+            ? `${plan.callsign} (${plan.name})`
+            : plan.callsign || plan.name || plan.identifier;
+          addNotification({
+            title: cleanTitle,
+            message: `${plan.airframe?.name || 'Aircraft'} — ${plan.departure_airfield || 'DEP'} to ${plan.destination_airfield || 'ARR'}${plan.description ? ` • ${plan.description}` : ''}`,
+            category: 'flight_plan',
+            actionTab: 'atc',
+          });
+        }
+      });
     }
-  }, [atcPackages, settings.notifyFlightPlans, addNotification, lastSyncedAt]);
+  }, [atcPackages, memberFlightPlans, settings.notifyFlightPlans, addNotification, lastSyncedAt]);
 
   useEffect(() => {
     const activePath = settings.dcsSavedGamesPath || dcsEnv?.activeSavedGamesPath;
@@ -1349,6 +1415,116 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     [dcsEnv?.activeSavedGamesPath, settings.dcsSavedGamesPath]
   );
 
+  // --- Flight Plans API & Integrations Handlers ---
+  const syncFlightPlans = useCallback(async () => {
+    setIsLoadingFlightPlans(true);
+    addLog('info', 'ATC', 'Fetching Member & Sortie Package Flight Plans from Portal...');
+    const baseUrl = settings.memberPortalApiUrl || STATIC_CONFIG.portalBaseUrl;
+    const discordId = userSession?.id || memberProfile.discordId || '112233445566778899';
+    const token = userSession?.accessToken;
+
+    try {
+      const [memberRes, sortieRes] = await Promise.all([
+        fetchMemberFlightPlans(baseUrl, discordId, true, token),
+        fetchActiveSortieFlightPlans(baseUrl, token),
+      ]);
+
+      setMemberFlightPlans(memberRes.plans);
+      setMemberFlightPlansMeta({
+        total: memberRes.total,
+        missions_count: memberRes.missions_count,
+        authored_count: memberRes.authored_count,
+        private_count: memberRes.private_count,
+      });
+
+      setActiveSortie(sortieRes.active_sortie);
+      setActiveSortieFlightPlans(sortieRes.plans);
+
+      addLog(
+        'success',
+        'ATC',
+        `Flight Plans synchronized: ${memberRes.plans.length} member plan(s), ${sortieRes.plans.length} in active sortie.`
+      );
+    } catch (err) {
+      addLog('warn', 'ATC', `Flight Plans sync warning: ${String(err)}`);
+    } finally {
+      setIsLoadingFlightPlans(false);
+    }
+  }, [addLog, memberProfile.discordId, settings.memberPortalApiUrl, userSession?.accessToken, userSession?.id]);
+
+  const loadFlightPlanDetail = useCallback(
+    async (idOrIdentifier: string | number): Promise<FlightPlanDetail> => {
+      const baseUrl = settings.memberPortalApiUrl || STATIC_CONFIG.portalBaseUrl;
+      const token = userSession?.accessToken;
+      return await fetchFlightPlanDetail(baseUrl, idOrIdentifier, token);
+    },
+    [settings.memberPortalApiUrl, userSession?.accessToken]
+  );
+
+  const saveRouteToDcs = useCallback(
+    async (theatre: string, luaContent: string): Promise<RoutePresetInstallResult> => {
+      const customDcsPath = settings.dcsSavedGamesPath || dcsEnv?.activeSavedGamesPath;
+      addLog('info', 'ATC', `Saving route preset to DCS theatre manifest "${theatre}"...`);
+      try {
+        const res = await installDcsRoutePresetCommand(theatre, luaContent, customDcsPath);
+        addLog(
+          'success',
+          'ATC',
+          `Route preset successfully ${res.action} in "${res.filePath}"!`
+        );
+        return res;
+      } catch (err: any) {
+        addLog('error', 'ATC', `Failed to save route preset to DCS: ${String(err)}`);
+        throw err;
+      }
+    },
+    [addLog, dcsEnv?.activeSavedGamesPath, settings.dcsSavedGamesPath]
+  );
+
+  const copyDcsRoutePresetsPathToClipboard = useCallback(async (): Promise<string> => {
+    const customDcsPath = settings.dcsSavedGamesPath || dcsEnv?.activeSavedGamesPath;
+    const path = await getDcsRoutePresetsPath(customDcsPath);
+    try {
+      await navigator.clipboard.writeText(path);
+      addLog('info', 'ATC', `Copied RouteToolPresets directory path to clipboard: ${path}`);
+    } catch {
+      // fallback
+    }
+    return path;
+  }, [addLog, dcsEnv?.activeSavedGamesPath, settings.dcsSavedGamesPath]);
+
+  const saveDtcCartridgeDirect = useCallback(
+    async (fileName: string, content: string, subfolder = 'DTC'): Promise<string> => {
+      const customDcsPath = settings.dcsSavedGamesPath || dcsEnv?.activeSavedGamesPath;
+      addLog('info', 'ATC', `Deploying DTC Cartridge "${fileName}" directly to DCS...`);
+      try {
+        const fullPath = await installDtcCartridgeDirect(fileName, content, subfolder, customDcsPath);
+        addLog('success', 'ATC', `Saved DTC Cartridge -> ${fullPath}`);
+        return fullPath;
+      } catch (err: any) {
+        addLog('error', 'ATC', `Failed to save DTC Cartridge: ${String(err)}`);
+        throw err;
+      }
+    },
+    [addLog, dcsEnv?.activeSavedGamesPath, settings.dcsSavedGamesPath]
+  );
+
+  const openPdfKneeboardViewer = useCallback(
+    async (pdfUrl: string, fileName?: string): Promise<string> => {
+      addLog('info', 'ATC', `Opening PDF Kneeboard viewer for ${fileName || 'flight plan'}...`);
+      const token = userSession?.accessToken;
+      try {
+        const opened = await openPdfExternalViewer(pdfUrl, fileName, token);
+        addLog('success', 'ATC', `Opened PDF Kneeboard in system viewer.`);
+        return opened;
+      } catch (err: any) {
+        addLog('error', 'ATC', `Failed opening PDF in default viewer: ${String(err)}`);
+        throw err;
+      }
+    },
+    [addLog, userSession?.accessToken]
+  );
+
   const confirmDcsPath = useCallback(
     (confirmedPath: string) => {
       const clean = confirmedPath.trim();
@@ -1427,6 +1603,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         deployAtcKneeboards,
         deployFullAtcPackage,
         inspectTheatreRouteLua,
+        memberFlightPlans,
+        memberFlightPlansMeta,
+        activeSortie,
+        activeSortieFlightPlans,
+        isLoadingFlightPlans,
+        syncFlightPlans,
+        loadFlightPlanDetail,
+        saveRouteToDcs,
+        copyDcsRoutePresetsPathToClipboard,
+        saveDtcCartridgeDirect,
+        openPdfKneeboardViewer,
         loginModalOpen,
         setLoginModalOpen,
         selectedAsset,

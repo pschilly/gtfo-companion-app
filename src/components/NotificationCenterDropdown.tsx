@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
   Bell,
   Check,
@@ -69,6 +69,18 @@ export const NotificationCenterDropdown: React.FC<NotificationCenterDropdownProp
     };
   }, []);
 
+  const counts = useMemo(() => {
+    let app = 0;
+    let assets = 0;
+    let flightPlan = 0;
+    notifications.forEach((n) => {
+      if (n.category === 'app') app++;
+      else if (n.category === 'livery' || n.category === 'mod') assets++;
+      else if (n.category === 'flight_plan') flightPlan++;
+    });
+    return { all: notifications.length, app, assets, flightPlan };
+  }, [notifications]);
+
   const filteredNotifications = notifications.filter((item) => {
     if (categoryFilter === 'all') return true;
     if (categoryFilter === 'livery' || categoryFilter === 'mod') {
@@ -134,7 +146,7 @@ export const NotificationCenterDropdown: React.FC<NotificationCenterDropdownProp
   };
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative z-50" ref={dropdownRef}>
       {/* Bell Trigger Button */}
       <button
         onClick={() => setIsOpen((prev) => !prev)}
@@ -156,35 +168,35 @@ export const NotificationCenterDropdown: React.FC<NotificationCenterDropdownProp
 
       {/* Popover Dropdown Panel */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-96 max-w-[calc(100vw-2rem)] rounded-2xl bg-stone-950/95 border border-stone-800 shadow-2xl backdrop-blur-xl z-50 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        <div className="absolute right-0 mt-2 w-[460px] sm:w-[500px] max-w-[calc(100vw-2rem)] rounded-2xl bg-stone-950 border border-stone-800 shadow-2xl shadow-black z-[100] flex flex-col overflow-hidden ring-1 ring-white/10 animate-in fade-in zoom-in-95 duration-150">
           {/* Header */}
-          <div className="p-3.5 border-b border-stone-800/80 flex items-center justify-between gap-2 bg-stone-900/50">
+          <div className="p-3.5 border-b border-stone-800 flex items-center justify-between gap-2 bg-stone-900">
             <div className="flex items-center gap-2">
               <span className="font-mono text-xs font-bold tracking-wider text-stone-200 uppercase">
                 Notifications
               </span>
               {unreadNotificationsCount > 0 && (
-                <span className="px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[10px] font-mono font-semibold">
+                <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[10px] font-mono font-semibold">
                   {unreadNotificationsCount} new
                 </span>
               )}
             </div>
 
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1.5">
               {unreadNotificationsCount > 0 && (
                 <button
                   onClick={markAllNotificationsAsRead}
-                  className="px-2 py-1 rounded-lg text-[10px] font-mono text-stone-400 hover:text-stone-200 hover:bg-stone-800/80 transition-colors flex items-center gap-1"
+                  className="px-2.5 py-1 rounded-lg text-[10px] font-mono text-stone-300 hover:text-stone-100 bg-stone-800/80 hover:bg-stone-750 border border-stone-700 transition-colors flex items-center gap-1.5"
                   title="Mark all as read"
                 >
-                  <Checks className="w-3.5 h-3.5 text-stone-400" />
+                  <Checks className="w-3.5 h-3.5 text-amber-400" />
                   <span>Mark read</span>
                 </button>
               )}
               {notifications.length > 0 && (
                 <button
                   onClick={clearAllNotifications}
-                  className="p-1 rounded-lg text-stone-500 hover:text-rose-400 hover:bg-rose-950/30 transition-colors"
+                  className="p-1.5 rounded-lg text-stone-400 hover:text-rose-400 hover:bg-rose-950/30 border border-stone-700/60 transition-colors"
                   title="Clear all notifications"
                 >
                   <Trash className="w-3.5 h-3.5" />
@@ -194,54 +206,61 @@ export const NotificationCenterDropdown: React.FC<NotificationCenterDropdownProp
           </div>
 
           {/* Filter Pills */}
-          <div className="px-3 py-2 border-b border-stone-800/60 bg-stone-900/20 flex items-center gap-1 overflow-x-auto scrollbar-none text-[11px] font-mono">
+          <div className="px-3 py-2 border-b border-stone-800 bg-stone-900/95 flex items-center gap-1.5 overflow-x-auto scrollbar-none text-[11px] font-mono">
             <button
               onClick={() => setCategoryFilter('all')}
-              className={`px-2 py-1 rounded-lg transition-all shrink-0 ${
+              className={`px-2.5 py-1 rounded-lg transition-all shrink-0 whitespace-nowrap flex items-center gap-1.5 ${
                 categoryFilter === 'all'
-                  ? 'bg-amber-500 text-stone-950 font-bold'
-                  : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800/60'
+                  ? 'bg-amber-500 text-stone-950 font-bold shadow-sm'
+                  : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800 border border-transparent'
               }`}
             >
-              All ({notifications.length})
-            </button>
-            <button
-              onClick={() => setCategoryFilter('app')}
-              className={`px-2 py-1 rounded-lg transition-all shrink-0 ${
-                categoryFilter === 'app'
-                  ? 'bg-amber-500 text-stone-950 font-bold'
-                  : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800/60'
-              }`}
-            >
-              App
-            </button>
-            <button
-              onClick={() => setCategoryFilter('livery')}
-              className={`px-2 py-1 rounded-lg transition-all shrink-0 ${
-                categoryFilter === 'livery'
-                  ? 'bg-amber-500 text-stone-950 font-bold'
-                  : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800/60'
-              }`}
-            >
-              Liveries & Mods
+              <span>All</span>
+              <span className="text-[10px] opacity-80">({counts.all})</span>
             </button>
             <button
               onClick={() => setCategoryFilter('flight_plan')}
-              className={`px-2 py-1 rounded-lg transition-all shrink-0 ${
+              className={`px-2.5 py-1 rounded-lg transition-all shrink-0 whitespace-nowrap flex items-center gap-1.5 ${
                 categoryFilter === 'flight_plan'
-                  ? 'bg-amber-500 text-stone-950 font-bold'
-                  : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800/60'
+                  ? 'bg-amber-500 text-stone-950 font-bold shadow-sm'
+                  : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800 border border-transparent'
               }`}
             >
-              Flight Plans
+              <AirplaneTilt className="w-3 h-3" />
+              <span>Flight Plans</span>
+              <span className="text-[10px] opacity-80">({counts.flightPlan})</span>
+            </button>
+            <button
+              onClick={() => setCategoryFilter('livery')}
+              className={`px-2.5 py-1 rounded-lg transition-all shrink-0 whitespace-nowrap flex items-center gap-1.5 ${
+                categoryFilter === 'livery'
+                  ? 'bg-amber-500 text-stone-950 font-bold shadow-sm'
+                  : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800 border border-transparent'
+              }`}
+            >
+              <Package className="w-3 h-3" />
+              <span>Liveries &amp; Mods</span>
+              <span className="text-[10px] opacity-80">({counts.assets})</span>
+            </button>
+            <button
+              onClick={() => setCategoryFilter('app')}
+              className={`px-2.5 py-1 rounded-lg transition-all shrink-0 whitespace-nowrap flex items-center gap-1.5 ${
+                categoryFilter === 'app'
+                  ? 'bg-amber-500 text-stone-950 font-bold shadow-sm'
+                  : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800 border border-transparent'
+              }`}
+            >
+              <Sparkle className="w-3 h-3" />
+              <span>App</span>
+              <span className="text-[10px] opacity-80">({counts.app})</span>
             </button>
           </div>
 
           {/* Notification List */}
-          <div className="max-h-96 overflow-y-auto divide-y divide-stone-800/50">
+          <div className="max-h-[480px] overflow-y-auto divide-y divide-stone-800 bg-stone-950">
             {filteredNotifications.length === 0 ? (
               <div className="py-12 px-6 text-center">
-                <div className="w-10 h-10 mx-auto mb-3 rounded-full bg-stone-900/80 border border-stone-800 flex items-center justify-center text-stone-500">
+                <div className="w-10 h-10 mx-auto mb-3 rounded-full bg-stone-900 border border-stone-800 flex items-center justify-center text-stone-500">
                   <Bell className="w-5 h-5 text-stone-600" />
                 </div>
                 <div className="text-xs font-mono font-medium text-stone-400">
@@ -255,10 +274,10 @@ export const NotificationCenterDropdown: React.FC<NotificationCenterDropdownProp
               filteredNotifications.map((item) => (
                 <div
                   key={item.id}
-                  className={`group relative p-3 transition-colors flex items-start gap-3 cursor-pointer ${
+                  className={`group relative p-3.5 transition-colors flex items-start gap-3.5 cursor-pointer ${
                     item.read
-                      ? 'bg-stone-950/40 hover:bg-stone-900/40 opacity-80 hover:opacity-100'
-                      : 'bg-amber-500/5 hover:bg-amber-500/10'
+                      ? 'bg-stone-950 hover:bg-stone-900/80 text-stone-300'
+                      : 'bg-stone-900/60 hover:bg-stone-900 border-l-2 border-l-amber-500'
                   }`}
                   onClick={() => handleNotificationClick(item)}
                 >
@@ -268,30 +287,46 @@ export const NotificationCenterDropdown: React.FC<NotificationCenterDropdownProp
                   </div>
 
                   {/* Text Content */}
-                  <div className="flex-1 min-w-0 pr-4">
-                    <div className="flex items-center gap-1.5">
-                      {!item.read && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
-                      )}
-                      <h4
-                        className={`text-xs font-medium truncate ${
-                          item.read ? 'text-stone-300' : 'text-stone-100 font-semibold'
-                        }`}
-                      >
-                        {item.title}
-                      </h4>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        {!item.read && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
+                        )}
+                        <h4
+                          className={`text-xs font-semibold leading-snug truncate ${
+                            item.read ? 'text-stone-300' : 'text-stone-100 font-bold'
+                          }`}
+                        >
+                          {item.title}
+                        </h4>
+                      </div>
+                      <span className="text-[10px] font-mono text-stone-500 shrink-0">
+                        {formatRelativeTime(item.timestamp)}
+                      </span>
                     </div>
+
                     <p className="text-[11px] text-stone-400 mt-1 line-clamp-2 leading-relaxed">
                       {item.message}
                     </p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className="text-[10px] font-mono text-stone-500">
-                        {formatRelativeTime(item.timestamp)}
+
+                    <div className="flex items-center justify-between gap-2 mt-2 pt-1 border-t border-stone-800/80">
+                      <span className="px-1.5 py-0.5 rounded bg-stone-900 border border-stone-800 text-[9px] font-mono uppercase text-stone-400">
+                        {item.category === 'flight_plan'
+                          ? 'Flight Plan'
+                          : item.category === 'app'
+                          ? 'System'
+                          : item.category === 'livery'
+                          ? 'Livery'
+                          : item.category === 'mod'
+                          ? 'Mod'
+                          : item.category}
                       </span>
+
                       {(item.actionTab || item.category === 'app') && (
-                        <span className="text-[10px] font-mono text-amber-400/80 flex items-center gap-0.5">
-                          <span>View</span>
-                          <ArrowSquareOut className="w-2.5 h-2.5" />
+                        <span className="text-[10px] font-mono text-amber-400 hover:text-amber-300 flex items-center gap-1 font-semibold">
+                          <span>{item.category === 'flight_plan' ? 'View in ATC' : 'Open'}</span>
+                          <ArrowSquareOut className="w-3 h-3" />
                         </span>
                       )}
                     </div>
@@ -303,7 +338,7 @@ export const NotificationCenterDropdown: React.FC<NotificationCenterDropdownProp
                       e.stopPropagation();
                       clearNotification(item.id);
                     }}
-                    className="opacity-0 group-hover:opacity-100 p-1 rounded-md text-stone-500 hover:text-stone-300 hover:bg-stone-800 transition-all shrink-0"
+                    className="opacity-0 group-hover:opacity-100 p-1 rounded-md text-stone-500 hover:text-rose-400 hover:bg-stone-800 transition-all shrink-0 -mr-1"
                     title="Dismiss"
                   >
                     <X className="w-3.5 h-3.5" />
@@ -314,7 +349,7 @@ export const NotificationCenterDropdown: React.FC<NotificationCenterDropdownProp
           </div>
 
           {/* Footer note */}
-          <div className="px-3.5 py-2 bg-stone-900/60 border-t border-stone-800/80 text-[10px] font-mono text-stone-500 flex items-center justify-between">
+          <div className="px-3.5 py-2 bg-stone-900 border-t border-stone-800 text-[10px] font-mono text-stone-500 flex items-center justify-between">
             <span>GTFO Tactical Comm Link</span>
             <span className="text-stone-600">v{manifest.manifestVersion}</span>
           </div>

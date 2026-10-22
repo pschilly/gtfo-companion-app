@@ -1441,14 +1441,24 @@ pub struct RoutePresetMergeResult {
     pub raw_content: String,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct RoutePresetInstallResult {
+    pub file_path: String,
+    pub directory_path: String,
+    pub action: String,
+    pub theatre: String,
+    pub preset_names: Vec<String>,
+}
+
 fn extract_top_level_preset_names(lua_content: &str) -> Vec<String> {
     let mut names = Vec::new();
     let mut depth: i32 = 0;
 
     for line in lua_content.lines() {
         let trimmed = line.trim();
-        // At depth 1 (inside `presets = { ... }`), look for `["Preset Name"] =`
-        if depth == 1 && trimmed.starts_with("[\"") {
+        // At depth 0 (snippet alone) or depth 1 (inside presets = { ... }), look for `["Preset Name"] =`
+        if (depth == 0 || depth == 1) && trimmed.starts_with("[\"") {
             if let Some(end_idx) = trimmed[2..].find("\"]") {
                 let name = &trimmed[2..2 + end_idx];
                 if !names.iter().any(|n| n == name) {
@@ -1466,6 +1476,125 @@ fn extract_top_level_preset_names(lua_content: &str) -> Vec<String> {
     }
 
     names
+}
+
+fn prepend_lua_preset_into_manifest(
+    existing_lua: Option<&str>,
+    incoming_lua: &str,
+) -> (String, String) {
+    let clean_incoming = incoming_lua.trim();
+
+    // Check if incoming is wrapped inside presets = { ... }
+    let snippet_body = if clean_incoming.contains("presets") && clean_incoming.contains('{') {
+        if let Some(first_brace) = clean_incoming.find('{') {
+            if let Some(last_brace) = clean_incoming.rfind('}') {
+                if last_brace > first_brace {
+                    clean_incoming[first_brace + 1..last_brace].trim()
+                } else {
+                    clean_incoming
+                }
+            } else {
+                clean_incoming
+            }
+        } else {
+            clean_incoming
+        }
+    } else {
+        clean_incoming
+    };
+
+    let detected_names = extract_top_level_preset_names(clean_incoming);
+    let target_name = detected_names.first().cloned();
+
+    let formatted_snippet: String = snippet_body
+        .lines()
+        .map(|l| format!("    {}", l.trim_end()))
+        .collect::<Vec<_>>()
+        .join("\n");
+
+    let Some(raw) = existing_lua else {
+        let created = format!(
+            "presets = \n{{\n{}\n}} -- end of presets\n",
+            formatted_snippet
+        );
+        return (created, "created".to_string());
+    };
+
+    if !raw.contains("presets") || !raw.contains('{') {
+        let created = format!(
+            "presets = \n{{\n{}\n}} -- end of presets\n",
+            formatted_snippet
+        );
+        return (created, "created".to_string());
+    }
+
+    let mut lines: Vec<&str> = raw.lines().collect();
+
+    // If target preset exists, remove old block so prepending replaces it at the top
+    if let Some(ref name) = target_name {
+        let target_key = format!("[\"{}\"]", name);
+        let mut depth: i32 = 0;
+        let mut block_start: Option<usize> = None;
+        let mut block_end: Option<usize> = None;
+        let mut block_brace_seen = false;
+
+        for (idx, line) in lines.iter().enumerate() {
+            let trimmed = line.trim();
+            if block_start.is_none() && depth == 1 && trimmed.starts_with(&target_key) {
+                block_start = Some(idx);
+            }
+
+            for ch in trimmed.chars() {
+                if ch == '{' {
+                    depth += 1;
+                    if block_start.is_some() && depth >= 2 {
+                        block_brace_seen = true;
+                    }
+                } else if ch == '}' {
+                    depth = (depth - 1).max(0);
+                    if block_start.is_some() && block_brace_seen && depth == 1 {
+                        block_end = Some(idx);
+                        break;
+                    }
+                }
+            }
+
+            if block_end.is_some() {
+                break;
+            }
+        }
+
+        if let (Some(start), Some(end)) = (block_start, block_end) {
+            lines.drain(start..=end);
+        }
+    }
+
+    // Find the first line containing `{` corresponding to `presets = {`
+    let mut insert_idx = None;
+    for (idx, line) in lines.iter().enumerate() {
+        if line.contains('{') {
+            insert_idx = Some(idx + 1);
+            break;
+        }
+    }
+
+    if let Some(pos) = insert_idx {
+        let mut result_lines: Vec<String> = Vec::new();
+        for l in &lines[..pos] {
+            result_lines.push((*l).to_string());
+        }
+        result_lines.push(formatted_snippet);
+        for l in &lines[pos..] {
+            result_lines.push((*l).to_string());
+        }
+        return (result_lines.join("\n") + "\n", "prepended".to_string());
+    }
+
+    let fallback = format!(
+        "presets = \n{{\n{}\n}} -- end of presets\n",
+        formatted_snippet
+    );
+    (fallback, "created".to_string())
 }
 
 fn merge_lua_preset_into_manifest(
@@ -1589,10 +1718,18 @@ fn inspect_route_tool_presets(
     theatre_file_name: String,
 ) -> Result<RoutePresetManifestInfo, String> {
     let base_dcs = PathBuf::from(&dcs_saved_games_path);
-    let preset_file = base_dcs
+    let normalized_file_name = normalize_dcs_theatre_file_name(&theatre_file_name);
+    let mut preset_file = base_dcs
         .join("Config")
         .join("RouteToolPresets")
-        .join(&theatre_file_name);
+        .join(&normalized_file_name);
+
+    if !preset_file.exists() && normalized_file_name == "PersianGulf.lua" {
+        let legacy = base_dcs.join("Config").join("RouteToolPresets").join("Persian Gulf.lua");
+        if legacy.exists() {
+            preset_file = legacy;
+        }
+    }
 
     if !preset_file.exists() {
         return Ok(RoutePresetManifestInfo {
@@ -1632,9 +1769,23 @@ fn merge_route_tool_preset(
         )
     })?;
 
-    let preset_file = presets_dir.join(&theatre_file_name);
+    let normalized_file_name = normalize_dcs_theatre_file_name(&theatre_file_name);
+    let preset_file = presets_dir.join(&normalized_file_name);
+    let legacy_file = if normalized_file_name == "PersianGulf.lua" {
+        let legacy = presets_dir.join("Persian Gulf.lua");
+        if legacy.exists() && !preset_file.exists() {
+            Some(legacy)
+        } else {
+            None
+        }
+    } else {
+        None
+    };
+
     let existing_content = if preset_file.exists() {
         fs::read_to_string(&preset_file).ok()
+    } else if let Some(ref leg) = legacy_file {
+        fs::read_to_string(leg).ok()
     } else {
         None
     };
@@ -1689,6 +1840,317 @@ fn open_external_url(url: String) -> Result<(), String> {
         return Err("Only http/https URLs are permitted.".to_string());
     }
     open::that(&url).map_err(|e| format!("Failed to open browser for {}: {}", url, e))
+}
+
+pub fn normalize_dcs_theatre_file_name(theatre: &str) -> String {
+    let clean = theatre.trim();
+    let without_ext = if clean.to_lowercase().ends_with(".lua") {
+        &clean[..clean.len() - 4]
+    } else {
+        clean
+    };
+
+    let normalized = without_ext.to_lowercase().replace([' ', '_', '-'], "");
+    match normalized.as_str() {
+        "persiangulf" => "PersianGulf.lua".to_string(),
+        "syria" => "Syria.lua".to_string(),
+        "caucasus" => "Caucasus.lua".to_string(),
+        "nevada" => "Nevada.lua".to_string(),
+        "sinai" | "sinaimap" => "SinaiMap.lua".to_string(),
+        "marianas" | "marianaislands" => "MarianaIslands.lua".to_string(),
+        "kola" => "Kola.lua".to_string(),
+        "southatlantic" => "SouthAtlantic.lua".to_string(),
+        "afghanistan" => "Afghanistan.lua".to_string(),
+        "iraq" => "Iraq.lua".to_string(),
+        "normandy" => "Normandy.lua".to_string(),
+        _ => {
+            // Remove any spaces to adhere to DCS Route Tool naming convention
+            format!("{}.lua", without_ext.replace(' ', ""))
+        }
+    }
+}
+
+#[tauri::command]
+fn install_dcs_route_preset(
+    theatre: String,
+    lua_content: String,
+    custom_dcs_path: Option<String>,
+) -> Result<RoutePresetInstallResult, String> {
+    let base_dcs = match custom_dcs_path {
+        Some(ref p) if !p.trim().is_empty() => PathBuf::from(p.trim()),
+        _ => {
+            let env = detect_dcs_paths(None)?;
+            PathBuf::from(env.active_saved_games_path)
+        }
+    };
+
+    let presets_dir = base_dcs.join("Config").join("RouteToolPresets");
+    fs::create_dir_all(&presets_dir).map_err(|e| {
+        format!(
+            "Failed to create Config\\RouteToolPresets directory {:?}: {}",
+            presets_dir, e
+        )
+    })?;
+
+    let theatre_file_name = normalize_dcs_theatre_file_name(&theatre);
+    let preset_file = presets_dir.join(&theatre_file_name);
+
+    // If migrating from legacy "Persian Gulf.lua" with a space, read from it if PersianGulf.lua doesn't exist yet
+    let legacy_file = if theatre_file_name == "PersianGulf.lua" {
+        let legacy = presets_dir.join("Persian Gulf.lua");
+        if legacy.exists() && !preset_file.exists() {
+            Some(legacy)
+        } else {
+            None
+        }
+    } else {
+        None
+    };
+
+    let existing_content = if preset_file.exists() {
+        fs::read_to_string(&preset_file).ok()
+    } else if let Some(ref leg) = legacy_file {
+        fs::read_to_string(leg).ok()
+    } else {
+        None
+    };
+
+    let (merged_content, action) = prepend_lua_preset_into_manifest(
+        existing_content.as_deref(),
+        &lua_content,
+    );
+
+    fs::write(&preset_file, merged_content.as_bytes()).map_err(|e| {
+        format!(
+            "Failed to write RouteToolPresets manifest {:?}: {}",
+            preset_file, e
+        )
+    })?;
+
+    let preset_names = extract_top_level_preset_names(&merged_content);
+
+    Ok(RoutePresetInstallResult {
+        file_path: preset_file.to_string_lossy().to_string(),
+        directory_path: presets_dir.to_string_lossy().to_string(),
+        action,
+        theatre: theatre_file_name,
+        preset_names,
+    })
+}
+
+#[tauri::command]
+fn get_dcs_route_presets_path(custom_dcs_path: Option<String>) -> Result<String, String> {
+    let base_dcs = match custom_dcs_path {
+        Some(ref p) if !p.trim().is_empty() => PathBuf::from(p.trim()),
+        _ => {
+            let env = detect_dcs_paths(None)?;
+            PathBuf::from(env.active_saved_games_path)
+        }
+    };
+    let presets_dir = base_dcs.join("Config").join("RouteToolPresets");
+    Ok(presets_dir.to_string_lossy().to_string())
+}
+
+#[tauri::command]
+fn install_dtc_cartridge(
+    dcs_saved_games_path: Option<String>,
+    file_name: String,
+    content: String,
+    subfolder: Option<String>,
+) -> Result<String, String> {
+    let base_dcs = match dcs_saved_games_path {
+        Some(ref p) if !p.trim().is_empty() => PathBuf::from(p.trim()),
+        _ => {
+            let env = detect_dcs_paths(None)?;
+            PathBuf::from(env.active_saved_games_path)
+        }
+    };
+    let clean_sub = subfolder.unwrap_or_else(|| "DTC".to_string()).replace('/', "\\");
+    let target_dir = base_dcs.join(clean_sub);
+    fs::create_dir_all(&target_dir)
+        .map_err(|e| format!("Failed to create DTC directory {:?}: {}", target_dir, e))?;
+
+    let target_file = target_dir.join(&file_name);
+    fs::write(&target_file, content.as_bytes())
+        .map_err(|e| format!("Failed to write DTC file {:?}: {}", target_file, e))?;
+
+    Ok(target_file.to_string_lossy().to_string())
+}
+
+#[tauri::command]
+async fn open_pdf_kneeboard(
+    pdf_url: String,
+    file_name: Option<String>,
+    access_token: Option<String>,
+) -> Result<String, String> {
+    let target_name = file_name.unwrap_or_else(|| "flight_plan.pdf".to_string());
+    let clean_name = if target_name.to_lowercase().ends_with(".pdf") {
+        target_name
+    } else {
+        format!("{}.pdf", target_name)
+    };
+
+    let temp_dir = std::env::temp_dir().join("gtfo_companion").join("kneeboards");
+    fs::create_dir_all(&temp_dir)
+        .map_err(|e| format!("Failed to create temp directory for PDF: {}", e))?;
+    let target_path = temp_dir.join(&clean_name);
+
+    if pdf_url.starts_with("http://") || pdf_url.starts_with("https://") {
+        let client = reqwest::Client::builder()
+            .user_agent("GTFO-Companion-App")
+            .timeout(std::time::Duration::from_secs(30))
+            .build()
+            .map_err(|e| e.to_string())?;
+
+        let mut req = client.get(&pdf_url);
+        if let Some(token) = access_token {
+            if !token.trim().is_empty() {
+                req = req.bearer_auth(token.trim());
+            }
+        }
+
+        let resp = req.send().await.map_err(|e| format!("Failed to fetch PDF: {}", e))?;
+        if !resp.status().is_success() {
+            return Err(format!("Server returned HTTP {} for PDF download", resp.status()));
+        }
+
+        let bytes = resp.bytes().await.map_err(|e| format!("Failed to read PDF bytes: {}", e))?;
+        fs::write(&target_path, &bytes).map_err(|e| format!("Failed to save PDF to temp file: {}", e))?;
+    } else {
+        let local_path = PathBuf::from(&pdf_url);
+        if local_path.exists() {
+            let path_str = local_path.to_string_lossy().to_string();
+            open::that(&path_str).map_err(|e| format!("Failed to open PDF viewer: {}", e))?;
+            return Ok(path_str);
+        }
+        return Err(format!("Invalid PDF URL or file path: {}", pdf_url));
+    }
+
+    let path_str = target_path.to_string_lossy().to_string();
+    open::that(&path_str).map_err(|e| format!("Failed to open PDF in default viewer: {}", e))?;
+    Ok(path_str)
+}
+
+#[tauri::command]
+fn save_binary_file(
+    target_path: String,
+    base64_content: String,
+) -> Result<String, String> {
+    use base64::Engine;
+    let bytes = base64::engine::general_purpose::STANDARD
+        .decode(&base64_content)
+        .map_err(|e| format!("Base64 decode failed: {}", e))?;
+    let path = PathBuf::from(&target_path);
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).map_err(|e| format!("Failed to create parent dir: {}", e))?;
+    }
+    fs::write(&path, &bytes).map_err(|e| format!("Failed to write file {:?}: {}", path, e))?;
+    Ok(path.to_string_lossy().to_string())
+}
+
+#[tauri::command]
+fn install_aircraft_kneeboard_page(
+    dcs_saved_games_path: Option<String>,
+    aircraft_folder: String,
+    file_name: String,
+    content_or_base64: String,
+    is_binary: bool,
+) -> Result<String, String> {
+    let base_dcs = match dcs_saved_games_path {
+        Some(ref p) if !p.trim().is_empty() => PathBuf::from(p.trim()),
+        _ => {
+            let env = detect_dcs_paths(None)?;
+            PathBuf::from(env.active_saved_games_path)
+        }
+    };
+
+    let target_dir = if aircraft_folder.trim().is_empty() || aircraft_folder == "ALL" {
+        base_dcs.join("Kneeboard")
+    } else {
+        base_dcs.join("Kneeboard").join(aircraft_folder.trim())
+    };
+
+    fs::create_dir_all(&target_dir).map_err(|e| {
+        format!("Failed to create aircraft kneeboard directory {:?}: {}", target_dir, e)
+    })?;
+
+    let target_file = target_dir.join(&file_name);
+    if is_binary {
+        use base64::Engine;
+        let bytes = base64::engine::general_purpose::STANDARD
+            .decode(&content_or_base64)
+            .map_err(|e| format!("Failed decoding image base64: {}", e))?;
+        fs::write(&target_file, &bytes).map_err(|e| format!("Failed to write kneeboard image: {}", e))?;
+    } else {
+        fs::write(&target_file, content_or_base64.as_bytes())
+            .map_err(|e| format!("Failed to write kneeboard file: {}", e))?;
+    }
+
+    Ok(target_file.to_string_lossy().to_string())
+}
+
+#[tauri::command]
+async fn fetch_portal_api(
+    endpoint_url: String,
+    access_token: Option<String>,
+) -> Result<serde_json::Value, String> {
+    let client = reqwest::Client::builder()
+        .user_agent("GTFO-Companion-App")
+        .timeout(std::time::Duration::from_secs(15))
+        .build()
+        .map_err(|e| e.to_string())?;
+
+    let mut req = client
+        .get(&endpoint_url)
+        .header("Accept", "application/json");
+
+    if let Some(token) = access_token {
+        if !token.trim().is_empty() {
+            req = req.bearer_auth(token.trim());
+        }
+    }
+
+    let resp = req
+        .send()
+        .await
+        .map_err(|e| format!("Failed to reach portal endpoint: {}", e))?;
+
+    if !resp.status().is_success() {
+        return Err(format!("Portal returned HTTP {}", resp.status()));
+    }
+
+    resp.json::<serde_json::Value>().await.map_err(|e| format!("Failed to parse JSON response: {}", e))
+}
+
+#[tauri::command]
+async fn fetch_portal_text(
+    endpoint_url: String,
+    access_token: Option<String>,
+) -> Result<String, String> {
+    let client = reqwest::Client::builder()
+        .user_agent("GTFO-Companion-App")
+        .timeout(std::time::Duration::from_secs(15))
+        .build()
+        .map_err(|e| e.to_string())?;
+
+    let mut req = client.get(&endpoint_url);
+
+    if let Some(token) = access_token {
+        if !token.trim().is_empty() {
+            req = req.bearer_auth(token.trim());
+        }
+    }
+
+    let resp = req
+        .send()
+        .await
+        .map_err(|e| format!("Failed to fetch portal text: {}", e))?;
+
+    if !resp.status().is_success() {
+        return Err(format!("Portal returned HTTP {}", resp.status()));
+    }
+
+    resp.text().await.map_err(|e| format!("Failed to read response body: {}", e))
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
@@ -2136,9 +2598,17 @@ pub fn run() {
             start_discord_oauth,
             verify_discord_token,
             install_dtc_file,
+            install_dtc_cartridge,
             inspect_route_tool_presets,
             merge_route_tool_preset,
+            install_dcs_route_preset,
+            get_dcs_route_presets_path,
             install_atc_kneeboard,
+            install_aircraft_kneeboard_page,
+            open_pdf_kneeboard,
+            save_binary_file,
+            fetch_portal_api,
+            fetch_portal_text,
             open_external_url,
             get_dcs_nickname,
             update_dcs_nickname,
@@ -2204,5 +2674,81 @@ nicknames =
         assert_eq!(list[1], "GTFO | Test");
         assert_eq!(list[2], "Wank | Schilly");
         assert_eq!(list.len(), 3);
+    }
+
+    #[test]
+    fn test_prepend_lua_preset_created() {
+        let snippet = r#"["VIPER 1-1"] = 
+{
+    [1] = { ["name"] = "WP1" },
+}, -- end of ["VIPER 1-1"]"#;
+        let (res, action) = prepend_lua_preset_into_manifest(None, snippet);
+        assert_eq!(action, "created");
+        assert!(res.starts_with("presets = \n{\n"));
+        assert!(res.contains("[\"VIPER 1-1\"] ="));
+        assert!(res.ends_with("} -- end of presets\n"));
+    }
+
+    #[test]
+    fn test_prepend_lua_preset_into_existing() {
+        let existing = r#"presets = 
+{
+    ["HAWK 2-1"] = 
+    {
+        [1] = { ["name"] = "WP1" },
+    }, -- end of ["HAWK 2-1"]
+} -- end of presets
+"#;
+        let snippet = r#"["VIPER 1-1"] = 
+{
+    [1] = { ["name"] = "VIPER_WP1" },
+}, -- end of ["VIPER 1-1"]"#;
+
+        let (res, action) = prepend_lua_preset_into_manifest(Some(existing), snippet);
+        assert_eq!(action, "prepended");
+        let viper_pos = res.find("[\"VIPER 1-1\"]").unwrap();
+        let hawk_pos = res.find("[\"HAWK 2-1\"]").unwrap();
+        assert!(viper_pos < hawk_pos, "VIPER 1-1 should be prepended before HAWK 2-1");
+    }
+
+    #[test]
+    fn test_prepend_lua_preset_replaces_old() {
+        let existing = r#"presets = 
+{
+    ["HAWK 2-1"] = 
+    {
+        [1] = { ["name"] = "WP1" },
+    }, -- end of ["HAWK 2-1"]
+    ["VIPER 1-1"] = 
+    {
+        [1] = { ["name"] = "OLD_WP" },
+    }, -- end of ["VIPER 1-1"]
+} -- end of presets
+"#;
+        let snippet = r#"["VIPER 1-1"] = 
+{
+    [1] = { ["name"] = "NEW_WP" },
+}, -- end of ["VIPER 1-1"]"#;
+
+        let (res, action) = prepend_lua_preset_into_manifest(Some(existing), snippet);
+        assert_eq!(action, "prepended");
+        assert!(!res.contains("OLD_WP"));
+        assert!(res.contains("NEW_WP"));
+        let viper_pos = res.find("[\"VIPER 1-1\"]").unwrap();
+        let hawk_pos = res.find("[\"HAWK 2-1\"]").unwrap();
+        assert!(viper_pos < hawk_pos, "VIPER 1-1 should now be prepended before HAWK 2-1");
+    }
+
+    #[test]
+    fn test_normalize_dcs_theatre_file_name() {
+        assert_eq!(normalize_dcs_theatre_file_name("Persian Gulf"), "PersianGulf.lua");
+        assert_eq!(normalize_dcs_theatre_file_name("Persian Gulf.lua"), "PersianGulf.lua");
+        assert_eq!(normalize_dcs_theatre_file_name("persian gulf"), "PersianGulf.lua");
+        assert_eq!(normalize_dcs_theatre_file_name("PersianGulf"), "PersianGulf.lua");
+        assert_eq!(normalize_dcs_theatre_file_name("Syria"), "Syria.lua");
+        assert_eq!(normalize_dcs_theatre_file_name("Nevada"), "Nevada.lua");
+        assert_eq!(normalize_dcs_theatre_file_name("Caucasus"), "Caucasus.lua");
+        assert_eq!(normalize_dcs_theatre_file_name("South Atlantic"), "SouthAtlantic.lua");
+        assert_eq!(normalize_dcs_theatre_file_name("Mariana Islands"), "MarianaIslands.lua");
     }
 }
