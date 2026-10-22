@@ -15,7 +15,7 @@ import { STATIC_CONFIG } from '../config/constants';
 import { formatBytes } from '../utils/formatters';
 
 export const AppUpdateModal: React.FC = () => {
-  const { appUpdate, isUpdateModalOpen, setIsUpdateModalOpen, addLog } = useApp();
+  const { appUpdate, isUpdateModalOpen, setIsUpdateModalOpen, addLog, currentAppVersion } = useApp();
 
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadPercent, setDownloadPercent] = useState(0);
@@ -81,7 +81,7 @@ export const AppUpdateModal: React.FC = () => {
                 </span>
               </div>
               <p className="text-xs text-stone-400 mt-0.5">
-                Current: v{appUpdate.currentVersion || STATIC_CONFIG.appVersion} &bull; Published: {appUpdate.date || 'Recent'}
+                Current: v{appUpdate.currentVersion || currentAppVersion} &bull; Published: {appUpdate.date || 'Recent'}
               </p>
             </div>
           </div>

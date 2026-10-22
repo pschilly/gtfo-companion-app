@@ -2596,7 +2596,7 @@ impl Default for WindowPreferences {
         Self {
             start_minimized: false,
             minimize_to_tray: true,
-            close_to_tray: true,
+            close_to_tray: false,
         }
     }
 }

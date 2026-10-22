@@ -20,6 +20,21 @@ export type UpdateDownloadProgressCallback = (
 ) => void;
 
 /**
+ * Retrieves the current runtime app version (from Tauri runtime or package.json fallback).
+ */
+export async function getRuntimeAppVersion(): Promise<string> {
+  if (isTauriRuntime()) {
+    try {
+      const ver = await getVersion();
+      if (ver) return ver;
+    } catch {
+      // Fallback to STATIC_CONFIG
+    }
+  }
+  return STATIC_CONFIG.appVersion;
+}
+
+/**
  * Checks GitHub Releases endpoint for an available application update.
  */
 export async function checkForAppUpdate(): Promise<AppUpdateInfo> {

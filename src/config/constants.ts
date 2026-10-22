@@ -1,7 +1,8 @@
+import packageJson from '../../package.json';
 import { AppSettings, AssetManifest } from '../types';
 
 export const STATIC_CONFIG = {
-  appVersion: '0.0.9',
+  appVersion: packageJson.version,
   appTitle: 'Companion App',
   shortName: 'GTFO',
   fullName: 'GLOBAL TASK FORCE OVERLORD',
@@ -35,7 +36,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   hasConfirmedDcsPath: false,
   startMinimized: false,
   minimizeToTray: true,
-  closeToTray: true,
+  closeToTray: false,
   enableDesktopNotifications: true,
   notifyAppUpdates: true,
   notifyAssetUpdates: true,

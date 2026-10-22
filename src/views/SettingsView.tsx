@@ -18,7 +18,6 @@ import {
 } from '@phosphor-icons/react';
 import { DEFAULT_SETTINGS, STATIC_CONFIG } from '../config/constants';
 import { useApp } from '../context/AppContext';
-import { minimizeMainWindowCommand } from '../services/notificationService';
 
 type SettingsSubTab = 'general' | 'window' | 'notifications' | 'updates' | 'about';
 
@@ -30,6 +29,7 @@ export const SettingsView: React.FC = () => {
     refreshDcsEnv,
     hasConfirmedDcsPath,
     setPathOnboardingOpen,
+    currentAppVersion,
     appUpdate,
     isCheckingAppUpdate,
     checkForAppUpdateAction,
@@ -80,7 +80,7 @@ export const SettingsView: React.FC = () => {
       if (info.available) {
         setManualCheckFeedback(`Update found: v${info.version}`);
       } else {
-        setManualCheckFeedback(`You are on the latest version (v${info.currentVersion || STATIC_CONFIG.appVersion}).`);
+        setManualCheckFeedback(`You are on the latest version (v${info.currentVersion || currentAppVersion}).`);
       }
     } catch {
       setManualCheckFeedback('Unable to check for updates right now. Please verify your internet connection.');
@@ -468,18 +468,11 @@ export const SettingsView: React.FC = () => {
               </div>
             </div>
 
-            {/* Test Minimize Action Button */}
-            <div className="pt-4 border-t border-stone-800/80 flex items-center justify-between">
+            {/* System Tray Note */}
+            <div className="pt-4 border-t border-stone-800/80">
               <span className="text-[11px] font-mono text-stone-500">
                 Left-click the GTFO icon in your Windows system tray to toggle window visibility at any time.
               </span>
-              <button
-                type="button"
-                onClick={() => minimizeMainWindowCommand()}
-                className="px-3.5 py-1.5 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-700 text-xs font-mono text-stone-300 hover:text-amber-300 transition-colors cursor-pointer shrink-0"
-              >
-                Test Minimize to Tray
-              </button>
             </div>
           </div>
         </div>
@@ -662,7 +655,7 @@ export const SettingsView: React.FC = () => {
                           : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
                       }`}
                     >
-                      {appUpdate?.available ? `v${appUpdate.version}` : `v${STATIC_CONFIG.appVersion}`}
+                      {appUpdate?.available ? `v${appUpdate.version}` : `v${currentAppVersion}`}
                     </span>
                   </div>
                   <p className="text-xs text-stone-400 mt-0.5">
@@ -728,7 +721,7 @@ export const SettingsView: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-mono">
               <div className="p-3 rounded-xl bg-stone-950 border border-stone-800 space-y-1">
                 <span className="text-stone-500 text-[10px] uppercase">Installed Version</span>
-                <p className="text-stone-200 font-bold">v{STATIC_CONFIG.appVersion}</p>
+                <p className="text-stone-200 font-bold">v{currentAppVersion}</p>
               </div>
 
               <div className="p-3 rounded-xl bg-stone-950 border border-stone-800 space-y-1">
@@ -766,7 +759,7 @@ export const SettingsView: React.FC = () => {
                     GTFO Companion App
                   </h2>
                   <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono text-[11px] font-bold border border-amber-500/40">
-                    v{STATIC_CONFIG.appVersion}
+                    v{currentAppVersion}
                   </span>
                 </div>
                 {/* <p className="text-xs text-stone-300 max-w-xl leading-relaxed">

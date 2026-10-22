@@ -51,6 +51,7 @@ export const Sidebar: React.FC = () => {
     settings,
     checklistSummary,
     memberFlightPlans,
+    currentAppVersion,
   } = useApp();
 
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -372,7 +373,7 @@ export const Sidebar: React.FC = () => {
             </div>
           </div>
           <span className="text-[10px] font-mono text-stone-500 bg-stone-950 px-1.5 py-0.5 rounded border border-stone-800/80 shrink-0">
-            v{STATIC_CONFIG.appVersion}
+            v{currentAppVersion}
           </span>
         </button>
 

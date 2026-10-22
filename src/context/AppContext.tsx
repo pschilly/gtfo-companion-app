@@ -62,7 +62,7 @@ import {
   UserTier,
 } from '../types';
 import { formatExpectedDcsNickname } from '../utils/formatters';
-import { checkForAppUpdate, AppUpdateInfo } from '../services/updaterService';
+import { checkForAppUpdate, getRuntimeAppVersion, AppUpdateInfo } from '../services/updaterService';
 import {
   dispatchDesktopToast,
   setWindowPreferencesCommand,
@@ -175,6 +175,7 @@ interface AppContextValue {
   installRequiredMods: () => Promise<void>;
   installRequiredLiveries: () => Promise<void>;
   checklistSummary: ChecklistSummary;
+  currentAppVersion: string;
   appUpdate: AppUpdateInfo | null;
   isCheckingAppUpdate: boolean;
   checkForAppUpdateAction: () => Promise<AppUpdateInfo>;
@@ -590,9 +591,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [addLog, dcsEnv?.activeSavedGamesPath, manifest.assets, persistInstalledMap, settings.dcsSavedGamesPath]);
 
+  const [currentAppVersion, setCurrentAppVersion] = useState<string>(STATIC_CONFIG.appVersion);
   const [appUpdate, setAppUpdate] = useState<AppUpdateInfo | null>(null);
   const [isCheckingAppUpdate, setIsCheckingAppUpdate] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+
+  useEffect(() => {
+    getRuntimeAppVersion()
+      .then((ver) => {
+        if (ver) setCurrentAppVersion(ver);
+      })
+      .catch(() => {});
+  }, []);
 
   const [notifications, setNotifications] = useState<AppNotification[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.NOTIFICATIONS);
@@ -801,6 +811,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     try {
       const info = await checkForAppUpdate();
       setAppUpdate(info);
+      if (info.currentVersion) {
+        setCurrentAppVersion(info.currentVersion);
+      }
       if (info.available) {
         addLog('info', 'SYSTEM', `Companion App update v${info.version} available!`);
         addNotification({
@@ -1800,6 +1813,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         installRequiredMods,
         installRequiredLiveries,
         checklistSummary,
+        currentAppVersion,
         appUpdate,
         isCheckingAppUpdate,
         checkForAppUpdateAction,
