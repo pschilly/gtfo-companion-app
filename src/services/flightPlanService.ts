@@ -1,16 +1,6 @@
 import { invoke } from '@tauri-apps/api/core';
 import { STATIC_CONFIG } from '../config/constants';
 import {
-  SAMPLE_ACTIVE_SORTIE_RESPONSE,
-  SAMPLE_FLIGHT_PLAN_HORNET,
-  SAMPLE_FLIGHT_PLAN_JF17,
-  SAMPLE_FLIGHT_PLAN_PRIVATE,
-  SAMPLE_FLIGHT_PLAN_TOMCAT,
-  SAMPLE_FLIGHT_PLAN_VIPER,
-  SAMPLE_MEMBER_FLIGHT_PLANS_RESPONSE,
-  formatFlightPlanToLuaPreset,
-} from '../data/sampleFlightPlans';
-import {
   ActiveSortieResponse,
   FileAtcResponse,
   FiledFlightPlansResponse,
@@ -83,11 +73,16 @@ export async function fetchMemberFlightPlans(
       }
     }
   } catch (err) {
-    console.warn('Fetch member flight-plans HTTP error, using mock data:', err);
+    console.warn('Fetch member flight-plans HTTP error:', err);
   }
 
-  // Fallback to rich sample data if offline/demo
-  return SAMPLE_MEMBER_FLIGHT_PLANS_RESPONSE;
+  return {
+    total: 0,
+    plans: [],
+    missions_count: 0,
+    authored_count: 0,
+    private_count: 0,
+  };
 }
 
 /**
@@ -126,10 +121,14 @@ export async function fetchActiveSortieFlightPlans(
       }
     }
   } catch (err) {
-    console.warn('Fetch active sortie flight-plans HTTP error, using mock data:', err);
+    console.warn('Fetch active sortie flight-plans HTTP error:', err);
   }
 
-  return SAMPLE_ACTIVE_SORTIE_RESPONSE;
+  return {
+    active_sortie: null,
+    total: 0,
+    plans: [],
+  };
 }
 
 export interface FetchFiledFlightPlansOptions {
@@ -171,25 +170,12 @@ export async function fetchFiledFlightPlans(
       return res;
     }
   } catch (err) {
-    console.warn('Native/fetch filed flight-plans failed, using fallback:', err);
+    console.warn('Native/fetch filed flight-plans failed:', err);
   }
 
-  // Fallback to active plans marked filed or sample data
-  const samplePlans = [
-    ...(SAMPLE_MEMBER_FLIGHT_PLANS_RESPONSE.plans || []),
-    ...(SAMPLE_ACTIVE_SORTIE_RESPONSE.plans || []),
-  ];
-  const filed = samplePlans.filter((p) => p.is_filed);
   return {
-    total: filed.length,
-    plans:
-      filed.length > 0
-        ? filed
-        : samplePlans.slice(0, 2).map((p) => ({
-            ...p,
-            is_filed: true,
-            filed_at: p.filed_at || new Date().toISOString(),
-          })),
+    total: 0,
+    plans: [],
   };
 }
 
@@ -291,28 +277,10 @@ export async function fetchFlightPlanDetail(
       }
     }
   } catch (err) {
-    console.warn('Fetch flight-plan detail HTTP error, using mock fallback:', err);
+    console.warn('Fetch flight-plan detail HTTP error:', err);
   }
 
-  // Fallback sample lookup matching the requested plan ID or identifier
-  const allSampleDetails: FlightPlanDetail[] = [
-    SAMPLE_FLIGHT_PLAN_VIPER,
-    SAMPLE_FLIGHT_PLAN_HORNET,
-    SAMPLE_FLIGHT_PLAN_TOMCAT,
-    SAMPLE_FLIGHT_PLAN_JF17,
-    SAMPLE_FLIGHT_PLAN_PRIVATE,
-    ...(SAMPLE_ACTIVE_SORTIE_RESPONSE.plans as FlightPlanDetail[]),
-  ];
-  const matched = allSampleDetails.find(
-    (p) =>
-      String(p.id) === String(idOrIdentifier) ||
-      p.identifier.toLowerCase() === String(idOrIdentifier).toLowerCase()
-  );
-  if (matched) {
-    return matched;
-  }
-
-  return SAMPLE_FLIGHT_PLAN_VIPER;
+  throw new Error(`Failed to load flight plan detail for identifier "${idOrIdentifier}"`);
 }
 
 /**
@@ -851,3 +819,97 @@ export async function installJf17AirspaceDirect(
   const { installJf17CustomAirspaceCommand } = await import('./tauriBridge');
   return await installJf17CustomAirspaceCommand(customDcsWorldPath, fileName, content);
 }
+
+/**
+ * Formats a flight plan into a RouteToolPresets DCS Lua snippet
+ */
+export function formatFlightPlanToLuaPreset(plan: FlightPlanDetail): string {
+  const wpBlocks = plan.route_points
+    .map((wp, idx) => {
+      const luaIdx = idx + 1;
+      const altMeters = Math.round(wp.alt * 0.3048);
+      const speedMps = Number((wp.speed * 0.514444).toFixed(2));
+      const xCoord = wp.x ?? Math.round(wp.lat * 10000);
+      const yCoord = wp.y ?? Math.round(wp.lng * 10000);
+      return [
+        `        [${luaIdx}] = `,
+        `        {`,
+        `            ["alt"] = ${altMeters},`,
+        `            ["alt_type"] = "BARO",`,
+        `            ["name"] = "${wp.name}",`,
+        `            ["speed"] = ${speedMps},`,
+        `            ["type"] = "Turning Point",`,
+        `            ["action"] = "${wp.action || 'Turning Point'}",`,
+        `            ["x"] = ${xCoord},`,
+        `            ["y"] = ${yCoord},`,
+        `        }, -- end of [${luaIdx}]`,
+      ].join('\n');
+    })
+    .join('\n');
+
+  return [
+    `["${plan.callsign}"] = `,
+    `{`,
+    `${wpBlocks}`,
+    `}, -- end of ["${plan.callsign}"]`,
+  ].join('\n');
+}
+
+/**
+ * Builds DTC JSON structure for .dtc export
+ */
+export function buildDtcJsonPayload(plan: FlightPlanDetail): Record<string, unknown> {
+  const comm1List = (() => {
+    if (!plan.comms_ladder) return [];
+    if (Array.isArray(plan.comms_ladder)) {
+      return plan.comms_ladder.map((c: any, i: number) => ({
+        channel: c.channel || i + 1,
+        frequency: c.frequency,
+        name: c.label || c.name || `CH ${i + 1}`,
+      }));
+    }
+    const c1 = Array.isArray((plan.comms_ladder as any).comm1) ? (plan.comms_ladder as any).comm1 : [];
+    return c1.map((c: any, i: number) => ({
+      channel: c.channel || i + 1,
+      frequency: c.frequency,
+      name: c.label || c.name || `CH ${i + 1}`,
+    }));
+  })();
+
+  const comm2List = (() => {
+    if (!plan.comms_ladder || Array.isArray(plan.comms_ladder)) return [];
+    const c2 = Array.isArray((plan.comms_ladder as any).comm2) ? (plan.comms_ladder as any).comm2 : [];
+    return c2.map((c: any, i: number) => ({
+      channel: c.channel || i + 1,
+      frequency: c.frequency,
+      name: c.label || c.name || `CH ${i + 1}`,
+    }));
+  })();
+
+  const radioPresets: any[] = [{ radio: 'COMM1', channels: comm1List }];
+  if (comm2List.length > 0) {
+    radioPresets.push({ radio: 'COMM2', channels: comm2List });
+  }
+
+  return {
+    version: '1.2',
+    aircraft: plan.airframe?.dcs_entity || 'FA-18C_hornet',
+    callsign: plan.callsign,
+    flight_plan_id: plan.identifier,
+    created_at: new Date().toISOString(),
+    radio_presets: radioPresets,
+    waypoints: plan.route_points.map((wp) => ({
+      index: wp.index,
+      name: wp.name,
+      lat: wp.lat,
+      lng: wp.lng,
+      alt_feet: wp.alt,
+      speed_knots: wp.speed,
+      mgrs: wp.mgrs,
+      notes: wp.remarks,
+    })),
+    mids: plan.mids_settings || {},
+    cmds: plan.cmds_settings || {},
+  };
+}
+

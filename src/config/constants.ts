@@ -1,7 +1,7 @@
-import { AppSettings } from '../types';
+import { AppSettings, AssetManifest } from '../types';
 
 export const STATIC_CONFIG = {
-  appVersion: '0.0.7',
+  appVersion: '0.0.9',
   appTitle: 'Companion App',
   shortName: 'GTFO',
   fullName: 'GLOBAL TASK FORCE OVERLORD',
@@ -16,6 +16,14 @@ export const STATIC_CONFIG = {
   coreRoleId: import.meta.env.VITE_DISCORD_CORE_ROLE_ID || '',
   oauthRedirectPort: Number(import.meta.env.VITE_OAUTH_REDIRECT_PORT) || 54321,
 } as const;
+
+export const EMPTY_MANIFEST: AssetManifest = {
+  schemaVersion: 1,
+  communityName: 'Global Task Force Overlord',
+  manifestVersion: '0.0.0',
+  generatedAt: '',
+  assets: [],
+};
 
 export const DEFAULT_SETTINGS: AppSettings = {
   dcsSavedGamesPath: '',

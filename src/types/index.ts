@@ -256,6 +256,8 @@ export interface FlightPlanRoutePoint {
   notes?: string | null;
   action?: string | null;
   type?: string | null;
+  x?: number;
+  y?: number;
 }
 
 export interface FlightPlanSummary {
@@ -418,7 +420,7 @@ export interface ActiveSortieResponse {
 }
 
 export interface MemberFlightPlansResponse {
-  member: {
+  member?: {
     id: number;
     callsign: string;
     discord_id: string;

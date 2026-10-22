@@ -1,16 +1,10 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { DEFAULT_SETTINGS, STATIC_CONFIG } from '../config/constants';
-import { SAMPLE_MANIFEST } from '../data/sampleManifest';
+import { DEFAULT_SETTINGS, EMPTY_MANIFEST, STATIC_CONFIG } from '../config/constants';
 import {
   buildFallbackMemberProfile,
   GTFO_GRADE_META,
   GTFO_SQUADRONS,
-  SAMPLE_ATC_PACKAGES,
-} from '../data/samplePortalData';
-import {
-  SAMPLE_ACTIVE_SORTIE_RESPONSE,
-  SAMPLE_MEMBER_FLIGHT_PLANS_RESPONSE,
-} from '../data/sampleFlightPlans';
+} from '../data/portalData';
 import {
   fetchMemberFlightPlans,
   fetchActiveSortieFlightPlans,
@@ -217,7 +211,7 @@ const DEFAULT_INSTALLED_ATC: InstalledAtcState = {
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [activeTab, setActiveTab] = useState<NavigationTab>('home');
-  const [manifest, setManifest] = useState<AssetManifest>(SAMPLE_MANIFEST);
+  const [manifest, setManifest] = useState<AssetManifest>(EMPTY_MANIFEST);
   const [isSyncingManifest, setIsSyncingManifest] = useState(false);
   const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(null);
   const [installedAssets, setInstalledAssets] = useState<Record<string, InstalledAssetRecord>>({});
@@ -229,7 +223,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [highlightedCertId, setHighlightedCertId] = useState<number | null>(null);
   const [logs, setLogs] = useState<TelemetryLogEntry[]>([]);
   const [isPortalLive, setIsPortalLive] = useState(false);
-  const [atcPackages, setAtcPackages] = useState<AtcFlightPlanPackage[]>(SAMPLE_ATC_PACKAGES);
+  const [atcPackages, setAtcPackages] = useState<AtcFlightPlanPackage[]>([]);
   const [verifyingAssetId, setVerifyingAssetId] = useState<string | null>(null);
   const [lastVerifyResults, setLastVerifyResults] = useState<Record<string, IntegrityCheckResult>>(
     {}
@@ -237,27 +231,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [repairPrompt, setRepairPrompt] = useState<RepairPromptState | null>(null);
 
   // Flight Plans State
-  const [memberFlightPlans, setMemberFlightPlans] = useState<FlightPlanSummary[]>(
-    SAMPLE_MEMBER_FLIGHT_PLANS_RESPONSE.plans
-  );
+  const [memberFlightPlans, setMemberFlightPlans] = useState<FlightPlanSummary[]>([]);
   const [memberFlightPlansMeta, setMemberFlightPlansMeta] = useState({
-    total: SAMPLE_MEMBER_FLIGHT_PLANS_RESPONSE.total,
-    missions_count: SAMPLE_MEMBER_FLIGHT_PLANS_RESPONSE.missions_count,
-    authored_count: SAMPLE_MEMBER_FLIGHT_PLANS_RESPONSE.authored_count,
-    private_count: SAMPLE_MEMBER_FLIGHT_PLANS_RESPONSE.private_count,
+    total: 0,
+    missions_count: 0,
+    authored_count: 0,
+    private_count: 0,
   });
-  const [activeSortie, setActiveSortie] = useState<ActiveSortie | null>(
-    SAMPLE_ACTIVE_SORTIE_RESPONSE.active_sortie
-  );
-  const [activeSortieFlightPlans, setActiveSortieFlightPlans] = useState<FlightPlanSummary[]>(
-    SAMPLE_ACTIVE_SORTIE_RESPONSE.plans
-  );
-  const [filedFlightPlans, setFiledFlightPlans] = useState<FlightPlanSummary[]>(() => {
-    return [
-      ...SAMPLE_MEMBER_FLIGHT_PLANS_RESPONSE.plans,
-      ...SAMPLE_ACTIVE_SORTIE_RESPONSE.plans,
-    ].filter((p) => p.is_filed);
-  });
+  const [activeSortie, setActiveSortie] = useState<ActiveSortie | null>(null);
+  const [activeSortieFlightPlans, setActiveSortieFlightPlans] = useState<FlightPlanSummary[]>([]);
+  const [filedFlightPlans, setFiledFlightPlans] = useState<FlightPlanSummary[]>([]);
   const [isLoadingFlightPlans, setIsLoadingFlightPlans] = useState(false);
 
   const [installedAtc, setInstalledAtc] = useState<InstalledAtcState>(() => {

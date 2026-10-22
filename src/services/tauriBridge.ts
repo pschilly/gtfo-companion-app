@@ -1,13 +1,12 @@
 import { invoke } from '@tauri-apps/api/core';
 import { listen, UnlistenFn } from '@tauri-apps/api/event';
-import { STATIC_CONFIG } from '../config/constants';
-import { SAMPLE_MANIFEST } from '../data/sampleManifest';
+import { EMPTY_MANIFEST, STATIC_CONFIG } from '../config/constants';
 import {
   buildFallbackMemberProfile,
   formatRoutePresetToLuaSnippet,
   generateKneeboardSvgCard,
   normalizeMemberPortalProfile,
-} from '../data/samplePortalData';
+} from '../data/portalData';
 import {
   AssetCategory,
   AssetItem,
@@ -324,7 +323,7 @@ export async function fetchStaticManifest(
     }
   }
 
-  return JSON.parse(JSON.stringify(SAMPLE_MANIFEST));
+  return JSON.parse(JSON.stringify(EMPTY_MANIFEST));
 }
 
 /**

@@ -735,8 +735,6 @@ export function buildFallbackMemberProfile(
   };
 }
 
-export const SAMPLE_ATC_PACKAGES: AtcFlightPlanPackage[] = [];
-
 export function formatRoutePresetToLuaSnippet(
   preset: AtcFlightPlanPackage['routePreset']
 ): string {

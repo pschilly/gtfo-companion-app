@@ -37,12 +37,10 @@ import {
 } from '@phosphor-icons/react';
 import { useApp } from '../context/AppContext';
 import {
-  formatFlightPlanToLuaPreset,
-} from '../data/sampleFlightPlans';
-import {
   downloadFlightPlanDcsRoute,
   downloadFlightPlanDtc,
   downloadFlightPlanJf17Airspace,
+  formatFlightPlanToLuaPreset,
   generateFallbackJf17Airspace,
   getFlightPlanPdfUrl,
   getJf17AirspaceFileName,
@@ -170,7 +168,7 @@ export const AtcView: React.FC = () => {
   // Mode: 'member' (Assigned/Private plans) or 'filed' (ATC Filed Plans)
   const [viewMode, setViewMode] = useState<'member' | 'filed'>('member');
   const [selectedPlanId, setSelectedPlanId] = useState<number | string>(
-    memberFlightPlans[0]?.id || 14
+    memberFlightPlans[0]?.id || ''
   );
   const [selectedDetail, setSelectedDetail] = useState<FlightPlanDetail | null>(null);
   const [isLoadingDetail, setIsLoadingDetail] = useState<boolean>(false);

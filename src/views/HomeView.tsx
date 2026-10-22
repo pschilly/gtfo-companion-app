@@ -25,7 +25,7 @@ import {
 import { AssetCard } from '../components/AssetCard';
 import { STATIC_CONFIG } from '../config/constants';
 import { useApp } from '../context/AppContext';
-import { GTFO_GRADE_META } from '../data/samplePortalData';
+import { GTFO_GRADE_META } from '../data/portalData';
 import { formatBytes } from '../utils/formatters';
 
 export const HomeView: React.FC = () => {

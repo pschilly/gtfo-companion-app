@@ -21,7 +21,7 @@ import {
 import { DossierNav } from '../components/DossierNav';
 import { STATIC_CONFIG } from '../config/constants';
 import { useApp } from '../context/AppContext';
-import { GTFO_GRADE_META } from '../data/samplePortalData';
+import { GTFO_GRADE_META } from '../data/portalData';
 import { MemberGradeLevel } from '../types';
 
 export const DashboardView: React.FC = () => {
