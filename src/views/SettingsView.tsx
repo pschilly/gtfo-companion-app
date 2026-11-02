@@ -36,6 +36,10 @@ export const SettingsView: React.FC = () => {
     setIsUpdateModalOpen,
     sendTestNotification,
     unreadNotificationsCount,
+    manifest,
+    isSyncingManifest,
+    lastSyncedAt,
+    syncManifest,
   } = useApp();
 
   const [activeSubTab, setActiveSubTab] = useState<SettingsSubTab>('general');
@@ -710,6 +714,42 @@ export const SettingsView: React.FC = () => {
                 </p>
               </div>
             )}
+          </div>
+
+          {/* Portal Manifest Version & Refresher Card */}
+          <div className="p-6 rounded-2xl bg-stone-900/90 border border-stone-800 space-y-4 shadow-xl">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2.5">
+                  <h3 className="font-display text-base font-bold text-stone-100">
+                    Portal Asset Manifest
+                  </h3>
+                  <span className="px-2 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wider bg-stone-950 text-amber-300 border border-stone-800">
+                    MANIFEST v{manifest.manifestVersion}
+                  </span>
+                </div>
+                <p className="text-xs text-stone-400">
+                  {lastSyncedAt
+                    ? `Last synced ${lastSyncedAt} • ${manifest.assets.length} liveries & technical mods indexed.`
+                    : `Portal Manifest • ${manifest.assets.length} liveries & technical mods indexed.`}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={syncManifest}
+                disabled={isSyncingManifest}
+                title="Sync remote manifest from Member Portal / CDN"
+                className="px-4 py-2 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-700 text-stone-200 font-mono text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer disabled:opacity-50 self-end sm:self-auto shrink-0"
+              >
+                <ArrowsClockwise
+                  className={`w-3.5 h-3.5 text-amber-400 ${
+                    isSyncingManifest ? 'animate-spin' : ''
+                  }`}
+                />
+                <span>{isSyncingManifest ? 'Syncing Manifest...' : 'Refresh Manifest'}</span>
+              </button>
+            </div>
           </div>
 
           {/* Update Channel & Technical Details Card */}

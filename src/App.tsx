@@ -10,12 +10,11 @@ import { TopBar } from './components/TopBar';
 import { AppProvider, useApp } from './context/AppContext';
 import { openExternalUrl } from './services/tauriBridge';
 import { AirframesView } from './views/AirframesView';
+import { AssetManagerView } from './views/AssetManagerView';
 import { AwardsView } from './views/AwardsView';
-import { CatalogView } from './views/CatalogView';
 import { ChecklistView } from './views/ChecklistView';
 import { DashboardView } from './views/DashboardView';
 import { HomeView } from './views/HomeView';
-import { LibraryView } from './views/LibraryView';
 import { LoginGateView } from './views/LoginGateView';
 import { QualificationsView } from './views/QualificationsView';
 import { SettingsView } from './views/SettingsView';
@@ -70,13 +69,9 @@ const MainShell: React.FC = () => {
           {activeTab === 'qualifications' && <QualificationsView />}
           {activeTab === 'awards' && <AwardsView />}
           {activeTab === 'atc' && <AtcView />}
-          {activeTab === 'liveries' && (
-            <CatalogView category="livery" searchQuery={searchQuery} />
+          {(activeTab === 'library' || activeTab === 'liveries' || activeTab === 'mods') && (
+            <AssetManagerView searchQuery={searchQuery} />
           )}
-          {activeTab === 'mods' && (
-            <CatalogView category="mod" searchQuery={searchQuery} />
-          )}
-          {activeTab === 'library' && <LibraryView />}
           {activeTab === 'settings' && <SettingsView />}
         </main>
 

@@ -5,7 +5,6 @@ import {
   ArrowCircleUp,
   ArrowRight,
   ArrowSquareOut,
-  ArrowsClockwise,
   Certificate,
   CheckCircle,
   Compass,
@@ -32,9 +31,6 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
   const {
     activeTab,
     manifest,
-    isSyncingManifest,
-    lastSyncedAt,
-    syncManifest,
     outdatedAssets,
     updateAllOutdated,
     setActiveTab,
@@ -676,7 +672,7 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
         )}
 
         {/* Flight Plans & ATC Navigation Button */}
-        <button
+        {/* <button
           onClick={() => setActiveTab('atc')}
           className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-mono font-semibold transition-all ${
             activeTab === 'atc'
@@ -692,29 +688,7 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
               {memberFlightPlans.length}
             </span>
           )}
-        </button>
-
-        {/* Manifest Version & Sync Button */}
-        <div className="flex items-center gap-2 bg-stone-900/90 border border-stone-800 rounded-xl px-3 py-1.5">
-          <div className="text-right hidden sm:block">
-            <div className="text-[10px] font-mono uppercase text-stone-400">
-              MANIFEST v{manifest.manifestVersion}
-            </div>
-            <div className="text-[10px] font-mono text-stone-500">
-              {lastSyncedAt ? `Synced ${lastSyncedAt}` : 'Portal Manifest'}
-            </div>
-          </div>
-          <button
-            onClick={syncManifest}
-            disabled={isSyncingManifest}
-            title="Sync remote manifest from Member Portal / CDN"
-            className="p-1.5 rounded-lg bg-stone-800/80 hover:bg-stone-700 text-stone-300 hover:text-amber-400 transition-colors disabled:opacity-50"
-          >
-            <ArrowsClockwise
-              className={`w-4 h-4 ${isSyncingManifest ? 'animate-spin text-amber-400' : ''}`}
-            />
-          </button>
-        </div>
+        </button> */}
 
         {/* Tactical In-App & OS Notification Center */}
         <NotificationCenterDropdown />

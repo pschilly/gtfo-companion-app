@@ -59,6 +59,10 @@ import {
   FlightPlanDivert,
   FlightPlanSummary,
 } from '../types';
+import {
+  formatLoadoutSummary,
+  normalizeStationLoadout,
+} from '../utils/formatters';
 
 function formatFiledTime(isoString?: string | null): string {
   if (!isoString) return '';
@@ -129,15 +133,19 @@ export function isJf17Airframe(plan?: FlightPlanSummary | FlightPlanDetail | nul
   const aircraft = ((plan as any).aircraft || '').toLowerCase();
   return (
     entity.includes('jf-17') ||
-    entity.includes('thunder') ||
     entity.includes('jf17') ||
-    name.includes('thunder') ||
     name.includes('jf-17') ||
+    name.includes('jf17') ||
     abbr.includes('jf-17') ||
     abbr.includes('jf17') ||
     aircraft.includes('jf-17') ||
     aircraft.includes('jf17')
   );
+}
+
+export function isDtcCapablePlan(plan?: FlightPlanSummary | FlightPlanDetail | null): boolean {
+  if (!plan || isJf17Airframe(plan)) return false;
+  return Boolean(plan.is_dtc_compatible || (plan.airframe as any)?.is_dtc_compatible);
 }
 
 export const AtcView: React.FC = () => {
@@ -381,7 +389,43 @@ export const AtcView: React.FC = () => {
   const isF16 = useMemo(() => isF16Airframe(selectedDetail), [selectedDetail]);
   const isF14 = useMemo(() => isF14Airframe(selectedDetail), [selectedDetail]);
   const isJf17 = useMemo(() => isJf17Airframe(selectedDetail), [selectedDetail]);
-  const isNotJf17 = useMemo(() => !isJf17Airframe(selectedDetail), [selectedDetail]);
+  const hasDtc = useMemo(() => isDtcCapablePlan(selectedDetail), [selectedDetail]);
+
+  // Normalized station loadout & clean weapon summary
+  const stationLoadoutItems = useMemo(
+    () =>
+      normalizeStationLoadout(
+        selectedDetail?.station_loadout,
+        (selectedDetail?.metadata as any)?.stations
+      ),
+    [selectedDetail]
+  );
+
+  const cleanLoadoutSummary = useMemo(() => {
+    if (selectedDetail?.formatted_loadout) {
+      return formatLoadoutSummary(selectedDetail.formatted_loadout);
+    }
+    if (stationLoadoutItems.length > 0) {
+      const counts = new Map<string, number>();
+      for (const item of stationLoadoutItems) {
+        if (item.weaponName && item.weaponName !== 'Empty') {
+          counts.set(item.weaponName, (counts.get(item.weaponName) || 0) + 1);
+        }
+      }
+      return Array.from(counts.entries())
+        .map(([name, count]) =>
+          count > 1 && !/^\d+x\s+/i.test(name)
+            ? `${count}x ${name}`
+            : count > 1
+            ? `${count}× (${name})`
+            : name
+        )
+        .join(', ');
+    }
+    return '';
+  }, [selectedDetail?.formatted_loadout, stationLoadoutItems]);
+
+  const hasLoadout = stationLoadoutItems.length > 0 || Boolean(cleanLoadoutSummary);
 
   const hasMids = !isF14 && (isF18 || isJf17 || (!isF16 && !!selectedDetail?.mids_settings));
   const hasSa = isF18; // Only F-18 has SA tab! (no SA for F-16 or F-14 or JF-17)
@@ -417,13 +461,14 @@ export const AtcView: React.FC = () => {
 
   // Fallback if current activeTab is not supported by current airframe
   useEffect(() => {
+    if (activeTab === 'loadouts' && !hasLoadout) setActiveTab('summary');
     if (activeTab === 'sa' && !hasSa) setActiveTab('summary');
     if (activeTab === 'mids' && !hasMids) setActiveTab('summary');
     if (activeTab === 'destpts' && !hasDestPts) setActiveTab('summary');
     if (activeTab === 'additionalpts' && !hasAdditionalPts) setActiveTab('summary');
     if (activeTab === 'cmds' && !hasCmds) setActiveTab('summary');
     if (activeTab === 'airspace' && !hasAirspace) setActiveTab('summary');
-  }, [activeTab, hasSa, hasMids, hasDestPts, hasAdditionalPts, hasCmds, hasAirspace]);
+  }, [activeTab, hasLoadout, hasSa, hasMids, hasDestPts, hasAdditionalPts, hasCmds, hasAirspace]);
 
   // Load JF-17 Custom Airspace from server endpoint (e.g. /api/v1/companion/flight-plans/{id}/jf17-airspace)
   useEffect(() => {
@@ -1253,10 +1298,16 @@ export const AtcView: React.FC = () => {
                         <span className="text-stone-500">
                           {plan.route_summary?.waypoint_count || 0} wpts
                         </span>
-                        {plan.is_dtc_compatible && (
-                          <span className="px-1 py-0.2 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[9px]">
-                            DTC
+                        {isJf17Airframe(plan) ? (
+                          <span className="px-1 py-0.2 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 text-[9px]">
+                            AIRSPACE
                           </span>
+                        ) : (
+                          isDtcCapablePlan(plan) && (
+                            <span className="px-1 py-0.2 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[9px]">
+                              DTC
+                            </span>
+                          )
                         )}
                       </div>
                     </div>
@@ -1396,13 +1447,17 @@ export const AtcView: React.FC = () => {
 
                   <div className="p-3 rounded-xl bg-stone-950/80 border border-stone-800/80">
                     <div className="text-[10px] font-mono uppercase text-stone-400">
-                      Airframe / Compatibility
+                      Airframe / Exports
                     </div>
                     <div className="text-xs font-mono font-semibold text-amber-300 mt-1 truncate">
                       {selectedDetail.airframe?.dcs_entity}
                     </div>
                     <div className="text-[11px] font-mono text-stone-400 truncate">
-                      {selectedDetail.is_dtc_compatible ? 'DTC Supported' : 'No Native DTC'}
+                      {isJf17
+                        ? 'Route, Kneeboard & Airspace'
+                        : hasDtc
+                        ? 'Route, Kneeboard & DTC'
+                        : 'Route & Kneeboard'}
                     </div>
                   </div>
                 </div>
@@ -1415,16 +1470,22 @@ export const AtcView: React.FC = () => {
                       {selectedDetail.remarks}
                     </div>
                   )}
-                  {selectedDetail.formatted_loadout && (
-                    <div className="px-3.5 py-2 rounded-xl bg-stone-950/60 border border-stone-800 text-xs font-mono text-stone-400 flex items-center gap-2">
-                      <span className="text-amber-400 font-semibold uppercase">Loadout:</span>
-                      <span>{selectedDetail.formatted_loadout}</span>
+                  {cleanLoadoutSummary && (
+                    <div className="px-3.5 py-2 rounded-xl bg-stone-950/60 border border-stone-800 text-xs font-mono text-stone-300 flex items-center gap-2">
+                      <span className="text-amber-400 font-semibold uppercase shrink-0">Loadout:</span>
+                      <span className="truncate" title={cleanLoadoutSummary}>
+                        {cleanLoadoutSummary}
+                      </span>
                     </div>
                   )}
                 </div>
 
-                {/* --- Action Integration Cards: Route Preset, JF-17 Airspace, DTC, Kneeboard --- */}
-                <div className={`grid grid-cols-1 md:grid-cols-3 gap-3.5 pt-2`}>
+                {/* --- Action Integration Cards: Route Preset, Kneeboard PDF, + optional DTC or JF-17 Custom Airspace --- */}
+                <div
+                  className={`grid grid-cols-1 ${
+                    isJf17 || hasDtc ? 'md:grid-cols-3' : 'md:grid-cols-2'
+                  } gap-3.5 pt-2`}
+                >
                   {/* 1. One-Click Save Route to DCS */}
                   <div className="p-4 rounded-xl bg-stone-950/90 border border-stone-800 flex flex-col justify-between gap-3">
                     <div>
@@ -1544,54 +1605,49 @@ export const AtcView: React.FC = () => {
                     </div>
                   )}
 
-                  {/* 2. DTC Export */}
-                  {isNotJf17 && (
-                  <div className="p-4 rounded-xl bg-stone-950/90 border border-stone-800 flex flex-col justify-between gap-3">
-                    <div>
-                      <div className="flex items-center justify-between gap-2 mb-1.5">
-                        <span className="inline-flex items-center gap-1.5 text-xs font-display font-semibold text-stone-200">
-                          <Cpu className="w-4 h-4 text-amber-400" />
-                          Data Cartridge (DTC)
+                  {/* 2. DTC Export (Only shown when flight plan / airframe supports DTC, and not JF-17) */}
+                  {hasDtc && (
+                    <div className="p-4 rounded-xl bg-stone-950/90 border border-stone-800 flex flex-col justify-between gap-3">
+                      <div>
+                        <div className="flex items-center justify-between gap-2 mb-1.5">
+                          <span className="inline-flex items-center gap-1.5 text-xs font-display font-semibold text-stone-200">
+                            <Cpu className="w-4 h-4 text-amber-400" />
+                            Data Cartridge (DTC)
+                          </span>
+                          {dtcSavedPath && (
+                            <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
+                          )}
+                        </div>
+                        <span className="inline-block mt-1.5 px-2 py-0.5 rounded bg-stone-900 border border-stone-800 text-emerald-400 text-[10px] font-mono">
+                          DTC Supported
                         </span>
-                        {dtcSavedPath && (
-                          <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
-                        )}
                       </div>
-                      <span className={`inline-block mt-1.5 px-2 py-0.5 rounded text-[10px] font-mono ${
-                        selectedDetail.is_dtc_compatible
-                          ? 'bg-stone-900 border border-stone-800 text-emerald-400'
-                          : 'bg-stone-900 border border-stone-800 text-rose-400'
-                      }`}>
-                        {selectedDetail.is_dtc_compatible ? 'DTC Supported' : 'Not DTC Compatible'}
-                      </span>
+
+                      <div className="space-y-1.5">
+                        <button
+                          onClick={handleSaveDtcToDcs}
+                          disabled={isSavingDtc}
+                          className="w-full py-2 px-3 rounded-lg bg-stone-800 hover:bg-stone-700 disabled:opacity-40 text-stone-200 font-mono font-semibold text-xs transition-all flex items-center justify-center gap-1.5 border border-stone-700"
+                        >
+                          <DownloadSimple className="w-3.5 h-3.5 text-amber-400" />
+                          <span>{isSavingDtc ? 'Saving DTC...' : 'Save DTC to DCS'}</span>
+                        </button>
+
+                        <button
+                          onClick={handleDownloadDtc}
+                          className="w-full py-1.5 px-3 rounded-lg bg-stone-900 hover:bg-stone-800 text-stone-300 font-mono text-[11px] transition-all flex items-center justify-center gap-1.5 border border-stone-800"
+                        >
+                          <FileCode className="w-3.5 h-3.5 text-stone-400" />
+                          <span>Download .dtc File</span>
+                        </button>
+                      </div>
+
+                      {dtcSavedPath && (
+                        <p className="text-[10px] font-mono text-emerald-400 truncate mt-1">
+                          Saved to: {dtcSavedPath}
+                        </p>
+                      )}
                     </div>
-
-                    <div className="space-y-1.5">
-                      <button
-                        onClick={handleSaveDtcToDcs}
-                        disabled={!selectedDetail.is_dtc_compatible || isSavingDtc}
-                        className="w-full py-2 px-3 rounded-lg bg-stone-800 hover:bg-stone-700 disabled:opacity-40 text-stone-200 font-mono font-semibold text-xs transition-all flex items-center justify-center gap-1.5 border border-stone-700"
-                      >
-                        <DownloadSimple className="w-3.5 h-3.5 text-amber-400" />
-                        <span>{isSavingDtc ? 'Saving DTC...' : 'Save DTC to DCS'}</span>
-                      </button>
-
-                      <button
-                        onClick={handleDownloadDtc}
-                        disabled={!selectedDetail.is_dtc_compatible}
-                        className="w-full py-1.5 px-3 rounded-lg bg-stone-900 hover:bg-stone-800 disabled:opacity-40 text-stone-300 font-mono text-[11px] transition-all flex items-center justify-center gap-1.5 border border-stone-800"
-                      >
-                        <FileCode className="w-3.5 h-3.5 text-stone-400" />
-                        <span>Download .dtc File</span>
-                      </button>
-                    </div>
-
-                    {dtcSavedPath && (
-                      <p className="text-[10px] font-mono text-emerald-400 truncate mt-1">
-                        Saved to: {dtcSavedPath}
-                      </p>
-                    )}
-                  </div>
                   )}
                   {/* 3. Kneeboard PDF & Export */}
                   <div className="p-4 rounded-xl bg-stone-950/90 border border-stone-800 flex flex-col justify-between gap-3">
@@ -1741,7 +1797,7 @@ export const AtcView: React.FC = () => {
                   </button>
 
                   {/* 4. Loadout */}
-                  {(selectedDetail.station_loadout || selectedDetail.formatted_loadout) && (
+                  {hasLoadout && (
                     <button
                       onClick={() => setActiveTab('loadouts')}
                       className={`px-3 py-2 text-xs font-display font-semibold border-b-2 transition-all flex items-center gap-1.5 shrink-0 ${
@@ -1752,6 +1808,11 @@ export const AtcView: React.FC = () => {
                     >
                       <Crosshair className="w-3.5 h-3.5" />
                       <span>Loadout</span>
+                      {stationLoadoutItems.length > 0 && (
+                        <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-stone-800 text-stone-300">
+                          {stationLoadoutItems.length}
+                        </span>
+                      )}
                     </button>
                   )}
 
@@ -2208,37 +2269,45 @@ export const AtcView: React.FC = () => {
                   {/* TAB 4: LOADOUT */}
                   {activeTab === 'loadouts' && (
                     <div className="space-y-6">
-                      <div className="space-y-2">
+                      <div className="space-y-2.5">
                         <h4 className="font-display text-xs font-semibold uppercase tracking-wider text-amber-400">
                           Aircraft Station Weapons Loadout
                         </h4>
-                        {selectedDetail.station_loadout && Object.keys(selectedDetail.station_loadout).length > 0 ? (
-                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5">
-                            {Object.entries(selectedDetail.station_loadout).map(([station, weapon]) => (
-                              <div key={station} className="p-3 rounded-xl bg-stone-950 border border-stone-800 space-y-1">
-                                <span className="text-[10px] font-mono uppercase text-amber-400 font-bold">
-                                  Station {station}
+                        {stationLoadoutItems.length > 0 ? (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5">
+                            {stationLoadoutItems.map((item) => (
+                              <div
+                                key={item.station}
+                                className="p-3.5 rounded-xl bg-stone-950 border border-stone-800 space-y-1 flex flex-col justify-between"
+                              >
+                                <span className="text-[10px] font-mono uppercase text-amber-400 font-bold tracking-wider">
+                                  Station {item.station}
                                 </span>
-                                <p className="text-xs font-mono text-stone-200 truncate">{weapon}</p>
+                                <p
+                                  className="text-xs font-mono text-stone-100 font-medium leading-snug break-words"
+                                  title={item.weaponName}
+                                >
+                                  {item.weaponName}
+                                </p>
                               </div>
                             ))}
                           </div>
                         ) : (
                           <div className="p-4 rounded-xl bg-stone-950 border border-stone-800">
-                            <p className="text-xs font-mono text-stone-300">
-                              {selectedDetail.formatted_loadout || 'Standard configuration.'}
+                            <p className="text-xs font-mono text-stone-200">
+                              {cleanLoadoutSummary || 'Standard configuration.'}
                             </p>
                           </div>
                         )}
                       </div>
 
-                      {/* Formatted Loadout Remarks if present */}
-                      {selectedDetail.formatted_loadout && selectedDetail.station_loadout && (
+                      {/* Formatted Loadout Summary if present */}
+                      {cleanLoadoutSummary && stationLoadoutItems.length > 0 && (
                         <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-1 text-xs font-mono">
                           <span className="text-[10px] uppercase font-bold text-stone-400 block">
                             Loadout Summary
                           </span>
-                          <p className="text-stone-300">{selectedDetail.formatted_loadout}</p>
+                          <p className="text-stone-200 leading-relaxed">{cleanLoadoutSummary}</p>
                         </div>
                       )}
                     </div>

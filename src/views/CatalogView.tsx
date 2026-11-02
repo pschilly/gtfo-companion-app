@@ -68,8 +68,8 @@ export const CatalogView: React.FC<CatalogViewProps> = ({ category, searchQuery 
         <div>
           <h1 className="font-display text-2xl font-bold bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent">
             {category === 'livery'
-              ? 'Global Task Force Overlord Liveries'
-              : 'DCS Tactical Mods & Airfield Systems'}
+              ? 'Requried Liveries'
+              : 'Required Modifications'}
           </h1>
           <p className="text-xs text-stone-400 mt-0.5">
             {category === 'livery'

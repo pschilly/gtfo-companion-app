@@ -58,12 +58,24 @@ export const Sidebar: React.FC = () => {
   // User manual collapse/expand overrides (collapsed by default unless active tab is inside)
   const [sectionOpenOverrides, setSectionOpenOverrides] = useState<Record<string, boolean>>({});
 
+  const isTabMatch = (itemId?: NavigationTab, currentTab?: NavigationTab) => {
+    if (!itemId || !currentTab) return false;
+    if (itemId === currentTab) return true;
+    if (
+      itemId === 'library' &&
+      (currentTab === 'library' || currentTab === 'liveries' || currentTab === 'mods')
+    ) {
+      return true;
+    }
+    return false;
+  };
+
   const isSectionOpen = (sectionTitle: string, items: { id?: NavigationTab }[]) => {
     if (sectionOpenOverrides[sectionTitle] !== undefined) {
       return sectionOpenOverrides[sectionTitle];
     }
     // Collapsed by default; if activeTab is an item in this section, keep it expanded
-    return items.some((item) => item.id && item.id === activeTab);
+    return items.some((item) => isTabMatch(item.id, activeTab));
   };
 
   const toggleSection = (title: string, items: { id?: NavigationTab }[]) => {
@@ -71,7 +83,7 @@ export const Sidebar: React.FC = () => {
       const currentlyOpen =
         prev[title] !== undefined
           ? prev[title]
-          : items.some((item) => item.id && item.id === activeTab);
+          : items.some((item) => isTabMatch(item.id, activeTab));
       return {
         ...prev,
         [title]: !currentlyOpen,
@@ -79,9 +91,7 @@ export const Sidebar: React.FC = () => {
     });
   };
 
-  const liveryCount = manifest.assets.filter((a) => a.category === 'livery').length;
-  const modCount = manifest.assets.filter((a) => a.category === 'mod').length;
-  const installedCount = Object.keys(installedAssets).length;
+  const totalAssetsCount = manifest.assets.length;
 
   const navSections: {
     title: string;
@@ -147,7 +157,7 @@ export const Sidebar: React.FC = () => {
       items: [
         {
           id: 'atc',
-          label: 'Flight Plans & ATC',
+          label: 'Air Traffic Control',
           icon: <Compass className="w-4 h-4" />,
           badge: memberFlightPlans?.length || undefined,
           badgeColor: 'bg-amber-500/20 text-amber-300 border border-amber-500/40',
@@ -171,25 +181,13 @@ export const Sidebar: React.FC = () => {
       items: [
         {
           id: 'library',
-          label: 'Library',
-          icon: <Folder className="w-4 h-4" />,
-          badge: outdatedAssets.length > 0 ? outdatedAssets.length : installedCount,
+          label: 'Asset Manager',
+          icon: <Package className="w-4 h-4" />,
+          badge: outdatedAssets.length > 0 ? outdatedAssets.length : totalAssetsCount,
           badgeColor:
             outdatedAssets.length > 0
               ? 'bg-amber-500 text-stone-950 font-bold animate-pulse'
               : 'bg-stone-800 text-stone-300',
-        },
-        {
-          id: 'liveries',
-          label: 'Airframe Liveries',
-          icon: <PaintBrush className="w-4 h-4" />,
-          badge: liveryCount,
-        },
-        {
-          id: 'mods',
-          label: 'Mods',
-          icon: <Package className="w-4 h-4" />,
-          badge: modCount,
         },
       ],
     },
@@ -246,7 +244,7 @@ export const Sidebar: React.FC = () => {
           {/* Collapsible Category Sections */}
           {navSections.map((section) => {
             const isOpen = isSectionOpen(section.title, section.items);
-            const isSectionActive = section.items.some((item) => item.id && item.id === activeTab);
+            const isSectionActive = section.items.some((item) => isTabMatch(item.id, activeTab));
             return (
               <div key={section.title} className="space-y-1">
                 <button
@@ -303,7 +301,7 @@ export const Sidebar: React.FC = () => {
                           </li>
                         );
                       }
-                      const isActive = item.id ? activeTab === item.id : false;
+                      const isActive = isTabMatch(item.id, activeTab);
                       return (
                         <li key={item.id} className="relative">
                           <button
