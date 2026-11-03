@@ -23,7 +23,10 @@ export interface RoutePresetInstallResult {
  * e.g. 'https://members.globaltaskforceoverlord.org' -> 'https://members.globaltaskforceoverlord.org/api/v1/companion'
  */
 export function normalizeCompanionBaseUrl(rawUrl?: string): string {
-  const url = (rawUrl || STATIC_CONFIG.portalBaseUrl).trim().replace(/\/+$/, '');
+  const url = (rawUrl || STATIC_CONFIG.portalBaseUrl)
+    .trim()
+    .replace(/\/+$/, '')
+    .replace(/\/manifest$/i, '');
   if (!url) {
     return 'https://members.globaltaskforceoverlord.org/api/v1/companion';
   }

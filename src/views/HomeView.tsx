@@ -4,6 +4,7 @@ import {
   ArrowCircleUp,
   ArrowRight,
   ArrowSquareOut,
+  CalendarBlank,
   Certificate,
   CheckCircle,
   Compass,
@@ -261,6 +262,36 @@ export const HomeView: React.FC = () => {
 
       {/* QUICK OPERATIONS PORTALS */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 pt-2">
+        {/* Taskforce Event Calendar Shortcut */}
+        <div
+          onClick={() => setActiveTab('calendar')}
+          className="p-5 rounded-2xl bg-stone-900/90 border border-stone-800 hover:border-amber-500/50 cursor-pointer transition-all space-y-3 group shadow-lg"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <CalendarBlank className="w-5 h-5 text-amber-400" />
+              </div>
+              <div>
+                <h3 className="font-display font-bold text-stone-100 text-sm group-hover:text-amber-400 transition-colors">
+                  Event Calendar
+                </h3>
+                <p className="text-[11px] font-mono text-stone-400">
+                  Operations &amp; Training
+                </p>
+              </div>
+            </div>
+            <ArrowRight className="w-4 h-4 text-stone-500 group-hover:text-amber-400 group-hover:translate-x-0.5 transition-all" />
+          </div>
+          <p className="text-xs text-stone-400 leading-relaxed">
+            View upcoming Operations and Training sorties on a unified monthly calendar and submit your RSVP.
+          </p>
+          <div className="pt-2 border-t border-stone-800/80 flex items-center justify-between text-[11px] font-mono text-stone-400">
+            <span>Schedule &amp; Roster</span>
+            <span className="text-amber-400">Open Calendar &rarr;</span>
+          </div>
+        </div>
+
         {/* Air Traffic Control & Flight Plans Shortcut */}
         <div
           onClick={() => setActiveTab('atc')}

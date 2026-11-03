@@ -19,6 +19,7 @@ import { LoginGateView } from './views/LoginGateView';
 import { QualificationsView } from './views/QualificationsView';
 import { SettingsView } from './views/SettingsView';
 import { AtcView } from './views/AtcView';
+import { EventCalendarView } from './views/EventCalendarView';
 
 const MainShell: React.FC = () => {
   const { activeTab, setActiveTab, userSession } = useApp();
@@ -35,8 +36,8 @@ const MainShell: React.FC = () => {
         openExternalUrl(href);
       }
     };
-    document.addEventListener('click', handleDocumentClick);
-    return () => document.removeEventListener('click', handleDocumentClick);
+    document.addEventListener('click', handleDocumentClick, true);
+    return () => document.removeEventListener('click', handleDocumentClick, true);
   }, []);
 
   // Require an authenticated Discord session with a verified GTFO role (Community or CORE)
@@ -63,6 +64,7 @@ const MainShell: React.FC = () => {
 
         <main className="flex-1 overflow-y-auto p-6">
           {activeTab === 'home' && <HomeView />}
+          {activeTab === 'calendar' && <EventCalendarView />}
           {activeTab === 'dashboard' && <DashboardView />}
           {activeTab === 'checklist' && <ChecklistView />}
           {activeTab === 'airframes' && <AirframesView />}

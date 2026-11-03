@@ -4,6 +4,7 @@ import {
   ArrowSquareOut,
   ArrowsClockwise,
   BookOpen,
+  CalendarBlank,
   CaretDown,
   CaretRight,
   Certificate,
@@ -222,8 +223,8 @@ export const Sidebar: React.FC = () => {
 
         {/* Navigation Links — Styled after kb.globaltaskforceoverlord.org left-border list */}
         <nav className="p-4 space-y-4">
-          {/* Standalone Home Navigation Item */}
-          <div className="mb-1">
+          {/* Standalone Home & Event Calendar Navigation Items */}
+          <div className="mb-1 space-y-1">
             <button
               onClick={() => setActiveTab('home')}
               className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-all duration-150 relative ${
@@ -237,6 +238,22 @@ export const Sidebar: React.FC = () => {
                   <House className="w-4 h-4" />
                 </span>
                 <span className="font-display text-[13px]">Home</span>
+              </div>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('calendar')}
+              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-all duration-150 relative ${
+                activeTab === 'calendar'
+                  ? 'font-semibold text-amber-400 bg-amber-500/10 shadow-sm'
+                  : 'text-stone-400 hover:text-stone-200 hover:bg-stone-900/70'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <span className={activeTab === 'calendar' ? 'text-amber-400' : 'text-stone-400'}>
+                  <CalendarBlank className="w-4 h-4" />
+                </span>
+                <span className="font-display text-[13px]">Event Calendar</span>
               </div>
             </button>
           </div>

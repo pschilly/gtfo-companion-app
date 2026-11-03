@@ -20,6 +20,7 @@ export type NavigationTab =
   | 'qualifications'
   | 'awards'
   | 'atc'
+  | 'calendar'
   | 'liveries'
   | 'mods'
   | 'library'
@@ -669,5 +670,143 @@ export interface ChecklistSummary {
   pendingCount: number;
   allComplete: boolean;
 }
+
+export type CalendarEventType = 'campaign' | 'training';
+
+export interface CalendarEventAttendee {
+  id: number;
+  user_id: number;
+  callsign: string;
+  flight_callsign?: string | null;
+  discord_id?: string | null;
+  airframe_id?: number | null;
+  airframe_name?: string | null;
+  airframe_abbreviation?: string | null;
+  role: string;
+  role_label: string;
+  is_opfor: boolean;
+  is_present?: boolean | null;
+  xp_awarded?: boolean;
+  squadron_name?: string | null;
+  squadron_abbreviation?: string | null;
+  notes?: string | null;
+}
+
+export interface CalendarEventMyRsvp {
+  id: number;
+  airframe_id?: number | null;
+  airframe_name?: string | null;
+  airframe_abbreviation?: string | null;
+  role: string;
+  role_label: string;
+  is_opfor: boolean;
+  callsign?: string | null;
+  flight_callsign?: string | null;
+  notes?: string | null;
+}
+
+export interface CalendarRsvpRoleOption {
+  value: string;
+  label: string;
+}
+
+export interface CalendarAuthorizedCallsignOption {
+  callsign: string;
+  purpose?: string | null;
+  airframe_id?: number | null;
+  is_primary_for_airframe?: boolean;
+  label?: string | null;
+}
+
+export interface CalendarRsvpAirframeOption {
+  id: number;
+  name: string;
+  abbreviation: string;
+  label?: string;
+  dcs_entity?: string;
+  image_url?: string | null;
+  is_primary?: boolean;
+  status?: string;
+  squadron_id?: number | null;
+  squadron_name?: string | null;
+  squadron_abbreviation?: string | null;
+  authorized_callsigns?: CalendarAuthorizedCallsignOption[];
+  allowed_roles: CalendarRsvpRoleOption[];
+}
+
+export interface CalendarRsvpOptions {
+  campaign_airframes: CalendarRsvpAirframeOption[];
+  training_airframes: CalendarRsvpAirframeOption[];
+}
+
+export interface CalendarEventItem {
+  uid: string; // e.g., "campaign-12" or "training-5"
+  id: number;
+  type: CalendarEventType;
+  type_label: string;
+  category_badge: string;
+  name: string;
+  title: string;
+  subtitle?: string | null;
+  scheduled_at: string;
+  signup_cutoff_at?: string | null;
+  has_cutoff: boolean;
+  is_signup_open: boolean;
+  is_concluded: boolean;
+  has_aar: boolean;
+  theatre?: string | null;
+  server?: string | null;
+  notes?: string | null;
+  campaign_id?: number | null;
+  campaign_name?: string | null;
+  campaign_abbreviation?: string | null;
+  mission_id?: number | null;
+  mission_name?: string | null;
+  sortie_number?: number | null;
+  trainer_name?: string | null;
+  trainer_discord_id?: string | null;
+  allow_opfor: boolean;
+  opfor_slots?: number | null;
+  opfor_count?: number;
+  is_opfor_eligible: boolean;
+  has_available_opfor_slots: boolean;
+  attendee_count: number;
+  blufor_count: number;
+  is_attending: boolean;
+  my_rsvp?: CalendarEventMyRsvp | null;
+  attendees: CalendarEventAttendee[];
+  discord_event_url?: string | null;
+  discord_thread_url?: string | null;
+  aar_discord_url?: string | null;
+  portal_url?: string | null;
+  our_losses?: string | null;
+  enemy_losses?: string | null;
+  aar_notes?: string | null;
+}
+
+export interface CalendarEventsResponse {
+  year: number;
+  month: number;
+  month_name: string;
+  range_start: string;
+  range_end: string;
+  latest_event_date?: string | null;
+  latest_event_year?: number | null;
+  latest_event_month?: number | null;
+  total: number;
+  campaign_count: number;
+  training_count: number;
+  attending_count: number;
+  rsvp_options: CalendarRsvpOptions;
+  events: CalendarEventItem[];
+}
+
+export interface CalendarRsvpResponse {
+  success: boolean;
+  message?: string;
+  error?: string;
+  event?: CalendarEventItem;
+}
+
 
 
