@@ -25,7 +25,10 @@ export type NavigationTab =
   | 'liveries'
   | 'mods'
   | 'library'
-  | 'settings';
+  | 'settings'
+  | 'squadrons'
+  | 'roster'
+  | 'qualifications_zone';
 
 export type MemberGradeLevel =
   | 'G0'
@@ -47,7 +50,6 @@ export interface SquadronAssignment {
   code: string; // e.g., '507th FS', '449th TFS', 'VF-141', '19th AAB'
   name: string;
   nickname: string;
-  era: 'Modern' | 'Cold War';
   role: string;
   primaryAirframe: string;
   radioCallsign: string;
@@ -187,6 +189,7 @@ export interface MemberPortalProfile {
   joinedAt: string;
   adminPosition?: string | null;
   adminPositions?: string[];
+  primaryAdminPosition?: string | null;
   adminPositionDetails?: AdminPositionDetail[];
   isCouncilMember?: boolean;
   isSquadronLeader?: boolean;
@@ -682,6 +685,115 @@ export interface AppSettings {
   calendarReminderMinutes: number[];
   calendarRemindOnlyAttending: boolean;
   pollingIntervalMinutes: number;
+  /** S1: Task Force Roster display preference (default false = CORE only) */
+  rosterShowAllMembers: boolean;
+  /** S3: User-tracked qualification IDs in progress in the LMS */
+  trackedQualificationIds: number[];
+  /** S3: Interactive checklist checkpoints keyed by `${certId}_${skillIdx}_${itemIdx}` */
+  completedQualificationCheckpoints: Record<string, boolean>;
+}
+
+export interface TaskForceRibbon {
+  id: number;
+  name: string;
+  description?: string | null;
+  ribbonUrl: string;
+  medalUrl?: string | null;
+  issueCount?: number;
+  numeralUrl?: string | null;
+}
+
+export interface TaskForceMember {
+  id: number;
+  name: string;
+  callsign: string;
+  discordId?: string | number | null;
+  group: 'CORE' | 'Community' | string;
+  tier: 'CORE' | 'Community' | string;
+  isCore: boolean;
+  status: string;
+  avatar?: string | null;
+  grade: MemberGradeLevel | string;
+  gradeName: string;
+  rank: string;
+  insigniaUrl?: string | null;
+  squadron?: string | null;
+  squadronAbbreviation?: string | null;
+  squadronEmblemUrl?: string | null;
+  position?: string | null;
+  flightIdentifier?: string | null;
+  primaryAirframe?: string | null;
+  primaryAirframeAbbreviation?: string | null;
+  adminPositions?: string[];
+  primaryAdminPosition?: string | null;
+  isCouncil?: boolean;
+  isCouncilMember?: boolean;
+  isLeadership?: boolean;
+  isSquadronLeader?: boolean;
+  isSpecialist?: boolean;
+  ribbons?: TaskForceRibbon[];
+  ribbonRackUrl?: string | null;
+  xp: number;
+  enlistedAt?: string | null;
+  certificatesCount?: number;
+  awardsCount?: number;
+}
+
+export interface SquadronOperatedAirframe {
+  id: number;
+  name: string;
+  abbreviation: string;
+  dcsEntity?: string;
+  imageUrl?: string | null;
+}
+
+export interface SquadronCallsignEntry {
+  callsign: string;
+  purpose?: string | null;
+  airframe?: string | null;
+}
+
+export interface SquadronDetail {
+  id: number;
+  slug: string;
+  code: string;
+  abbreviation: string;
+  name: string;
+  nickname?: string | null;
+  role: string;
+  primaryAirframe?: string | null;
+  description?: string | null;
+  emblemUrl: string;
+  callsigns?: SquadronCallsignEntry[];
+  frequencies?: Array<{
+    name?: string;
+    frequency?: string;
+    modulation?: string;
+    description?: string;
+    notes?: string;
+  }>;
+  liveries?: string[];
+  discordRole?: string | number | null;
+  pilotsCount?: number;
+  airframes?: SquadronOperatedAirframe[];
+  sortOrder?: number;
+}
+
+export interface QualificationCourse {
+  id: number;
+  code: string;
+  name: string;
+  slug: string;
+  category: string;
+  description?: string | null;
+  airframe?: string | null;
+  airframeAbbreviation?: string | null;
+  airframes?: string[];
+  awardedRole?: string | null;
+  xpValue: number;
+  requirements: CertificateRequirement[];
+  totalHops?: number;
+  sortOrder?: number;
 }
 
 export interface IntegrityCheckResult {

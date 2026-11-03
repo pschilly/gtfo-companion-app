@@ -45,4 +45,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   calendarReminderMinutes: [1440, 120, 30],
   calendarRemindOnlyAttending: true,
   pollingIntervalMinutes: 30,
+  rosterShowAllMembers: false,
+  trackedQualificationIds: [],
+  completedQualificationCheckpoints: {},
 };

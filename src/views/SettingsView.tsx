@@ -9,17 +9,19 @@ import {
   Desktop,
   FloppyDisk,
   FolderSimplePlus,
+  GraduationCap,
   HardDrive,
   Info,
   PaperPlaneTilt,
   ShieldCheck,
   Sliders,
   Sparkle,
+  UsersFour,
 } from '@phosphor-icons/react';
 import { DEFAULT_SETTINGS, STATIC_CONFIG } from '../config/constants';
 import { useApp } from '../context/AppContext';
 
-type SettingsSubTab = 'general' | 'window' | 'notifications' | 'updates' | 'about';
+type SettingsSubTab = 'app' | 'dcs' | 'window' | 'notifications' | 'updates' | 'about';
 
 export const SettingsView: React.FC = () => {
   const {
@@ -42,7 +44,7 @@ export const SettingsView: React.FC = () => {
     syncManifest,
   } = useApp();
 
-  const [activeSubTab, setActiveSubTab] = useState<SettingsSubTab>('general');
+  const [activeSubTab, setActiveSubTab] = useState<SettingsSubTab>('app');
   const [pathInput, setPathInput] = useState(
     settings.dcsSavedGamesPath || dcsEnv?.activeSavedGamesPath || ''
   );
@@ -104,9 +106,14 @@ export const SettingsView: React.FC = () => {
 
   const tabs: { id: SettingsSubTab; label: string; icon: React.ReactNode; badge?: React.ReactNode }[] = [
     {
-      id: 'general',
-      label: 'General & DCS',
+      id: 'app',
+      label: 'App Settings',
       icon: <Sliders className="w-4 h-4" />,
+    },
+    {
+      id: 'dcs',
+      label: 'DCS Paths',
+      icon: <HardDrive className="w-4 h-4" />,
     },
     {
       id: 'window',
@@ -182,9 +189,221 @@ export const SettingsView: React.FC = () => {
       </div>
 
       {/* ============================================================ */}
-      {/* SUB-PAGE 1: GENERAL & DCS SETUP                              */}
+      {/* SUB-PAGE 1: APPLICATION SETTINGS                             */}
       {/* ============================================================ */}
-      {activeSubTab === 'general' && (
+      {activeSubTab === 'app' && (
+        <div className="space-y-6">
+          <div className="p-6 rounded-2xl bg-stone-900/90 border border-stone-800 space-y-6 shadow-xl">
+            <div>
+              <h2 className="font-display text-lg font-bold text-stone-100 flex items-center gap-2">
+                <Sliders className="w-5 h-5 text-amber-400" />
+                <span>Application &amp; Companion Preferences</span>
+              </h2>
+              <p className="text-xs text-stone-400 mt-1 leading-relaxed">
+                Configure default roster displays, training queue preferences, background data sync, and portal connectivity.
+              </p>
+            </div>
+
+            {/* Section 1: S1 Task Force Roster Display Configuration */}
+            <div className="pt-2 space-y-4">
+              <div className="flex items-center gap-2">
+                <UsersFour className="w-4 h-4 text-amber-400" />
+                <h3 className="font-display font-semibold text-stone-200 text-sm">
+                  S1 // Task Force Roster Default View
+                </h3>
+              </div>
+              <p className="text-xs text-stone-400 leading-relaxed">
+                Configure which member tier is presented by default when opening the Task Force Roster.
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                <label
+                  className={`p-3.5 rounded-xl border flex items-start gap-3 cursor-pointer transition-all ${
+                    !settings.rosterShowAllMembers
+                      ? 'bg-amber-500/10 border-amber-500/40 text-stone-100 ring-1 ring-amber-500/30'
+                      : 'bg-stone-950/60 border-stone-800 text-stone-300 hover:border-stone-700'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="rosterDefault"
+                    checked={!settings.rosterShowAllMembers}
+                    onChange={() => updateSettings({ rosterShowAllMembers: false })}
+                    className="mt-0.5 text-amber-500 focus:ring-amber-500"
+                  />
+                  <div className="space-y-0.5">
+                    <div className="flex items-center gap-2">
+                      <span className="font-display font-bold text-xs text-amber-300">
+                        CORE Members Only
+                      </span>
+                      <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 text-[10px] font-mono font-bold">
+                        DEFAULT
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-stone-400 leading-normal">
+                      Shows only primary operational flight personnel (CORE) by default. Reduces visual noise and focuses on active task force aviators.
+                    </p>
+                  </div>
+                </label>
+
+                <label
+                  className={`p-3.5 rounded-xl border flex items-start gap-3 cursor-pointer transition-all ${
+                    settings.rosterShowAllMembers
+                      ? 'bg-amber-500/10 border-amber-500/40 text-stone-100 ring-1 ring-amber-500/30'
+                      : 'bg-stone-950/60 border-stone-800 text-stone-300 hover:border-stone-700'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="rosterDefault"
+                    checked={settings.rosterShowAllMembers}
+                    onChange={() => updateSettings({ rosterShowAllMembers: true })}
+                    className="mt-0.5 text-amber-500 focus:ring-amber-500"
+                  />
+                  <div className="space-y-0.5">
+                    <span className="font-display font-bold text-xs text-stone-100">
+                      Full Task Force Roster
+                    </span>
+                    <p className="text-[11px] text-stone-400 leading-normal">
+                      Shows all members of the organization by default, including both verified CORE and community roster members.
+                    </p>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            {/* Section 2: S3 LMS & Qualifications Training Queue */}
+            <div className="pt-6 border-t border-stone-800/80 space-y-4">
+              <div className="flex items-center gap-2">
+                <GraduationCap className="w-4 h-4 text-amber-400" />
+                <h3 className="font-display font-semibold text-stone-200 text-sm">
+                  S3 // Qualifications &amp; LMS Training Queue
+                </h3>
+              </div>
+              <p className="text-xs text-stone-400 leading-relaxed">
+                Manage your personal self-paced training queue and interactive syllabus checkpoints.
+              </p>
+
+              <div className="p-3.5 rounded-xl bg-stone-950/80 border border-stone-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="text-xs font-mono">
+                  <span className="text-stone-300 font-semibold">Currently Tracked: </span>
+                  <span className="text-amber-400 font-bold">
+                    {(settings.trackedQualificationIds || []).length} Qualifications
+                  </span>
+                  <span className="text-stone-500 ml-2">
+                    ({Object.keys(settings.completedQualificationCheckpoints || {}).filter((k) => settings.completedQualificationCheckpoints?.[k]).length} checkpoints marked)
+                  </span>
+                </div>
+
+                {(settings.trackedQualificationIds || []).length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      updateSettings({
+                        trackedQualificationIds: [],
+                        completedQualificationCheckpoints: {},
+                      });
+                    }}
+                    className="px-3 py-1.5 rounded-lg bg-stone-900 hover:bg-rose-950/40 border border-stone-700 hover:border-rose-500/50 text-stone-400 hover:text-rose-300 font-mono text-xs transition-colors self-start sm:self-auto"
+                  >
+                    Clear Tracked Queue
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Section 3: Synchronization & Integrity Preferences */}
+            <div className="pt-6 border-t border-stone-800/80 space-y-4">
+              <div className="flex items-center gap-2">
+                <ArrowsClockwise className="w-4 h-4 text-amber-400" />
+                <h3 className="font-display font-semibold text-stone-200 text-sm">
+                  Background Synchronization &amp; Integrity
+                </h3>
+              </div>
+
+              <div className="space-y-3">
+                <label className="flex items-center gap-2 text-xs text-stone-300 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={settings.autoSyncOnStartup}
+                    onChange={(e) => updateSettings({ autoSyncOnStartup: e.target.checked })}
+                    className="rounded border-stone-700 bg-stone-950 text-amber-500 focus:ring-amber-500"
+                  />
+                  <span>Automatically sync Portal Dossier &amp; Asset Manifest on application startup</span>
+                </label>
+
+                <label className="flex items-center gap-2 text-xs text-stone-300 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={settings.verifyFileHash}
+                    onChange={(e) => updateSettings({ verifyFileHash: e.target.checked })}
+                    className="rounded border-stone-700 bg-stone-950 text-amber-500 focus:ring-amber-500"
+                  />
+                  <span>Verify file integrity hashes (Git Blob SHA-1 / SHA-256) on mod/livery deployments</span>
+                </label>
+              </div>
+
+              {/* Polling Interval */}
+              <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-stone-950/80 border border-stone-800">
+                <div className="space-y-0.5">
+                  <span className="text-xs font-semibold text-stone-200">
+                    Periodic Background Polling Interval
+                  </span>
+                  <p className="text-[11px] text-stone-400">
+                    How frequently the app checks for new flight plans, manifest updates, and portal changes.
+                  </p>
+                </div>
+                <select
+                  value={settings.pollingIntervalMinutes}
+                  onChange={(e) => updateSettings({ pollingIntervalMinutes: Number(e.target.value) })}
+                  className="px-3 py-1.5 rounded-xl bg-stone-900 border border-stone-700 text-xs font-mono text-stone-200 focus:outline-none focus:border-amber-500/60 shrink-0"
+                >
+                  <option value={10}>Every 10 Minutes</option>
+                  <option value={15}>Every 15 Minutes</option>
+                  <option value={30}>Every 30 Minutes (Default)</option>
+                  <option value={60}>Every 60 Minutes</option>
+                  <option value={0}>Manual Only (Disabled)</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Section 4: Portal Uplink & Manifest */}
+            <div className="pt-6 border-t border-stone-800/80 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-display font-semibold text-stone-200 text-sm">
+                    GTFO Portal Uplink Status
+                  </h3>
+                  <p className="text-[11px] text-stone-400 font-mono mt-0.5">
+                    Connected: {settings.memberPortalApiUrl || STATIC_CONFIG.portalBaseUrl}
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => syncManifest()}
+                  disabled={isSyncingManifest}
+                  className="px-3.5 py-1.5 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-700 text-xs font-mono text-stone-300 hover:text-amber-300 flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                >
+                  <ArrowsClockwise className={`w-3.5 h-3.5 text-amber-400 ${isSyncingManifest ? 'animate-spin' : ''}`} />
+                  <span>{isSyncingManifest ? 'Syncing...' : 'Sync Manifest Now'}</span>
+                </button>
+              </div>
+
+              {lastSyncedAt && (
+                <p className="text-[10px] font-mono text-stone-500">
+                  Last successful manifest sync: {new Date(lastSyncedAt).toLocaleString()}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================ */}
+      {/* SUB-PAGE 2: DCS PATHING & ENVIRONMENT MAPPING                */}
+      {/* ============================================================ */}
+      {activeSubTab === 'dcs' && (
         <form
           onSubmit={handleSavePaths}
           className="p-6 rounded-2xl bg-stone-900/90 border border-stone-800 space-y-6 shadow-xl"
@@ -192,14 +411,19 @@ export const SettingsView: React.FC = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <HardDrive className="w-5 h-5 text-amber-400" />
-              <h2 className="font-display text-base font-bold text-stone-100">
-                DCS Saved Games Directory Mapping
-              </h2>
+              <div>
+                <h2 className="font-display text-base font-bold text-stone-100">
+                  DCS Saved Games Directory Mapping
+                </h2>
+                <p className="text-xs text-stone-400 mt-0.5">
+                  Target directory for liveries, aircraft mods, kneeboards, and DTC cartridges.
+                </p>
+              </div>
             </div>
             <button
               type="button"
               onClick={() => refreshDcsEnv()}
-              className="px-3 py-1.5 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-700 text-xs font-mono text-stone-300 flex items-center gap-1.5 transition-colors cursor-pointer"
+              className="px-3 py-1.5 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-700 text-xs font-mono text-stone-300 flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
             >
               <FolderSimplePlus className="w-3.5 h-3.5 text-amber-400" />
               Auto-Detect Windows Paths
@@ -268,12 +492,17 @@ export const SettingsView: React.FC = () => {
           )}
 
           {/* Section 2: DCS World Root / Core Install Directory */}
-          <div className="pt-4 border-t border-stone-800/80 space-y-4">
+          <div className="pt-6 border-t border-stone-800/80 space-y-4">
             <div className="flex items-center gap-2.5">
               <HardDrive className="w-5 h-5 text-amber-400" />
-              <h2 className="font-display text-base font-bold text-stone-100">
-                DCS World Core Installation Directory Mapping
-              </h2>
+              <div>
+                <h2 className="font-display text-base font-bold text-stone-100">
+                  DCS World Core Installation Directory Mapping
+                </h2>
+                <p className="text-xs text-stone-400 mt-0.5">
+                  Root installation folder of the game client.
+                </p>
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -337,44 +566,18 @@ export const SettingsView: React.FC = () => {
             )}
           </div>
 
-          {/* Verification & Sync Toggles */}
-          <div className="pt-4 border-t border-stone-800/80 space-y-3">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-6">
-              <label className="flex items-center gap-2 text-xs text-stone-300 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={settings.autoSyncOnStartup}
-                  onChange={(e) => updateSettings({ autoSyncOnStartup: e.target.checked })}
-                  className="rounded border-stone-700 bg-stone-950 text-amber-500 focus:ring-amber-500"
-                />
-                Automatically sync Portal Dossier &amp; Asset Manifest on startup
-              </label>
-
-              <label className="flex items-center gap-2 text-xs text-stone-300 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={settings.verifyFileHash}
-                  onChange={(e) => updateSettings({ verifyFileHash: e.target.checked })}
-                  className="rounded border-stone-700 bg-stone-950 text-amber-500 focus:ring-amber-500"
-                />
-                Verify file integrity hashes (Git Blob SHA-1 / SHA-256)
-              </label>
-            </div>
-          </div>
-
-          <div className="pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-4">
               <button
                 type="button"
                 onClick={() => {
-                  updateSettings(DEFAULT_SETTINGS);
                   setPathInput(dcsEnv?.activeSavedGamesPath || '');
                   setWorldPathInput(dcsEnv?.activeWorldRootPath || '');
                 }}
                 className="text-xs font-mono text-stone-400 hover:text-stone-200 flex items-center gap-1.5 cursor-pointer"
               >
                 <ArrowCounterClockwise className="w-3.5 h-3.5" />
-                Reset to Defaults
+                Reset Paths to Detected
               </button>
               <button
                 type="button"
@@ -391,7 +594,7 @@ export const SettingsView: React.FC = () => {
               className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-bold text-xs flex items-center justify-center gap-2 shadow cursor-pointer"
             >
               <FloppyDisk className="w-4 h-4" />
-              Save Settings
+              Save DCS Paths
             </button>
           </div>
         </form>

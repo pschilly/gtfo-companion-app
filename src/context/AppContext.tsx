@@ -4,6 +4,7 @@ import {
   buildFallbackMemberProfile,
   GTFO_GRADE_META,
   GTFO_SQUADRONS,
+  setLiveSquadronsRegistry,
 } from '../data/portalData';
 import {
   fetchMemberFlightPlans,
@@ -59,10 +60,18 @@ import {
   MemberGradeLevel,
   MemberPortalProfile,
   NavigationTab,
+  QualificationCourse,
+  SquadronDetail,
+  TaskForceMember,
   TelemetryLogEntry,
   UserTier,
 } from '../types';
 import { fetchCalendarEvents } from '../services/calendarService';
+import {
+  fetchQualificationsCatalog,
+  fetchSquadrons,
+  fetchTaskForceRoster,
+} from '../services/taskforceService';
 import { formatExpectedDcsNickname } from '../utils/formatters';
 import { checkForAppUpdate, getRuntimeAppVersion, AppUpdateInfo } from '../services/updaterService';
 import {
@@ -183,6 +192,19 @@ interface AppContextValue {
   appUpdate: AppUpdateInfo | null;
   isCheckingAppUpdate: boolean;
   checkForAppUpdateAction: () => Promise<AppUpdateInfo>;
+  // S1 & S3 Task Force extensions
+  squadronsList: SquadronDetail[];
+  taskForceRoster: TaskForceMember[];
+  rosterCounts: { total: number; coreCount: number; communityCount: number };
+  qualificationsCatalog: QualificationCourse[];
+  isLoadingTaskforce: boolean;
+  refreshTaskforceData: () => Promise<void>;
+  rosterSquadronFilter: string | null;
+  setRosterSquadronFilter: (filter: string | null) => void;
+  navigateToRoster: (squadronFilter?: string | null) => void;
+  toggleTrackedQualification: (certId: number) => void;
+  toggleQualificationCheckpoint: (checkpointKey: string) => void;
+  isQualificationTracked: (certId: number) => boolean;
   isUpdateModalOpen: boolean;
   setIsUpdateModalOpen: (open: boolean) => void;
   notifications: AppNotification[];
@@ -248,6 +270,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [filedFlightPlans, setFiledFlightPlans] = useState<FlightPlanSummary[]>([]);
   const [isLoadingFlightPlans, setIsLoadingFlightPlans] = useState(false);
   const [upcomingCalendarEvents, setUpcomingCalendarEvents] = useState<CalendarEventItem[]>([]);
+
+  // S1 & S3 Task Force State
+  const [squadronsList, setSquadronsList] = useState<SquadronDetail[]>([]);
+  const [taskForceRoster, setTaskForceRoster] = useState<TaskForceMember[]>([]);
+  const [rosterCounts, setRosterCounts] = useState({ total: 0, coreCount: 0, communityCount: 0 });
+  const [qualificationsCatalog, setQualificationsCatalog] = useState<QualificationCourse[]>([]);
+  const [isLoadingTaskforce, setIsLoadingTaskforce] = useState(false);
+  const [rosterSquadronFilter, setRosterSquadronFilter] = useState<string | null>(null);
+
+  const navigateToRoster = useCallback((squadronFilter?: string | null) => {
+    if (squadronFilter !== undefined) {
+      setRosterSquadronFilter(squadronFilter);
+    }
+    setActiveTab('roster');
+  }, []);
 
   const [installedAtc, setInstalledAtc] = useState<InstalledAtcState>(() => {
     const raw = localStorage.getItem(STORAGE_KEYS.INSTALLED_ATC);
@@ -861,6 +898,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     syncMemberPortal();
     syncFlightPlans();
     syncCalendarEvents();
+    refreshTaskforceData();
     checkForAppUpdateAction();
 
     if (window.location.hash.includes('access_token=')) {
@@ -900,6 +938,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       syncMemberPortal();
       syncManifest();
       syncCalendarEvents();
+      refreshTaskforceData();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userSession?.id, syncMemberPortal, syncManifest]);
@@ -1732,6 +1771,127 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     [settings.memberPortalApiUrl, userSession?.accessToken]
   );
 
+  const refreshTaskforceData = useCallback(async () => {
+    const baseUrl = settings.memberPortalApiUrl || STATIC_CONFIG.portalBaseUrl;
+    const token = userSession?.accessToken;
+    setIsLoadingTaskforce(true);
+    addLog('info', 'PORTAL', 'Fetching Task Force squadrons, roster, and qualifications catalog...');
+
+    try {
+      const [sqs, rosterRes, quals] = await Promise.all([
+        fetchSquadrons(baseUrl, token),
+        fetchTaskForceRoster(baseUrl, { tier: 'all' }, token),
+        fetchQualificationsCatalog(baseUrl, token),
+      ]);
+
+      setSquadronsList(sqs);
+      setLiveSquadronsRegistry(sqs);
+      setTaskForceRoster(rosterRes.members);
+      setRosterCounts({
+        total: rosterRes.total,
+        coreCount: rosterRes.coreCount,
+        communityCount: rosterRes.communityCount,
+      });
+      setQualificationsCatalog(quals);
+
+      // Dynamically reconcile member's squadron assignment with live API data and CDN emblems
+      setMemberProfile((prev) => {
+        if (!prev.squadronAssignment) return prev;
+        const curName = (prev.squadronAssignment.name || '').toLowerCase();
+        const curCode = (prev.squadronAssignment.code || '').toLowerCase();
+        const liveMatch = sqs.find((s) => {
+          const sName = s.name.toLowerCase();
+          const sCode = s.code.toLowerCase();
+          const sAbbr = s.abbreviation.toLowerCase();
+          return (
+            sName === curName ||
+            sCode === curCode ||
+            sAbbr === curCode ||
+            (curName.includes('449') && (sCode.includes('449') || sName.includes('449'))) ||
+            (curName.includes('507') && (sCode.includes('507') || sName.includes('507'))) ||
+            (curName.includes('141') && (sCode.includes('141') || sName.includes('141'))) ||
+            (curName.includes('19th') && (sCode.includes('19th') || sName.includes('19th'))) ||
+            (curName.includes('777') && (sCode.includes('777') || sName.includes('777')))
+          );
+        });
+
+        if (liveMatch && liveMatch.emblemUrl) {
+          const updatedSq = {
+            ...prev.squadronAssignment,
+            name: liveMatch.name,
+            code: liveMatch.abbreviation || liveMatch.code,
+            nickname: liveMatch.nickname || prev.squadronAssignment.nickname,
+            role: liveMatch.role,
+            primaryAirframe: liveMatch.primaryAirframe || prev.squadronAssignment.primaryAirframe,
+            radioCallsign: Array.isArray(liveMatch.callsigns) && liveMatch.callsigns.length
+              ? liveMatch.callsigns
+                  .map((c: any) =>
+                    typeof c === 'string'
+                      ? c
+                      : c && typeof c === 'object' && 'callsign' in c
+                      ? String((c as Record<string, unknown>).callsign || '')
+                      : ''
+                  )
+                  .filter(Boolean)
+                  .join(' / ')
+              : prev.squadronAssignment.radioCallsign,
+            emblemUrl: liveMatch.emblemUrl,
+            rosterUrl: liveMatch.slug
+              ? `https://members.globaltaskforceoverlord.org/member/squadrons/${liveMatch.slug}/roster`
+              : prev.squadronAssignment.rosterUrl,
+          };
+          const updated = { ...prev, squadronAssignment: updatedSq };
+          localStorage.setItem(STORAGE_KEYS.PORTAL_PROFILE, JSON.stringify(updated));
+          return updated;
+        }
+        return prev;
+      });
+      addLog(
+        'success',
+        'PORTAL',
+        `Task Force data loaded: ${sqs.length} squadrons, ${rosterRes.total} roster members (${rosterRes.coreCount} CORE), ${quals.length} LMS qualifications.`
+      );
+    } catch (err) {
+      console.warn('refreshTaskforceData error:', err);
+      addLog('warn', 'PORTAL', `Task Force data sync warning: ${String(err)}`);
+    } finally {
+      setIsLoadingTaskforce(false);
+    }
+  }, [addLog, settings.memberPortalApiUrl, userSession?.accessToken]);
+
+  const toggleTrackedQualification = useCallback((certId: number) => {
+    setSettings((prev) => {
+      const currentTracked = prev.trackedQualificationIds || [];
+      const isTracked = currentTracked.includes(certId);
+      const nextTracked = isTracked
+        ? currentTracked.filter((id) => id !== certId)
+        : [...currentTracked, certId];
+      const next: AppSettings = { ...prev, trackedQualificationIds: nextTracked };
+      localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
+  const toggleQualificationCheckpoint = useCallback((checkpointKey: string) => {
+    setSettings((prev) => {
+      const currentCheckpoints = prev.completedQualificationCheckpoints || {};
+      const nextCheckpoints = {
+        ...currentCheckpoints,
+        [checkpointKey]: !currentCheckpoints[checkpointKey],
+      };
+      const next: AppSettings = { ...prev, completedQualificationCheckpoints: nextCheckpoints };
+      localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
+  const isQualificationTracked = useCallback(
+    (certId: number) => {
+      return (settings.trackedQualificationIds || []).includes(certId);
+    },
+    [settings.trackedQualificationIds]
+  );
+
   const saveRouteToDcs = useCallback(
     async (theatre: string, luaContent: string): Promise<RoutePresetInstallResult> => {
       const customDcsPath = settings.dcsSavedGamesPath || dcsEnv?.activeSavedGamesPath;
@@ -1981,6 +2141,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         clearNotification,
         clearAllNotifications,
         sendTestNotification,
+        // S1 & S3 Task Force extensions
+        squadronsList,
+        taskForceRoster,
+        rosterCounts,
+        qualificationsCatalog,
+        isLoadingTaskforce,
+        refreshTaskforceData,
+        rosterSquadronFilter,
+        setRosterSquadronFilter,
+        navigateToRoster,
+        toggleTrackedQualification,
+        toggleQualificationCheckpoint,
+        isQualificationTracked,
       }}
     >
       {children}

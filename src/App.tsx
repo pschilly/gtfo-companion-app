@@ -21,6 +21,9 @@ import { ServiceRecordView } from './views/ServiceRecordView';
 import { SettingsView } from './views/SettingsView';
 import { AtcView } from './views/AtcView';
 import { EventCalendarView } from './views/EventCalendarView';
+import { QualificationsZoneView } from './views/QualificationsZoneView';
+import { SquadronsView } from './views/SquadronsView';
+import { TaskForceRosterView } from './views/TaskForceRosterView';
 
 const MainShell: React.FC = () => {
   const { activeTab, setActiveTab, userSession } = useApp();
@@ -70,6 +73,9 @@ const MainShell: React.FC = () => {
           {activeTab === 'checklist' && <ChecklistView />}
           {activeTab === 'airframes' && <AirframesView />}
           {activeTab === 'qualifications' && <QualificationsView />}
+          {activeTab === 'qualifications_zone' && <QualificationsZoneView />}
+          {activeTab === 'squadrons' && <SquadronsView />}
+          {activeTab === 'roster' && <TaskForceRosterView />}
           {activeTab === 'awards' && <AwardsView />}
           {activeTab === 'service_record' && <ServiceRecordView />}
           {activeTab === 'atc' && <AtcView />}

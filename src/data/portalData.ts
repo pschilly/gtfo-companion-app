@@ -27,7 +27,7 @@ export const GTFO_GRADE_META: Record<
     title: 'Grade 0 // Candidate',
     xpRequired: 0,
     monthsRequired: 0,
-    iconUrl: 'https://members.globaltaskforceoverlord.org/storage/rank-insignia/01K865691S8PCZJQDWAWG1N1MH.png',
+    iconUrl: 'https://cdn.globaltaskforceoverlord.org/rank-insignia/01K69JQS4NS26RB05EKQ8NRVMQ.png',
     notes: 'Starting point for new members of Global Task Force Overlord.',
   },
   G1: {
@@ -35,7 +35,7 @@ export const GTFO_GRADE_META: Record<
     title: 'Grade 1 // Aviator',
     xpRequired: 1000,
     monthsRequired: 1,
-    iconUrl: 'https://members.globaltaskforceoverlord.org/storage/rank-insignia/01K8656HHGVQ777KD6QFYY7AGN.png',
+    iconUrl: 'https://cdn.globaltaskforceoverlord.org/rank-insignia/01K69JWNB6VGVHVC6269QM5870.png',
     notes: 'Awarded upon completion of Basic Check Flight (1,000 XP).',
   },
   G2: {
@@ -43,7 +43,7 @@ export const GTFO_GRADE_META: Record<
     title: 'Grade 2',
     xpRequired: 25000,
     monthsRequired: 3,
-    iconUrl: 'https://members.globaltaskforceoverlord.org/storage/rank-insignia/01K8656SP5EC6S1KK30V8JYM0W.png',
+    iconUrl: 'https://cdn.globaltaskforceoverlord.org/rank-insignia/01K69JX0ZSXAREZJH35W4G027K.png',
     notes: '25,000 XP Service Milestone',
   },
   G3: {
@@ -51,7 +51,7 @@ export const GTFO_GRADE_META: Record<
     title: 'Grade 3',
     xpRequired: 50000,
     monthsRequired: 6,
-    iconUrl: 'https://members.globaltaskforceoverlord.org/storage/rank-insignia/01K865729S5PK2HJ9WGVBF3G7Q.png',
+    iconUrl: 'https://cdn.globaltaskforceoverlord.org/rank-insignia/01K69JXNJPE8S8Q9DJX6NRKGQ9.png',
     notes: '50,000 XP Service Milestone',
   },
   G4: {
@@ -59,7 +59,7 @@ export const GTFO_GRADE_META: Record<
     title: 'Grade 4',
     xpRequired: 75000,
     monthsRequired: 9,
-    iconUrl: 'https://members.globaltaskforceoverlord.org/storage/rank-insignia/01K8657BHZQBB7M7RR3YNJHEBJ.png',
+    iconUrl: 'https://cdn.globaltaskforceoverlord.org/rank-insignia/01K69JYBM85BC9PGP5963PEEF2.png',
     notes: '75,000 XP Service Milestone',
   },
   G5: {
@@ -67,7 +67,7 @@ export const GTFO_GRADE_META: Record<
     title: 'Grade 5',
     xpRequired: 125000,
     monthsRequired: 12,
-    iconUrl: 'https://members.globaltaskforceoverlord.org/storage/rank-insignia/01K8657MK654YYZNK3VSCPPBK1.png',
+    iconUrl: 'https://cdn.globaltaskforceoverlord.org/rank-insignia/01K69JYSS7TBZMSN0SR8KGFHZS.png',
     notes: '125,000 XP Service Milestone',
   },
   G6: {
@@ -75,7 +75,7 @@ export const GTFO_GRADE_META: Record<
     title: 'Grade 6',
     xpRequired: 175000,
     monthsRequired: 18,
-    iconUrl: 'https://members.globaltaskforceoverlord.org/storage/rank-insignia/01K8657Y6BSR7JF211BGFTNC50.png',
+    iconUrl: 'https://cdn.globaltaskforceoverlord.org/rank-insignia/01K69JZ4KK67ZJ8PCYGHN1AY5M.png',
     notes: '175,000 XP Service Milestone',
   },
   G7: {
@@ -83,7 +83,7 @@ export const GTFO_GRADE_META: Record<
     title: 'Grade 7',
     xpRequired: 225000,
     monthsRequired: 24,
-    iconUrl: 'https://members.globaltaskforceoverlord.org/storage/rank-insignia/01K86587424M1Z46H43BKATWXD.png',
+    iconUrl: 'https://cdn.globaltaskforceoverlord.org/rank-insignia/01K69K3H4DQYY3AM3MJRAWZ6HZ.png',
     notes: '225,000 XP Service Milestone',
   },
   G8: {
@@ -91,7 +91,7 @@ export const GTFO_GRADE_META: Record<
     title: 'Grade 8',
     xpRequired: 300000,
     monthsRequired: 30,
-    iconUrl: 'https://members.globaltaskforceoverlord.org/storage/rank-insignia/01K8658F2TBVW3Q2YD444NK7JZ.png',
+    iconUrl: 'https://cdn.globaltaskforceoverlord.org/rank-insignia/01K69K3XWENT6MBF8B321S70DP.png',
     notes: '300,000 XP Service Milestone',
   },
   G9: {
@@ -99,7 +99,7 @@ export const GTFO_GRADE_META: Record<
     title: 'Grade 9',
     xpRequired: 375000,
     monthsRequired: 36,
-    iconUrl: 'https://members.globaltaskforceoverlord.org/storage/rank-insignia/01K8658QFF0YBQXE0YW0YT2566.png',
+    iconUrl: 'https://cdn.globaltaskforceoverlord.org/rank-insignia/01K69K4ACEZ7A46VPQQ2M66NTY.png',
     notes: '375,000 XP Service Milestone',
   },
   G10: {
@@ -107,7 +107,7 @@ export const GTFO_GRADE_META: Record<
     title: 'Grade 10',
     xpRequired: 450000,
     monthsRequired: 42,
-    iconUrl: 'https://members.globaltaskforceoverlord.org/storage/rank-insignia/01K8659076GWZN48N2HDMRGV1Y.png',
+    iconUrl: 'https://cdn.globaltaskforceoverlord.org/rank-insignia/01K69K4Q360G9WXH4N185RXSB1.png',
     notes: '450,000 XP Senior Task Force Milestone',
   },
   G11: {
@@ -115,7 +115,7 @@ export const GTFO_GRADE_META: Record<
     title: 'Grade 11',
     xpRequired: 900000,
     monthsRequired: 48,
-    iconUrl: 'https://members.globaltaskforceoverlord.org/storage/rank-insignia/01K86597Y1KN2WGGAYK38XJQYA.png',
+    iconUrl: 'https://cdn.globaltaskforceoverlord.org/rank-insignia/01K84AQXEM0E6H008TFDN3XKCT.png',
     notes: '900,000 XP Command & Veteran Milestone',
   },
 };
@@ -125,87 +125,95 @@ export const GTFO_SQUADRONS: Record<string, SquadronAssignment> = {
     code: '507th FS',
     name: '507th Fighter Squadron',
     nickname: 'Knights',
-    era: 'Modern',
-    role: 'SEAD / Multi-Role',
+    role: 'SEAD / Strike / Multi-Role',
     primaryAirframe: 'F-16C Viper',
     radioCallsign: 'Dagger / Hammer / Spear',
-    emblemUrl: 'https://members.globaltaskforceoverlord.org/storage/squadron-logos/01K86512ZR598V2887G2GA90W6.png',
+    emblemUrl: 'https://cdn.globaltaskforceoverlord.org/squadron-logos/pU9xtFLUuU8r5Ep840diEtdpkdoG6n7jm7bk4Ueb.png',
     rosterUrl: 'https://members.globaltaskforceoverlord.org/member/squadrons/507th-fighter-squadron/roster',
   },
   '449th TFS': {
     code: '449th TFS',
     name: '449th Tactical Fighter Squadron',
     nickname: 'Wolverines',
-    era: 'Modern',
     role: 'Strike / Air Superiority',
     primaryAirframe: 'F/A-18C Hornet',
     radioCallsign: 'Logan',
-    emblemUrl: 'https://members.globaltaskforceoverlord.org/storage/squadron-logos/01K8651G32MJRH2A7C517JM98W.png',
+    emblemUrl: 'https://cdn.globaltaskforceoverlord.org/squadron-logos/rduOq2gNFu8PHfX7Ovgv2xArV2l2gZfZo0Gou33Z.png',
     rosterUrl: 'https://kb.globaltaskforceoverlord.org/docs/squadrons/449th',
   },
   '19th AAB': {
     code: '19th AAB',
     name: '19th Air Assault Brigade',
     nickname: 'Shake & Bake',
-    era: 'Modern',
     role: 'Rotary & Air Mobility',
     primaryAirframe: 'CH-47F / AH-64D / C-130J',
     radioCallsign: 'Shake / Bake / Wonder / Hawg',
-    emblemUrl: 'https://members.globaltaskforceoverlord.org/storage/squadron-logos/01K8650Q0BMVY4W076MJFN55F6.png',
+    emblemUrl: 'https://cdn.globaltaskforceoverlord.org/squadron-logos/IKMfUTOd8385wO4YvJPKYXYHtdvpbaRqv1TSFahh.png',
     rosterUrl: 'https://kb.globaltaskforceoverlord.org/docs/squadrons/19th',
   },
   'VF-141': {
     code: 'VF-141',
     name: 'Strike Fighter Squadron 141',
     nickname: 'Ghostfighters',
-    era: 'Cold War',
     role: 'Naval Air Superiority',
     primaryAirframe: 'F-14A/B Tomcat',
     radioCallsign: 'Camelot / Gypsy / Black Knight',
-    emblemUrl: 'https://members.globaltaskforceoverlord.org/storage/squadron-logos/01KNAJYTWR4XVAMPXFBVN4X0ZA.png',
+    emblemUrl: 'https://cdn.globaltaskforceoverlord.org/squadron-logos/qdM2p9W4HbhyZNGkE5bN4vYu7lZjnfbsAUxT982a.png',
     rosterUrl: 'https://kb.globaltaskforceoverlord.org/docs/squadrons/VF-141',
   },
   '777AGR': {
     code: '777AGR',
     name: 'Squadron 777',
     nickname: 'The Nutcrackers',
-    era: 'Modern',
-    role: 'Aggressor / OPFOR',
+    role: 'Aggressor / OPFOR Wing',
     primaryAirframe: 'Multi-Airframe Aggressor',
     radioCallsign: 'Red Air',
-    emblemUrl: 'https://members.globaltaskforceoverlord.org/storage/squadron-logos/01M46Z4PFEK0NHRXB94PAPAV7V.png',
+    emblemUrl: 'https://cdn.globaltaskforceoverlord.org/squadron-logos/nUOdVDMn8CjWQ7ufQeZcJlu8O0ejfThdKsJKwbyy.png',
   },
   '42nd HS': {
     code: '42nd HS',
     name: '42nd Holding Squadron',
     nickname: 'Training Wing',
-    era: 'Modern',
     role: 'Check Flight & Indoctrination',
     primaryAirframe: 'All Training Airframes',
     radioCallsign: 'Overlord',
-    emblemUrl: 'https://members.globaltaskforceoverlord.org/storage/squadron-logos/01K864XGPS10WDYKVC03MQKS1Q.png',
+    emblemUrl: 'https://cdn.globaltaskforceoverlord.org/GTFO-Logo.png',
   },
   '479th FIS': {
     code: '479th FIS',
     name: '479th Fighter Interceptor Squadron',
     nickname: 'The Battering Rams',
-    era: 'Cold War',
-    role: 'Interceptor',
+    role: 'Air Intercept & Air Superiority',
     primaryAirframe: 'F-4E Phantom II',
     radioCallsign: 'Rut / Horn / Scythe',
-    emblemUrl: 'https://members.globaltaskforceoverlord.org/storage/squadron-logos/01K8651V2JGPJNDBAG2KCRNMGM.png',
+    emblemUrl: 'https://cdn.globaltaskforceoverlord.org/GTFO-Logo.png',
   },
   '62nd TFS': {
     code: '62nd TFS',
     name: '62nd Tactical Fighter Squadron',
     nickname: 'Akula Squadron',
-    era: 'Cold War',
     role: 'Air Superiority',
     primaryAirframe: 'MiG-29A Fulcrum',
     radioCallsign: 'Mako / Tiger',
-    emblemUrl: 'https://members.globaltaskforceoverlord.org/storage/squadron-logos/01K86528B3PXZF9XEF6RHPVKSR.png',
+    emblemUrl: 'https://cdn.globaltaskforceoverlord.org/GTFO-Logo.png',
   },
 };
+
+/**
+ * In-memory cache of live squadrons returned from the REST API endpoint
+ * (/api/v1/companion/squadrons). Takes highest precedence over static fallbacks.
+ */
+let liveSquadronsRegistry: any[] = [];
+
+export function setLiveSquadronsRegistry(squadrons: any[]): void {
+  if (Array.isArray(squadrons) && squadrons.length > 0) {
+    liveSquadronsRegistry = squadrons;
+  }
+}
+
+export function getLiveSquadronsRegistry(): any[] {
+  return liveSquadronsRegistry;
+}
 
 const GRADE_ORDER: MemberGradeLevel[] = [
   'G0',
@@ -222,8 +230,27 @@ const GRADE_ORDER: MemberGradeLevel[] = [
   'G11',
 ];
 
-export function resolveSquadronAssignment(raw: unknown): SquadronAssignment | null {
-  if (!raw) return null;
+export function resolveSquadronAssignment(
+  raw: unknown,
+  liveEmblemUrl?: string | null
+): SquadronAssignment | null {
+  if (!raw) {
+    if (liveEmblemUrl) {
+      return {
+        code: 'GTFO',
+        name: 'Assigned Squadron',
+        nickname: '',
+        role: 'Active Billet',
+        primaryAirframe: 'Multi-Role',
+        radioCallsign: 'Overlord',
+        emblemUrl: normalizePortalCdnUrl(
+          liveEmblemUrl,
+          'https://cdn.globaltaskforceoverlord.org/GTFO-Logo.png'
+        ),
+      };
+    }
+    return null;
+  }
 
   if (typeof raw === 'string') {
     const trimmed = raw.trim();
@@ -231,6 +258,56 @@ export function resolveSquadronAssignment(raw: unknown): SquadronAssignment | nu
       return null;
     }
     const lower = trimmed.toLowerCase();
+
+    // 1. Check live REST API registry first
+    if (liveSquadronsRegistry.length > 0) {
+      const liveSq = liveSquadronsRegistry.find((s: any) => {
+        const sName = String(s.name || '').toLowerCase();
+        const sCode = String(s.code || s.abbreviation || '').toLowerCase();
+        const sSlug = String(s.slug || '').toLowerCase();
+        return (
+          sName === lower ||
+          sCode === lower ||
+          sSlug === lower ||
+          (lower.includes('449') && (sCode.includes('449') || sName.includes('449'))) ||
+          (lower.includes('507') && (sCode.includes('507') || sName.includes('507'))) ||
+          (lower.includes('141') && (sCode.includes('141') || sName.includes('141'))) ||
+          (lower.includes('19th') && (sCode.includes('19th') || sName.includes('19th'))) ||
+          (lower.includes('777') && (sCode.includes('777') || sName.includes('777')))
+        );
+      });
+
+      if (liveSq) {
+        return {
+          code: liveSq.abbreviation || liveSq.code || trimmed,
+          name: liveSq.name || trimmed,
+          nickname: liveSq.nickname || '',
+          role: liveSq.role || 'Multi-Role Squadron',
+          primaryAirframe: liveSq.primaryAirframe || '',
+          radioCallsign: Array.isArray(liveSq.callsigns)
+            ? liveSq.callsigns
+                .map((c: any) =>
+                  typeof c === 'string'
+                    ? c
+                    : c && typeof c === 'object' && 'callsign' in c
+                    ? String((c as Record<string, unknown>).callsign || '')
+                    : ''
+                )
+                .filter(Boolean)
+                .join(' / ')
+            : '',
+          emblemUrl: normalizePortalCdnUrl(
+            liveEmblemUrl || liveSq.emblemUrl || liveSq.emblem_url,
+            'https://cdn.globaltaskforceoverlord.org/GTFO-Logo.png'
+          ),
+          rosterUrl: liveSq.slug
+            ? `https://members.globaltaskforceoverlord.org/member/squadrons/${liveSq.slug}/roster`
+            : undefined,
+        };
+      }
+    }
+
+    // 2. Fall back to static dictionary
     for (const sq of Object.values(GTFO_SQUADRONS)) {
       if (
         sq.code.toLowerCase() === lower ||
@@ -245,25 +322,44 @@ export function resolveSquadronAssignment(raw: unknown): SquadronAssignment | nu
         (lower.includes('479') && sq.code === '479th FIS') ||
         (lower.includes('62nd') && sq.code === '62nd TFS')
       ) {
-        return sq;
+        return {
+          ...sq,
+          emblemUrl: normalizePortalCdnUrl(liveEmblemUrl || sq.emblemUrl, sq.emblemUrl),
+        };
       }
     }
+
     return {
       code: trimmed,
       name: trimmed,
       nickname: 'GTFO Squadron',
-      era: 'Modern',
       role: 'Aviator',
       primaryAirframe: 'Multi-Role',
       radioCallsign: 'Overlord',
-      emblemUrl: 'https://cdn.globaltaskforceoverlord.org/GTFO-Logo.png',
+      emblemUrl: normalizePortalCdnUrl(
+        liveEmblemUrl,
+        'https://cdn.globaltaskforceoverlord.org/GTFO-Logo.png'
+      ),
     };
   }
 
   if (typeof raw === 'object') {
     const obj = raw as Record<string, unknown>;
     const nameOrCode = String(obj.name || obj.code || obj.abbreviation || '').trim();
-    const matched = nameOrCode ? resolveSquadronAssignment(nameOrCode) : null;
+    const emblemCandidate = String(
+      liveEmblemUrl ||
+        obj.emblemUrl ||
+        obj.emblem_url ||
+        obj.squadronEmblemUrl ||
+        obj.squadron_emblem_url ||
+        obj.logoUrl ||
+        obj.logo_url ||
+        obj.imageUrl ||
+        obj.image_url ||
+        obj.image_path ||
+        ''
+    );
+    const matched = nameOrCode ? resolveSquadronAssignment(nameOrCode, emblemCandidate) : null;
 
     let callsignStr = '';
     if (typeof obj.radioCallsign === 'string') {
@@ -301,7 +397,6 @@ export function resolveSquadronAssignment(raw: unknown): SquadronAssignment | nu
       code: String(obj.abbreviation || obj.code || matched?.code || nameOrCode || 'GTFO'),
       name: String(obj.name || matched?.name || nameOrCode || 'Assigned Squadron'),
       nickname: String(obj.nickname || matched?.nickname || ''),
-      era: (obj.era === 'Cold War' ? 'Cold War' : matched?.era || 'Modern') as 'Modern' | 'Cold War',
       role: String(obj.role || obj.position || matched?.role || 'Active Billet'),
       primaryAirframe: airframeStr || matched?.primaryAirframe || '',
       radioCallsign: callsignStr || matched?.radioCallsign || '',
@@ -374,19 +469,19 @@ export function normalizePortalCdnUrl(rawUrl: unknown, fallbackUrl: string): str
   if (trimmed.includes('kb.globaltaskforceoverlord.org/assets/')) {
     return fallbackUrl;
   }
-  if (
-    trimmed.startsWith('https://cdn.globaltaskforceoverlord.org/rank-insignia/') ||
-    trimmed.startsWith('https://cdn.globaltaskforceoverlord.org/squadron-logos/')
-  ) {
+  // Convert any legacy local storage URLs into official CDN URLs
+  if (trimmed.startsWith('https://members.globaltaskforceoverlord.org/storage/')) {
     return trimmed.replace(
-      'https://cdn.globaltaskforceoverlord.org/',
-      'https://members.globaltaskforceoverlord.org/storage/'
+      'https://members.globaltaskforceoverlord.org/storage/',
+      'https://cdn.globaltaskforceoverlord.org/'
     );
   }
+  // Discord CDN and other absolute HTTPS URLs
   if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
     return trimmed;
   }
-  return `https://members.globaltaskforceoverlord.org/storage/${trimmed.replace(
+  // Relative storage paths resolve directly to Cloudflare R2 / CDN
+  return `https://cdn.globaltaskforceoverlord.org/${trimmed.replace(
     /^\/?(storage\/)?/,
     ''
   )}`;
@@ -492,22 +587,42 @@ export function normalizeMemberPortalProfile(
       ? Number(((xp / nextGradeXpRequired) * 100).toFixed(2))
       : undefined;
 
+  const liveEmblem =
+    (typeof raw.squadronEmblemUrl === 'string' && raw.squadronEmblemUrl) ||
+    (typeof raw.squadron_emblem_url === 'string' && raw.squadron_emblem_url) ||
+    (typeof raw.squadronLogoUrl === 'string' && raw.squadronLogoUrl) ||
+    (typeof raw.squadron_logo_url === 'string' && raw.squadron_logo_url) ||
+    (typeof raw.squadronLogo === 'string' && raw.squadronLogo) ||
+    (typeof raw.squadron_logo === 'string' && raw.squadron_logo) ||
+    (typeof raw.squadronImageUrl === 'string' && raw.squadronImageUrl) ||
+    (typeof raw.squadron_image_url === 'string' && raw.squadron_image_url) ||
+    undefined;
+
   const primarySq = resolveSquadronAssignment(
-    raw.squadron ?? raw.squadronAssignment ?? raw.squadron_assignment
+    raw.squadron ?? raw.squadronAssignment ?? raw.squadron_assignment,
+    liveEmblem
   );
-  if (primarySq && typeof raw.squadronLogoUrl === 'string' && raw.squadronLogoUrl) {
-    primarySq.emblemUrl = normalizePortalCdnUrl(raw.squadronLogoUrl, primarySq.emblemUrl);
+  if (primarySq && liveEmblem) {
+    primarySq.emblemUrl = normalizePortalCdnUrl(liveEmblem, primarySq.emblemUrl);
   }
   const secondarySq = resolveSquadronAssignment(raw.secondarySquadronAssignment);
 
   const gradeIconUrl = normalizePortalCdnUrl(
-    gp?.currentInsigniaUrl || raw.insigniaUrl || raw.gradeIconUrl,
+    gp?.currentInsigniaUrl ||
+      gp?.current_insignia_url ||
+      raw.insigniaUrl ||
+      raw.insignia_url ||
+      raw.gradeIconUrl ||
+      raw.grade_icon_url,
     gradeMeta.iconUrl
   );
 
   const nextInsigniaUrl = nextGradeKey
     ? normalizePortalCdnUrl(
-        gp?.nextInsigniaUrl || raw.nextInsigniaUrl,
+        gp?.nextInsigniaUrl ||
+          gp?.next_insignia_url ||
+          raw.nextInsigniaUrl ||
+          raw.next_insignia_url,
         GTFO_GRADE_META[nextGradeKey].iconUrl
       )
     : undefined;

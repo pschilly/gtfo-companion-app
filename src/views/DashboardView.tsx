@@ -356,6 +356,12 @@ export const DashboardView: React.FC = () => {
                   <img
                     src={memberProfile.squadronAssignment.emblemUrl}
                     alt={memberProfile.squadronAssignment.name}
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      if (target.src !== 'https://cdn.globaltaskforceoverlord.org/GTFO-Logo.png') {
+                        target.src = 'https://cdn.globaltaskforceoverlord.org/GTFO-Logo.png';
+                      }
+                    }}
                     className="w-16 h-16 rounded-xl object-contain bg-stone-900 p-1.5 border border-stone-800 shrink-0"
                   />
                   <div className="min-w-0 space-y-1">

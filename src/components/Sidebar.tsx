@@ -149,9 +149,18 @@ export const Sidebar: React.FC = () => {
       icon: <UsersFour className="w-4 h-4" />,
       items: [
         {
+          id: 'squadrons',
+          label: 'Squadrons',
+          icon: <AirplaneTilt className="w-4 h-4" />,
+        },
+        {
+          id: 'roster',
           label: 'Taskforce Roster',
           icon: <UserCheck className="w-4 h-4" />,
-          href: `${STATIC_CONFIG.portalBaseUrl.replace('/api/v1/companion', '')}/users`,
+          badge: settings.rosterShowAllMembers ? 'ALL' : 'CORE',
+          badgeColor: settings.rosterShowAllMembers
+            ? 'bg-stone-800 text-stone-300'
+            : 'bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold',
         },
       ],
     },
@@ -172,6 +181,15 @@ export const Sidebar: React.FC = () => {
       title: 'S3 - Training',
       icon: <GraduationCap className="w-4 h-4" />,
       items: [
+        {
+          id: 'qualifications_zone',
+          label: 'Qualifications Zone',
+          icon: <GraduationCap className="w-4 h-4" />,
+          badge: (settings.trackedQualificationIds || []).length > 0
+            ? `${(settings.trackedQualificationIds || []).length}`
+            : undefined,
+          badgeColor: 'bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold',
+        },
         {
           label: 'Knowledge Base',
           icon: <BookOpen className="w-4 h-4" />,

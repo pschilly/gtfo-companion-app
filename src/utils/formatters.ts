@@ -19,6 +19,30 @@ export function formatShortDate(iso: string): string {
   }
 }
 
+/**
+ * Strips HTML tags and decodes HTML entities (&amp;, &#039;, etc.) into clean plain text.
+ */
+export function stripHtml(input: string | null | undefined): string {
+  if (!input) return '';
+  try {
+    const doc = new DOMParser().parseFromString(input, 'text/html');
+    return (doc.body.textContent || '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  } catch {
+    return input
+      .replace(/<[^>]*>/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&#039;|&#39;|&apos;/g, "'")
+      .replace(/&quot;/g, '"')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+}
+
 export function formatExpectedDcsNickname(
   callsign: string,
   discordServerNick?: string | null
