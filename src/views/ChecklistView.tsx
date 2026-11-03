@@ -4,11 +4,8 @@ import {
   ArrowsClockwise,
   CheckCircle,
   ListChecks,
-  ShieldCheck,
   ShieldWarning,
-  Sparkle,
 } from '@phosphor-icons/react';
-import { DossierNav } from '../components/DossierNav';
 import { NewMemberChecklist } from '../components/NewMemberChecklist';
 import { STATIC_CONFIG } from '../config/constants';
 import { useApp } from '../context/AppContext';
@@ -33,9 +30,6 @@ export const ChecklistView: React.FC = () => {
 
   return (
     <div className="space-y-6 pb-8 max-w-7xl mx-auto">
-      {/* Dossier Sub NavigationArrow */}
-      <DossierNav />
-
       {/* Hero Header Card */}
       <div className="relative rounded-2xl overflow-hidden border border-stone-800 bg-stone-900/90 shadow-2xl p-6 sm:p-7">
         {/* Atmospheric Lighting */}

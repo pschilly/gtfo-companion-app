@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
   Bell,
+  CalendarBlank,
   Check,
   Checks,
   Trash,
@@ -73,12 +74,14 @@ export const NotificationCenterDropdown: React.FC<NotificationCenterDropdownProp
     let app = 0;
     let assets = 0;
     let flightPlan = 0;
+    let calendar = 0;
     notifications.forEach((n) => {
       if (n.category === 'app') app++;
       else if (n.category === 'livery' || n.category === 'mod') assets++;
       else if (n.category === 'flight_plan') flightPlan++;
+      else if (n.category === 'calendar') calendar++;
     });
-    return { all: notifications.length, app, assets, flightPlan };
+    return { all: notifications.length, app, assets, flightPlan, calendar };
   }, [notifications]);
 
   const filteredNotifications = notifications.filter((item) => {
@@ -115,6 +118,8 @@ export const NotificationCenterDropdown: React.FC<NotificationCenterDropdownProp
         return <Package className="w-4 h-4 text-emerald-400" />;
       case 'flight_plan':
         return <AirplaneTilt className="w-4 h-4 text-sky-400" />;
+      case 'calendar':
+        return <CalendarBlank className="w-4 h-4 text-amber-400" />;
       case 'announcement':
         return <Megaphone className="w-4 h-4 text-rose-400" />;
       default:
@@ -217,6 +222,18 @@ export const NotificationCenterDropdown: React.FC<NotificationCenterDropdownProp
             >
               <span>All</span>
               <span className="text-[10px] opacity-80">({counts.all})</span>
+            </button>
+            <button
+              onClick={() => setCategoryFilter('calendar')}
+              className={`px-2.5 py-1 rounded-lg transition-all shrink-0 whitespace-nowrap flex items-center gap-1.5 ${
+                categoryFilter === 'calendar'
+                  ? 'bg-amber-500 text-stone-950 font-bold shadow-sm'
+                  : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800 border border-transparent'
+              }`}
+            >
+              <CalendarBlank className="w-3 h-3" />
+              <span>Sorties</span>
+              <span className="text-[10px] opacity-80">({counts.calendar})</span>
             </button>
             <button
               onClick={() => setCategoryFilter('flight_plan')}

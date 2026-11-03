@@ -17,6 +17,7 @@ import { DashboardView } from './views/DashboardView';
 import { HomeView } from './views/HomeView';
 import { LoginGateView } from './views/LoginGateView';
 import { QualificationsView } from './views/QualificationsView';
+import { ServiceRecordView } from './views/ServiceRecordView';
 import { SettingsView } from './views/SettingsView';
 import { AtcView } from './views/AtcView';
 import { EventCalendarView } from './views/EventCalendarView';
@@ -70,6 +71,7 @@ const MainShell: React.FC = () => {
           {activeTab === 'airframes' && <AirframesView />}
           {activeTab === 'qualifications' && <QualificationsView />}
           {activeTab === 'awards' && <AwardsView />}
+          {activeTab === 'service_record' && <ServiceRecordView />}
           {activeTab === 'atc' && <AtcView />}
           {(activeTab === 'library' || activeTab === 'liveries' || activeTab === 'mods') && (
             <AssetManagerView searchQuery={searchQuery} />

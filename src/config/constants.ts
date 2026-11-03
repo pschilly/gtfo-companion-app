@@ -41,5 +41,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
   notifyAppUpdates: true,
   notifyAssetUpdates: true,
   notifyFlightPlans: true,
+  notifyCalendarEvents: true,
+  calendarReminderMinutes: [1440, 120, 30],
+  calendarRemindOnlyAttending: true,
   pollingIntervalMinutes: 30,
 };

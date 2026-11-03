@@ -5,6 +5,7 @@ import {
   Check,
   ListChecks,
   Medal,
+  Scroll,
   SquaresFour,
 } from '@phosphor-icons/react';
 import { useApp } from '../context/AppContext';
@@ -26,21 +27,6 @@ export const DossierNav: React.FC = () => {
       icon: <SquaresFour className="w-4 h-4" />,
     },
     {
-      id: 'checklist',
-      label: 'Member Readiness',
-      icon: <ListChecks className="w-4 h-4" />,
-      count:
-        checklistSummary.pendingCount > 0 ? (
-          checklistSummary.pendingCount
-        ) : (
-          <Check weight="bold" className="w-3 h-3" />
-        ),
-      badgeColor:
-        checklistSummary.pendingCount > 0
-          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-          : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40',
-    },
-    {
       id: 'airframes',
       label: 'Qualified Airframes',
       icon: <AirplaneTilt className="w-4 h-4" />,
@@ -57,6 +43,12 @@ export const DossierNav: React.FC = () => {
       label: 'Awards & Ribbons',
       icon: <Medal className="w-4 h-4" />,
       count: memberProfile.awards?.length || 0,
+    },
+    {
+      id: 'service_record',
+      label: 'Service Record',
+      icon: <Scroll className="w-4 h-4" />,
+      count: memberProfile.serviceRecords?.length || 0,
     },
   ];
 

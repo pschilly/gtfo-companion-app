@@ -682,6 +682,42 @@ export function normalizeMemberPortalProfile(
         : Array.isArray(raw.awards)
         ? raw.awards.length
         : 0,
+    serviceRecords: Array.isArray(raw.serviceRecords ?? raw.service_records)
+      ? ((raw.serviceRecords ?? raw.service_records) as any[]).map((sr: any, idx: number) => ({
+          id: Number(sr.id || idx + 1),
+          type: String(sr.type || 'note'),
+          typeLabel: String(sr.typeLabel || sr.type_label || sr.type || 'Note'),
+          color: String(sr.color || 'gray'),
+          details: String(sr.details || ''),
+          createdAt: sr.createdAt || sr.created_at || null,
+        }))
+      : [],
+    serviceRecordStats: (() => {
+      const rawStats = (raw.serviceRecordStats ?? raw.service_record_stats) as Record<string, any> | undefined;
+      const recordsArr = Array.isArray(raw.serviceRecords ?? raw.service_records)
+        ? ((raw.serviceRecords ?? raw.service_records) as any[])
+        : [];
+      if (!rawStats || typeof rawStats !== 'object') {
+        return {
+          totalRsvps: 0,
+          attended: 0,
+          absent: 0,
+          pending: 0,
+          rate: null,
+          rateFormatted: 'N/A',
+          totalEntries: recordsArr.length,
+        };
+      }
+      return {
+        totalRsvps: Number(rawStats.totalRsvps ?? rawStats.total_rsvps ?? 0),
+        attended: Number(rawStats.attended ?? 0),
+        absent: Number(rawStats.absent ?? 0),
+        pending: Number(rawStats.pending ?? 0),
+        rate: typeof rawStats.rate === 'number' ? rawStats.rate : null,
+        rateFormatted: String(rawStats.rateFormatted ?? rawStats.rate_formatted ?? 'N/A'),
+        totalEntries: Number(rawStats.totalEntries ?? rawStats.total_entries ?? recordsArr.length),
+      };
+    })(),
     flightHoursLogged: typeof raw.flightHoursLogged === 'number' ? raw.flightHoursLogged : 0,
     portalSyncSource: 'portal_api',
     lastPortalSyncAt: new Date().toISOString(),
@@ -729,6 +765,16 @@ export function buildFallbackMemberProfile(
     certificates: [],
     awards: [],
     awardsCount: 0,
+    serviceRecords: [],
+    serviceRecordStats: {
+      totalRsvps: 0,
+      attended: 0,
+      absent: 0,
+      pending: 0,
+      rate: null,
+      rateFormatted: 'N/A',
+      totalEntries: 0,
+    },
     flightHoursLogged: 0,
     portalSyncSource: 'discord_fallback',
     lastPortalSyncAt: new Date().toISOString(),

@@ -315,8 +315,8 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
                 </div>
               </div>
 
-              <div className="pt-4 mt-2 border-t border-stone-800/80">
-                {missingRequiredMods.length > 0 ? (
+              <div className="pt-4 mt-2 border-t border-stone-800/80 space-y-2">
+                {missingRequiredMods.length > 0 && (
                   <button
                     onClick={handleInstallMods}
                     disabled={isInstallingMods}
@@ -334,15 +334,14 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
                       </>
                     )}
                   </button>
-                ) : (
-                  <button
-                    onClick={() => setActiveTab('mods')}
-                    className="w-full py-2 px-3 rounded-lg bg-stone-800/80 hover:bg-stone-700 text-stone-300 hover:text-stone-100 font-mono text-xs flex items-center justify-center gap-1.5 transition-colors"
-                  >
-                    <Package className="w-3.5 h-3.5 text-stone-400" />
-                    <span>Browse All Mods</span>
-                  </button>
                 )}
+                <button
+                  onClick={() => setActiveTab('mods')}
+                  className="w-full py-2 px-3 rounded-lg bg-stone-800/80 hover:bg-stone-700 text-stone-300 hover:text-stone-100 font-mono text-xs flex items-center justify-center gap-1.5 transition-colors"
+                >
+                  <Package className="w-3.5 h-3.5 text-stone-400" />
+                  <span>Browse All Mods</span>
+                </button>
               </div>
             </div>
 
@@ -398,8 +397,8 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
                 </div>
               </div>
 
-              <div className="pt-4 mt-2 border-t border-stone-800/80">
-                {missingRequiredLiveries.length > 0 ? (
+              <div className="pt-4 mt-2 border-t border-stone-800/80 space-y-2">
+                {missingRequiredLiveries.length > 0 && (
                   <button
                     onClick={handleInstallLiveries}
                     disabled={isInstallingLiveries}
@@ -417,15 +416,14 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
                       </>
                     )}
                   </button>
-                ) : (
-                  <button
-                    onClick={() => setActiveTab('liveries')}
-                    className="w-full py-2 px-3 rounded-lg bg-stone-800/80 hover:bg-stone-700 text-stone-300 hover:text-stone-100 font-mono text-xs flex items-center justify-center gap-1.5 transition-colors"
-                  >
-                    <PaintBrush className="w-3.5 h-3.5 text-stone-400" />
-                    <span>{installedLiveriesCount > 0 ? 'Browse Hangar' : 'Select Liveries'}</span>
-                  </button>
                 )}
+                <button
+                  onClick={() => setActiveTab('liveries')}
+                  className="w-full py-2 px-3 rounded-lg bg-stone-800/80 hover:bg-stone-700 text-stone-300 hover:text-stone-100 font-mono text-xs flex items-center justify-center gap-1.5 transition-colors"
+                >
+                  <PaintBrush className="w-3.5 h-3.5 text-stone-400" />
+                  <span>Browse All Liveries</span>
+                </button>
               </div>
             </div>
 
@@ -513,10 +511,20 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
                     )}
                   </button>
                 ) : (
-                  <div className="w-full py-2 px-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-xs flex items-center justify-center gap-1.5">
-                    <Check className="w-3.5 h-3.5" />
-                    <span>Active in DCS</span>
-                  </div>
+                  <>
+                    <div className="w-full py-2 px-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-xs flex items-center justify-center gap-1.5">
+                      <Check className="w-3.5 h-3.5" />
+                      <span>Active in DCS</span>
+                    </div>
+                    <button
+                      onClick={handleApplyExpectedNickname}
+                      disabled={isUpdatingNick}
+                      className="w-full py-2 px-3 rounded-lg bg-stone-800/80 hover:bg-stone-700 text-stone-300 hover:text-stone-100 font-mono text-xs flex items-center justify-center gap-1.5 transition-colors"
+                    >
+                      <Tag className="w-3.5 h-3.5 text-stone-400" />
+                      <span>{isUpdatingNick ? 'Updating Lua...' : 'Re-sync DCS Nickname'}</span>
+                    </button>
+                  </>
                 )}
               </div>
             </div>
@@ -581,12 +589,21 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
                 </div>
               </div>
 
-              <div className="pt-4 mt-2 border-t border-stone-800/80">
+              <div className="pt-4 mt-2 border-t border-stone-800/80 space-y-2">
                 {isDcsBotLinked ? (
-                  <div className="w-full py-2 px-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-xs flex items-center justify-center gap-1.5">
-                    <Check className="w-3.5 h-3.5" />
-                    <span>Bot Account Linked</span>
-                  </div>
+                  <>
+                    <div className="w-full py-2 px-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-xs flex items-center justify-center gap-1.5">
+                      <Check className="w-3.5 h-3.5" />
+                      <span>Bot Account Linked</span>
+                    </div>
+                    <button
+                      onClick={() => setShowLinkModal(true)}
+                      className="w-full py-2 px-3 rounded-lg bg-stone-800/80 hover:bg-stone-700 text-stone-300 hover:text-stone-100 font-mono text-xs flex items-center justify-center gap-1.5 transition-colors"
+                    >
+                      <Link className="w-3.5 h-3.5 text-stone-400" />
+                      <span>Link Instructions (/linkme)</span>
+                    </button>
+                  </>
                 ) : (
                   <button
                     onClick={() => setShowLinkModal(true)}

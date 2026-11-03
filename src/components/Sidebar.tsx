@@ -21,6 +21,7 @@ import {
   Medal,
   Package,
   PaintBrush,
+  Scroll,
   Shield,
   ShieldCheck,
   ShieldWarning,
@@ -62,6 +63,16 @@ export const Sidebar: React.FC = () => {
   const isTabMatch = (itemId?: NavigationTab, currentTab?: NavigationTab) => {
     if (!itemId || !currentTab) return false;
     if (itemId === currentTab) return true;
+    if (
+      itemId === 'dashboard' &&
+      (currentTab === 'dashboard' ||
+        currentTab === 'airframes' ||
+        currentTab === 'qualifications' ||
+        currentTab === 'awards' ||
+        currentTab === 'service_record')
+    ) {
+      return true;
+    }
     if (
       itemId === 'library' &&
       (currentTab === 'library' || currentTab === 'liveries' || currentTab === 'mods')
@@ -112,43 +123,10 @@ export const Sidebar: React.FC = () => {
       items: [
         {
           id: 'dashboard',
-          label: 'Overview',
+          label: 'Your Dossier',
           icon: <SquaresFour className="w-4 h-4" />,
           badge: memberProfile?.grade,
           badgeColor: 'bg-amber-500/20 text-amber-300 border border-amber-500/40',
-        },
-        {
-          id: 'checklist',
-          label: 'Member Readiness',
-          icon: <ListChecks className="w-4 h-4" />,
-          badge:
-            checklistSummary.pendingCount > 0 ? (
-              checklistSummary.pendingCount
-            ) : (
-              <Check weight="bold" className="w-2.5 h-2.5" />
-            ),
-          badgeColor:
-            checklistSummary.pendingCount > 0
-              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold'
-              : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40',
-        },
-        {
-          id: 'airframes',
-          label: 'Qualified Airframes',
-          icon: <AirplaneTilt className="w-4 h-4" />,
-          badge: memberProfile?.qualifiedAirframes?.length || undefined,
-        },
-        {
-          id: 'qualifications',
-          label: 'Certifications',
-          icon: <Certificate className="w-4 h-4" />,
-          badge: memberProfile?.certificates?.length || undefined,
-        },
-        {
-          id: 'awards',
-          label: 'Awards & Ribbons',
-          icon: <Medal className="w-4 h-4" />,
-          badge: memberProfile?.awards?.length || undefined,
         },
       ],
     },

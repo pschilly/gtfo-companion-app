@@ -5,10 +5,13 @@ import {
   ArrowCircleUp,
   ArrowRight,
   ArrowSquareOut,
+  CalendarBlank,
   Certificate,
+  Check,
   CheckCircle,
   Compass,
   Cpu,
+  ListChecks,
   MagnifyingGlass,
   Medal,
   Package,
@@ -43,6 +46,8 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
     setSelectedAsset,
     setSelectedFlightPlanId,
     setHighlightedCertId,
+    upcomingCalendarEvents,
+    checklistSummary,
   } = useApp();
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -689,6 +694,62 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
             </span>
           )}
         </button> */}
+
+        {/* Member Readiness Shortcut Button */}
+        <button
+          onClick={() => setActiveTab('checklist')}
+          className={`relative p-2 rounded-xl border transition-all ${
+            activeTab === 'checklist'
+              ? 'bg-amber-500/20 border-amber-500/50 text-amber-300'
+              : checklistSummary.pendingCount > 0
+              ? 'bg-stone-900/90 hover:bg-stone-800 border-amber-500/40 text-amber-300 hover:text-amber-200'
+              : 'bg-stone-900/90 hover:bg-stone-800 border-stone-800 text-stone-300 hover:text-amber-400'
+          }`}
+          title={
+            checklistSummary.pendingCount > 0
+              ? `Member Readiness (${checklistSummary.pendingCount} action item${
+                  checklistSummary.pendingCount === 1 ? '' : 's'
+                } pending)`
+              : 'Member Readiness (All 4 checks complete)'
+          }
+          aria-label="Open Member Readiness"
+        >
+          <ListChecks className="w-4 h-4" />
+          {checklistSummary.pendingCount > 0 ? (
+            <span className="absolute -top-1 -right-1 flex h-4 min-w-4 px-1 items-center justify-center rounded-full bg-amber-500 text-[9px] font-mono font-bold text-stone-950 shadow-sm">
+              {checklistSummary.pendingCount}
+            </span>
+          ) : (
+            <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-stone-950 shadow-sm">
+              <Check weight="bold" className="w-2.5 h-2.5" />
+            </span>
+          )}
+        </button>
+
+        {/* Event Calendar Shortcut Button */}
+        <button
+          onClick={() => setActiveTab('calendar')}
+          className={`relative p-2 rounded-xl border transition-all ${
+            activeTab === 'calendar'
+              ? 'bg-amber-500/20 border-amber-500/50 text-amber-300'
+              : 'bg-stone-900/90 hover:bg-stone-800 border-stone-800 text-stone-300 hover:text-amber-400'
+          }`}
+          title={
+            upcomingCalendarEvents.length > 0
+              ? `Event Calendar (${upcomingCalendarEvents.length} upcoming sortie${
+                  upcomingCalendarEvents.length === 1 ? '' : 's'
+                })`
+              : 'Event Calendar'
+          }
+          aria-label="Open Event Calendar"
+        >
+          <CalendarBlank className="w-4 h-4" />
+          {upcomingCalendarEvents.length > 0 && (
+            <span className="absolute -top-1 -right-1 flex h-4 min-w-4 px-1 items-center justify-center rounded-full bg-sky-500 text-[9px] font-mono font-bold text-stone-950 shadow-sm">
+              {upcomingCalendarEvents.length > 99 ? '99+' : upcomingCalendarEvents.length}
+            </span>
+          )}
+        </button>
 
         {/* Tactical In-App & OS Notification Center */}
         <NotificationCenterDropdown />

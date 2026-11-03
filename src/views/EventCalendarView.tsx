@@ -1580,10 +1580,14 @@ export const EventCalendarView: React.FC = () => {
                 <div className="p-3.5 rounded-2xl bg-stone-950/90 border border-stone-800/90">
                   <div className="text-[10px] font-mono uppercase text-stone-400 flex items-center gap-1.5">
                     <Users className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Confirmed Roster</span>
+                    <span>{selectedEvent.has_aar ? 'Sortie Attendance' : 'Confirmed Roster'}</span>
                   </div>
                   <div className="text-base font-display font-bold text-emerald-400 mt-1">
-                    {selectedEvent.attendee_count} Attending
+                    {selectedEvent.has_aar
+                      ? `${selectedEvent.attendees.filter((a) => a.is_present === true).length} Attended / ${
+                          selectedEvent.attendees.filter((a) => a.is_present === false).length
+                        } Absent`
+                      : `${selectedEvent.attendee_count} Attending`}
                   </div>
                   {selectedEvent.type === 'campaign' && selectedEvent.allow_opfor && (
                     <div className="text-[10px] font-mono text-red-400 mt-0.5">
@@ -1975,7 +1979,11 @@ export const EventCalendarView: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <h3 className="font-display font-bold text-sm sm:text-base text-stone-100 flex items-center gap-2">
                     <Users className="w-4 h-4 text-amber-400" />
-                    <span>Registered Flight Roster ({selectedEvent.attendee_count})</span>
+                    <span>
+                      {selectedEvent.has_aar
+                        ? `Flight Attendance (${selectedEvent.attendees.filter((a) => a.is_present === true).length} Attended / ${selectedEvent.attendees.filter((a) => a.is_present === false).length} Absent)`
+                        : `Registered Flight Roster (${selectedEvent.attendee_count})`}
+                    </span>
                   </h3>
                 </div>
 
@@ -1997,7 +2005,9 @@ export const EventCalendarView: React.FC = () => {
                               {squadronName}
                             </span>
                             <span className="text-stone-400">
-                              {list.length} Member{list.length === 1 ? '' : 's'}
+                              {selectedEvent.has_aar
+                                ? `${list.filter((a) => a.is_present === true).length} Attended / ${list.filter((a) => a.is_present === false).length} Absent`
+                                : `${list.length} Member${list.length === 1 ? '' : 's'}`}
                             </span>
                           </div>
                           <div className="divide-y divide-stone-800/60">
@@ -2007,28 +2017,52 @@ export const EventCalendarView: React.FC = () => {
                                 (att.id
                                   ? resolvedAttendeeCallsigns.get(att.id)
                                   : undefined);
+                              const isAbsent = selectedEvent.has_aar && att.is_present === false;
                               return (
                                 <div
                                   key={`${att.callsign}-${idx}`}
-                                  className="px-4 py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
+                                  className={`px-4 py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs transition-colors ${
+                                    isAbsent ? 'bg-stone-950/40 opacity-70' : ''
+                                  }`}
                                 >
                                   <div className="flex flex-wrap items-center gap-2">
-                                    <AirplaneTilt className="w-4 h-4 text-stone-400 shrink-0" />
+                                    <AirplaneTilt className={`w-4 h-4 shrink-0 ${isAbsent ? 'text-stone-600' : 'text-stone-400'}`} />
                                     {resolvedFlightCs && (
-                                      <span className="px-2 py-0.5 rounded bg-amber-500/15 border border-amber-500/40 text-amber-300 font-mono font-bold text-[11px]">
+                                      <span className={`px-2 py-0.5 rounded font-mono font-bold text-[11px] border ${
+                                        isAbsent
+                                          ? 'bg-stone-800/40 border-stone-700/50 text-stone-500 line-through'
+                                          : 'bg-amber-500/15 border-amber-500/40 text-amber-300'
+                                      }`}>
                                         {resolvedFlightCs}
                                       </span>
                                     )}
-                                    <span className="font-display font-semibold text-stone-100">
+                                    <span className={`font-display font-semibold ${
+                                      isAbsent ? 'line-through text-stone-500' : 'text-stone-100'
+                                    }`}>
                                       {att.callsign}
                                     </span>
                                     <span
                                       className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${getRoleBadgeStyle(
                                         att.role
-                                      )}`}
+                                      )} ${isAbsent ? 'opacity-60' : ''}`}
                                     >
                                       {att.role_label}
                                     </span>
+                                    {selectedEvent.has_aar && (
+                                      att.is_present === false ? (
+                                        <span className="px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[9px] font-bold uppercase font-mono">
+                                          Not Present
+                                        </span>
+                                      ) : att.xp_awarded ? (
+                                        <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[9px] font-bold font-mono">
+                                          +500 XP
+                                        </span>
+                                      ) : (
+                                        <span className="px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[9px] font-bold uppercase font-mono">
+                                          Attended
+                                        </span>
+                                      )
+                                    )}
                                   </div>
                                   <div className="flex items-center gap-3 font-mono text-stone-300">
                                     {att.notes && (
@@ -2036,7 +2070,11 @@ export const EventCalendarView: React.FC = () => {
                                         &ldquo;{att.notes}&rdquo;
                                       </span>
                                     )}
-                                    <span className="px-2 py-0.5 rounded bg-stone-900 border border-stone-800 text-amber-300 text-[11px]">
+                                    <span className={`px-2 py-0.5 rounded border text-[11px] ${
+                                      isAbsent
+                                        ? 'bg-stone-900/60 border-stone-800/60 text-stone-500 line-through'
+                                        : 'bg-stone-900 border-stone-800 text-amber-300'
+                                    }`}>
                                       {att.airframe_name ||
                                         att.airframe_abbreviation ||
                                         'TBD'}
@@ -2058,8 +2096,9 @@ export const EventCalendarView: React.FC = () => {
                             OPFOR Aggressor Element
                           </span>
                           <span className="text-red-300/80">
-                            {groupedAttendees.opfor.length} Pilot
-                            {groupedAttendees.opfor.length === 1 ? '' : 's'}
+                            {selectedEvent.has_aar
+                              ? `${groupedAttendees.opfor.filter((a) => a.is_present === true).length} Attended / ${groupedAttendees.opfor.filter((a) => a.is_present === false).length} Absent`
+                              : `${groupedAttendees.opfor.length} Pilot${groupedAttendees.opfor.length === 1 ? '' : 's'}`}
                           </span>
                         </div>
                         <div className="divide-y divide-red-500/20">
@@ -2069,22 +2108,50 @@ export const EventCalendarView: React.FC = () => {
                               (att.id
                                 ? resolvedAttendeeCallsigns.get(att.id)
                                 : undefined);
+                            const isAbsent = selectedEvent.has_aar && att.is_present === false;
                             return (
                               <div
                                 key={`opfor-${idx}`}
-                                className="px-4 py-2.5 flex items-center justify-between gap-2 text-xs"
+                                className={`px-4 py-2.5 flex items-center justify-between gap-2 text-xs transition-colors ${
+                                  isAbsent ? 'bg-stone-950/40 opacity-70' : ''
+                                }`}
                               >
                                 <div className="flex items-center gap-2">
                                   {resolvedOpforCs && (
-                                    <span className="px-2 py-0.5 rounded bg-red-500/20 border border-red-500/40 text-red-200 font-mono font-bold text-[11px]">
+                                    <span className={`px-2 py-0.5 rounded border font-mono font-bold text-[11px] ${
+                                      isAbsent
+                                        ? 'bg-stone-800/40 border-stone-700/50 text-stone-500 line-through'
+                                        : 'bg-red-500/20 border-red-500/40 text-red-200'
+                                    }`}>
                                       {resolvedOpforCs}
                                     </span>
                                   )}
-                                  <span className="font-display font-semibold text-red-200">
+                                  <span className={`font-display font-semibold ${
+                                    isAbsent ? 'line-through text-stone-500' : 'text-red-200'
+                                  }`}>
                                     {att.callsign}
                                   </span>
+                                  {selectedEvent.has_aar && (
+                                    att.is_present === false ? (
+                                      <span className="px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[9px] font-bold uppercase font-mono">
+                                        Not Present
+                                      </span>
+                                    ) : att.xp_awarded ? (
+                                      <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[9px] font-bold font-mono">
+                                        +500 XP
+                                      </span>
+                                    ) : (
+                                      <span className="px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[9px] font-bold uppercase font-mono">
+                                        Attended
+                                      </span>
+                                    )
+                                  )}
                                 </div>
-                                <span className="px-2 py-0.5 rounded bg-stone-950 border border-red-500/30 text-red-300 font-mono text-[11px]">
+                                <span className={`px-2 py-0.5 rounded border font-mono text-[11px] ${
+                                  isAbsent
+                                    ? 'bg-stone-950/60 border-stone-800 text-stone-500 line-through'
+                                    : 'bg-stone-950 border-red-500/30 text-red-300'
+                                }`}>
                                   {att.airframe_name ||
                                     att.airframe_abbreviation ||
                                     'Classified'}

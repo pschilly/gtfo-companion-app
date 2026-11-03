@@ -19,6 +19,7 @@ export type NavigationTab =
   | 'airframes'
   | 'qualifications'
   | 'awards'
+  | 'service_record'
   | 'atc'
   | 'calendar'
   | 'liveries'
@@ -134,6 +135,38 @@ export interface AdminPositionDetail {
   discordRole?: string | number;
 }
 
+export type ServiceRecordType =
+  | 'note'
+  | 'enlistment'
+  | 'squadron'
+  | 'grade'
+  | 'certificate'
+  | 'xp_award'
+  | 'xp_penalty'
+  | 'callsign_change'
+  | 'operation-sortie'
+  | 'opfor-sortie'
+  | string;
+
+export interface ServiceRecordEntry {
+  id: number;
+  type: ServiceRecordType;
+  typeLabel: string;
+  color: 'gray' | 'success' | 'warning' | 'info' | 'danger' | string;
+  details: string;
+  createdAt?: string | null;
+}
+
+export interface ServiceRecordStats {
+  totalRsvps: number;
+  attended: number;
+  absent: number;
+  pending: number;
+  rate: number | null;
+  rateFormatted: string;
+  totalEntries: number;
+}
+
 export interface MemberPortalProfile {
   discordId: string;
   callsign: string;
@@ -172,6 +205,8 @@ export interface MemberPortalProfile {
   certificates: MemberCertificate[];
   awards: MemberAward[];
   awardsCount: number;
+  serviceRecords?: ServiceRecordEntry[];
+  serviceRecordStats?: ServiceRecordStats;
   flightHoursLogged: number;
   portalSyncSource: 'portal_api' | 'discord_fallback';
   lastPortalSyncAt: string;
@@ -613,7 +648,7 @@ export interface WindowPreferences {
   closeToTray: boolean;
 }
 
-export type NotificationCategory = 'app' | 'livery' | 'mod' | 'flight_plan' | 'announcement';
+export type NotificationCategory = 'app' | 'livery' | 'mod' | 'flight_plan' | 'calendar' | 'announcement';
 
 export interface AppNotification {
   id: string;
@@ -643,6 +678,9 @@ export interface AppSettings {
   notifyAppUpdates: boolean;
   notifyAssetUpdates: boolean;
   notifyFlightPlans: boolean;
+  notifyCalendarEvents: boolean;
+  calendarReminderMinutes: number[];
+  calendarRemindOnlyAttending: boolean;
   pollingIntervalMinutes: number;
 }
 

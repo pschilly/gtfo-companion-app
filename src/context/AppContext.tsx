@@ -45,6 +45,7 @@ import {
   AssetItem,
   AssetManifest,
   AtcFlightPlanPackage,
+  CalendarEventItem,
   ChecklistSummary,
   DcsEnvironmentInfo,
   DcsNicknameInfo,
@@ -61,6 +62,7 @@ import {
   TelemetryLogEntry,
   UserTier,
 } from '../types';
+import { fetchCalendarEvents } from '../services/calendarService';
 import { formatExpectedDcsNickname } from '../utils/formatters';
 import { checkForAppUpdate, getRuntimeAppVersion, AppUpdateInfo } from '../services/updaterService';
 import {
@@ -121,6 +123,8 @@ interface AppContextValue {
   filedFlightPlans: FlightPlanSummary[];
   isLoadingFlightPlans: boolean;
   syncFlightPlans: () => Promise<void>;
+  upcomingCalendarEvents: CalendarEventItem[];
+  syncCalendarEvents: () => Promise<void>;
   fetchFiledPlans: (options?: FetchFiledFlightPlansOptions) => Promise<FlightPlanSummary[]>;
   loadFlightPlanDetail: (idOrIdentifier: string | number) => Promise<FlightPlanDetail>;
   saveRouteToDcs: (theatre: string, luaContent: string) => Promise<RoutePresetInstallResult>;
@@ -243,6 +247,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [activeSortieFlightPlans, setActiveSortieFlightPlans] = useState<FlightPlanSummary[]>([]);
   const [filedFlightPlans, setFiledFlightPlans] = useState<FlightPlanSummary[]>([]);
   const [isLoadingFlightPlans, setIsLoadingFlightPlans] = useState(false);
+  const [upcomingCalendarEvents, setUpcomingCalendarEvents] = useState<CalendarEventItem[]>([]);
 
   const [installedAtc, setInstalledAtc] = useState<InstalledAtcState>(() => {
     const raw = localStorage.getItem(STORAGE_KEYS.INSTALLED_ATC);
@@ -706,6 +711,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         if ((item.category === 'livery' || item.category === 'mod') && !settings.notifyAssetUpdates)
           shouldToast = false;
         if (item.category === 'flight_plan' && !settings.notifyFlightPlans) shouldToast = false;
+        if (item.category === 'calendar' && !settings.notifyCalendarEvents) shouldToast = false;
 
         if (shouldToast) {
           dispatchDesktopToast(`GTFO: ${item.title}`, item.message);
@@ -719,6 +725,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       settings.notifyAppUpdates,
       settings.notifyAssetUpdates,
       settings.notifyFlightPlans,
+      settings.notifyCalendarEvents,
     ]
   );
 
@@ -853,6 +860,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     syncManifest();
     syncMemberPortal();
     syncFlightPlans();
+    syncCalendarEvents();
     checkForAppUpdateAction();
 
     if (window.location.hash.includes('access_token=')) {
@@ -891,7 +899,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (userSession?.id) {
       syncMemberPortal();
       syncManifest();
+      syncCalendarEvents();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userSession?.id, syncMemberPortal, syncManifest]);
 
   // Configurable periodic background polling & window refocus sync
@@ -903,6 +913,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       syncManifest();
       syncMemberPortal();
       syncFlightPlans();
+      syncCalendarEvents();
       checkForAppUpdateAction();
     }, pollIntervalMs);
 
@@ -914,6 +925,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         syncManifest();
         syncMemberPortal();
         syncFlightPlans();
+        syncCalendarEvents();
         checkForAppUpdateAction();
       }
     };
@@ -923,6 +935,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       clearInterval(intervalId);
       window.removeEventListener('focus', handleFocus);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings.pollingIntervalMinutes, syncManifest, syncMemberPortal, checkForAppUpdateAction]);
 
   // Notify when new remote announcements are broadcast in manifest
@@ -1571,6 +1584,145 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [addLog, memberProfile.discordId, settings.memberPortalApiUrl, userSession?.accessToken, userSession?.id]);
 
+  const syncCalendarEvents = useCallback(async () => {
+    const baseUrl = settings.memberPortalApiUrl || STATIC_CONFIG.portalBaseUrl;
+    const discordId = userSession?.id || memberProfile.discordId;
+    const token = userSession?.accessToken;
+    const now = new Date();
+    const curYear = now.getFullYear();
+    const curMonth = now.getMonth() + 1;
+    const nextYear = curMonth === 12 ? curYear + 1 : curYear;
+    const nextMonth = curMonth === 12 ? 1 : curMonth + 1;
+
+    try {
+      const [curRes, nextRes] = await Promise.all([
+        fetchCalendarEvents(baseUrl, { year: curYear, month: curMonth, discord_id: discordId }, token),
+        fetchCalendarEvents(baseUrl, { year: nextYear, month: nextMonth, discord_id: discordId }, token),
+      ]);
+
+      const mergedMap = new Map<string, CalendarEventItem>();
+      [...(curRes.events || []), ...(nextRes.events || [])].forEach((ev) => {
+        mergedMap.set(ev.uid, ev);
+      });
+
+      const nowMs = Date.now();
+      const upcoming = Array.from(mergedMap.values())
+        .filter((ev) => {
+          if (!ev.scheduled_at || ev.is_concluded) return false;
+          return new Date(ev.scheduled_at).getTime() >= nowMs - 2 * 60 * 60 * 1000;
+        })
+        .sort((a, b) => {
+          const tA = a.scheduled_at ? new Date(a.scheduled_at).getTime() : 0;
+          const tB = b.scheduled_at ? new Date(b.scheduled_at).getTime() : 0;
+          return tA - tB;
+        });
+
+      setUpcomingCalendarEvents(upcoming);
+
+      if (settings.notifyCalendarEvents) {
+        upcoming.forEach((ev) => {
+          const dt = ev.scheduled_at ? new Date(ev.scheduled_at) : null;
+          const dateLabel =
+            dt && !Number.isNaN(dt.getTime())
+              ? dt.toLocaleString(undefined, {
+                  month: 'short',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })
+              : 'TBD';
+
+          const badge = ev.type === 'campaign' ? 'Operation' : 'Training';
+          const eventKey = `calendar_event:${ev.uid}:${ev.scheduled_at || 'tbd'}`;
+
+          addNotification({
+            title: `${badge}: ${ev.name}`,
+            message: `${ev.subtitle ? `${ev.subtitle} • ` : ''}Scheduled for ${dateLabel}`,
+            category: 'calendar',
+            actionTab: 'calendar',
+            fingerprint: eventKey,
+          });
+        });
+      }
+    } catch {
+      // Non-blocking background sync
+    }
+  }, [
+    addNotification,
+    memberProfile.discordId,
+    settings.memberPortalApiUrl,
+    settings.notifyCalendarEvents,
+    userSession?.accessToken,
+    userSession?.id,
+  ]);
+
+  // Evaluate configurable pre-sortie launch reminders (24h, 2h, 30m, 15m before launch)
+  useEffect(() => {
+    if (!settings.notifyCalendarEvents || upcomingCalendarEvents.length === 0) return;
+
+    const reminderWindows = Array.isArray(settings.calendarReminderMinutes)
+      ? [...settings.calendarReminderMinutes].sort((a, b) => a - b)
+      : [1440, 120, 30];
+
+    if (reminderWindows.length === 0) return;
+
+    const checkReminders = () => {
+      const nowMs = Date.now();
+      upcomingCalendarEvents.forEach((ev) => {
+        if (ev.is_concluded || !ev.scheduled_at) return;
+        if (settings.calendarRemindOnlyAttending && !ev.is_attending) return;
+
+        const dt = new Date(ev.scheduled_at);
+        if (Number.isNaN(dt.getTime())) return;
+
+        const diffMin = Math.round((dt.getTime() - nowMs) / 60000);
+        if (diffMin <= 0) return;
+
+        // Find the smallest configured reminder window that the sortie has entered
+        const activeThreshold = reminderWindows.find((thresholdMin) => diffMin <= thresholdMin);
+        if (!activeThreshold) return;
+
+        const dateLabel = dt.toLocaleString(undefined, {
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        });
+
+        const badge = ev.type === 'campaign' ? 'Operation' : 'Training';
+        const callsignInfo = ev.my_rsvp?.flight_callsign
+          ? ` (${ev.my_rsvp.flight_callsign})`
+          : '';
+        const thresholdLabel =
+          activeThreshold >= 60
+            ? `${Math.round(activeThreshold / 60)}h`
+            : `${activeThreshold}m`;
+        const timeRemainingLabel =
+          diffMin >= 60
+            ? `${Math.floor(diffMin / 60)}h ${diffMin % 60}m`
+            : `${diffMin}m`;
+
+        addNotification({
+          title: `Sortie Reminder (${thresholdLabel}): ${ev.name}`,
+          message: `${badge} sortie${callsignInfo} launches at ${dateLabel} (in ~${timeRemainingLabel}).`,
+          category: 'calendar',
+          actionTab: 'calendar',
+          fingerprint: `calendar_reminder:${ev.uid}:${ev.scheduled_at}:${activeThreshold}m`,
+        });
+      });
+    };
+
+    checkReminders();
+    const timer = setInterval(checkReminders, 60 * 1000);
+    return () => clearInterval(timer);
+  }, [
+    upcomingCalendarEvents,
+    settings.notifyCalendarEvents,
+    settings.calendarReminderMinutes,
+    settings.calendarRemindOnlyAttending,
+    addNotification,
+  ]);
+
   const loadFlightPlanDetail = useCallback(
     async (idOrIdentifier: string | number): Promise<FlightPlanDetail> => {
       const baseUrl = settings.memberPortalApiUrl || STATIC_CONFIG.portalBaseUrl;
@@ -1763,6 +1915,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         filedFlightPlans,
         isLoadingFlightPlans,
         syncFlightPlans,
+        upcomingCalendarEvents,
+        syncCalendarEvents,
         fetchFiledPlans,
         loadFlightPlanDetail,
         saveRouteToDcs,
