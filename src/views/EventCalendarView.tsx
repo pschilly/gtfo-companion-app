@@ -18,6 +18,7 @@ import {
   Lock,
   MapPin,
   Note,
+  Radio,
   ShieldCheck,
   ShieldWarning,
   SquaresFour,
@@ -110,7 +111,16 @@ function formatFullDateTime(iso: string | null | undefined): string {
 }
 
 function getRoleBadgeStyle(role: string): string {
-  switch (role) {
+  switch (role.toLowerCase()) {
+    case 'game_master':
+    case 'gm':
+      return 'bg-amber-500/20 text-amber-300 border-amber-500/40';
+    case 'jtac':
+      return 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40';
+    case 'atc':
+      return 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40';
+    case 'gci':
+      return 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40';
     case 'instructor':
       return 'bg-amber-500/20 text-amber-300 border-amber-500/40';
     case 'student':
@@ -426,6 +436,7 @@ export const EventCalendarView: React.FC = () => {
   const [selectedEventUid, setSelectedEventUid] = useState<string | null>(null);
 
   // RSVP Form state inside modal
+  const [rsvpCategory, setRsvpCategory] = useState<'flight' | 'support'>('flight');
   const [rsvpAirframeId, setRsvpAirframeId] = useState<number | ''>('');
   const [rsvpRole, setRsvpRole] = useState<string>('pilot');
   const [rsvpSide, setRsvpSide] = useState<'blufor' | 'opfor'>('blufor');
@@ -548,6 +559,66 @@ export const EventCalendarView: React.FC = () => {
     return getAuthorizedCallsignsForOption(found, isOpfor);
   }, [selectedEvent, availableAirframesForSelectedEvent, rsvpAirframeId, rsvpSide]);
 
+  // Support role options allocated for this campaign sortie
+  const supportRoleOptions = useMemo(() => {
+    if (!selectedEvent || selectedEvent.type !== 'campaign') return [];
+
+    const options = [];
+    if ((selectedEvent.game_master_slots ?? 0) > 0) {
+      options.push({
+        value: 'game_master',
+        label: 'Game Master (GM)',
+        short_label: 'GM',
+        totalSlots: selectedEvent.game_master_slots ?? 0,
+        occupiedSlots: selectedEvent.game_master_count ?? 0,
+        available: Boolean(selectedEvent.has_available_game_master_slots),
+        eligible: Boolean(selectedEvent.can_rsvp_game_master),
+        active: selectedEvent.my_rsvp?.role === 'game_master',
+      });
+    }
+    if ((selectedEvent.jtac_slots ?? 0) > 0) {
+      options.push({
+        value: 'jtac',
+        label: 'JTAC',
+        short_label: 'JTAC',
+        totalSlots: selectedEvent.jtac_slots ?? 0,
+        occupiedSlots: selectedEvent.jtac_count ?? 0,
+        available: Boolean(selectedEvent.has_available_jtac_slots),
+        eligible: Boolean(selectedEvent.can_rsvp_jtac),
+        active: selectedEvent.my_rsvp?.role === 'jtac',
+      });
+    }
+    if ((selectedEvent.atc_slots ?? 0) > 0) {
+      options.push({
+        value: 'atc',
+        label: 'Air Traffic Control (ATC)',
+        short_label: 'ATC',
+        totalSlots: selectedEvent.atc_slots ?? 0,
+        occupiedSlots: selectedEvent.atc_count ?? 0,
+        available: Boolean(selectedEvent.has_available_atc_slots),
+        eligible: Boolean(selectedEvent.can_rsvp_atc),
+        active: selectedEvent.my_rsvp?.role === 'atc',
+      });
+    }
+    if ((selectedEvent.gci_slots ?? 0) > 0) {
+      options.push({
+        value: 'gci',
+        label: 'Ground-Controlled Interceptor (GCI)',
+        short_label: 'GCI',
+        totalSlots: selectedEvent.gci_slots ?? 0,
+        occupiedSlots: selectedEvent.gci_count ?? 0,
+        available: Boolean(selectedEvent.has_available_gci_slots),
+        eligible: Boolean(selectedEvent.can_rsvp_gci),
+        active: selectedEvent.my_rsvp?.role === 'gci',
+      });
+    }
+    return options;
+  }, [selectedEvent]);
+
+  const isSupportRole = useMemo(() => {
+    return ['game_master', 'gm', 'jtac', 'atc', 'gci'].includes((rsvpRole || '').toLowerCase());
+  }, [rsvpRole]);
+
   // Resolved callsigns map for all attendees on the selected event
   const resolvedAttendeeCallsigns = useMemo(() => {
     if (!selectedEvent) return new Map<number, string>();
@@ -596,9 +667,12 @@ export const EventCalendarView: React.FC = () => {
     setRsvpFeedback(null);
 
     if (selectedEvent.my_rsvp) {
+      const myRole = (selectedEvent.my_rsvp.role || 'pilot').toLowerCase();
+      const isSupport = ['game_master', 'gm', 'jtac', 'atc', 'gci'].includes(myRole);
+      setRsvpCategory(isSupport ? 'support' : 'flight');
       const existingAfId = selectedEvent.my_rsvp.airframe_id;
       setRsvpAirframeId(existingAfId ?? '');
-      setRsvpRole(selectedEvent.my_rsvp.role || 'pilot');
+      setRsvpRole(selectedEvent.my_rsvp.role || (isSupport ? myRole : 'pilot'));
       const isOpfor = Boolean(selectedEvent.my_rsvp.is_opfor);
       setRsvpSide(isOpfor ? 'opfor' : 'blufor');
       setRsvpNotes(selectedEvent.my_rsvp.notes || '');
@@ -610,6 +684,8 @@ export const EventCalendarView: React.FC = () => {
 
       if (savedCallsign) {
         setRsvpCallsign(savedCallsign);
+      } else if (isSupport) {
+        setRsvpCallsign(selectedEvent.my_rsvp.role_label || 'Game Master');
       } else {
         const afOpt = availableAirframesForSelectedEvent.find(
           (a) => a.id === Number(existingAfId)
@@ -625,6 +701,7 @@ export const EventCalendarView: React.FC = () => {
         );
       }
     } else {
+      setRsvpCategory('flight');
       const primaryAf =
         availableAirframesForSelectedEvent.find((a) => a.is_primary) ||
         availableAirframesForSelectedEvent[0];
@@ -839,7 +916,7 @@ export const EventCalendarView: React.FC = () => {
   const handleSubmitRsvp = async (action: 'attend' | 'cancel') => {
     if (!selectedEvent) return;
 
-    if (action === 'attend' && !rsvpAirframeId) {
+    if (action === 'attend' && !isSupportRole && !rsvpAirframeId) {
       setRsvpFeedback({
         type: 'error',
         message: 'Please select a qualified aircraft before confirming your RSVP.',
@@ -861,10 +938,10 @@ export const EventCalendarView: React.FC = () => {
         {
           discord_id: userSession?.id || '',
           action,
-          airframe_id: action === 'attend' ? Number(rsvpAirframeId) : null,
+          airframe_id: action === 'attend' && !isSupportRole && rsvpAirframeId ? Number(rsvpAirframeId) : null,
           role: action === 'attend' ? rsvpRole : undefined,
           is_opfor:
-            action === 'attend' && selectedEvent.type === 'campaign'
+            action === 'attend' && selectedEvent.type === 'campaign' && !isSupportRole
               ? rsvpSide === 'opfor'
               : false,
           callsign: submittedCallsign,
@@ -941,7 +1018,8 @@ export const EventCalendarView: React.FC = () => {
       if (att.is_opfor) {
         opfor.push(att);
       } else {
-        const sq = att.squadron_name || 'Unassigned / Attached';
+        const isSupport = att.is_support || ['game_master', 'gm', 'jtac', 'atc', 'gci'].includes((att.role || '').toLowerCase());
+        const sq = isSupport ? 'Command & Support Staff' : (att.squadron_name || 'Unassigned / Attached');
         if (!bluforBySquadron[sq]) {
           bluforBySquadron[sq] = [];
         }
@@ -949,7 +1027,17 @@ export const EventCalendarView: React.FC = () => {
       }
     });
 
-    return { bluforBySquadron, opfor };
+    const sortedBlufor: Record<string, CalendarEventAttendee[]> = {};
+    if (bluforBySquadron['Command & Support Staff']) {
+      sortedBlufor['Command & Support Staff'] = bluforBySquadron['Command & Support Staff'];
+    }
+    Object.keys(bluforBySquadron).sort().forEach((key) => {
+      if (key !== 'Command & Support Staff') {
+        sortedBlufor[key] = bluforBySquadron[key];
+      }
+    });
+
+    return { bluforBySquadron: sortedBlufor, opfor };
   }, [selectedEvent]);
 
   return (
@@ -1704,7 +1792,7 @@ export const EventCalendarView: React.FC = () => {
                         The sign-up cut-off for this sortie has passed. Contact S2/S3 command on Discord for late slot changes.
                       </span>
                     </div>
-                  ) : availableAirframesForSelectedEvent.length === 0 ? (
+                  ) : availableAirframesForSelectedEvent.length === 0 && supportRoleOptions.length === 0 ? (
                     <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 flex items-center gap-2.5">
                       <Info className="w-4 h-4 text-amber-400 shrink-0" />
                       <span>
@@ -1713,6 +1801,125 @@ export const EventCalendarView: React.FC = () => {
                     </div>
                   ) : (
                     <div className="space-y-4">
+                      {/* Slot Category Selector: Flight Slot vs Support Slot */}
+                      {supportRoleOptions.length > 0 && selectedEvent.is_signup_open && (
+                        <div className="flex items-center gap-2 p-1 rounded-xl bg-stone-900 border border-stone-800 text-xs font-mono">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setRsvpCategory('flight');
+                              const primaryAf =
+                                availableAirframesForSelectedEvent.find((a) => a.is_primary) ||
+                                availableAirframesForSelectedEvent[0];
+                              setRsvpAirframeId(primaryAf ? primaryAf.id : '');
+                              setRsvpRole(primaryAf?.allowed_roles?.[0]?.value || 'pilot');
+                            }}
+                            className={`flex-1 py-1.5 px-3 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all ${
+                              rsvpCategory === 'flight'
+                                ? 'bg-amber-500 text-stone-950 shadow-sm'
+                                : 'text-stone-400 hover:text-stone-200'
+                            }`}
+                          >
+                            <AirplaneTilt className="w-3.5 h-3.5" />
+                            <span>Flight Slot (Aircraft)</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setRsvpCategory('support');
+                              const firstEligible =
+                                supportRoleOptions.find((o) => o.eligible && (o.available || o.active)) ||
+                                supportRoleOptions[0];
+                              setRsvpRole(firstEligible?.value || 'game_master');
+                              setRsvpAirframeId('');
+                              setRsvpCallsign(firstEligible?.label || 'Game Master');
+                            }}
+                            className={`flex-1 py-1.5 px-3 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all ${
+                              rsvpCategory === 'support'
+                                ? 'bg-amber-500 text-stone-950 shadow-sm'
+                                : 'text-stone-400 hover:text-stone-200'
+                            }`}
+                          >
+                            <Radio className="w-3.5 h-3.5" />
+                            <span>Support Slot (GM / JTAC / ATC / GCI)</span>
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Support Slot Form */}
+                      {rsvpCategory === 'support' && selectedEvent.is_signup_open ? (
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <label className="block text-[11px] font-mono uppercase text-stone-400 font-semibold">
+                              Select Support Role Slot
+                            </label>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                              {supportRoleOptions.map((opt) => {
+                                const isSelected = rsvpRole.toLowerCase() === opt.value.toLowerCase();
+                                const isFull = !opt.available && !opt.active;
+                                const isLocked = !opt.eligible;
+                                const isDisabled = isFull || isLocked;
+
+                                return (
+                                  <button
+                                    key={opt.value}
+                                    type="button"
+                                    disabled={isDisabled}
+                                    onClick={() => {
+                                      setRsvpRole(opt.value);
+                                      setRsvpCallsign(opt.label);
+                                    }}
+                                    className={`p-3 rounded-xl border text-left transition-all ${
+                                      isSelected
+                                        ? 'bg-amber-500/15 border-amber-500 text-amber-200 ring-1 ring-amber-500/50'
+                                        : isDisabled
+                                        ? 'bg-stone-950/40 border-stone-800/40 text-stone-600 cursor-not-allowed opacity-60'
+                                        : 'bg-stone-900/60 border-stone-800 text-stone-300 hover:border-stone-700'
+                                    }`}
+                                  >
+                                    <div className="flex items-center justify-between gap-1 mb-1">
+                                      <span className="font-bold font-mono text-xs text-stone-100">{opt.label}</span>
+                                      <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${
+                                        isSelected ? 'bg-amber-500/20 border-amber-500/40 text-amber-300' : 'bg-stone-800 border-stone-700 text-stone-400'
+                                      }`}>
+                                        {opt.occupiedSlots} / {opt.totalSlots} Slots
+                                      </span>
+                                    </div>
+                                    <div className="text-[11px] font-mono">
+                                      {isLocked ? (
+                                        <span className="text-rose-400/80 flex items-center gap-1">
+                                          <Lock className="w-3 h-3" /> Locked &bull; Requires {opt.short_label} role
+                                        </span>
+                                      ) : isFull ? (
+                                        <span className="text-stone-500">All slots filled</span>
+                                      ) : (
+                                        <span className="text-emerald-400/80">Available &bull; Qualified</span>
+                                      )}
+                                    </div>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+
+                          <div className="p-3.5 rounded-xl bg-stone-900/70 border border-stone-800 space-y-2">
+                            <label className="block text-[11px] font-mono uppercase text-amber-300 font-semibold">
+                              Tactical Callsign / Callsign Identifier
+                            </label>
+                            <input
+                              type="text"
+                              value={rsvpCallsign}
+                              onChange={(e) => setRsvpCallsign(e.target.value)}
+                              placeholder="e.g. Game Master, Overlord, Magic, etc."
+                              className="w-full px-3.5 py-2.5 rounded-xl bg-stone-900 border border-stone-800 text-xs sm:text-sm text-stone-100 font-mono focus:outline-none focus:border-amber-500"
+                            />
+                            <p className="text-[11px] font-mono text-stone-400">
+                              Support slots do not require a qualified airframe. You will receive full attendance credit and service record entry upon sortie debrief.
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
                       {selectedEvent.is_signup_open && (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           {/* Aircraft Selector */}
@@ -1936,6 +2143,8 @@ export const EventCalendarView: React.FC = () => {
                             />
                           </div>
                         )}
+                      </>
+                    )}
 
                       {/* Action Buttons */}
                       <div className="flex flex-wrap items-center justify-end gap-3 pt-1">
@@ -1954,7 +2163,7 @@ export const EventCalendarView: React.FC = () => {
                         {selectedEvent.is_signup_open && (
                           <button
                             type="button"
-                            disabled={isSubmittingRsvp || !rsvpAirframeId}
+                            disabled={isSubmittingRsvp || (!isSupportRole && !rsvpAirframeId)}
                             onClick={() => handleSubmitRsvp('attend')}
                             className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono font-bold text-xs flex items-center gap-2 transition-all shadow-md shadow-amber-500/20 disabled:opacity-50"
                           >
@@ -2026,7 +2235,11 @@ export const EventCalendarView: React.FC = () => {
                                   }`}
                                 >
                                   <div className="flex flex-wrap items-center gap-2">
-                                    <AirplaneTilt className={`w-4 h-4 shrink-0 ${isAbsent ? 'text-stone-600' : 'text-stone-400'}`} />
+                                    {att.is_support || ['game_master', 'gm', 'jtac', 'atc', 'gci'].includes((att.role || '').toLowerCase()) ? (
+                                      <Radio className={`w-4 h-4 shrink-0 ${isAbsent ? 'text-stone-600' : 'text-amber-400'}`} />
+                                    ) : (
+                                      <AirplaneTilt className={`w-4 h-4 shrink-0 ${isAbsent ? 'text-stone-600' : 'text-stone-400'}`} />
+                                    )}
                                     {resolvedFlightCs && (
                                       <span className={`px-2 py-0.5 rounded font-mono font-bold text-[11px] border ${
                                         isAbsent
@@ -2075,9 +2288,9 @@ export const EventCalendarView: React.FC = () => {
                                         ? 'bg-stone-900/60 border-stone-800/60 text-stone-500 line-through'
                                         : 'bg-stone-900 border-stone-800 text-amber-300'
                                     }`}>
-                                      {att.airframe_name ||
-                                        att.airframe_abbreviation ||
-                                        'TBD'}
+                                      {att.is_support || ['game_master', 'gm', 'jtac', 'atc', 'gci'].includes((att.role || '').toLowerCase())
+                                        ? (att.role_label || 'Support Slot')
+                                        : (att.airframe_name || att.airframe_abbreviation || 'TBD')}
                                     </span>
                                   </div>
                                 </div>

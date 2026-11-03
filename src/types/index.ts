@@ -834,6 +834,7 @@ export interface CalendarEventAttendee {
   airframe_abbreviation?: string | null;
   role: string;
   role_label: string;
+  is_support?: boolean;
   is_opfor: boolean;
   is_present?: boolean | null;
   xp_awarded?: boolean;
@@ -849,6 +850,7 @@ export interface CalendarEventMyRsvp {
   airframe_abbreviation?: string | null;
   role: string;
   role_label: string;
+  is_support?: boolean;
   is_opfor: boolean;
   callsign?: string | null;
   flight_callsign?: string | null;
@@ -884,9 +886,17 @@ export interface CalendarRsvpAirframeOption {
   allowed_roles: CalendarRsvpRoleOption[];
 }
 
+export interface CalendarSupportRoleOption {
+  value: string;
+  label: string;
+  short_label?: string;
+  eligible: boolean;
+}
+
 export interface CalendarRsvpOptions {
   campaign_airframes: CalendarRsvpAirframeOption[];
   training_airframes: CalendarRsvpAirframeOption[];
+  support_roles?: CalendarSupportRoleOption[];
 }
 
 export interface CalendarEventItem {
@@ -920,6 +930,22 @@ export interface CalendarEventItem {
   opfor_count?: number;
   is_opfor_eligible: boolean;
   has_available_opfor_slots: boolean;
+  game_master_slots?: number;
+  game_master_count?: number;
+  has_available_game_master_slots?: boolean;
+  can_rsvp_game_master?: boolean;
+  jtac_slots?: number;
+  jtac_count?: number;
+  has_available_jtac_slots?: boolean;
+  can_rsvp_jtac?: boolean;
+  atc_slots?: number;
+  atc_count?: number;
+  has_available_atc_slots?: boolean;
+  can_rsvp_atc?: boolean;
+  gci_slots?: number;
+  gci_count?: number;
+  has_available_gci_slots?: boolean;
+  can_rsvp_gci?: boolean;
   attendee_count: number;
   blufor_count: number;
   is_attending: boolean;
