@@ -64,16 +64,6 @@ export const Sidebar: React.FC = () => {
     if (!itemId || !currentTab) return false;
     if (itemId === currentTab) return true;
     if (
-      itemId === 'dashboard' &&
-      (currentTab === 'dashboard' ||
-        currentTab === 'airframes' ||
-        currentTab === 'qualifications' ||
-        currentTab === 'awards' ||
-        currentTab === 'service_record')
-    ) {
-      return true;
-    }
-    if (
       itemId === 'library' &&
       (currentTab === 'library' || currentTab === 'liveries' || currentTab === 'mods')
     ) {
@@ -118,15 +108,50 @@ export const Sidebar: React.FC = () => {
     }[];
   }[] = [
     {
+      title: 'Your Dossier',
+      icon: <SquaresFour className="w-4 h-4" />,
+      items: [
+        {
+          id: 'dashboard',
+          label: 'Overview',
+          icon: <SquaresFour className="w-4 h-4" />,
+          badge: memberProfile?.grade,
+          badgeColor: 'bg-amber-500/20 text-amber-300 border border-amber-500/40',
+        },
+        {
+          id: 'airframes',
+          label: 'Qualified Airframes',
+          icon: <AirplaneTilt className="w-4 h-4" />,
+          badge: memberProfile.qualifiedAirframes?.length || undefined,
+        },
+        {
+          id: 'qualifications',
+          label: 'Certifications',
+          icon: <Certificate className="w-4 h-4" />,
+          badge: memberProfile.certificates?.length || undefined,
+        },
+        {
+          id: 'awards',
+          label: 'Awards & Ribbons',
+          icon: <Medal className="w-4 h-4" />,
+          badge: memberProfile.awards?.length || undefined,
+        },
+        {
+          id: 'service_record',
+          label: 'Service Record',
+          icon: <Scroll className="w-4 h-4" />,
+          badge: memberProfile.serviceRecords?.length || undefined,
+        },
+      ],
+    },
+    {
       title: 'S1 - Personnel',
       icon: <UsersFour className="w-4 h-4" />,
       items: [
         {
-          id: 'dashboard',
-          label: 'Your Dossier',
-          icon: <SquaresFour className="w-4 h-4" />,
-          badge: memberProfile?.grade,
-          badgeColor: 'bg-amber-500/20 text-amber-300 border border-amber-500/40',
+          label: 'Taskforce Roster',
+          icon: <UserCheck className="w-4 h-4" />,
+          href: `${STATIC_CONFIG.portalBaseUrl.replace('/api/v1/companion', '')}/users`,
         },
       ],
     },

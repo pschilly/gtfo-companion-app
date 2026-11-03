@@ -7,7 +7,6 @@ import {
   Sparkle,
   Star,
 } from '@phosphor-icons/react';
-import { DossierNav } from '../components/DossierNav';
 import { STATIC_CONFIG } from '../config/constants';
 import { useApp } from '../context/AppContext';
 import { formatShortDate } from '../utils/formatters';
@@ -48,9 +47,6 @@ export const AwardsView: React.FC = () => {
 
   return (
     <div className="space-y-6 pb-8 max-w-7xl mx-auto">
-      {/* Sub NavigationArrow */}
-      <DossierNav />
-
       {/* Header Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-800/80">
         <div>
