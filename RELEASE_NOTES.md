@@ -1,6 +1,6 @@
-• DCS World Core Installation Directory: Added auto-detection, candidate selection, and onboarding configuration for the core DCS World root folder (<DCS World>) supporting Standalone, OpenBeta, Steam, and custom multi-drive installs
-• JF-17 Custom Airspace Integration: Live integration with Member Portal API to fetch and deploy authentic Custom Airspace Lua definitions directly into <DCS World>\Mods\aircraft\JF-17\Customization\airspace\ with automated directory creation
-• Case-Sensitive Airspace Terrain Mapping: Authoritative campaign theatre resolution producing exact DCS module preset files (Custom_AirSpace_PersianGulf.lua, Custom_AirSpace_Syria.lua, etc.) with dedicated syntax viewer, download, and copy controls
-• Airframe-Specific ATC Detail Tabs: Tailored flight plan tabs to airframe capabilities (SA tab exclusive to F/A-18, MIDS datalink for F/A-18 and JF-17, Additional Points for F-14B/14BU, Airspace for JF-17)
-• Flight Plan Comms Ladder Normalization: Automatically groups live backend array frequencies into Task Force Common, Squadron Tactical Nets, and AWACS & Tanker Support categories with quick-copy clipboard buttons
-• Airfield Frequencies Normalization: Dynamically organizes airfield frequencies by base name (e.g. Al Dhafra AFB, Incirlik AB) with ATIS, Ground, Tower, and Approach channels instead of raw array indices
+• Event Calendar (Operations & Training Sorties): Added a unified Event Calendar displaying both Campaign Operations (OP) and S3 Training Sorties (TRG) with interactive Monthly Grid and Upcoming Schedule Agenda views
+• Direct Sortie RSVP & Flight Roster Management: RSVP directly from the Companion App with qualified/in-training aircraft selection, crew position (Pilot, Crew/RIO/WSO/CPG, Instructor, Student), BLUFOR/OPFOR side assignment, and training remarks
+• Authorized Squadron Callsigns & Element Numbering: Automatically resolves authorized squadron callsigns by airframe and pre-assigns sequential flight & element numbers (1-1 through 1-4, then 2-1, etc.) with full custom callsign override support
+• Compact Single-Row Calendar Pills & External Deep Links: Streamlined multi-event calendar days into compact single-row pills and fixed external browser deep-links for Discord Events, Briefing Threads, AARs, and Member Portal pages
+• Unified DCS Asset Manager: Consolidated Liveries, Kneeboards, Mods, and Soundpacks into a single unified Asset Manager view with category filtering and batch operations
+• A-10C Custom Airspace Fix: Disabled unsupported Custom Airspace tab for A-10C flight plans
