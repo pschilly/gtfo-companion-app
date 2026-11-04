@@ -40,3 +40,4 @@ All notable changes to the GTFO Companion App are documented in this file.
 ### Added
 - Tactical flight planner and kneeboard generator.
 - Discord Rich Presence integration and DCS liveries asset installer.
+
