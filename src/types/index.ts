@@ -148,6 +148,7 @@ export type ServiceRecordType =
   | 'callsign_change'
   | 'operation-sortie'
   | 'opfor-sortie'
+  | 'training-sortie'
   | string;
 
 export interface ServiceRecordEntry {
@@ -958,6 +959,15 @@ export interface CalendarEventItem {
   our_losses?: string | null;
   enemy_losses?: string | null;
   aar_notes?: string | null;
+  concluded_at?: string | null;
+  can_complete?: boolean;
+}
+
+export interface SubmitCalendarCompletePayload {
+  discord_id?: string;
+  notes?: string | null;
+  aar_notes?: string | null;
+  attendance?: Record<number, boolean>;
 }
 
 export interface CalendarEventsResponse {

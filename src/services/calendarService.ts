@@ -4,6 +4,7 @@ import {
   CalendarEventsResponse,
   CalendarEventType,
   CalendarRsvpResponse,
+  SubmitCalendarCompletePayload,
 } from '../types';
 import { normalizeCompanionBaseUrl } from './flightPlanService';
 import { isTauriRuntime, sendPortalApiRequest } from './tauriBridge';
@@ -127,6 +128,28 @@ export async function submitCalendarEventRsvp(
   const endpoint = `${cleanBase}/calendar/${encodeURIComponent(type)}/${id}/rsvp`;
 
   return await sendPortalApiRequest<CalendarRsvpResponse>(
+    endpoint,
+    'POST',
+    payload,
+    token
+  );
+}
+
+/**
+ * POST /api/v1/companion/calendar/{type}/{id}/complete
+ * Completes a training sortie, records attendance, awards XP, and publishes debrief.
+ */
+export async function submitCalendarEventComplete(
+  baseUrl: string,
+  type: CalendarEventType,
+  id: number,
+  payload: SubmitCalendarCompletePayload,
+  token?: string
+): Promise<{ success: boolean; message: string; event?: CalendarEventItem }> {
+  const cleanBase = normalizeCompanionBaseUrl(baseUrl);
+  const endpoint = `${cleanBase}/calendar/${encodeURIComponent(type)}/${id}/complete`;
+
+  return await sendPortalApiRequest<{ success: boolean; message: string; event?: CalendarEventItem }>(
     endpoint,
     'POST',
     payload,

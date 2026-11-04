@@ -32,6 +32,7 @@ import {
 import { useApp } from '../context/AppContext';
 import {
   fetchCalendarEvents,
+  submitCalendarEventComplete,
   submitCalendarEventRsvp,
 } from '../services/calendarService';
 import { openExternalUrl } from '../services/tauriBridge';
@@ -448,6 +449,15 @@ export const EventCalendarView: React.FC = () => {
     message: string;
   } | null>(null);
 
+  // Training Sortie Completion & Attendance state
+  const [completeNotes, setCompleteNotes] = useState<string>('');
+  const [completeAttendance, setCompleteAttendance] = useState<Record<number, boolean>>({});
+  const [isSubmittingComplete, setIsSubmittingComplete] = useState<boolean>(false);
+  const [completeFeedback, setCompleteFeedback] = useState<{
+    type: 'success' | 'error';
+    message: string;
+  } | null>(null);
+
   const loadCalendar = useCallback(
     async (year?: number, month?: number, silent = false) => {
       if (!silent) {
@@ -661,10 +671,21 @@ export const EventCalendarView: React.FC = () => {
   useEffect(() => {
     if (!selectedEvent) {
       setRsvpFeedback(null);
+      setCompleteFeedback(null);
       return;
     }
 
     setRsvpFeedback(null);
+    setCompleteFeedback(null);
+    setCompleteNotes(selectedEvent.aar_notes || '');
+
+    const initialAtt: Record<number, boolean> = {};
+    (selectedEvent.attendees || []).forEach((att) => {
+      if (att.id) {
+        initialAtt[att.id] = att.is_present !== false;
+      }
+    });
+    setCompleteAttendance(initialAtt);
 
     if (selectedEvent.my_rsvp) {
       const myRole = (selectedEvent.my_rsvp.role || 'pilot').toLowerCase();
@@ -1004,6 +1025,57 @@ export const EventCalendarView: React.FC = () => {
       addLog('error', 'PORTAL', `[Calendar] RSVP error: ${msg}`);
     } finally {
       setIsSubmittingRsvp(false);
+    }
+  };
+
+  const handleCompleteSortie = async () => {
+    if (!selectedEvent || selectedEvent.type !== 'training') return;
+
+    setIsSubmittingComplete(true);
+    setCompleteFeedback(null);
+
+    try {
+      const response = await submitCalendarEventComplete(
+        settings.memberPortalApiUrl,
+        'training',
+        selectedEvent.id,
+        {
+          discord_id: userSession?.id || '',
+          notes: completeNotes.trim() || null,
+          aar_notes: completeNotes.trim() || null,
+          attendance: completeAttendance,
+        },
+        userSession?.accessToken
+      );
+
+      const updatedEvent = response.event;
+      if (updatedEvent) {
+        setEvents((prev) =>
+          prev.map((item) =>
+            item.uid === updatedEvent.uid ? updatedEvent : item
+          )
+        );
+      }
+
+      setCompleteFeedback({
+        type: 'success',
+        message: response.message || 'Training sortie completed and attendance recorded!',
+      });
+
+      addLog(
+        'success',
+        'PORTAL',
+        `[Calendar] ${response.message || 'Completed training sortie.'}`
+      );
+    } catch (err: any) {
+      const msg = err?.message || 'Failed to complete training sortie.';
+      setCompleteFeedback({
+        type: 'error',
+        message: msg,
+      });
+      addLog('error', 'PORTAL', `[Calendar] Training completion error: ${msg}`);
+    } finally {
+      setIsSubmittingComplete(false);
     }
   };
 
@@ -1698,28 +1770,217 @@ export const EventCalendarView: React.FC = () => {
                 </div>
               )}
 
-              {/* AAR Summary (For concluded Campaign Sorties with AAR) */}
+              {/* AAR Summary (For concluded Sorties with AAR) */}
               {selectedEvent.has_aar && (
                 <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-mono font-bold uppercase text-amber-300 flex items-center gap-1.5">
                       <Sword className="w-4 h-4 text-amber-400" />
-                      <span>After Action Report (AAR)</span>
+                      <span>{selectedEvent.type === 'training' ? 'Training Debrief & Attendance Record' : 'After Action Report (AAR)'}</span>
                     </span>
-                    <div className="flex items-center gap-3 text-xs font-mono">
-                      <span className="text-red-300">
-                        Friendly Losses: <strong>{selectedEvent.our_losses ?? 0}</strong>
-                      </span>
-                      <span className="text-emerald-300">
-                        Enemy Losses: <strong>{selectedEvent.enemy_losses ?? 0}</strong>
-                      </span>
-                    </div>
+                    {selectedEvent.type === 'campaign' ? (
+                      <div className="flex items-center gap-3 text-xs font-mono">
+                        <span className="text-red-300">
+                          Friendly Losses: <strong>{selectedEvent.our_losses ?? 0}</strong>
+                        </span>
+                        <span className="text-emerald-300">
+                          Enemy Losses: <strong>{selectedEvent.enemy_losses ?? 0}</strong>
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="text-xs font-mono text-emerald-400">
+                        {selectedEvent.attendees.filter((a) => a.is_present === true).length} Pilots Attended (+100 XP)
+                      </div>
+                    )}
                   </div>
                   {selectedEvent.aar_notes && (
                     <p className="text-xs text-stone-300 whitespace-pre-line leading-relaxed">
                       {selectedEvent.aar_notes}
                     </p>
                   )}
+                </div>
+              )}
+
+              {/* INSTRUCTOR COMPLETION & ATTENDANCE WORKBENCH */}
+              {selectedEvent.type === 'training' && selectedEvent.can_complete && (
+                <div className="p-5 rounded-2xl bg-amber-950/20 border border-amber-500/40 space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-amber-500/20">
+                    <div>
+                      <h3 className="font-display font-bold text-sm sm:text-base text-amber-200 flex items-center gap-2">
+                        <GraduationCap className="w-5 h-5 text-amber-400" />
+                        <span>
+                          {selectedEvent.is_concluded
+                            ? 'Edit Sortie Debrief & Attendance'
+                            : 'Complete Sortie & Record Attendance'}
+                        </span>
+                      </h3>
+                      <p className="text-xs text-stone-400 mt-0.5">
+                        Mark attendance to award <strong className="text-emerald-400">+100 XP</strong> and publish the debrief AAR to Discord.
+                      </p>
+                    </div>
+                    {selectedEvent.is_concluded && (
+                      <span className="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-mono font-bold uppercase shrink-0">
+                        ✓ Sortie Concluded
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Feedback message */}
+                  {completeFeedback && (
+                    <div
+                      className={`p-3 rounded-xl text-xs font-mono flex items-center gap-2 ${
+                        completeFeedback.type === 'success'
+                          ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+                          : 'bg-red-500/15 text-red-300 border border-red-500/30'
+                      }`}
+                    >
+                      {completeFeedback.type === 'success' ? (
+                        <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
+                      ) : (
+                        <WarningCircle className="w-4 h-4 text-red-400 shrink-0" />
+                      )}
+                      <span>{completeFeedback.message}</span>
+                    </div>
+                  )}
+
+                  {/* Debrief Notes */}
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-mono font-bold uppercase tracking-wider text-stone-300 flex items-center justify-between">
+                      <span>Debrief Notes / AAR Remarks</span>
+                      <span className="text-[10px] text-stone-500 lowercase font-normal">optional</span>
+                    </label>
+                    <textarea
+                      value={completeNotes}
+                      onChange={(e) => setCompleteNotes(e.target.value)}
+                      placeholder="Enter training debrief, maneuvers practiced, radio comms evaluation, or notes..."
+                      rows={3}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-stone-900 border border-stone-800 text-stone-100 placeholder-stone-500 text-xs font-sans focus:outline-none focus:border-amber-500/60 transition-colors"
+                    />
+                  </div>
+
+                  {/* Attendance Checklist */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="text-[11px] font-mono font-bold uppercase tracking-wider text-stone-300 flex items-center gap-1.5">
+                        <Users className="w-3.5 h-3.5 text-amber-400" />
+                        <span>Pilot &amp; Crew Attendance</span>
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const allTrue: Record<number, boolean> = {};
+                            (selectedEvent.attendees || []).forEach((a) => {
+                              if (a.id) allTrue[a.id] = true;
+                            });
+                            setCompleteAttendance(allTrue);
+                          }}
+                          className="text-[10px] font-mono text-emerald-400 hover:underline cursor-pointer"
+                        >
+                          Mark All Present
+                        </button>
+                        <span className="text-stone-600">•</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const allFalse: Record<number, boolean> = {};
+                            (selectedEvent.attendees || []).forEach((a) => {
+                              if (a.id) allFalse[a.id] = false;
+                            });
+                            setCompleteAttendance(allFalse);
+                          }}
+                          className="text-[10px] font-mono text-stone-400 hover:underline cursor-pointer"
+                        >
+                          Mark All Absent
+                        </button>
+                      </div>
+                    </div>
+
+                    {(!selectedEvent.attendees || selectedEvent.attendees.length === 0) ? (
+                      <p className="text-xs text-stone-500 font-mono italic">
+                        No pilots registered for this sortie yet.
+                      </p>
+                    ) : (
+                      <div className="divide-y divide-stone-800/80 rounded-xl bg-stone-900/90 border border-stone-800 overflow-hidden max-h-60 overflow-y-auto">
+                        {selectedEvent.attendees.map((att) => {
+                          const isPresent = completeAttendance[att.id] !== false;
+                          return (
+                            <div
+                              key={att.id}
+                              className="px-3.5 py-2.5 flex items-center justify-between gap-3 text-xs"
+                            >
+                              <div className="flex items-center gap-2 truncate">
+                                <span className="font-display font-semibold text-stone-100">
+                                  {att.callsign}
+                                </span>
+                                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-stone-800 text-stone-300 border border-stone-700">
+                                  {att.role_label}
+                                </span>
+                                {att.airframe_name && (
+                                  <span className="text-[11px] font-mono text-stone-400 truncate">
+                                    {att.airframe_name}
+                                  </span>
+                                )}
+                              </div>
+
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setCompleteAttendance((prev) => ({
+                                    ...prev,
+                                    [att.id]: !isPresent,
+                                  }))
+                                }
+                                className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold uppercase flex items-center gap-1.5 border transition-all cursor-pointer ${
+                                  isPresent
+                                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 hover:bg-emerald-500/30'
+                                    : 'bg-rose-500/20 text-rose-300 border-rose-500/40 hover:bg-rose-500/30'
+                                }`}
+                              >
+                                {isPresent ? (
+                                  <>
+                                    <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
+                                    <span>Present (+100 XP)</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <X className="w-3.5 h-3.5 text-rose-400" />
+                                    <span>Absent / No-Show</span>
+                                  </>
+                                )}
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Submit Completion Button */}
+                  <div className="pt-2 flex justify-end">
+                    <button
+                      type="button"
+                      disabled={isSubmittingComplete}
+                      onClick={handleCompleteSortie}
+                      className="w-full sm:w-auto px-5 py-2.5 rounded-xl font-mono text-xs font-bold uppercase tracking-wider bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-stone-950 shadow-lg shadow-amber-500/20 disabled:opacity-50 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      {isSubmittingComplete ? (
+                        <>
+                          <ArrowClockwise className="w-4 h-4 animate-spin" />
+                          <span>Saving Completion...</span>
+                        </>
+                      ) : (
+                        <>
+                          <GraduationCap className="w-4 h-4" />
+                          <span>
+                            {selectedEvent.is_concluded
+                              ? 'Update Attendance & Debrief'
+                              : 'Complete Sortie & Award XP'}
+                          </span>
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -2268,7 +2529,7 @@ export const EventCalendarView: React.FC = () => {
                                         </span>
                                       ) : att.xp_awarded ? (
                                         <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[9px] font-bold font-mono">
-                                          +500 XP
+                                          {selectedEvent.type === 'training' ? '+100 XP' : '+500 XP'}
                                         </span>
                                       ) : (
                                         <span className="px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[9px] font-bold uppercase font-mono">
@@ -2351,7 +2612,7 @@ export const EventCalendarView: React.FC = () => {
                                       </span>
                                     ) : att.xp_awarded ? (
                                       <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[9px] font-bold font-mono">
-                                        +500 XP
+                                        {selectedEvent.type === 'training' ? '+100 XP' : '+500 XP'}
                                       </span>
                                     ) : (
                                       <span className="px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[9px] font-bold uppercase font-mono">

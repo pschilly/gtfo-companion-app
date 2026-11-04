@@ -12,6 +12,7 @@ import {
   ChartLineUp,
   CheckCircle,
   Crosshair,
+  GraduationCap,
   IdentificationBadge,
   MagnifyingGlass,
   NotePencil,
@@ -98,6 +99,13 @@ function getRecordVisuals(entry: ServiceRecordEntry): {
         icon: <Crosshair weight="duotone" className="w-4 h-4" />,
         badgeClass: 'bg-rose-500/15 text-rose-300 border-rose-500/30',
         iconBoxClass: 'bg-rose-500/15 text-rose-400 border-rose-500/30',
+        group: 'sorties',
+      };
+    case 'training-sortie':
+      return {
+        icon: <GraduationCap weight="duotone" className="w-4 h-4" />,
+        badgeClass: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+        iconBoxClass: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
         group: 'sorties',
       };
     case 'note':
