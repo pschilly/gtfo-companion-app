@@ -326,33 +326,43 @@ export const AtcView: React.FC = () => {
 
   // Active Theatre for presets
   const activeTheatre = useMemo(() => {
-    if ((selectedDetail as any)?.theatre) return (selectedDetail as any).theatre;
-    if (
-      selectedDetail?.departure_airfield?.includes('Incirlik') ||
-      selectedDetail?.departure_airfield?.includes('Ramat')
-    ) {
+    const rawDirectTheatre =
+      selectedDetail?.campaign?.theatre ||
+      (selectedDetail as any)?.theatre ||
+      activeSummary?.campaign?.theatre ||
+      (activeSummary as any)?.theatre;
+    const directTheatre =
+      typeof rawDirectTheatre === 'object' && rawDirectTheatre !== null
+        ? (rawDirectTheatre as any).name
+        : rawDirectTheatre;
+    if (directTheatre && typeof directTheatre === 'string' && directTheatre.trim()) {
+      return directTheatre.trim();
+    }
+
+    const dep = selectedDetail?.departure_airfield || activeSummary?.departure_airfield || '';
+    if (dep.includes('Incirlik') || dep.includes('Ramat')) {
       return 'Syria';
     }
-    if (
-      selectedDetail?.departure_airfield?.includes('Nellis') ||
-      selectedDetail?.departure_airfield?.includes('Creech')
-    ) {
+    if (dep.includes('Nellis') || dep.includes('Creech')) {
       return 'Nevada';
     }
-    if (
-      selectedDetail?.departure_airfield?.includes('Krymsk') ||
-      selectedDetail?.departure_airfield?.includes('Batumi')
-    ) {
+    if (dep.includes('Krymsk') || dep.includes('Batumi')) {
       return 'Caucasus';
     }
-    if (
-      selectedDetail?.departure_airfield?.includes('Al Dhafra') ||
-      selectedDetail?.departure_airfield?.includes('Khasab')
-    ) {
+    if (dep.includes('Al Dhafra') || dep.includes('Khasab')) {
       return 'Persian Gulf';
     }
+    if (
+      dep.includes('Andersen') ||
+      dep.includes('Antonio') ||
+      dep.includes('Saipan') ||
+      dep.includes('Rota') ||
+      dep.includes('Tinian')
+    ) {
+      return 'Mariana Islands';
+    }
     return activeSortie?.theatre || 'Persian Gulf';
-  }, [activeSortie?.theatre, selectedDetail]);
+  }, [activeSortie?.theatre, selectedDetail, activeSummary]);
 
   // DCS Route Tool Lua file name without space (e.g. 'PersianGulf.lua')
   const activeTheatreFileName = useMemo(() => {
@@ -434,7 +444,12 @@ export const AtcView: React.FC = () => {
   const hasCmds = !isJf17 && (!!selectedDetail?.cmds_settings || isF18 || isF16 || isF14);
   const hasAirspace = isJf17;
 
-  const planTheatre = selectedDetail?.campaign?.theatre || (selectedDetail as any)?.theatre;
+  const planTheatre =
+    (typeof selectedDetail?.campaign?.theatre === 'object' && selectedDetail?.campaign?.theatre !== null
+      ? (selectedDetail.campaign.theatre as any).name
+      : selectedDetail?.campaign?.theatre) ||
+    (selectedDetail as any)?.theatre ||
+    activeTheatre;
 
   const computedFallbackFileName = useMemo(() => {
     if (!selectedDetail) return 'Custom_AirSpace_Syria.lua';

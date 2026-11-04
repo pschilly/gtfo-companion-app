@@ -222,7 +222,7 @@ export const SquadronsView: React.FC = () => {
 
                   {/* Emblem & Identity */}
                   <div className="mt-4 flex items-center gap-4">
-                    <div className="w-20 h-20 rounded-2xl bg-stone-950/80 border border-stone-800 flex items-center justify-center p-2 shrink-0 group-hover:scale-105 transition-transform overflow-hidden shadow-inner">
+                    <div className="w-36 h-36 flex items-center justify-center overflow-hidden">
                       {sq.emblemUrl ? (
                         <img
                           src={sq.emblemUrl}
