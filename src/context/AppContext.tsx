@@ -54,6 +54,8 @@ import {
   DownloadProgressEvent,
   FlightPlanDetail,
   FlightPlanSummary,
+  HomeLayoutPreferences,
+  HomeWidgetItem,
   InstalledAssetRecord,
   InstalledAtcState,
   IntegrityCheckResult,
@@ -73,6 +75,13 @@ import {
   fetchTaskForceRoster,
 } from '../services/taskforceService';
 import { formatExpectedDcsNickname } from '../utils/formatters';
+import {
+  buildDefaultHomeLayout,
+  fetchRemoteHomeLayout,
+  loadCachedHomeLayout,
+  saveCachedHomeLayout,
+  saveRemoteHomeLayout,
+} from '../services/homeLayoutService';
 import { checkForAppUpdate, getRuntimeAppVersion, AppUpdateInfo } from '../services/updaterService';
 import {
   dispatchDesktopToast,
@@ -217,6 +226,10 @@ interface AppContextValue {
   clearNotification: (id: string) => void;
   clearAllNotifications: () => void;
   sendTestNotification: () => Promise<void>;
+  homeLayout: HomeLayoutPreferences;
+  updateHomeLayout: (widgets: HomeWidgetItem[]) => void;
+  resetHomeLayout: () => void;
+  isSyncingHomeLayout: boolean;
 }
 
 const AppContext = createContext<AppContextValue | undefined>(undefined);
@@ -341,6 +354,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
     return null;
   });
+
+  const [homeLayout, setHomeLayout] = useState<HomeLayoutPreferences>(() => {
+    return loadCachedHomeLayout(userSession?.id) || buildDefaultHomeLayout();
+  });
+  const [isSyncingHomeLayout, setIsSyncingHomeLayout] = useState(false);
 
   const baseDiscordTier: UserTier = useMemo(() => {
     if (!userSession || !userSession.isGuildMember) return 'guest';
@@ -471,6 +489,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     [addLog, settings.autoDetectDcsPath, settings.dcsSavedGamesPath, settings.dcsWorldRootPath]
   );
 
+  const reconcileRemoteHomeLayout = useCallback(
+    (discordId: string | undefined | null, remote: HomeLayoutPreferences | null | undefined) => {
+      if (!discordId || !remote) return;
+      const cached = loadCachedHomeLayout(discordId);
+      if (!cached) {
+        setHomeLayout(remote);
+        saveCachedHomeLayout(discordId, remote);
+        return;
+      }
+      const remoteTs = new Date(remote.updatedAt).getTime();
+      const cachedTs = new Date(cached.updatedAt).getTime();
+      if (!Number.isNaN(remoteTs) && (Number.isNaN(cachedTs) || remoteTs >= cachedTs)) {
+        setHomeLayout(remote);
+        saveCachedHomeLayout(discordId, remote);
+      }
+    },
+    []
+  );
+
   const syncMemberPortal = useCallback(async () => {
     const tierForFallback = baseDiscordTier === 'guest' ? 'core' : baseDiscordTier;
 
@@ -488,6 +525,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (profileRes.fromLiveApi) {
         setMemberProfile(profileRes.profile);
         localStorage.setItem(STORAGE_KEYS.PORTAL_PROFILE, JSON.stringify(profileRes.profile));
+        if (profileRes.profile.homeLayout) {
+          reconcileRemoteHomeLayout(
+            userSession?.id || profileRes.profile.discordId,
+            profileRes.profile.homeLayout
+          );
+        }
         addLog(
           'success',
           'PORTAL',
@@ -511,7 +554,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     } catch (err) {
       addLog('warn', 'PORTAL', `Portal sync notice: ${String(err)}`);
     }
-  }, [addLog, baseDiscordTier, userSession]);
+  }, [addLog, baseDiscordTier, reconcileRemoteHomeLayout, userSession]);
 
   const overrideMemberProfile = useCallback(
     (patch: MemberProfileOverridePatch) => {
@@ -967,6 +1010,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   useEffect(() => {
     if (userSession?.id) {
+      const cached = loadCachedHomeLayout(userSession.id);
+      setHomeLayout(cached || buildDefaultHomeLayout());
+
+      const baseUrl = settings.memberPortalApiUrl || STATIC_CONFIG.portalBaseUrl;
+      setIsSyncingHomeLayout(true);
+      fetchRemoteHomeLayout(baseUrl, userSession.id, userSession.accessToken)
+        .then((remote) => {
+          reconcileRemoteHomeLayout(userSession.id, remote);
+        })
+        .finally(() => {
+          setIsSyncingHomeLayout(false);
+        });
+
       syncMemberPortal();
       syncManifest();
       syncCalendarEvents();
@@ -974,6 +1030,61 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userSession?.id, syncMemberPortal, syncManifest]);
+
+  const updateHomeLayout = useCallback(
+    (widgets: HomeWidgetItem[]) => {
+      const normalizedWidgets = widgets.map((w, idx) => ({
+        ...w,
+        order: idx,
+      }));
+      const nextLayout: HomeLayoutPreferences = {
+        version: 1,
+        updatedAt: new Date().toISOString(),
+        widgets: normalizedWidgets,
+      };
+      const targetDiscordId = userSession?.id || memberProfile.discordId;
+      setHomeLayout(nextLayout);
+      saveCachedHomeLayout(targetDiscordId, nextLayout);
+
+      if (targetDiscordId) {
+        const baseUrl = settings.memberPortalApiUrl || STATIC_CONFIG.portalBaseUrl;
+        setIsSyncingHomeLayout(true);
+        saveRemoteHomeLayout(baseUrl, targetDiscordId, nextLayout, userSession?.accessToken).finally(
+          () => {
+            setIsSyncingHomeLayout(false);
+          }
+        );
+      }
+    },
+    [
+      memberProfile.discordId,
+      settings.memberPortalApiUrl,
+      userSession?.accessToken,
+      userSession?.id,
+    ]
+  );
+
+  const resetHomeLayout = useCallback(() => {
+    const defaultLayout = buildDefaultHomeLayout();
+    const targetDiscordId = userSession?.id || memberProfile.discordId;
+    setHomeLayout(defaultLayout);
+    saveCachedHomeLayout(targetDiscordId, defaultLayout);
+
+    if (targetDiscordId) {
+      const baseUrl = settings.memberPortalApiUrl || STATIC_CONFIG.portalBaseUrl;
+      setIsSyncingHomeLayout(true);
+      saveRemoteHomeLayout(baseUrl, targetDiscordId, defaultLayout, userSession?.accessToken).finally(
+        () => {
+          setIsSyncingHomeLayout(false);
+        }
+      );
+    }
+  }, [
+    memberProfile.discordId,
+    settings.memberPortalApiUrl,
+    userSession?.accessToken,
+    userSession?.id,
+  ]);
 
   // Configurable periodic background polling & window refocus sync
   useEffect(() => {
@@ -2192,6 +2303,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         toggleTrackedQualification,
         toggleQualificationCheckpoint,
         isQualificationTracked,
+        homeLayout,
+        updateHomeLayout,
+        resetHomeLayout,
+        isSyncingHomeLayout,
       }}
     >
       {children}

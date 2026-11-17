@@ -212,6 +212,7 @@ export interface MemberPortalProfile {
   serviceRecords?: ServiceRecordEntry[];
   serviceRecordStats?: ServiceRecordStats;
   flightHoursLogged: number;
+  homeLayout?: HomeLayoutPreferences | null;
   portalSyncSource: 'portal_api' | 'discord_fallback';
   lastPortalSyncAt: string;
 }
@@ -994,6 +995,29 @@ export interface CalendarRsvpResponse {
   message?: string;
   error?: string;
   event?: CalendarEventItem;
+}
+
+export type HomeWidgetId =
+  | 'upcoming_sorties'
+  | 'filed_flight_plans'
+  | 'my_flight_plans'
+  | 'dossier_summary'
+  | 'tracked_qualifications'
+  | 'qualified_airframes';
+
+export type HomeWidgetColSpan = 4 | 6 | 8 | 12;
+
+export interface HomeWidgetItem {
+  id: HomeWidgetId;
+  enabled: boolean;
+  colSpan: HomeWidgetColSpan;
+  order: number;
+}
+
+export interface HomeLayoutPreferences {
+  version: number;
+  updatedAt: string;
+  widgets: HomeWidgetItem[];
 }
 
 

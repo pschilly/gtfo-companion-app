@@ -10,6 +10,7 @@ import {
   SquadronAssignment,
   UserTier,
 } from '../types';
+import { normalizeHomeLayout } from '../services/homeLayoutService';
 
 export const GTFO_GRADE_META: Record<
   MemberGradeLevel,
@@ -627,6 +628,12 @@ export function normalizeMemberPortalProfile(
       )
     : undefined;
 
+  const rawHomeLayout =
+    raw.homeLayout ??
+    raw.home_layout ??
+    (raw.companionPreferences as Record<string, unknown> | undefined)?.homeLayout ??
+    (raw.companion_preferences as Record<string, unknown> | undefined)?.home_layout;
+
   return {
     discordId: String(raw.discordId || raw.discord_id || session?.id || ''),
     callsign: String(
@@ -834,6 +841,7 @@ export function normalizeMemberPortalProfile(
       };
     })(),
     flightHoursLogged: typeof raw.flightHoursLogged === 'number' ? raw.flightHoursLogged : 0,
+    homeLayout: normalizeHomeLayout(rawHomeLayout),
     portalSyncSource: 'portal_api',
     lastPortalSyncAt: new Date().toISOString(),
   };
