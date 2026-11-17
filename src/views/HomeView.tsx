@@ -1,21 +1,14 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  AirplaneTilt,
   ArrowRight,
   CalendarBlank,
   Camera,
   CaretLeft,
   CaretRight,
   Compass,
-  Folder,
   ListChecks,
-  MapPin,
-  Package,
-  PaperPlaneTilt,
   ShieldCheck,
-  Sparkle,
 } from '@phosphor-icons/react';
-import { AssetCard } from '../components/AssetCard';
 import { STATIC_CONFIG } from '../config/constants';
 import { useApp } from '../context/AppContext';
 import { GTFO_GRADE_META } from '../data/portalData';
@@ -25,13 +18,13 @@ import { CalendarEventItem } from '../types';
 
 export const HomeView: React.FC = () => {
   const {
-    manifest,
-    installedAssets,
-    outdatedAssets,
     memberProfile,
     setActiveTab,
     checklistSummary,
     filedFlightPlans,
+    upcomingCalendarEvents,
+    setSelectedCalendarEventUid,
+    setSelectedFlightPlanId,
     userSession,
   } = useApp();
 
@@ -104,20 +97,12 @@ export const HomeView: React.FC = () => {
 
   const currentGradeMeta = GTFO_GRADE_META[memberProfile.grade] || GTFO_GRADE_META.G1;
 
-  const totalAssets = manifest.assets.length;
-  const installedCount = Object.keys(installedAssets).length;
-
-  const requiredAllCount = manifest.assets.filter(
-    (a) => a.requirementLevel === 'required_all'
-  ).length;
-  const requiredCoreCount = manifest.assets.filter(
-    (a) => a.requirementLevel === 'required_core'
-  ).length;
-
-  const featuredAssets = useMemo(() => {
-    const featured = manifest.assets.filter((a) => a.featured);
-    return featured.length > 0 ? featured : manifest.assets.slice(0, 6);
-  }, [manifest.assets]);
+  const displayedEvents =
+    upcomingEvents.length > 0
+      ? upcomingEvents
+      : !eventsLoading
+      ? upcomingCalendarEvents.slice(0, 4)
+      : [];
 
   const currentHero = heroImages.length > 0 ? heroImages[activeSlide] : null;
 
@@ -313,8 +298,8 @@ export const HomeView: React.FC = () => {
             </div>
 
             <div className="mt-4 space-y-2.5">
-              {upcomingEvents.length > 0 ? (
-                upcomingEvents.map((ev) => {
+              {displayedEvents.length > 0 ? (
+                displayedEvents.map((ev) => {
                   const evDate = new Date(ev.scheduled_at);
                   const dateStr = !isNaN(evDate.getTime())
                     ? evDate.toLocaleString('en-US', {
@@ -329,7 +314,10 @@ export const HomeView: React.FC = () => {
                   return (
                     <div
                       key={ev.uid || `${ev.type}-${ev.id}`}
-                      onClick={() => setActiveTab('calendar')}
+                      onClick={() => {
+                        setSelectedCalendarEventUid(ev.uid || `${ev.type}-${ev.id}`);
+                        setActiveTab('calendar');
+                      }}
                       className="p-3 rounded-2xl bg-stone-950/60 border border-stone-800/80 hover:border-amber-500/40 transition-all cursor-pointer group flex flex-col gap-1.5"
                     >
                       <div className="flex items-center justify-between gap-2">
@@ -427,7 +415,10 @@ export const HomeView: React.FC = () => {
                   return (
                     <div
                       key={plan.id}
-                      onClick={() => setActiveTab('atc')}
+                      onClick={() => {
+                        setSelectedFlightPlanId(plan.id || plan.identifier);
+                        setActiveTab('atc');
+                      }}
                       className="p-3 rounded-2xl bg-stone-950/60 border border-stone-800/80 hover:border-sky-500/40 transition-all cursor-pointer group flex flex-col gap-1.5"
                     >
                       <div className="flex items-center justify-between gap-2">
@@ -480,123 +471,6 @@ export const HomeView: React.FC = () => {
               Open Air Traffic &rarr;
             </button>
           </div>
-        </div>
-      </div>
-
-      {/* TELEMETRY & STATS STRIP */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div
-          onClick={() => setActiveTab('liveries')}
-          className="p-4 rounded-2xl bg-stone-900/90 border border-stone-800 hover:border-amber-500/40 cursor-pointer transition-all flex items-center justify-between shadow-md group"
-        >
-          <div>
-            <p className="text-[11px] font-mono uppercase text-stone-400">Available Packages</p>
-            <p className="text-2xl font-bold font-display text-stone-100 mt-1">{totalAssets}</p>
-            <p className="text-[11px] font-mono text-stone-400 mt-0.5">
-              {requiredAllCount} Mandatory • {requiredCoreCount} CORE
-            </p>
-          </div>
-          <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center group-hover:scale-105 transition-transform">
-            <Package className="w-5 h-5 text-amber-400" />
-          </div>
-        </div>
-
-        <div
-          onClick={() => setActiveTab('library')}
-          className="p-4 rounded-2xl bg-stone-900/90 border border-stone-800 hover:border-emerald-500/40 cursor-pointer transition-all flex items-center justify-between shadow-md group"
-        >
-          <div>
-            <p className="text-[11px] font-mono uppercase text-stone-400">Installed Locally</p>
-            <p className="text-2xl font-bold font-display text-emerald-400 mt-1">
-              {installedCount}
-            </p>
-            <p className="text-[11px] font-mono text-stone-400 mt-0.5">
-              {outdatedAssets.length > 0
-                ? `${outdatedAssets.length} update(s) ready`
-                : 'All packages verified'}
-            </p>
-          </div>
-          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center group-hover:scale-105 transition-transform">
-            <Folder className="w-5 h-5 text-emerald-400" />
-          </div>
-        </div>
-
-        <div
-          onClick={() => setActiveTab('checklist')}
-          className={`p-4 rounded-2xl bg-stone-900/90 border transition-all cursor-pointer flex items-center justify-between shadow-md group ${
-            !checklistSummary.allComplete
-              ? 'border-amber-500/40 hover:border-amber-500/70 bg-amber-950/10'
-              : 'border-stone-800 hover:border-emerald-500/40'
-          }`}
-          title="View Member Readiness checklist"
-        >
-          <div>
-            <p className="text-[11px] font-mono uppercase text-stone-400">Flight Readiness</p>
-            <p
-              className={`text-2xl font-bold font-display mt-1 ${
-                !checklistSummary.allComplete ? 'text-amber-400' : 'text-emerald-400'
-              }`}
-            >
-              {!checklistSummary.allComplete
-                ? `${checklistSummary.pendingCount} Pending`
-                : '100% Ready'}
-            </p>
-            <p className="text-[11px] font-mono text-stone-400 mt-0.5">
-              {!checklistSummary.allComplete ? (
-                <span className="text-amber-400/90 font-semibold group-hover:underline">
-                  Review Member Readiness
-                </span>
-              ) : (
-                <span>All readiness checks passed</span>
-              )}
-            </p>
-          </div>
-          <div
-            className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform ${
-              !checklistSummary.allComplete
-                ? 'bg-amber-500/10 border border-amber-500/30'
-                : 'bg-emerald-500/10 border border-emerald-500/30'
-            }`}
-          >
-            {!checklistSummary.allComplete ? (
-              <ListChecks className="w-5 h-5 text-amber-400" />
-            ) : (
-              <ShieldCheck className="w-5 h-5 text-emerald-400" />
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* FEATURED ASSETS SHOWCASE */}
-      <div className="space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-stone-800/80">
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="font-display text-xl font-bold text-stone-100">
-                Featured Tactical Assets
-              </h2>
-              <span className="px-2 py-0.5 rounded bg-amber-500/15 border border-amber-500/30 text-amber-300 font-mono text-[10px] font-bold">
-                NEW &amp; UPDATED
-              </span>
-            </div>
-            <p className="text-xs text-stone-400 mt-0.5">
-              Highlighted community liveries, official squadron skins, and essential simulator modifications.
-            </p>
-          </div>
-
-          <button
-            onClick={() => setActiveTab('liveries')}
-            className="text-xs font-mono text-amber-400 hover:text-amber-300 flex items-center gap-1.5 transition-colors shrink-0"
-          >
-            <span>Browse All Packages</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {featuredAssets.map((asset) => (
-            <AssetCard key={asset.id} asset={asset} />
-          ))}
         </div>
       </div>
     </div>

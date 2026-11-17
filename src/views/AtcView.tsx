@@ -82,6 +82,18 @@ function formatDiverts(diverts?: Array<FlightPlanDivert | string>): string {
     .join(', ');
 }
 
+function isPlanMatch(
+  p: FlightPlanSummary,
+  targetId: number | string | null | undefined
+): boolean {
+  if (targetId === null || targetId === undefined || targetId === '') return false;
+  const idStr = String(targetId).toLowerCase();
+  return (
+    String(p.id).toLowerCase() === idStr ||
+    (Boolean(p.identifier) && p.identifier.toLowerCase() === idStr)
+  );
+}
+
 export function isF18Airframe(plan?: FlightPlanSummary | FlightPlanDetail | null): boolean {
   if (!plan) return false;
   const entity = (plan.airframe?.dcs_entity || '').toLowerCase();
@@ -153,6 +165,7 @@ export const AtcView: React.FC = () => {
     memberFlightPlans,
     memberFlightPlansMeta,
     activeSortie,
+    activeSortieFlightPlans,
     filedFlightPlans,
     isLoadingFlightPlans,
     syncFlightPlans,
@@ -174,9 +187,16 @@ export const AtcView: React.FC = () => {
   } = useApp();
 
   // Mode: 'member' (Assigned/Private plans) or 'filed' (ATC Filed Plans)
-  const [viewMode, setViewMode] = useState<'member' | 'filed'>('member');
+  const [viewMode, setViewMode] = useState<'member' | 'filed'>(() => {
+    if (selectedFlightPlanId !== null && selectedFlightPlanId !== undefined) {
+      const inMember = memberFlightPlans.some((p) => isPlanMatch(p, selectedFlightPlanId));
+      const inFiled = filedFlightPlans.some((p) => isPlanMatch(p, selectedFlightPlanId));
+      if (!inMember && inFiled) return 'filed';
+    }
+    return 'member';
+  });
   const [selectedPlanId, setSelectedPlanId] = useState<number | string>(
-    memberFlightPlans[0]?.id || ''
+    selectedFlightPlanId ?? memberFlightPlans[0]?.id ?? ''
   );
   const [selectedDetail, setSelectedDetail] = useState<FlightPlanDetail | null>(null);
   const [isLoadingDetail, setIsLoadingDetail] = useState<boolean>(false);
@@ -206,20 +226,18 @@ export const AtcView: React.FC = () => {
   const [activeSaSubTab, setActiveSaSubTab] = useState<'flot' | 'faor' | 'cap' | 'corridors'>('flot');
   const [copiedFreqKey, setCopiedFreqKey] = useState<string | null>(null);
 
-  // Synchronize with external selectedFlightPlanId (e.g. from Global Search)
+  // Synchronize with external selectedFlightPlanId (e.g. from Global Search, Home, or Notifications)
   useEffect(() => {
     if (selectedFlightPlanId !== null && selectedFlightPlanId !== undefined) {
-      const idStr = String(selectedFlightPlanId).toLowerCase();
-      const inMember = memberFlightPlans.some(
-        (p) => String(p.id).toLowerCase() === idStr || p.identifier?.toLowerCase() === idStr
-      );
-      const inFiled = filedFlightPlans.some(
-        (p) => String(p.id).toLowerCase() === idStr || p.identifier?.toLowerCase() === idStr
-      );
+      const inMember = memberFlightPlans.some((p) => isPlanMatch(p, selectedFlightPlanId));
+      const inFiled = filedFlightPlans.some((p) => isPlanMatch(p, selectedFlightPlanId));
 
       if (inMember) setViewMode('member');
       else if (inFiled) setViewMode('filed');
 
+      setSearchQuery('');
+      setSelectedSquadron('ALL');
+      setSelectedAirframe('ALL');
       setSelectedPlanId(selectedFlightPlanId);
     }
   }, [selectedFlightPlanId, memberFlightPlans, filedFlightPlans]);
@@ -286,11 +304,22 @@ export const AtcView: React.FC = () => {
   // Selected plan summary
   const activeSummary: FlightPlanSummary | undefined = useMemo(() => {
     return (
-      filteredPlans.find((p) => p.id === selectedPlanId || p.identifier === selectedPlanId) ||
+      filteredPlans.find((p) => isPlanMatch(p, selectedPlanId)) ||
+      currentPlans.find((p) => isPlanMatch(p, selectedPlanId)) ||
+      memberFlightPlans.find((p) => isPlanMatch(p, selectedPlanId)) ||
+      filedFlightPlans.find((p) => isPlanMatch(p, selectedPlanId)) ||
+      activeSortieFlightPlans.find((p) => isPlanMatch(p, selectedPlanId)) ||
       filteredPlans[0] ||
       currentPlans[0]
     );
-  }, [currentPlans, filteredPlans, selectedPlanId]);
+  }, [
+    currentPlans,
+    filteredPlans,
+    memberFlightPlans,
+    filedFlightPlans,
+    activeSortieFlightPlans,
+    selectedPlanId,
+  ]);
 
   // Fetch full details whenever the active selected plan changes
   useEffect(() => {
@@ -821,6 +850,7 @@ export const AtcView: React.FC = () => {
         message: `Saved DTC to ${path}`,
         category: 'flight_plan',
         actionTab: 'atc',
+        actionFlightPlanId: selectedDetail.id || selectedDetail.identifier,
       });
     } catch (err: any) {
       console.error(err);
@@ -830,6 +860,7 @@ export const AtcView: React.FC = () => {
         message: String(err?.message || err),
         category: 'flight_plan',
         actionTab: 'atc',
+        actionFlightPlanId: selectedDetail.id || selectedDetail.identifier,
       });
     } finally {
       setIsSavingDtc(false);
@@ -863,6 +894,7 @@ export const AtcView: React.FC = () => {
         message: String(err?.message || err),
         category: 'flight_plan',
         actionTab: 'atc',
+        actionFlightPlanId: selectedDetail.id || selectedDetail.identifier,
       });
     } finally {
       setIsSavingDtc(false);
@@ -899,6 +931,7 @@ export const AtcView: React.FC = () => {
         message: `JF-17 airspace saved as ${fileName} to ${installedPath}`,
         category: 'flight_plan',
         actionTab: 'atc',
+        actionFlightPlanId: selectedDetail.id || selectedDetail.identifier,
       });
     } catch (err: any) {
       console.error(err);
@@ -908,6 +941,7 @@ export const AtcView: React.FC = () => {
         message: String(err?.message || err),
         category: 'flight_plan',
         actionTab: 'atc',
+        actionFlightPlanId: selectedDetail.id || selectedDetail.identifier,
       });
     } finally {
       setIsSavingAirspace(false);
@@ -1011,6 +1045,7 @@ export const AtcView: React.FC = () => {
         message: `Saved ${result.pageCount} page(s) (${result.prefix}) to DCS Kneeboard/${result.folderName}/`,
         category: 'flight_plan',
         actionTab: 'atc',
+        actionFlightPlanId: selectedDetail.id || selectedDetail.identifier,
       });
 
       setTimeout(() => setHasExportedKneeboard(false), 5000);
@@ -1022,6 +1057,7 @@ export const AtcView: React.FC = () => {
         message: String(err?.message || err),
         category: 'flight_plan',
         actionTab: 'atc',
+        actionFlightPlanId: selectedDetail.id || selectedDetail.identifier,
       });
     } finally {
       setIsExportingKneeboard(false);

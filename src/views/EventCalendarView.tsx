@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   AirplaneTilt,
   ArrowClockwise,
@@ -417,11 +417,33 @@ function computeNextAvailableCallsign(
 }
 
 export const EventCalendarView: React.FC = () => {
-  const { userSession, memberProfile, settings, addLog } = useApp();
+  const {
+    userSession,
+    memberProfile,
+    settings,
+    addLog,
+    selectedCalendarEventUid,
+    setSelectedCalendarEventUid,
+    upcomingCalendarEvents,
+  } = useApp();
 
   const now = useMemo(() => new Date(), []);
-  const [currentYear, setCurrentYear] = useState<number>(now.getFullYear());
-  const [currentMonth, setCurrentMonth] = useState<number>(now.getMonth() + 1); // 1-12
+  const initialTargetDate = useMemo(() => {
+    if (!selectedCalendarEventUid) return null;
+    const match = upcomingCalendarEvents.find((e) => e.uid === selectedCalendarEventUid);
+    if (!match?.scheduled_at) return null;
+    const dt = new Date(match.scheduled_at);
+    return Number.isNaN(dt.getTime()) ? null : dt;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const hasExplicitInitialDateRef = useRef<boolean>(Boolean(initialTargetDate));
+
+  const [currentYear, setCurrentYear] = useState<number>(() =>
+    initialTargetDate ? initialTargetDate.getFullYear() : now.getFullYear()
+  );
+  const [currentMonth, setCurrentMonth] = useState<number>(() =>
+    initialTargetDate ? initialTargetDate.getMonth() + 1 : now.getMonth() + 1
+  ); // 1-12
   const [filterType, setFilterType] = useState<EventFilterType>('all');
   const [layoutMode, setLayoutMode] = useState<ViewLayoutMode>('grid');
 
@@ -434,7 +456,9 @@ export const EventCalendarView: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Selected event modal state
-  const [selectedEventUid, setSelectedEventUid] = useState<string | null>(null);
+  const [selectedEventUid, setSelectedEventUid] = useState<string | null>(
+    () => selectedCalendarEventUid || null
+  );
 
   // RSVP Form state inside modal
   const [rsvpCategory, setRsvpCategory] = useState<'flight' | 'support'>('flight');
@@ -502,16 +526,53 @@ export const EventCalendarView: React.FC = () => {
   useEffect(() => {
     if (!hasInitialized) {
       setHasInitialized(true);
-      loadCalendar(undefined, undefined);
+      if (hasExplicitInitialDateRef.current) {
+        loadCalendar(currentYear, currentMonth);
+      } else {
+        loadCalendar(undefined, undefined);
+      }
     } else {
       loadCalendar(currentYear, currentMonth);
     }
   }, [currentYear, currentMonth, hasInitialized, loadCalendar]);
 
+  // Synchronize external event deep-link (e.g. from HomeView or Notifications)
+  useEffect(() => {
+    if (!selectedCalendarEventUid) return;
+    setSelectedEventUid(selectedCalendarEventUid);
+
+    const target =
+      events.find((e) => e.uid === selectedCalendarEventUid) ||
+      upcomingCalendarEvents.find((e) => e.uid === selectedCalendarEventUid);
+
+    if (target?.scheduled_at) {
+      const dt = new Date(target.scheduled_at);
+      if (!Number.isNaN(dt.getTime())) {
+        const y = dt.getFullYear();
+        const m = dt.getMonth() + 1;
+        if (y !== currentYear) setCurrentYear(y);
+        if (m !== currentMonth) setCurrentMonth(m);
+      }
+    }
+
+    setSelectedCalendarEventUid(null);
+  }, [
+    selectedCalendarEventUid,
+    events,
+    upcomingCalendarEvents,
+    currentYear,
+    currentMonth,
+    setSelectedCalendarEventUid,
+  ]);
+
   const selectedEvent = useMemo(() => {
     if (!selectedEventUid) return null;
-    return events.find((e) => e.uid === selectedEventUid) || null;
-  }, [events, selectedEventUid]);
+    return (
+      events.find((e) => e.uid === selectedEventUid) ||
+      upcomingCalendarEvents.find((e) => e.uid === selectedEventUid) ||
+      null
+    );
+  }, [events, upcomingCalendarEvents, selectedEventUid]);
 
   // Available airframes for the currently selected event
   const availableAirframesForSelectedEvent = useMemo<CalendarRsvpAirframeOption[]>(() => {

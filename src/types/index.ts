@@ -664,6 +664,8 @@ export interface AppNotification {
   read: boolean;
   actionTab?: NavigationTab;
   actionAssetId?: string;
+  actionEventUid?: string;
+  actionFlightPlanId?: string | number;
   metadata?: Record<string, unknown>;
 }
 

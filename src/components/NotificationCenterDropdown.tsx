@@ -32,6 +32,12 @@ export const NotificationCenterDropdown: React.FC<NotificationCenterDropdownProp
     clearAllNotifications,
     setActiveTab,
     setSelectedAsset,
+    setSelectedFlightPlanId,
+    setSelectedCalendarEventUid,
+    upcomingCalendarEvents,
+    memberFlightPlans,
+    filedFlightPlans,
+    activeSortieFlightPlans,
     manifest,
     setIsUpdateModalOpen,
   } = useApp();
@@ -136,15 +142,88 @@ export const NotificationCenterDropdown: React.FC<NotificationCenterDropdownProp
       return;
     }
 
-    if (item.actionTab) {
-      setActiveTab(item.actionTab);
+    if (item.category === 'calendar' || item.actionEventUid) {
+      let resolvedEventUid = item.actionEventUid;
+      if (
+        !resolvedEventUid &&
+        (item.fingerprint?.startsWith('calendar_event:') ||
+          item.fingerprint?.startsWith('calendar_reminder:'))
+      ) {
+        resolvedEventUid = item.fingerprint.split(':')[1] || undefined;
+      }
+      if (!resolvedEventUid) {
+        const titleLower = item.title.toLowerCase();
+        const matchedEv = upcomingCalendarEvents.find(
+          (ev) => ev.name && titleLower.includes(ev.name.toLowerCase())
+        );
+        if (matchedEv) {
+          resolvedEventUid = matchedEv.uid;
+        }
+      }
+      if (resolvedEventUid) {
+        setSelectedCalendarEventUid(resolvedEventUid);
+      }
+      setActiveTab(item.actionTab || 'calendar');
+      setIsOpen(false);
+      return;
     }
 
-    if (item.actionAssetId) {
-      const match = manifest.assets.find((a) => a.id === item.actionAssetId);
+    if (item.category === 'flight_plan' || item.actionFlightPlanId !== undefined) {
+      let resolvedFpId: string | number | undefined = item.actionFlightPlanId;
+      if (
+        resolvedFpId === undefined &&
+        (item.fingerprint?.startsWith('flight_plan:') || item.fingerprint?.startsWith('atc_pkg:'))
+      ) {
+        resolvedFpId = item.fingerprint.split(':')[1] || undefined;
+      }
+      if (resolvedFpId === undefined) {
+        const titleLower = item.title.toLowerCase();
+        const matchedPlan = [
+          ...memberFlightPlans,
+          ...filedFlightPlans,
+          ...activeSortieFlightPlans,
+        ].find(
+          (p) =>
+            (p.identifier && titleLower.includes(p.identifier.toLowerCase())) ||
+            (p.callsign && titleLower.includes(p.callsign.toLowerCase())) ||
+            (p.name && titleLower.includes(p.name.toLowerCase()))
+        );
+        if (matchedPlan) {
+          resolvedFpId = matchedPlan.id || matchedPlan.identifier;
+        }
+      }
+      if (resolvedFpId !== undefined) {
+        setSelectedFlightPlanId(resolvedFpId);
+      }
+      setActiveTab(item.actionTab || 'atc');
+      setIsOpen(false);
+      return;
+    }
+
+    if (item.actionAssetId || item.category === 'livery' || item.category === 'mod') {
+      const assetId =
+        item.actionAssetId ||
+        (item.fingerprint?.startsWith('asset_update:')
+          ? item.fingerprint.split(':')[1]
+          : undefined);
+      const strippedTitle = item.title.replace(/^Update Ready:\s*/i, '').trim().toLowerCase();
+      const match =
+        (assetId ? manifest.assets.find((a) => a.id === assetId) : undefined) ||
+        (strippedTitle
+          ? manifest.assets.find((a) => a.name.toLowerCase() === strippedTitle)
+          : undefined);
       if (match) {
         setSelectedAsset(match);
       }
+      if (item.actionTab) {
+        setActiveTab(item.actionTab);
+      }
+      setIsOpen(false);
+      return;
+    }
+
+    if (item.actionTab) {
+      setActiveTab(item.actionTab);
     }
 
     setIsOpen(false);

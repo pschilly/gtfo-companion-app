@@ -166,6 +166,8 @@ interface AppContextValue {
   logoutDiscord: () => void;
   selectedFlightPlanId: string | number | null;
   setSelectedFlightPlanId: (id: string | number | null) => void;
+  selectedCalendarEventUid: string | null;
+  setSelectedCalendarEventUid: (uid: string | null) => void;
   highlightedCertId: number | null;
   setHighlightedCertId: (id: number | null) => void;
   hasConfirmedDcsPath: boolean;
@@ -247,6 +249,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState<AssetItem | null>(null);
   const [selectedFlightPlanId, setSelectedFlightPlanId] = useState<string | number | null>(null);
+  const [selectedCalendarEventUid, setSelectedCalendarEventUid] = useState<string | null>(null);
   const [highlightedCertId, setHighlightedCertId] = useState<number | null>(null);
   const [logs, setLogs] = useState<TelemetryLogEntry[]>([]);
   const [isPortalLive, setIsPortalLive] = useState(false);
@@ -651,10 +654,39 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (saved) {
       try {
         const parsed = JSON.parse(saved) as AppNotification[];
-        return parsed.map((n) => ({
-          ...n,
-          fingerprint: n.fingerprint || `${n.category}:${n.title}:${n.message}`,
-        }));
+        return parsed.map((n) => {
+          const fp = n.fingerprint || `${n.category}:${n.title}:${n.message}`;
+          let actionEventUid = n.actionEventUid;
+          let actionFlightPlanId = n.actionFlightPlanId;
+          let actionAssetId = n.actionAssetId;
+
+          if (!actionEventUid && n.category === 'calendar') {
+            if (fp.startsWith('calendar_event:') || fp.startsWith('calendar_reminder:')) {
+              const parts = fp.split(':');
+              if (parts[1]) actionEventUid = parts[1];
+            }
+          }
+          if (!actionFlightPlanId && n.category === 'flight_plan') {
+            if (fp.startsWith('flight_plan:') || fp.startsWith('atc_pkg:')) {
+              const parts = fp.split(':');
+              if (parts[1]) actionFlightPlanId = parts[1];
+            }
+          }
+          if (!actionAssetId && (n.category === 'livery' || n.category === 'mod')) {
+            if (fp.startsWith('asset_update:')) {
+              const parts = fp.split(':');
+              if (parts[1]) actionAssetId = parts[1];
+            }
+          }
+
+          return {
+            ...n,
+            fingerprint: fp,
+            actionEventUid,
+            actionFlightPlanId,
+            actionAssetId,
+          };
+        });
       } catch {
         return [];
       }
@@ -1001,6 +1033,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           message: `${pkg.aircraft} package at ${pkg.theatre}. Callsign: ${pkg.callsign}.`,
           category: 'flight_plan',
           actionTab: 'atc',
+          actionFlightPlanId: pkg.id,
           fingerprint: pkgKey,
         });
       });
@@ -1015,6 +1048,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           message: `${plan.airframe?.name || 'Aircraft'} — ${plan.departure_airfield || 'DEP'} to ${plan.destination_airfield || 'ARR'}${plan.description ? ` • ${plan.description}` : ''}`,
           category: 'flight_plan',
           actionTab: 'atc',
+          actionFlightPlanId: plan.id || plan.identifier,
           fingerprint: planKey,
         });
       });
@@ -1679,6 +1713,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             message: `${ev.subtitle ? `${ev.subtitle} • ` : ''}Scheduled for ${dateLabel}`,
             category: 'calendar',
             actionTab: 'calendar',
+            actionEventUid: ev.uid,
             fingerprint: eventKey,
           });
         });
@@ -1746,6 +1781,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           message: `${badge} sortie${callsignInfo} launches at ${dateLabel} (in ~${timeRemainingLabel}).`,
           category: 'calendar',
           actionTab: 'calendar',
+          actionEventUid: ev.uid,
           fingerprint: `calendar_reminder:${ev.uid}:${ev.scheduled_at}:${activeThreshold}m`,
         });
       });
@@ -2091,6 +2127,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setSelectedAsset,
         selectedFlightPlanId,
         setSelectedFlightPlanId,
+        selectedCalendarEventUid,
+        setSelectedCalendarEventUid,
         highlightedCertId,
         setHighlightedCertId,
         settings,
