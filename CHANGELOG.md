@@ -2,6 +2,29 @@
 
 All notable changes to the GTFO Companion App are documented in this file.
 
+## [0.0.13] - 2026-11-18
+
+### Added
+- **S2 Operations — Campaigns & Theater Command (`CampaignsView`)**:
+  - Active-only campaign hub with live updating breadcrumbs (`S2 - Operations > Campaigns > [Campaign] > [Section]`) and expandable sidebar sub-navigation (`Overview`, `Campaign Lore`, `Missions`, `Intel Reports`, `Airframes`).
+  - **Campaign Overview (`CampaignOverviewTab`)**: Full-width campaign briefing container, operational progress tracker, theater resource pools, transaction ledger, pending supply orders manifest, and section quick-jump cards.
+  - **Campaign Lore (`CampaignLoreTab`)**: Multi-chapter theater lore reader with paginated chapters, cover imagery, comms intercept audio, and embedded video briefings.
+  - **Campaign Missions & Two-Pane Mission Dossier (`CampaignMissionsTab`, `CampaignMissionModal`)**: Active and completed mission grouping, actual objective names, priority/point/resource rewards, SMEAC operational orders, flight & package rosters, frequency ladder, sortie schedule strips, and a full-window portaled dossier modal with soft backdrop blur.
+  - **Unified Intelligence & Sortie AAR Feed (`CampaignIntelTab`)**: Aggregated standalone S2 intel dispatches alongside filed Sortie After Action Reports (`AAR & BDA`), Friendly vs. Estimated Enemy Losses, debrief narratives, BDA reconnaissance media galleries, relevance/recency aging window (`Current & Relevant`, `Last 14 Days`, `Full Archive`), pagination (`6 / 12 / 24 / 48` per page), and staged media loading.
+  - **Theater Airframes Inventory (`CampaignAirframesTab`)**: Squadron-grouped tracked airframe inventory with airbase breakdowns.
+- **Customizable Home Dashboard & Pinned Campaign Widget**:
+  - Added modular home dashboard widgets with `PinnedCampaignWidget` and synchronized pin/unpin controls across Home and Campaigns.
+
+### Changed & Fixed
+- **Cross-View Sortie & Mission Navigation**:
+  - Opening a sortie event from a mission page or Mission Dossier preserves origin context (`calendarReturnContext`) so closing the Event Calendar modal returns directly to the originating mission dossier tab or Missions view, while providing a **Stay on Calendar** option and automatic campaign roster refresh after RSVP updates.
+- **UI & Layout Refinements**:
+  - Added collapsible sidebar mode (`Sidebar`), updated top-bar telemetry/navigation controls (`TopBar`), fixed mission sortie list indentation, and unified full-viewport lightbox/modal backdrop blur portals.
+- **Release Packaging**:
+  - Enhanced `scripts/generate-updater-json.js` to fall back to `CHANGELOG.md` release notes automatically when building `latest.json`.
+
+---
+
 ## [0.0.12] - 2026-11-04
 
 ### Added

@@ -44,6 +44,20 @@ try {
   }
 
   if (!notes) {
+    const changelogFile = path.join(projectRoot, 'CHANGELOG.md');
+    if (fs.existsSync(changelogFile)) {
+      const changelogRaw = fs.readFileSync(changelogFile, 'utf8');
+      const escapedVersion = version.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const sectionMatch = changelogRaw.match(
+        new RegExp(`^## \\[${escapedVersion}\\][^\\n]*\\r?\\n([\\s\\S]*?)(?=\\r?\\n---|\\r?\\n## \\[|$)`, 'm')
+      );
+      if (sectionMatch && sectionMatch[1]) {
+        notes = sectionMatch[1].trim();
+      }
+    }
+  }
+
+  if (!notes) {
     try {
       const allTags = execSync('git tag --sort=-creatordate', { encoding: 'utf8' })
         .split('\n')
