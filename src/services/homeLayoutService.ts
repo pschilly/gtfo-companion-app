@@ -36,6 +36,15 @@ export const HOME_WIDGET_CATALOG: HomeWidgetCatalogEntry[] = [
     defaultEnabled: true,
   },
   {
+    id: 'pinned_campaign',
+    title: 'Pinned Campaign Overview',
+    subtitle: 'Live theater progress, resources & active missions',
+    description:
+      'Monitor your pinned campaign operational progress, resource pools, active missions, and pending supply orders.',
+    defaultColSpan: 6,
+    defaultEnabled: true,
+  },
+  {
     id: 'my_flight_plans',
     title: 'My Flight Plans',
     subtitle: 'Authored & mission-assigned routes',
@@ -85,6 +94,7 @@ export function buildDefaultHomeLayout(): HomeLayoutPreferences {
   return {
     version: 1,
     updatedAt: new Date().toISOString(),
+    pinnedCampaignId: null,
     widgets: HOME_WIDGET_CATALOG.map((entry, idx) => ({
       id: entry.id,
       enabled: entry.defaultEnabled,
@@ -169,9 +179,21 @@ export function normalizeHomeLayout(raw: unknown): HomeLayoutPreferences | null 
       ? rawUpdatedAt
       : new Date().toISOString();
 
+  const rawPinned = obj.pinnedCampaignId ?? obj.pinned_campaign_id;
+  const parsedPinned = Number(rawPinned);
+  const pinnedCampaignId =
+    rawPinned !== null &&
+    rawPinned !== undefined &&
+    rawPinned !== '' &&
+    Number.isFinite(parsedPinned) &&
+    parsedPinned > 0
+      ? parsedPinned
+      : null;
+
   return {
     version: typeof obj.version === 'number' ? obj.version : 1,
     updatedAt,
+    pinnedCampaignId,
     widgets: normalizedWidgets,
   };
 }
@@ -183,7 +205,9 @@ export function getHomeLayoutStorageKey(discordId?: string | null): string {
 
 export function loadCachedHomeLayout(discordId?: string | null): HomeLayoutPreferences | null {
   try {
-    const raw = localStorage.getItem(getHomeLayoutStorageKey(discordId));
+    const raw =
+      localStorage.getItem(getHomeLayoutStorageKey(discordId)) ??
+      (discordId ? localStorage.getItem(getHomeLayoutStorageKey(null)) : null);
     if (!raw) return null;
     return normalizeHomeLayout(JSON.parse(raw));
   } catch {
@@ -196,7 +220,13 @@ export function saveCachedHomeLayout(
   layout: HomeLayoutPreferences
 ): void {
   try {
-    localStorage.setItem(getHomeLayoutStorageKey(discordId), JSON.stringify(layout));
+    const serialized = JSON.stringify(layout);
+    const primaryKey = getHomeLayoutStorageKey(discordId);
+    const defaultKey = getHomeLayoutStorageKey(null);
+    localStorage.setItem(primaryKey, serialized);
+    if (primaryKey !== defaultKey) {
+      localStorage.setItem(defaultKey, serialized);
+    }
   } catch {
     // Ignore storage quota errors
   }
@@ -258,6 +288,7 @@ export async function saveRemoteHomeLayout(
       'PUT',
       {
         discord_id: discordId,
+        pinned_campaign_id: layout.pinnedCampaignId ?? null,
         home_layout: layout,
       },
       token

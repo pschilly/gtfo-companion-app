@@ -21,6 +21,7 @@ export type NavigationTab =
   | 'awards'
   | 'service_record'
   | 'atc'
+  | 'campaigns'
   | 'calendar'
   | 'liveries'
   | 'mods'
@@ -695,6 +696,8 @@ export interface AppSettings {
   trackedQualificationIds: number[];
   /** S3: Interactive checklist checkpoints keyed by `${certId}_${skillIdx}_${itemIdx}` */
   completedQualificationCheckpoints: Record<string, boolean>;
+  /** Home: Optional campaign ID pinned to the Home page dashboard widget */
+  pinnedCampaignId?: number | null;
 }
 
 export interface TaskForceRibbon {
@@ -1000,6 +1003,7 @@ export interface CalendarRsvpResponse {
 export type HomeWidgetId =
   | 'upcoming_sorties'
   | 'filed_flight_plans'
+  | 'pinned_campaign'
   | 'my_flight_plans'
   | 'dossier_summary'
   | 'tracked_qualifications'
@@ -1017,7 +1021,396 @@ export interface HomeWidgetItem {
 export interface HomeLayoutPreferences {
   version: number;
   updatedAt: string;
+  pinnedCampaignId?: number | null;
   widgets: HomeWidgetItem[];
+}
+
+export interface CampaignResourcePool {
+  key: 'command_points' | 'airframe_credits' | 'isr_credits' | 'logistics_points' | string;
+  label: string;
+  shortLabel: string;
+  description: string;
+  color: string;
+  balance: number;
+}
+
+export interface CampaignSortieAttendeeItem {
+  id: number;
+  userId?: number | null;
+  callsign: string;
+  flightCallsign?: string | null;
+  discordId?: string | null;
+  airframeId?: number | null;
+  airframeName?: string | null;
+  airframeAbbreviation?: string | null;
+  role: string;
+  roleLabel: string;
+  isSupport: boolean;
+  isOpfor: boolean;
+  isPresent?: boolean | null;
+  xpAwarded: boolean;
+  squadronName?: string | null;
+  squadronAbbreviation?: string | null;
+}
+
+export interface CampaignSortieBdaMediaItem {
+  url: string;
+  isVideo: boolean;
+  extension: string;
+  filename: string;
+}
+
+export interface CampaignMissionSortieBrief {
+  id: number;
+  calendarEventUid: string;
+  sortieNumber: number;
+  name: string;
+  scheduledAt?: string | null;
+  signupCutoffAt?: string | null;
+  isSignupOpen: boolean;
+  isConcluded: boolean;
+  hasAar: boolean;
+  notes?: string | null;
+  notesHtml?: string | null;
+  allowOpfor: boolean;
+  opforSlots?: number | null;
+  opforCount: number;
+  bluforCount: number;
+  gameMasterSlots: number;
+  gameMasterCount: number;
+  jtacSlots: number;
+  jtacCount: number;
+  atcSlots: number;
+  atcCount: number;
+  gciSlots: number;
+  gciCount: number;
+  attendeesCount: number;
+  attendedCount: number;
+  absentCount: number;
+  attendees: CampaignSortieAttendeeItem[];
+  ourLosses?: string | null;
+  ourLossesHtml?: string | null;
+  enemyLosses?: string | null;
+  enemyLossesHtml?: string | null;
+  aarNotes?: string | null;
+  aarNotesHtml?: string | null;
+  bdaMediaItems: CampaignSortieBdaMediaItem[];
+  discordEventUrl?: string | null;
+  discordMessageUrl?: string | null;
+  aarDiscordMessageUrl?: string | null;
+}
+
+export interface CampaignMissionObjectiveSquadron {
+  id: number;
+  name: string;
+  abbreviation: string;
+  emblemUrl?: string | null;
+}
+
+export interface CampaignMissionAor {
+  type: string;
+  label?: string | null;
+  center_lat?: number | null;
+  center_lng?: number | null;
+  radius_nm?: number | null;
+  north?: number | null;
+  south?: number | null;
+  east?: number | null;
+  west?: number | null;
+  coordinates?: unknown[];
+}
+
+export interface CampaignMissionObjective {
+  index?: number;
+  name: string;
+  objective?: string;
+  priority?: string;
+  status: string;
+  isCompleted: boolean;
+  points?: number;
+  resourceType?: string;
+  resourceLabel?: string;
+  resourceShortLabel?: string;
+  mgrs?: string | null;
+  aor?: CampaignMissionAor | null;
+  squadrons?: CampaignMissionObjectiveSquadron[];
+}
+
+export interface CampaignMissionFrequencyItem {
+  name: string;
+  frequency: string;
+  modulation: string;
+  band: string;
+  notes?: string | null;
+}
+
+export interface CampaignMissionRewardBreakdownItem {
+  type: string;
+  label: string;
+  shortLabel: string;
+  color: string;
+  total: number;
+  earned: number;
+  missionAmount: number;
+  objectiveAmount: number;
+  isFullyEarned: boolean;
+}
+
+export interface CampaignMissionFlightSlotItem {
+  position: number;
+  status: string;
+  pilotName?: string | null;
+}
+
+export interface CampaignMissionFlightItem {
+  id: number;
+  callsign: string;
+  task?: string | null;
+  frequency?: string | null;
+  packageName?: string | null;
+  slotsCount: number;
+  squadronName?: string | null;
+  airframeName?: string | null;
+  slots: CampaignMissionFlightSlotItem[];
+}
+
+export interface CampaignMissionFlightPlanBrief {
+  id: number;
+  identifier: string;
+  name: string;
+  callsign: string;
+  authorName?: string | null;
+  airframeName?: string | null;
+  squadronName?: string | null;
+  departureAirfield?: string | null;
+  destinationAirfield?: string | null;
+  launchTime?: string | null;
+  flightRules: string;
+  isFiled: boolean;
+  isOpfor: boolean;
+  waypointsCount: number;
+}
+
+export interface CampaignMissionRewardBadge {
+  type: string;
+  label: string;
+  shortLabel: string;
+  amount: number;
+}
+
+export type CampaignSubTab =
+  | 'overview'
+  | 'lore'
+  | 'missions'
+  | 'intel'
+  | 'airframes'
+  | 'campaigns_grid';
+
+export interface CampaignMissionSmeac {
+  situation?: string | null;
+  mission?: string | null;
+  execution?: string | null;
+  admin_logistics?: string | null;
+  command_signals?: string | null;
+}
+
+export interface CampaignLorePageItem {
+  id: number;
+  pageNumber: number;
+  title?: string | null;
+  contentHtml?: string | null;
+  imageUrl?: string | null;
+  audioUrl?: string | null;
+  audioTitle?: string | null;
+  videoUrl?: string | null;
+  videoEmbedUrl?: string | null;
+  videoTitle?: string | null;
+}
+
+export interface CampaignLoreChapter {
+  id: number;
+  title: string;
+  slug: string;
+  order: number;
+  author?: string | null;
+  summary?: string | null;
+  coverImageUrl?: string | null;
+  totalPages: number;
+  pages: CampaignLorePageItem[];
+  updatedAt?: string | null;
+}
+
+export interface CampaignIntelReportItem {
+  id: number;
+  title: string;
+  type: 'image' | 'video' | 'audio' | 'document' | 'note' | string;
+  missionId?: number | null;
+  missionName?: string | null;
+  sortieId?: number | null;
+  sortieName?: string | null;
+  reporterName?: string | null;
+  notes?: string | null;
+  fileUrls: string[];
+  videoUrl?: string | null;
+  discordMessageUrl?: string | null;
+  portalUrl?: string | null;
+  createdAt?: string | null;
+}
+
+export interface CampaignTrackedAirframeEntry {
+  dcsEntity: string;
+  name: string;
+  abbreviation: string;
+  imageUrl?: string | null;
+  totalCount: number;
+  airbaseBreakdown: Record<string, number>;
+}
+
+export interface CampaignAirframeSquadronGroup {
+  id?: number | null;
+  name: string;
+  nickname?: string | null;
+  abbreviation?: string | null;
+  imageUrl?: string | null;
+  totalCount: number;
+  airframes: CampaignTrackedAirframeEntry[];
+}
+
+export interface CampaignMissionItem {
+  id: number;
+  name: string;
+  status: string;
+  statusLabel: string;
+  type?: string | null;
+  taskingName: string;
+  squadronName?: string | null;
+  planningUserName?: string | null;
+  descriptionHtml?: string | null;
+  smeac?: CampaignMissionSmeac;
+  weather?: string | null;
+  missionTime?: string | null;
+  startTime?: string | null;
+  lat?: number | null;
+  lng?: number | null;
+  aor?: CampaignMissionAor | null;
+  frequencies: CampaignMissionFrequencyItem[];
+  images: string[];
+  flightsCount: number;
+  flights: CampaignMissionFlightItem[];
+  flightPlans: CampaignMissionFlightPlanBrief[];
+  objectivesCount: number;
+  completedObjectivesCount: number;
+  objectives: CampaignMissionObjective[];
+  sorties: CampaignMissionSortieBrief[];
+  totalRewards: Record<string, number>;
+  earnedRewards: Record<string, number>;
+  totalRewardsSummary: string;
+  earnedRewardsSummary: string;
+  rewardBadges: CampaignMissionRewardBadge[];
+  rewardsBreakdown: CampaignMissionRewardBreakdownItem[];
+  discordThreadUrl?: string | null;
+  mapUrl?: string | null;
+}
+
+export interface CampaignSupplyOrderManifestItem {
+  id: number;
+  name: string;
+  quantity: number;
+  unitWeightLbs: number;
+  totalWeightLbs: number;
+  requestedBy?: string | null;
+  notes?: string | null;
+}
+
+export interface CampaignSupplyOrderItem {
+  id: number;
+  identifier: string;
+  flightCallsign: string;
+  airframeType: string;
+  airframeShortName: string;
+  airframeLabel: string;
+  status: string;
+  statusLabel: string;
+  statusColor: string;
+  isOpen: boolean;
+  originName: string;
+  originIcao?: string | null;
+  destinationName: string;
+  distanceNm: number;
+  costLogisticsPoints: number;
+  totalWeightLbs: number;
+  maxPayloadLbs: number;
+  remainingPayloadLbs: number;
+  payloadPercentage: number;
+  totalItemsCount: number;
+  notes?: string | null;
+  createdBy?: string | null;
+  items: CampaignSupplyOrderManifestItem[];
+}
+
+export interface CampaignResourceTransactionItem {
+  id: number;
+  resourceType: string;
+  resourceLabel: string;
+  resourceShortLabel: string;
+  transactionType: string;
+  transactionTypeLabel: string;
+  amount: number;
+  description?: string | null;
+  userName?: string | null;
+  createdAt?: string | null;
+}
+
+export interface CampaignItem {
+  id: number;
+  slug: string;
+  name: string;
+  abbreviation: string;
+  era?: string | null;
+  status: string;
+  statusLabel: string;
+  statusColor: string;
+  isActive: boolean;
+  isCompleted: boolean;
+  theatre?: string | null;
+  theatreId?: number | null;
+  dcsServer?: string | null;
+  coverImageUrl?: string | null;
+  descriptionHtml?: string | null;
+  descriptionSummary?: string | null;
+  startedAt?: string | null;
+  endedAt?: string | null;
+  publishedAt?: string | null;
+  progressPercentage: number;
+  totalMissions: number;
+  activeMissionsCount: number;
+  targetMissions: number;
+  earnedMissionPoints: number;
+  totalObjectivesCount: number;
+  completedObjectivesCount: number;
+  resourceBalances: Record<string, number>;
+  resourcePools: CampaignResourcePool[];
+  activeMissions: CampaignMissionItem[];
+  missions: CampaignMissionItem[];
+  lores: CampaignLoreChapter[];
+  loresCount: number;
+  intelReports: CampaignIntelReportItem[];
+  intelReportsCount: number;
+  airframeSquadronGroups: CampaignAirframeSquadronGroup[];
+  totalTrackedAirframes: number;
+  pendingSupplyOrders: CampaignSupplyOrderItem[];
+  pendingSupplyOrdersCount: number;
+  recentTransactions: CampaignResourceTransactionItem[];
+  portalUrl?: string | null;
+  mapUrl?: string | null;
+  updatedAt?: string | null;
+}
+
+export interface CampaignsResponse {
+  campaigns: CampaignItem[];
+  activeCampaignId: number | null;
+  total: number;
+  activeCount: number;
 }
 
 

@@ -48,4 +48,5 @@ export const DEFAULT_SETTINGS: AppSettings = {
   rosterShowAllMembers: false,
   trackedQualificationIds: [],
   completedQualificationCheckpoints: {},
+  pinnedCampaignId: null,
 };

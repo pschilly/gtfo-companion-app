@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
+  AirplaneTakeoff,
   AirplaneTilt,
   ArrowSquareOut,
   ArrowsClockwise,
+  Binoculars,
   BookOpen,
   CalendarBlank,
   CaretDown,
@@ -21,6 +23,7 @@ import {
   Medal,
   Package,
   PaintBrush,
+  Rows,
   Scroll,
   Shield,
   ShieldCheck,
@@ -35,7 +38,8 @@ import {
 } from '@phosphor-icons/react';
 import { STATIC_CONFIG } from '../config/constants';
 import { useApp } from '../context/AppContext';
-import { NavigationTab } from '../types';
+import { CampaignSubTab, NavigationTab } from '../types';
+import { getCampaignTotalIntelCount } from '../views/campaigns/utils';
 import { LogoutConfirmModal } from './LogoutConfirmModal';
 
 const SIDEBAR_COLLAPSED_KEY = 'gtfo_sidebar_collapsed_v1';
@@ -56,6 +60,10 @@ export const Sidebar: React.FC = () => {
     settings,
     checklistSummary,
     memberFlightPlans,
+    campaignsList,
+    selectedCampaignId,
+    activeCampaignSubTab,
+    setActiveCampaignSubTab,
     currentAppVersion,
   } = useApp();
 
@@ -129,6 +137,50 @@ export const Sidebar: React.FC = () => {
   };
 
   const totalAssetsCount = manifest.assets.length;
+  const activeCampaigns = campaignsList.filter((c) => c.isActive);
+  const activeCampaignsCount = activeCampaigns.length;
+  const activeSidebarCampaign =
+    activeCampaigns.find((c) => c.id === selectedCampaignId) || activeCampaigns[0] || null;
+
+  const campaignSubItems: Array<{
+    subTab: CampaignSubTab;
+    label: string;
+    icon: React.ReactNode;
+    badge?: number;
+  }> = [
+    {
+      subTab: 'overview',
+      label: 'Overview',
+      icon: <Rows className="w-3.5 h-3.5" />,
+    },
+    {
+      subTab: 'lore',
+      label: 'Campaign Lore',
+      icon: <BookOpen className="w-3.5 h-3.5" />,
+      badge: activeSidebarCampaign?.loresCount || undefined,
+    },
+    {
+      subTab: 'missions',
+      label: 'Missions',
+      icon: <AirplaneTakeoff className="w-3.5 h-3.5" />,
+      badge: activeSidebarCampaign?.missions.length || undefined,
+    },
+    {
+      subTab: 'intel',
+      label: 'Intel Reports',
+      icon: <Binoculars className="w-3.5 h-3.5" />,
+      badge: getCampaignTotalIntelCount(activeSidebarCampaign) || undefined,
+    },
+    {
+      subTab: 'airframes',
+      label: 'Airframes',
+      icon: <AirplaneTilt className="w-3.5 h-3.5" />,
+      badge:
+        activeSidebarCampaign?.totalTrackedAirframes ||
+        activeSidebarCampaign?.airframeSquadronGroups.length ||
+        undefined,
+    },
+  ];
 
   const navSections: {
     title: string;
@@ -203,6 +255,13 @@ export const Sidebar: React.FC = () => {
       title: 'S2 - Operations',
       icon: <Crosshair className="w-4 h-4" />,
       items: [
+        {
+          id: 'campaigns',
+          label: 'Campaigns',
+          icon: <Crosshair className="w-4 h-4" />,
+          badge: activeCampaignsCount > 0 ? activeCampaignsCount : undefined,
+          badgeColor: 'bg-amber-500/20 text-amber-300 border border-amber-500/40',
+        },
         {
           id: 'atc',
           label: 'Air Traffic Control',
@@ -435,45 +494,82 @@ export const Sidebar: React.FC = () => {
 
                                 const isActive = isTabMatch(item.id, activeTab);
                                 return (
-                                  <button
-                                    key={item.id}
-                                    type="button"
-                                    onClick={() => {
-                                      if (item.id) setActiveTab(item.id);
-                                      setPinnedSection(null);
-                                      setHoveredSection(null);
-                                    }}
-                                    className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm transition-all duration-150 ${
-                                      isActive
-                                        ? 'font-semibold text-amber-400 bg-amber-500/10'
-                                        : 'text-stone-400 hover:text-stone-200 hover:bg-stone-900/80'
-                                    }`}
-                                  >
-                                    <div className="flex items-center gap-2.5 min-w-0">
-                                      <span
-                                        className={`shrink-0 ${
-                                          isActive ? 'text-amber-400' : 'text-stone-400'
-                                        }`}
-                                      >
-                                        {item.icon}
-                                      </span>
-                                      <span className="font-display text-[13px] truncate">
-                                        {item.label}
-                                      </span>
-                                    </div>
-                                    {item.badge !== undefined && item.badge !== 0 && (
-                                      <span
-                                        className={`min-w-5 h-5 px-1.5 flex items-center justify-center text-[10px] font-mono leading-none rounded-full shrink-0 ${
-                                          item.badgeColor ||
-                                          (isActive
-                                            ? 'bg-amber-500/20 text-amber-300'
-                                            : 'bg-stone-900 text-stone-400 border border-stone-800')
-                                        }`}
-                                      >
-                                        {item.badge}
-                                      </span>
+                                  <div key={item.id} className="space-y-1">
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        if (item.id) setActiveTab(item.id);
+                                        setPinnedSection(null);
+                                        setHoveredSection(null);
+                                      }}
+                                      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm transition-all duration-150 ${
+                                        isActive
+                                          ? 'font-semibold text-amber-400 bg-amber-500/10'
+                                          : 'text-stone-400 hover:text-stone-200 hover:bg-stone-900/80'
+                                      }`}
+                                    >
+                                      <div className="flex items-center gap-2.5 min-w-0">
+                                        <span
+                                          className={`shrink-0 ${
+                                            isActive ? 'text-amber-400' : 'text-stone-400'
+                                          }`}
+                                        >
+                                          {item.icon}
+                                        </span>
+                                        <span className="font-display text-[13px] truncate">
+                                          {item.label}
+                                        </span>
+                                      </div>
+                                      {item.badge !== undefined && item.badge !== 0 && (
+                                        <span
+                                          className={`min-w-5 h-5 px-1.5 flex items-center justify-center text-[10px] font-mono leading-none rounded-full shrink-0 ${
+                                            item.badgeColor ||
+                                            (isActive
+                                              ? 'bg-amber-500/20 text-amber-300'
+                                              : 'bg-stone-900 text-stone-400 border border-stone-800')
+                                          }`}
+                                        >
+                                          {item.badge}
+                                        </span>
+                                      )}
+                                    </button>
+                                    {item.id === 'campaigns' && (
+                                      <div className="ml-3 pl-2.5 border-l border-stone-800/90 space-y-0.5">
+                                        {campaignSubItems.map((sub) => {
+                                          const isSubActive =
+                                            activeTab === 'campaigns' &&
+                                            activeCampaignSubTab === sub.subTab;
+                                          return (
+                                            <button
+                                              key={sub.subTab}
+                                              type="button"
+                                              onClick={() => {
+                                                setActiveCampaignSubTab(sub.subTab);
+                                                setActiveTab('campaigns');
+                                                setPinnedSection(null);
+                                                setHoveredSection(null);
+                                              }}
+                                              className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition-all ${
+                                                isSubActive
+                                                  ? 'text-amber-300 bg-amber-500/10 font-semibold'
+                                                  : 'text-stone-400 hover:text-stone-200 hover:bg-stone-900/70'
+                                              }`}
+                                            >
+                                              <span className="flex items-center gap-2 truncate">
+                                                {sub.icon}
+                                                <span className="truncate">{sub.label}</span>
+                                              </span>
+                                              {sub.badge !== undefined && sub.badge > 0 && (
+                                                <span className="text-[10px] font-mono text-stone-500">
+                                                  {sub.badge}
+                                                </span>
+                                              )}
+                                            </button>
+                                          );
+                                        })}
+                                      </div>
                                     )}
-                                  </button>
+                                  </div>
                                 );
                               })}
                             </div>
@@ -584,7 +680,7 @@ export const Sidebar: React.FC = () => {
                           }
                           const isActive = isTabMatch(item.id, activeTab);
                           return (
-                            <li key={item.id} className="relative">
+                            <li key={item.id} className="relative space-y-1">
                               <button
                                 onClick={() => item.id && setActiveTab(item.id)}
                                 className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-all duration-150 relative ${
@@ -612,6 +708,46 @@ export const Sidebar: React.FC = () => {
                                   </span>
                                 )}
                               </button>
+
+                              {item.id === 'campaigns' && activeTab === 'campaigns' && (
+                                <ul className="ml-3 pl-3 border-l border-stone-800 space-y-0.5 pt-0.5">
+                                  {campaignSubItems.map((sub) => {
+                                    const isSubActive = activeCampaignSubTab === sub.subTab;
+                                    return (
+                                      <li key={sub.subTab}>
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            setActiveCampaignSubTab(sub.subTab);
+                                            setActiveTab('campaigns');
+                                          }}
+                                          className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition-all ${
+                                            isSubActive
+                                              ? 'font-semibold text-amber-300 bg-amber-500/10'
+                                              : 'text-stone-400 hover:text-stone-200 hover:bg-stone-900/70'
+                                          }`}
+                                        >
+                                          <span className="flex items-center gap-2 truncate">
+                                            <span
+                                              className={
+                                                isSubActive ? 'text-amber-400' : 'text-stone-500'
+                                              }
+                                            >
+                                              {sub.icon}
+                                            </span>
+                                            <span className="truncate">{sub.label}</span>
+                                          </span>
+                                          {sub.badge !== undefined && sub.badge > 0 && (
+                                            <span className="text-[10px] font-mono text-stone-500">
+                                              {sub.badge}
+                                            </span>
+                                          )}
+                                        </button>
+                                      </li>
+                                    );
+                                  })}
+                                </ul>
+                              )}
                             </li>
                           );
                         })}

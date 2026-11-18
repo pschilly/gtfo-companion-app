@@ -47,6 +47,8 @@ import {
   AssetManifest,
   AtcFlightPlanPackage,
   CalendarEventItem,
+  CampaignItem,
+  CampaignSubTab,
   ChecklistSummary,
   DcsEnvironmentInfo,
   DcsNicknameInfo,
@@ -69,6 +71,7 @@ import {
   UserTier,
 } from '../types';
 import { fetchCalendarEvents } from '../services/calendarService';
+import { fetchCampaigns } from '../services/campaignService';
 import {
   fetchQualificationsCatalog,
   fetchSquadrons,
@@ -106,6 +109,21 @@ export interface RepairPromptState {
   asset?: AssetItem;
   record: InstalledAssetRecord;
   result: IntegrityCheckResult;
+}
+
+export type CampaignMissionModalSection =
+  | 'overview'
+  | 'objectives'
+  | 'sorties'
+  | 'aar'
+  | 'comms_packages';
+
+export interface CalendarReturnContext {
+  tab: NavigationTab;
+  campaignId: number | null;
+  campaignSubTab: CampaignSubTab;
+  missionId: number | null;
+  missionSection: CampaignMissionModalSection;
 }
 
 interface AppContextValue {
@@ -226,6 +244,35 @@ interface AppContextValue {
   clearNotification: (id: string) => void;
   clearAllNotifications: () => void;
   sendTestNotification: () => Promise<void>;
+  // S2 Operations: Campaigns
+  campaignsList: CampaignItem[];
+  selectedCampaignId: number | null;
+  setSelectedCampaignId: (id: number | null) => void;
+  selectedCampaignMissionId: number | null;
+  setSelectedCampaignMissionId: (id: number | null) => void;
+  selectedCampaignMissionSection: CampaignMissionModalSection;
+  setSelectedCampaignMissionSection: (section: CampaignMissionModalSection) => void;
+  openCampaignMissionModal: (
+    campaignId: number | null,
+    missionId: number,
+    section?: CampaignMissionModalSection
+  ) => void;
+  openSortieInCalendar: (
+    sortieId: number,
+    returnOverride?: {
+      missionId?: number | null;
+      missionSection?: CampaignMissionModalSection;
+    }
+  ) => void;
+  calendarReturnContext: CalendarReturnContext | null;
+  returnFromCalendarEvent: () => void;
+  clearCalendarReturnContext: () => void;
+  activeCampaignSubTab: CampaignSubTab;
+  setActiveCampaignSubTab: (tab: CampaignSubTab) => void;
+  isLoadingCampaigns: boolean;
+  refreshCampaigns: () => Promise<void>;
+  pinnedCampaignId: number | null;
+  pinCampaignToHome: (campaignId: number | null) => void;
   homeLayout: HomeLayoutPreferences;
   updateHomeLayout: (widgets: HomeWidgetItem[]) => void;
   resetHomeLayout: () => void;
@@ -294,6 +341,89 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [qualificationsCatalog, setQualificationsCatalog] = useState<QualificationCourse[]>([]);
   const [isLoadingTaskforce, setIsLoadingTaskforce] = useState(false);
   const [rosterSquadronFilter, setRosterSquadronFilter] = useState<string | null>(null);
+
+  // S2 Operations: Campaigns State
+  const [campaignsList, setCampaignsList] = useState<CampaignItem[]>([]);
+  const [selectedCampaignId, setSelectedCampaignId] = useState<number | null>(null);
+  const [selectedCampaignMissionId, setSelectedCampaignMissionId] = useState<number | null>(null);
+  const [selectedCampaignMissionSection, setSelectedCampaignMissionSection] =
+    useState<CampaignMissionModalSection>('overview');
+  const [activeCampaignSubTab, setActiveCampaignSubTab] = useState<CampaignSubTab>('overview');
+  const [calendarReturnContext, setCalendarReturnContext] =
+    useState<CalendarReturnContext | null>(null);
+  const [isLoadingCampaigns, setIsLoadingCampaigns] = useState(false);
+
+  const openCampaignMissionModal = useCallback(
+    (
+      campaignId: number | null,
+      missionId: number,
+      section: CampaignMissionModalSection = 'overview'
+    ) => {
+      if (campaignId !== null && campaignId > 0) {
+        setSelectedCampaignId(campaignId);
+      }
+      setCalendarReturnContext(null);
+      setActiveTab('campaigns');
+      setActiveCampaignSubTab('missions');
+      setSelectedCampaignMissionSection(section);
+      setSelectedCampaignMissionId(missionId);
+    },
+    []
+  );
+
+  const openSortieInCalendar = useCallback(
+    (
+      sortieId: number,
+      returnOverride?: {
+        missionId?: number | null;
+        missionSection?: CampaignMissionModalSection;
+      }
+    ) => {
+      setCalendarReturnContext({
+        tab: activeTab,
+        campaignId: selectedCampaignId,
+        campaignSubTab: activeCampaignSubTab,
+        missionId:
+          returnOverride?.missionId !== undefined
+            ? returnOverride.missionId
+            : selectedCampaignMissionId,
+        missionSection:
+          returnOverride?.missionSection ?? selectedCampaignMissionSection,
+      });
+      setSelectedCalendarEventUid(`campaign-${sortieId}`);
+      setActiveTab('calendar');
+    },
+    [
+      activeCampaignSubTab,
+      activeTab,
+      selectedCampaignId,
+      selectedCampaignMissionId,
+      selectedCampaignMissionSection,
+    ]
+  );
+
+  const clearCalendarReturnContext = useCallback(() => {
+    setCalendarReturnContext(null);
+  }, []);
+
+  const returnFromCalendarEvent = useCallback(() => {
+    const ctx = calendarReturnContext;
+    if (!ctx) return;
+    if (ctx.campaignId !== null) {
+      setSelectedCampaignId(ctx.campaignId);
+    }
+    setActiveCampaignSubTab(ctx.campaignSubTab);
+    setSelectedCampaignMissionSection(ctx.missionSection);
+    setSelectedCampaignMissionId(ctx.missionId);
+    setCalendarReturnContext(null);
+    setActiveTab(ctx.tab);
+  }, [calendarReturnContext]);
+
+  useEffect(() => {
+    if (activeTab !== 'calendar') {
+      setCalendarReturnContext(null);
+    }
+  }, [activeTab]);
 
   const navigateToRoster = useCallback((squadronFilter?: string | null) => {
     if (squadronFilter !== undefined) {
@@ -965,6 +1095,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
   }, [checkForAppUpdateAction]);
 
+  const refreshCampaigns = useCallback(async () => {
+    const baseUrl = settings.memberPortalApiUrl || STATIC_CONFIG.portalBaseUrl;
+    const token = userSession?.accessToken;
+    setIsLoadingCampaigns(true);
+    try {
+      const res = await fetchCampaigns(baseUrl, token);
+      setCampaignsList(res.campaigns);
+      setSelectedCampaignId((prev) => {
+        if (prev && res.campaigns.some((c) => c.id === prev)) {
+          return prev;
+        }
+        return res.activeCampaignId ?? res.campaigns[0]?.id ?? null;
+      });
+    } catch (err) {
+      console.warn('refreshCampaigns error:', err);
+    } finally {
+      setIsLoadingCampaigns(false);
+    }
+  }, [settings.memberPortalApiUrl, userSession?.accessToken]);
+
   useEffect(() => {
     addLog('info', 'SYSTEM', `${STATIC_CONFIG.appTitle} initialized.`);
     refreshDcsEnv();
@@ -974,6 +1124,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     syncFlightPlans();
     syncCalendarEvents();
     refreshTaskforceData();
+    refreshCampaigns();
     checkForAppUpdateAction();
 
     if (window.location.hash.includes('access_token=')) {
@@ -1027,9 +1178,40 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       syncManifest();
       syncCalendarEvents();
       refreshTaskforceData();
+      refreshCampaigns();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userSession?.id, syncMemberPortal, syncManifest]);
+
+  const isPinnedCampaignWidgetEnabled = useMemo(() => {
+    return (homeLayout.widgets || []).some((w) => w.id === 'pinned_campaign' && w.enabled);
+  }, [homeLayout.widgets]);
+
+  const pinnedCampaignId = useMemo(() => {
+    if (!isPinnedCampaignWidgetEnabled) {
+      return null;
+    }
+
+    const explicitId =
+      homeLayout.pinnedCampaignId !== undefined
+        ? homeLayout.pinnedCampaignId
+        : (settings.pinnedCampaignId ?? null);
+
+    const activeCampaigns = campaignsList.filter((c) => c.isActive);
+    if (
+      explicitId !== null &&
+      (activeCampaigns.length === 0 || activeCampaigns.some((c) => c.id === explicitId))
+    ) {
+      return explicitId;
+    }
+
+    return activeCampaigns[0]?.id ?? null;
+  }, [
+    campaignsList,
+    homeLayout.pinnedCampaignId,
+    isPinnedCampaignWidgetEnabled,
+    settings.pinnedCampaignId,
+  ]);
 
   const updateHomeLayout = useCallback(
     (widgets: HomeWidgetItem[]) => {
@@ -1037,9 +1219,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         ...w,
         order: idx,
       }));
+      const isPinnedEnabled = normalizedWidgets.some(
+        (w) => w.id === 'pinned_campaign' && w.enabled
+      );
+      const nextPinnedId = isPinnedEnabled
+        ? (pinnedCampaignId ?? campaignsList.find((c) => c.isActive)?.id ?? null)
+        : null;
+
+      setSettings((prev) => {
+        const next: AppSettings = { ...prev, pinnedCampaignId: nextPinnedId };
+        localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(next));
+        return next;
+      });
+
       const nextLayout: HomeLayoutPreferences = {
         version: 1,
         updatedAt: new Date().toISOString(),
+        pinnedCampaignId: nextPinnedId,
         widgets: normalizedWidgets,
       };
       const targetDiscordId = userSession?.id || memberProfile.discordId;
@@ -1057,6 +1253,73 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     },
     [
+      campaignsList,
+      memberProfile.discordId,
+      pinnedCampaignId,
+      settings.memberPortalApiUrl,
+      userSession?.accessToken,
+      userSession?.id,
+    ]
+  );
+
+  const pinCampaignToHome = useCallback(
+    (campaignId: number | null) => {
+      setSettings((prev) => {
+        const next: AppSettings = { ...prev, pinnedCampaignId: campaignId };
+        localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(next));
+        return next;
+      });
+
+      const baseWidgets = homeLayout.widgets || [];
+      const updatedWidgets = baseWidgets.map((w) =>
+        w.id === 'pinned_campaign' ? { ...w, enabled: campaignId !== null } : w
+      );
+      const hasPinnedWidget = updatedWidgets.some((w) => w.id === 'pinned_campaign');
+      const finalWidgets =
+        campaignId !== null && !hasPinnedWidget
+          ? [
+              ...updatedWidgets,
+              {
+                id: 'pinned_campaign' as const,
+                enabled: true,
+                colSpan: 6 as const,
+                order: updatedWidgets.length,
+              },
+            ]
+          : updatedWidgets;
+
+      const nextLayout: HomeLayoutPreferences = {
+        version: homeLayout.version || 1,
+        updatedAt: new Date().toISOString(),
+        pinnedCampaignId: campaignId,
+        widgets: finalWidgets.map((w, idx) => ({ ...w, order: idx })),
+      };
+
+      const targetDiscordId = userSession?.id || memberProfile.discordId;
+      setHomeLayout(nextLayout);
+      saveCachedHomeLayout(targetDiscordId, nextLayout);
+
+      if (targetDiscordId) {
+        const baseUrl = settings.memberPortalApiUrl || STATIC_CONFIG.portalBaseUrl;
+        setIsSyncingHomeLayout(true);
+        saveRemoteHomeLayout(baseUrl, targetDiscordId, nextLayout, userSession?.accessToken).finally(
+          () => {
+            setIsSyncingHomeLayout(false);
+          }
+        );
+      }
+
+      addLog(
+        'info',
+        'PORTAL',
+        campaignId !== null
+          ? `Pinned campaign #${campaignId} to Home dashboard.`
+          : 'Unpinned campaign from Home dashboard.'
+      );
+    },
+    [
+      addLog,
+      homeLayout,
       memberProfile.discordId,
       settings.memberPortalApiUrl,
       userSession?.accessToken,
@@ -1067,6 +1330,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const resetHomeLayout = useCallback(() => {
     const defaultLayout = buildDefaultHomeLayout();
     const targetDiscordId = userSession?.id || memberProfile.discordId;
+    setSettings((prev) => {
+      const next: AppSettings = { ...prev, pinnedCampaignId: null };
+      localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(next));
+      return next;
+    });
     setHomeLayout(defaultLayout);
     saveCachedHomeLayout(targetDiscordId, defaultLayout);
 
@@ -1096,6 +1364,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       syncMemberPortal();
       syncFlightPlans();
       syncCalendarEvents();
+      refreshCampaigns();
       checkForAppUpdateAction();
     }, pollIntervalMs);
 
@@ -1108,6 +1377,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         syncMemberPortal();
         syncFlightPlans();
         syncCalendarEvents();
+        refreshCampaigns();
         checkForAppUpdateAction();
       }
     };
@@ -2303,6 +2573,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         toggleTrackedQualification,
         toggleQualificationCheckpoint,
         isQualificationTracked,
+        campaignsList,
+        selectedCampaignId,
+        setSelectedCampaignId,
+        selectedCampaignMissionId,
+        setSelectedCampaignMissionId,
+        selectedCampaignMissionSection,
+        setSelectedCampaignMissionSection,
+        openCampaignMissionModal,
+        openSortieInCalendar,
+        calendarReturnContext,
+        returnFromCalendarEvent,
+        clearCalendarReturnContext,
+        activeCampaignSubTab,
+        setActiveCampaignSubTab,
+        isLoadingCampaigns,
+        refreshCampaigns,
+        pinnedCampaignId,
+        pinCampaignToHome,
         homeLayout,
         updateHomeLayout,
         resetHomeLayout,

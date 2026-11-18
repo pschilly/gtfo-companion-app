@@ -11,6 +11,7 @@ import {
   CheckCircle,
   Compass,
   Cpu,
+  Crosshair,
   ListChecks,
   MagnifyingGlass,
   Medal,
@@ -21,14 +22,28 @@ import {
 } from '@phosphor-icons/react';
 import { useApp } from '../context/AppContext';
 import { NotificationCenterDropdown } from './NotificationCenterDropdown';
-import { AssetItem, FlightPlanSummary, MemberAward, MemberCertificate, QualifiedAirframe } from '../types';
+import {
+  AssetItem,
+  CampaignItem,
+  FlightPlanSummary,
+  MemberAward,
+  MemberCertificate,
+  QualifiedAirframe,
+} from '../types';
 
 interface TopBarProps {
   searchQuery: string;
   onSearchChange: (q: string) => void;
 }
 
-type SearchCategoryFilter = 'all' | 'flight_plans' | 'certificates' | 'liveries' | 'mods' | 'awards';
+type SearchCategoryFilter =
+  | 'all'
+  | 'campaigns'
+  | 'flight_plans'
+  | 'certificates'
+  | 'liveries'
+  | 'mods'
+  | 'awards';
 
 export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) => {
   const {
@@ -48,6 +63,8 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
     setHighlightedCertId,
     upcomingCalendarEvents,
     checklistSummary,
+    campaignsList,
+    setSelectedCampaignId,
   } = useApp();
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -174,13 +191,39 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
       .slice(0, 3);
   }, [q, memberProfile?.qualifiedAirframes]);
 
+  // 7. Matching Campaigns
+  const matchingCampaigns = useMemo<CampaignItem[]>(() => {
+    if (!q) return [];
+    return campaignsList
+      .filter((camp) => {
+        return (
+          camp.name?.toLowerCase().includes(q) ||
+          camp.abbreviation?.toLowerCase().includes(q) ||
+          camp.theatre?.toLowerCase().includes(q) ||
+          camp.era?.toLowerCase().includes(q) ||
+          camp.dcsServer?.toLowerCase().includes(q) ||
+          camp.statusLabel?.toLowerCase().includes(q) ||
+          camp.descriptionSummary?.toLowerCase().includes(q)
+        );
+      })
+      .slice(0, 4);
+  }, [q, campaignsList]);
+
   const totalMatchesCount =
+    matchingCampaigns.length +
     matchingFlightPlans.length +
     matchingCertificates.length +
     matchingAwards.length +
     matchingLiveries.length +
     matchingMods.length +
     matchingAirframes.length;
+
+  const handleSelectCampaign = (camp: CampaignItem) => {
+    setSelectedCampaignId(camp.id);
+    setActiveTab('campaigns');
+    setIsSearchOpen(false);
+    onSearchChange('');
+  };
 
   const handleSelectFlightPlan = (plan: FlightPlanSummary) => {
     setSelectedFlightPlanId(plan.id || plan.identifier);
@@ -243,7 +286,7 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
             }
           }}
           onKeyDown={handleKeyDown}
-          placeholder="Search flight plans, certificates, liveries, mods, airframes..."
+          placeholder="Search campaigns, flight plans, certificates, liveries, mods..."
           className="w-full pl-10 pr-10 py-2 rounded-xl bg-stone-900/90 border border-stone-800 text-sm text-stone-100 placeholder:text-stone-500 focus:outline-none focus:border-amber-500/60 focus:ring-1 focus:ring-amber-500/30 transition-all font-sans"
         />
         {searchQuery ? (
@@ -280,6 +323,20 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
                   <span>All</span>
                   <span className="text-[10px] opacity-75">({totalMatchesCount})</span>
                 </button>
+                {matchingCampaigns.length > 0 && (
+                  <button
+                    onClick={() => setCategoryFilter('campaigns')}
+                    className={`px-2.5 py-1 rounded-lg text-xs transition-colors flex items-center gap-1.5 ${
+                      categoryFilter === 'campaigns'
+                        ? 'bg-amber-500 text-stone-950 font-bold'
+                        : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800'
+                    }`}
+                  >
+                    <Crosshair className="w-3 h-3" />
+                    <span>Campaigns</span>
+                    <span className="text-[10px] opacity-75">({matchingCampaigns.length})</span>
+                  </button>
+                )}
                 {matchingFlightPlans.length > 0 && (
                   <button
                     onClick={() => setCategoryFilter('flight_plans')}
@@ -356,6 +413,52 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
                 </div>
               ) : (
                 <>
+                  {/* Category: Campaigns */}
+                  {(categoryFilter === 'all' || categoryFilter === 'campaigns') &&
+                    matchingCampaigns.length > 0 && (
+                      <div className="p-2 space-y-1">
+                        <div className="px-2 py-1 text-[10px] font-mono font-bold uppercase tracking-wider text-amber-400/90 flex items-center justify-between">
+                          <span className="flex items-center gap-1.5">
+                            <Crosshair className="w-3.5 h-3.5 text-amber-400" />
+                            <span>Operations // Campaigns</span>
+                          </span>
+                          <span className="text-stone-500">
+                            {matchingCampaigns.length} match{matchingCampaigns.length === 1 ? '' : 'es'}
+                          </span>
+                        </div>
+                        {matchingCampaigns.map((camp) => (
+                          <div
+                            key={camp.id}
+                            onClick={() => handleSelectCampaign(camp)}
+                            className="group p-2.5 rounded-xl hover:bg-stone-900/90 cursor-pointer transition-all flex items-center justify-between gap-3 border border-transparent hover:border-amber-500/30"
+                          >
+                            <div className="flex items-center gap-3 min-w-0">
+                              <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 text-amber-400">
+                                <Crosshair className="w-5 h-5" />
+                              </div>
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <h4 className="text-sm font-semibold text-stone-100 truncate group-hover:text-amber-300 transition-colors">
+                                    {camp.name}
+                                  </h4>
+                                  <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-stone-900 border border-stone-800 text-amber-300">
+                                    {camp.statusLabel}
+                                  </span>
+                                </div>
+                                <p className="text-xs text-stone-400 truncate mt-0.5 font-mono">
+                                  {camp.theatre || 'Active Theatre'} &bull; {camp.progressPercentage}% complete
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-xs text-stone-500 group-hover:text-amber-400 font-mono shrink-0">
+                              <span className="hidden sm:inline text-[11px]">Overview</span>
+                              <ArrowRight className="w-3.5 h-3.5" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
                   {/* Category: Flight Plans */}
                   {(categoryFilter === 'all' || categoryFilter === 'flight_plans') &&
                     matchingFlightPlans.length > 0 && (

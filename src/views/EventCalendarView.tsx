@@ -23,6 +23,7 @@ import {
   ShieldWarning,
   SquaresFour,
   Sword,
+  Target,
   Trash,
   UserCheck,
   Users,
@@ -31,6 +32,7 @@ import {
 } from '@phosphor-icons/react';
 import { useApp } from '../context/AppContext';
 import {
+  fetchCalendarEventDetail,
   fetchCalendarEvents,
   submitCalendarEventComplete,
   submitCalendarEventRsvp,
@@ -425,6 +427,11 @@ export const EventCalendarView: React.FC = () => {
     selectedCalendarEventUid,
     setSelectedCalendarEventUid,
     upcomingCalendarEvents,
+    openCampaignMissionModal,
+    calendarReturnContext,
+    returnFromCalendarEvent,
+    clearCalendarReturnContext,
+    refreshCampaigns,
   } = useApp();
 
   const now = useMemo(() => new Date(), []);
@@ -459,6 +466,18 @@ export const EventCalendarView: React.FC = () => {
   const [selectedEventUid, setSelectedEventUid] = useState<string | null>(
     () => selectedCalendarEventUid || null
   );
+
+  const handleCloseEventModal = useCallback(() => {
+    setSelectedEventUid(null);
+    if (calendarReturnContext) {
+      returnFromCalendarEvent();
+    }
+  }, [calendarReturnContext, returnFromCalendarEvent]);
+
+  const handleStayOnCalendar = useCallback(() => {
+    clearCalendarReturnContext();
+    setSelectedEventUid(null);
+  }, [clearCalendarReturnContext]);
 
   // RSVP Form state inside modal
   const [rsvpCategory, setRsvpCategory] = useState<'flight' | 'support'>('flight');
@@ -565,6 +584,8 @@ export const EventCalendarView: React.FC = () => {
     setSelectedCalendarEventUid,
   ]);
 
+  const attemptedDetailFetchRef = useRef<Set<string>>(new Set());
+
   const selectedEvent = useMemo(() => {
     if (!selectedEventUid) return null;
     return (
@@ -573,6 +594,63 @@ export const EventCalendarView: React.FC = () => {
       null
     );
   }, [events, upcomingCalendarEvents, selectedEventUid]);
+
+  // If a deep-linked UID (e.g. a past/completed sortie from Campaign Missions) is not in the loaded month,
+  // fetch its full detail from the portal API and navigate the calendar grid to that sortie's month.
+  useEffect(() => {
+    if (!selectedEventUid || selectedEvent || isLoading) return;
+    if (attemptedDetailFetchRef.current.has(selectedEventUid)) return;
+
+    const match = selectedEventUid.match(/^(campaign|training)-(\d+)$/i);
+    if (!match) return;
+
+    const evType = match[1].toLowerCase() as 'campaign' | 'training';
+    const evId = Number(match[2]);
+    if (!Number.isFinite(evId) || evId <= 0) return;
+
+    attemptedDetailFetchRef.current.add(selectedEventUid);
+
+    let cancelled = false;
+    fetchCalendarEventDetail(
+      settings.memberPortalApiUrl,
+      evType,
+      evId,
+      userSession?.id,
+      userSession?.accessToken
+    )
+      .then((res) => {
+        if (cancelled || !res?.event) return;
+        setEvents((prev) => {
+          if (prev.some((e) => e.uid === res.event.uid)) return prev;
+          return [...prev, res.event];
+        });
+        if (res.event.scheduled_at) {
+          const dt = new Date(res.event.scheduled_at);
+          if (!Number.isNaN(dt.getTime())) {
+            const y = dt.getFullYear();
+            const m = dt.getMonth() + 1;
+            if (y !== currentYear) setCurrentYear(y);
+            if (m !== currentMonth) setCurrentMonth(m);
+          }
+        }
+      })
+      .catch((err) => {
+        console.warn('fetchCalendarEventDetail fallback error:', err);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    currentMonth,
+    currentYear,
+    isLoading,
+    selectedEvent,
+    selectedEventUid,
+    settings.memberPortalApiUrl,
+    userSession?.accessToken,
+    userSession?.id,
+  ]);
 
   // Available airframes for the currently selected event
   const availableAirframesForSelectedEvent = useMemo<CalendarRsvpAirframeOption[]>(() => {
@@ -1063,6 +1141,10 @@ export const EventCalendarView: React.FC = () => {
             item.uid === updatedEvent.uid ? updatedEvent : item
           )
         );
+      }
+
+      if (selectedEvent.type === 'campaign') {
+        void refreshCampaigns();
       }
 
       setRsvpFeedback({
@@ -1679,7 +1761,7 @@ export const EventCalendarView: React.FC = () => {
       {selectedEvent && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/80 backdrop-blur-md animate-in fade-in duration-150"
-          onClick={() => setSelectedEventUid(null)}
+          onClick={handleCloseEventModal}
         >
           <div
             className="w-full max-w-3xl max-h-[90vh] flex flex-col rounded-3xl bg-stone-900 border border-stone-800 shadow-2xl overflow-hidden"
@@ -1744,13 +1826,32 @@ export const EventCalendarView: React.FC = () => {
                 )}
               </div>
 
-              <button
-                onClick={() => setSelectedEventUid(null)}
-                className="p-2 rounded-xl bg-stone-900 hover:bg-stone-800 text-stone-400 hover:text-stone-100 border border-stone-800 transition-colors shrink-0"
-                title="Close"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex flex-wrap items-center gap-2 shrink-0">
+                {selectedEvent.type === 'campaign' && selectedEvent.mission_id && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const missionId = selectedEvent.mission_id!;
+                      const campaignId = selectedEvent.campaign_id ?? null;
+                      setSelectedEventUid(null);
+                      openCampaignMissionModal(campaignId, missionId);
+                    }}
+                    className="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-mono font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                    title="Jump to full Campaign Mission Briefing, Objectives & AAR"
+                  >
+                    <Target weight="duotone" className="w-4 h-4" />
+                    <span>Mission Briefing</span>
+                  </button>
+                )}
+
+                <button
+                  onClick={handleCloseEventModal}
+                  className="p-2 rounded-xl bg-stone-900 hover:bg-stone-800 text-stone-400 hover:text-stone-100 border border-stone-800 transition-colors shrink-0"
+                  title={calendarReturnContext ? 'Return to previous view' : 'Close'}
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             {/* Scrollable Modal Body */}
@@ -2750,6 +2851,22 @@ export const EventCalendarView: React.FC = () => {
                   </button>
                 )}
 
+                {selectedEvent.type === 'campaign' && selectedEvent.mission_id && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const missionId = selectedEvent.mission_id!;
+                      const campaignId = selectedEvent.campaign_id ?? null;
+                      setSelectedEventUid(null);
+                      openCampaignMissionModal(campaignId, missionId);
+                    }}
+                    className="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-mono font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <Target weight="duotone" className="w-4 h-4" />
+                    <span>View Mission Briefing &amp; Objectives</span>
+                  </button>
+                )}
+
                 {selectedEvent.portal_url && (
                   <button
                     type="button"
@@ -2774,13 +2891,31 @@ export const EventCalendarView: React.FC = () => {
                 )}
               </div>
 
-              <button
-                type="button"
-                onClick={() => setSelectedEventUid(null)}
-                className="px-4 py-1.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-mono font-semibold transition-colors"
-              >
-                Close
-              </button>
+              <div className="flex items-center gap-2">
+                {calendarReturnContext && (
+                  <button
+                    type="button"
+                    onClick={handleStayOnCalendar}
+                    className="px-3 py-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-300 hover:text-stone-100 text-xs font-mono transition-colors cursor-pointer"
+                  >
+                    Stay on Calendar
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  onClick={handleCloseEventModal}
+                  className="px-4 py-1.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-mono font-semibold transition-colors cursor-pointer"
+                >
+                  {calendarReturnContext
+                    ? calendarReturnContext.missionId !== null
+                      ? 'Return to Mission'
+                      : calendarReturnContext.tab === 'campaigns'
+                        ? 'Back to Campaigns'
+                        : 'Return'
+                    : 'Close'}
+                </button>
+              </div>
             </div>
           </div>
         </div>

@@ -20,6 +20,7 @@ import { QualificationsView } from './views/QualificationsView';
 import { ServiceRecordView } from './views/ServiceRecordView';
 import { SettingsView } from './views/SettingsView';
 import { AtcView } from './views/AtcView';
+import { CampaignsView } from './views/CampaignsView';
 import { EventCalendarView } from './views/EventCalendarView';
 import { QualificationsZoneView } from './views/QualificationsZoneView';
 import { SquadronsView } from './views/SquadronsView';
@@ -78,6 +79,7 @@ const MainShell: React.FC = () => {
           {activeTab === 'roster' && <TaskForceRosterView />}
           {activeTab === 'awards' && <AwardsView />}
           {activeTab === 'service_record' && <ServiceRecordView />}
+          {activeTab === 'campaigns' && <CampaignsView />}
           {activeTab === 'atc' && <AtcView />}
           {(activeTab === 'library' || activeTab === 'liveries' || activeTab === 'mods') && (
             <AssetManagerView searchQuery={searchQuery} />
