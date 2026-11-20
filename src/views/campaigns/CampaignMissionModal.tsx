@@ -55,6 +55,7 @@ interface CampaignMissionModalProps {
   initialSection?: MissionModalSection;
   onClose: () => void;
   onOpenExternal: (url?: string | null, fallbackPath?: string) => void;
+  onOpenOnMap?: (missionId: number) => void;
 }
 
 const SMEAC_SECTIONS: Array<{
@@ -177,6 +178,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
   initialSection = 'overview',
   onClose,
   onOpenExternal,
+  onOpenOnMap,
 }) => {
   const { userSession, openSortieInCalendar, setSelectedFlightPlanId, setActiveTab } = useApp();
   const [activeSection, setActiveSection] = useState<MissionModalSection>(initialSection);
@@ -272,7 +274,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
 
   return createPortal(
     <div
-      className="fixed inset-0 !m-0 w-screen h-screen z-50 flex items-center justify-center p-3 sm:p-5 bg-stone-950/45 backdrop-blur-md animate-in fade-in duration-150"
+      className="fixed inset-0 !m-0 w-screen h-screen z-[1400] flex items-center justify-center p-3 sm:p-5 bg-stone-950/45 backdrop-blur-md animate-in fade-in duration-150"
       onClick={onClose}
     >
       <div
@@ -355,17 +357,20 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
 
             <button
               type="button"
-              onClick={() =>
-                onOpenExternal(
-                  mission.mapUrl,
-                  `/campaigns/${campaign.slug}/map?mission_id=${mission.id}`
-                )
-              }
+              onClick={() => {
+                if (onOpenOnMap) {
+                  onOpenOnMap(mission.id);
+                } else {
+                  onOpenExternal(
+                    mission.mapUrl,
+                    `/campaigns/${campaign.slug}/map?mission_id=${mission.id}`
+                  );
+                }
+              }}
               className="px-3 py-1.5 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/35 text-sky-300 text-xs font-mono font-bold flex items-center gap-1.5 transition-colors"
             >
               <MapTrifold weight="duotone" className="w-4 h-4" />
               <span>Open on Map</span>
-              <ArrowSquareOut className="w-3.5 h-3.5" />
             </button>
 
             <button
@@ -1575,7 +1580,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
       {/* ==================== MEDIA LIGHTBOX OVERLAY ==================== */}
       {lightboxImage && (
         <div
-          className="fixed inset-0 !m-0 z-[60] bg-stone-950/65 backdrop-blur-md flex items-center justify-center p-4"
+          className="fixed inset-0 !m-0 z-[1450] bg-stone-950/65 backdrop-blur-md flex items-center justify-center p-4"
           onClick={(e) => {
             e.stopPropagation();
             setLightboxImage(null);

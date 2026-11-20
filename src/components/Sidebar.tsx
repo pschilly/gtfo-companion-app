@@ -20,6 +20,7 @@ import {
   House,
   ListChecks,
   Lock,
+  MapTrifold,
   Medal,
   Package,
   PaintBrush,
@@ -152,6 +153,11 @@ export const Sidebar: React.FC = () => {
       subTab: 'overview',
       label: 'Overview',
       icon: <Rows className="w-3.5 h-3.5" />,
+    },
+    {
+      subTab: 'map',
+      label: 'Campaign Map',
+      icon: <MapTrifold className="w-3.5 h-3.5" />,
     },
     {
       subTab: 'lore',

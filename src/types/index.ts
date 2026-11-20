@@ -396,8 +396,10 @@ export interface FlightPlanCommsEntry {
 }
 
 export interface FlightPlanDetail extends FlightPlanSummary {
+  tasking_id?: number | null;
+  tasking?: Record<string, any> | null;
   route_points: Array<FlightPlanRoutePoint>;
-  loadout?: Record<string, unknown> | null;
+  loadout?: Record<string, unknown> | string | null;
   station_loadout?: Record<string, string>;
   comms_ladder?: FlightPlanCommsEntry[] | Record<string, any> | null;
   default_comms_ladder?: {
@@ -418,14 +420,35 @@ export interface FlightPlanDetail extends FlightPlanSummary {
   };
   mids_settings?: {
     mids_a_channel?: string | number | null;
+    mids_a_name?: string | null;
+    mids_a_notes?: string | null;
     mids_b_channel?: string | number | null;
+    mids_b_name?: string | null;
+    mids_b_notes?: string | null;
     net_label?: string | null;
+    lead_stn?: string | null;
     [key: string]: any;
   } | null;
   cmds_settings?: Record<string, any> | Array<any> | null;
   sa_settings?: Record<string, any> | null;
   geo_lines_settings?: Record<string, any> | null;
-  dest_points_settings?: Record<string, any> | null;
+  dest_points_settings?: Array<Record<string, any>> | Record<string, any> | null;
+  f14_plot_lines_settings?: Record<string, any> | null;
+  jf17_airspace_settings?: Record<string, any> | null;
+  overhead_pattern?: Record<string, any> | null;
+  comm1?: FlightPlanCommsEntry[];
+  comm2?: FlightPlanCommsEntry[];
+  comms_ladder_by_radio?: Record<string, FlightPlanCommsEntry[]>;
+  gun_loadout?: string | null;
+  countermeasures_loadout?: string | null;
+  can_edit?: boolean;
+  can_delete?: boolean;
+  is_f18?: boolean;
+  is_f16?: boolean;
+  is_f14?: boolean;
+  is_jf17?: boolean;
+  has_cmds?: boolean;
+  has_mids?: boolean;
   metadata?: Record<string, unknown> | null;
 }
 
@@ -1200,6 +1223,7 @@ export interface CampaignMissionRewardBadge {
 
 export type CampaignSubTab =
   | 'overview'
+  | 'map'
   | 'lore'
   | 'missions'
   | 'intel'
@@ -1411,6 +1435,496 @@ export interface CampaignsResponse {
   activeCampaignId: number | null;
   total: number;
   activeCount: number;
+}
+
+export interface CampaignMapPermissions {
+  canViewMap: boolean;
+  canCreateFlightPlan: boolean;
+  canManageFlightPlans: boolean;
+  canManageBothCoalitions: boolean;
+  canManageThreats: boolean;
+  canManageSupportAssets: boolean;
+  canCreateTacticalMarkings: boolean;
+  canManageCampaignTacticalMarkings: boolean;
+  canManageMissionTacticalMarkings: boolean;
+  canManageSortieTacticalMarkings: boolean;
+  canManageSharedTacticalMarkings: boolean;
+  canViewIsr: boolean;
+  canRequestIsr: boolean;
+  canManageIsr: boolean;
+  canMarkupIsr: boolean;
+  canEditMissionAor: boolean;
+  isSuperAdmin: boolean;
+  isCouncil: boolean;
+}
+
+export interface CampaignMapHeader {
+  id: number;
+  name: string;
+  slug: string;
+  theatre?: string | null;
+  theatreDcsName?: string | null;
+  dcsServer?: string | null;
+  isTraining: boolean;
+  magneticDeclination?: number | null;
+  campaignDate?: string | null;
+  center: {
+    lat: number;
+    lng: number;
+    zoom: number;
+  };
+  bounds?: any;
+  isrCreditsBalance: number;
+}
+
+export interface CampaignMapProcedureWaypoint {
+  name?: string;
+  lat: number;
+  lng: number;
+  alt?: number | string | null;
+  speed?: number | string | null;
+  notes?: string | null;
+}
+
+export interface CampaignMapProcedure {
+  id: number;
+  airbase_id: number;
+  airbase_name?: string;
+  name: string;
+  type: 'sid' | 'star' | 'iap' | 'overhead' | string;
+  type_label?: string;
+  runway?: string | null;
+  initial_altitude?: number | string | null;
+  color?: string | null;
+  waypoints: CampaignMapProcedureWaypoint[];
+  description?: string | null;
+}
+
+export interface CampaignMapAirbase {
+  id?: number | null;
+  dcs_id?: number | string | null;
+  name: string;
+  icao?: string | null;
+  code?: string | null;
+  coalition: 'blue' | 'red' | 'neutral' | string;
+  lat: number;
+  lng: number;
+  category?: string;
+  runways?: Array<any>;
+  frequencies?: Array<any>;
+  custom_frequencies?: Array<any>;
+  dcs_frequencies?: Array<any>;
+  tacan?: string | null;
+  elevation?: number | null;
+  ils?: any;
+  description?: string | null;
+  status?: string | null;
+  procedures: CampaignMapProcedure[];
+}
+
+export interface CampaignMapBullseye {
+  name: string;
+  coalition?: number | string;
+  lat: number;
+  lng: number;
+}
+
+export interface CampaignMapFrontLine {
+  group_name?: string;
+  name?: string;
+  source_type?: string;
+  label?: string | null;
+  line_style?: string;
+  weight?: number;
+  color?: string;
+  points: Array<{ lat: number; lng: number } | [number, number]>;
+}
+
+export interface CampaignMapPolygonGroup {
+  group_name?: string;
+  name?: string;
+  source_type?: string;
+  label?: string | null;
+  line_style?: string;
+  weight?: number;
+  color?: string;
+  fill_color?: string;
+  fill_opacity?: number;
+  points: Array<{ lat: number; lng: number } | [number, number]>;
+}
+
+export interface CampaignMapThreat {
+  id?: number;
+  type: string;
+  sam_system_id?: number | null;
+  sam_name?: string | null;
+  range: number;
+  max_range_nm?: number;
+  range_m: number;
+  color?: string;
+  title?: string | null;
+  description?: string | null;
+  image_url?: string | null;
+  heading?: number | null;
+  lat: number;
+  lng: number;
+  is_visible?: boolean;
+}
+
+export interface CampaignMapThreatTypeOption {
+  value: string;
+  label: string;
+  category?: string | null;
+  icon?: string;
+}
+
+export interface CampaignMapSamSystem {
+  id: number;
+  name: string;
+  type?: string;
+  range: number;
+  max_range: number;
+  range_m: number;
+  color?: string;
+}
+
+export interface CampaignMapSupportAsset {
+  id?: number;
+  type: string;
+  sam_system_id?: number | null;
+  sam_name?: string | null;
+  range?: number;
+  range_m?: number;
+  color?: string;
+  title?: string | null;
+  description?: string | null;
+  lat: number;
+  lng: number;
+  heading?: number | null;
+  leg_length?: number | null;
+  altitude?: number | string | null;
+  aircraft_type?: string | null;
+  speed?: number | null;
+  tacan_channel?: string | null;
+  radio_freq?: string | null;
+  dcs_group_name?: string | null;
+  dcs_group_type?: string | null;
+  waypoints?: Array<{ lat: number; lng: number }> | null;
+  dcs_lat?: number | null;
+  dcs_lng?: number | null;
+  dcs_heading?: number | null;
+  dcs_altitude?: number | null;
+  dcs_speed?: number | null;
+  is_dcs_tracked?: boolean;
+  status?: string | null;
+  mission_file?: string | null;
+  image_url?: string | null;
+}
+
+export interface CampaignMapSupportAssetTypeOption {
+  value: string;
+  label: string;
+  icon?: string;
+}
+
+export interface CampaignMapTacticalMarking {
+  id: number;
+  marking_type: string;
+  geometry: Record<string, any>;
+  properties: Record<string, any>;
+  visibility: 'personal' | 'campaign' | 'mission' | 'sortie' | string;
+  mission_id?: number | null;
+  mission_name?: string | null;
+  sortie_id?: number | null;
+  sortie_name?: string | null;
+  user_id?: number | null;
+  creator_name?: string | null;
+  can_edit: boolean;
+}
+
+export interface CampaignMapTacticalIcon {
+  id?: string;
+  key?: string;
+  name?: string;
+  label?: string;
+  category?: string;
+  svg?: string;
+  url?: string;
+  [key: string]: any;
+}
+
+export interface CampaignMapIsrTarget {
+  id: number;
+  user_id?: number | null;
+  user_name?: string;
+  label: string;
+  label_text?: string;
+  notes?: string | null;
+  lat: number;
+  lon: number;
+  bbox?: any;
+  created_at?: string | null;
+}
+
+export interface CampaignMapIsrImageVariant {
+  type?: string;
+  label?: string;
+  path?: string;
+  url: string;
+}
+
+export interface CampaignMapIsrRequest {
+  id: number;
+  campaign_id: number;
+  mission_id?: number | null;
+  mission_name?: string | null;
+  user_id?: number | null;
+  user_name?: string;
+  mission_file?: string | null;
+  is_current_mission?: boolean;
+  lat: number;
+  lon: number;
+  km_size: number;
+  sensor: 'eo' | 'flir_white' | 'flir_black' | 'whot' | 'bhot' | 'nvg' | string;
+  sensor_label?: string;
+  cost: number;
+  status: string;
+  status_label?: string;
+  is_expired?: boolean;
+  image_url?: string | null;
+  image_urls?: Array<CampaignMapIsrImageVariant | string> | null;
+  targets: CampaignMapIsrTarget[];
+  created_at?: string | null;
+  created_at_human?: string | null;
+}
+
+export interface CampaignMapLogisticsItem {
+  id: number;
+  name: string;
+  quantity: number;
+  delivered_quantity: number;
+  progress_percent: number;
+  is_completed: boolean;
+  completed_by?: string | null;
+  category?: string;
+  xp_reward?: number;
+  xp_awarded?: number;
+}
+
+export interface CampaignMapLogisticsRequest {
+  id: number;
+  identifier: string;
+  type?: string;
+  status: string;
+  status_label?: string;
+  pilot?: string | null;
+  contributing_pilots?: string[];
+  delivering_pilots_summary?: string | null;
+  requester?: string;
+  distance_nm?: number | null;
+  xp_reward?: number | null;
+  created_at?: string | null;
+  origin?: { id?: number; name: string; lat: number; lng: number } | null;
+  destination?: { id?: number; name: string; lat: number; lng: number } | null;
+  total_units: number;
+  delivered_units: number;
+  progress_percent: number;
+  items_count?: number;
+  items_lines_count?: number;
+  items_completed_count?: number;
+  items_summary?: string;
+  items?: CampaignMapLogisticsItem[];
+}
+
+export interface CampaignMapNavaid {
+  id?: number | string;
+  name?: string;
+  ident?: string;
+  mgrs?: string;
+  type?: string;
+  frequency?: string | null;
+  tacan?: string | null;
+  channel?: string | null;
+  lat?: number;
+  lng?: number;
+  coordinates?: { lat: number; lon: number; lng?: number };
+  elevation?: number | null;
+  [key: string]: any;
+}
+
+export interface CampaignMapMissionObjective {
+  index: number;
+  priority: string;
+  status: string;
+  objective: string;
+  squadron_id?: number | null;
+  squadron_name?: string | null;
+  squadron_abbreviation?: string | null;
+  squadron_ids?: number[];
+  squadrons?: Array<{ id: number; name: string; abbreviation?: string; logo?: string | null }>;
+  resource_type?: string | null;
+  points?: number | null;
+  lat?: number | null;
+  lng?: number | null;
+  mgrs?: string | null;
+  aor?: any;
+}
+
+export interface CampaignMapMissionSortie {
+  id: number;
+  mission_id: number;
+  sortie_number: number;
+  name: string;
+  scheduled_at?: string | null;
+  scheduled_at_human?: string | null;
+  flight_plans_count: number;
+}
+
+export interface CampaignMapMission {
+  id: number;
+  name: string;
+  lat?: number | null;
+  lng?: number | null;
+  aor?: any;
+  status: string;
+  status_label?: string;
+  tasking_id?: number | null;
+  tasking_label?: string;
+  type?: string;
+  color_hex: string;
+  color: string;
+  icon_html?: string;
+  squadron_name?: string | null;
+  squadron_abbreviation?: string | null;
+  squadron_nickname?: string | null;
+  squadron_logo?: string | null;
+  planning_user_name?: string | null;
+  scheduled_date?: string | null;
+  scheduled_date_relative?: string | null;
+  objective_mgrs?: string | null;
+  objectives: CampaignMapMissionObjective[];
+  total_objectives?: number;
+  completed_objectives?: number;
+  high_priority_count?: number;
+  medium_priority_count?: number;
+  low_priority_count?: number;
+  high_priority_pending?: number;
+  progress_percent?: number;
+  rewards_summary?: string | null;
+  earned_rewards_summary?: string | null;
+  description?: string | null;
+  remarks?: string | null;
+  sorties: CampaignMapMissionSortie[];
+}
+
+export interface CampaignMapFlightPlanBrief {
+  id: number;
+  flight_plan_id: number;
+  flight_id?: number | null;
+  identifier: string;
+  callsign?: string | null;
+  name?: string | null;
+  airframe_id?: number | null;
+  airframe_name?: string | null;
+  airframe_abbr?: string | null;
+  squadron_id?: number | null;
+  squadron_name?: string | null;
+  squadron_logo?: string | null;
+  mission_id?: number | null;
+  mission_name?: string | null;
+  sortie_id?: number | null;
+  sortie_name?: string | null;
+  tasking_id?: number | null;
+  tasking_label?: string | null;
+  user_id?: number | null;
+  creator_name?: string | null;
+  is_opfor: boolean;
+  is_filed: boolean;
+  filed_at?: string | null;
+  can_edit: boolean;
+  can_delete: boolean;
+  color: string;
+  route_points: Array<any>;
+  points_count: number;
+  has_plan: boolean;
+  updated_at?: string | null;
+}
+
+export interface CampaignMapAirframeCatalogItem {
+  id: number;
+  name: string;
+  abbreviation: string;
+  dcs_entity: string;
+  squadron_id?: number | null;
+  squadron_name?: string | null;
+  is_qualified: boolean;
+  is_f18: boolean;
+  is_f16: boolean;
+  is_f14: boolean;
+  is_jf17: boolean;
+  has_mids: boolean;
+  has_cmds: boolean;
+  is_dtc_compatible: boolean;
+  loadout_config?: Record<string, any> | null;
+  radios_config?: Record<string, any> | null;
+  default_cmds?: Record<string, any> | null;
+}
+
+export interface CampaignMapLoadoutPreset {
+  id: number;
+  name: string;
+  description?: string | null;
+  airframe_id?: number | null;
+  airframe_key?: string | null;
+  stations?: Record<string, any> | null;
+  gun?: string | null;
+  countermeasures?: string | null;
+}
+
+export interface CampaignMapTasking {
+  id: number;
+  name: string;
+  slug: string;
+  label: string;
+  description?: string | null;
+  color?: string | null;
+  color_hex?: string;
+  icon?: string | null;
+  icon_html?: string;
+}
+
+export interface CampaignMapWarehouseInventory {
+  is_unlimited: boolean;
+  weapons: Record<string, number> | Array<any>;
+}
+
+export interface CampaignMapPayload {
+  campaign: CampaignMapHeader;
+  permissions: CampaignMapPermissions;
+  airbases: CampaignMapAirbase[];
+  bullseyes: CampaignMapBullseye[];
+  frontLine: CampaignMapFrontLine[];
+  polygonGroups: CampaignMapPolygonGroup[];
+  threats: CampaignMapThreat[];
+  threatTypes: CampaignMapThreatTypeOption[];
+  samSystems: CampaignMapSamSystem[];
+  supportAssets: CampaignMapSupportAsset[];
+  supportAssetTypes: CampaignMapSupportAssetTypeOption[];
+  tacticalMarkings: CampaignMapTacticalMarking[];
+  tacticalIcons: CampaignMapTacticalIcon[];
+  isrRequests: CampaignMapIsrRequest[];
+  isrTargetTypes: Record<string, string> | Array<{ value: string; label: string }>;
+  logisticsRequests: CampaignMapLogisticsRequest[];
+  navaids: CampaignMapNavaid[];
+  missions: CampaignMapMission[];
+  flightPlans: {
+    allPlans: CampaignMapFlightPlanBrief[];
+    myPlans: CampaignMapFlightPlanBrief[];
+  };
+  airframesCatalog: CampaignMapAirframeCatalogItem[];
+  loadoutPresets: CampaignMapLoadoutPreset[];
+  taskings: CampaignMapTasking[];
+  fetchedAt?: string;
 }
 
 

@@ -16,6 +16,7 @@ export const STATIC_CONFIG = {
   communityRoleId: import.meta.env.VITE_DISCORD_COMMUNITY_ROLE_ID || '',
   coreRoleId: import.meta.env.VITE_DISCORD_CORE_ROLE_ID || '',
   oauthRedirectPort: Number(import.meta.env.VITE_OAUTH_REDIRECT_PORT) || 54321,
+  cartoKey: (import.meta.env.CARTO_KEY as string | undefined) || (import.meta.env.VITE_CARTO_KEY as string | undefined) || '',
 } as const;
 
 export const EMPTY_MANIFEST: AssetManifest = {

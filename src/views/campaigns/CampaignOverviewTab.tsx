@@ -43,6 +43,7 @@ interface CampaignOverviewTabProps {
   onOpenExternal: (url?: string | null, fallbackPath?: string) => void;
   onNavigateSubTab: (subTab: CampaignSubTab) => void;
   onInspectMission: (mission: CampaignMissionItem, section?: MissionModalSection) => void;
+  onOpenMissionOnMap?: (missionId: number) => void;
 }
 
 export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
@@ -52,6 +53,7 @@ export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
   onOpenExternal,
   onNavigateSubTab,
   onInspectMission,
+  onOpenMissionOnMap,
 }) => {
   return (
     <div className="space-y-6">
@@ -140,12 +142,11 @@ export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
 
               <button
                 type="button"
-                onClick={() => onOpenExternal(campaign.mapUrl, `/campaigns/${campaign.slug}/map`)}
+                onClick={() => onNavigateSubTab('map')}
                 className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-mono font-bold flex items-center gap-1.5 shadow-md shadow-amber-500/20 transition-colors"
               >
                 <MapTrifold weight="duotone" className="w-4 h-4" />
-                <span>Interactive Map</span>
-                <ArrowSquareOut className="w-3.5 h-3.5" />
+                <span>Campaign Map &amp; Planner</span>
               </button>
 
               <button
@@ -465,12 +466,11 @@ export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
                         <button
                           type="button"
                           onClick={() =>
-                            onOpenExternal(
-                              mission.mapUrl,
-                              `/campaigns/${campaign.slug}/map?mission_id=${mission.id}`
-                            )
+                            onOpenMissionOnMap
+                              ? onOpenMissionOnMap(mission.id)
+                              : onNavigateSubTab('map')
                           }
-                          title="Open mission on Member Portal Tactical Map"
+                          title="Focus mission on in-app Campaign Tactical Map"
                           className="p-1.5 rounded-lg bg-sky-500/10 border border-sky-500/20 hover:bg-sky-500/20 hover:border-sky-500/40 text-sky-400 transition-all"
                         >
                           <MapTrifold weight="duotone" className="w-4 h-4" />

@@ -1,6 +1,60 @@
+@import 'leaflet/dist/leaflet.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Dark Tactical Leaflet Overrides */
+.leaflet-container {
+  background: #09090b;
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: #141210;
+  color: #e7e5e4;
+  border: 1px solid #292524;
+  box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.75);
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 12px;
+}
+
+.leaflet-popup-close-button {
+  color: #a8a29e !important;
+}
+
+.leaflet-popup-close-button:hover {
+  color: #f59e0b !important;
+}
+
+.leaflet-tooltip.gtfo-map-tooltip {
+  background: rgba(12, 10, 9, 0.92);
+  border: 1px solid #44403c;
+  color: #f5f5f4;
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+.leaflet-tooltip.gtfo-map-tooltip::before {
+  border-top-color: rgba(12, 10, 9, 0.92);
+}
+
+.leaflet-control-zoom a {
+  background-color: rgba(20, 18, 16, 0.92) !important;
+  color: #e7e5e4 !important;
+  border-color: #292524 !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background-color: #292524 !important;
+  color: #f59e0b !important;
+}
 
 @layer base {
   body {
@@ -41,4 +95,255 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: #f59e0b;
+}
+
+/* ============================================================================
+ * Member Portal Campaign Map Styles (ported from partials/map-styles.blade.php)
+ * ========================================================================== */
+:root {
+  --cursor-hand-tap: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDI1NiAyNTYiPjxwYXRoIGZpbGw9IiMwMDAwMDAiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLXdpZHRoPSIxNiIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZD0iTTIyOCAxNTZ2MzZjMCAxMy44NS0xLjYzIDI2LjUyLTQuNTggMzUuNjhhMTIgMTIgMCAxIDEtMjIuODQtNy4zNmMyLjE0LTYuNjUgMy40Mi0xNy4yNCAzLjQyLTI4LjMyVjE1NmE4IDggMCAwIDAtMTYgMHY0YTEyIDEyIDAgMCAxLTI0IDBWMTQwYTggOCAwIDAgMC0xNiAwdjEyYTEyIDEyIDAgMCAxLTI0IDBWODRhOCA4IDAgMCAwLTE2IDBWMTkyYTEyIDEyIDAgMCAxLTIyLjE4IDYuMzRsLTE4LjY4LTMwLS4yMS0uMzRBOCA4IDAgMCAwIDUzIDE3NS45Mkw3OC4yNyAyMTcuOGExMiAxMiAwIDAgMS0yMC41NiAxMi4zOWwtMjUuMzEtNDItLjEyLS4yQTMyIDMyIDAgMCAxIDg0IDE1MC44M1Y4NGEzMiAzMiAwIDAgMSA2NCAwdjI1YTMyIDMyIDAgMCAxIDM2Ljc4IDE3QTMyIDMyIDAgMCAxIDIyOCAxNTZaTTU2IDk2QTEyIDEyIDAgMCAwIDY4IDg0YTQ4IDQ4IDAgMCAxIDk2IDAgMTIgMTIgMCAwIDAgMjQgMEE3MiA3MiAwIDAgMCA0NCA4NCAxMiAxMiAwIDAgMCA1NiA5NloiLz48cGF0aCBmaWxsPSIjZmZmZmZmIiBkPSJNMjI4IDE1NnYzNmMwIDEzLjg1LTEuNjMgMjYuNTItNC41OCAzNS42OGExMiAxMiAwIDEgMS0yMi44NC03LjM2YzIuMTQtNi42NSAzLjQyLTE3LjI0IDMuNDItMjguMzJWMTU2YTggOCAwIDAgMC0xNiAwdjRhMTIgMTIgMCAwIDEtMjQgMFYxNDBhOCA4IDAgMCAwLTE2IDB2MTJhMTIgMTIgMCAwIDEtMjQgMFY4NGE4IDggMCAwIDAtMTYgMFYxOTJhMTIgMTIgMCAwIDEtMjIuMTggNi4zNGwtMTguNjgtMzAtLjIxLS4zNEE4IDggMCAwIDAgNTMgMTc1LjkyTDc4LjI3IDIxNy44YTEyIDEyIDAgMCAxLTIwLjU2IDEyLjM5bC0yNS4zMS00Mi0uMTItLjJBMzIgMzIgMCAwIDEgODQgMTUwLjgzVjg0YTMyIDMyIDAgMCAxIDY0IDB2MjVhMzIgMzIgMCAwIDEgMzYuNzggMTdBMzIgMzIgMCAwIDEgMjI4IDE1NlpNNTYgOTZBMTIgMTIgMCAwIDAgNjggODRhNDggNDggMCAwIDEgOTYgMCAxMiAxMiAwIDAgMCAyNCAwQTcyIDcyIDAgMCAwIDQ0IDg0IDEyIDEyIDAgMCAwIDU2IDk2WiIvPjwvc3ZnPg==") 14 5;
+  --cursor-hand-grabbing: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDI1NiAyNTYiPjxwYXRoIGZpbGw9IiMwMDAwMDAiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLXdpZHRoPSIxNiIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZD0iTTE4OCA3NmEzMS44NSAzMS44NSAwIDAgMC0xMS4yMSAyIDMyIDMyIDAgMCAwLTQ4Ljc5LTExQTMyIDMyIDAgMCAwIDc2IDkydjE2SDY4YTMyIDMyIDAgMCAwLTMyIDMydjEyYTkyIDkyIDAgMCAwIDE4NCAwVjEwOEEzMiAzMiAwIDAgMCAxODggNzZabTggNzZhNjggNjggMCAwIDEtMTM2IDBWMTQwYTggOCAwIDAgMSA4LThoOHYyMGExMiAxMiAwIDAgMCAyNCAwVjkyYTggOCAwIDAgMSAxNiAwdjI4YTEyIDEyIDAgMCAwIDI0IDBWOTJhOCA4IDAgMCAxIDE2IDB2MjhhMTIgMTIgMCAwIDAgMjQgMFYxMDhhOCA4IDAgMCAxIDE2IDBaIi8+PHBhdGggZmlsbD0iI2ZmZmZmZiIgZD0iTTE4OCA3NmEzMS44NSAzMS44NSAwIDAgMC0xMS4yMSAyIDMyIDMyIDAgMCAwLTQ4Ljc5LTExQTMyIDMyIDAgMCAwIDc2IDkydjE2SDY4YTMyIDMyIDAgMCAwLTMyIDMydjEyYTkyIDkyIDAgMCAwIDE4NCAwVjEwOEEzMiAzMiAwIDAgMCAxODggNzZabTggNzZhNjggNjggMCAwIDEtMTM2IDBWMTQwYTggOCAwIDAgMSA4LThoOHYyMGExMiAxMiAwIDAgMCAyNCAwVjkyYTggOCAwIDAgMSAxNiAwdjI4YTEyIDEyIDAgMCAwIDI0IDBWOTJhOCA4IDAgMCAxIDE2IDB2MjhhMTIgMTIgMCAwIDAgMjQgMFYxMDhhOCA4IDAgMCAxIDE2IDBaIi8+PC9zdmc+") 14 14;
+  --cursor-hand-palm: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDI1NiAyNTYiPjxwYXRoIGZpbGw9IiMwMDAwMDAiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLXdpZHRoPSIxNiIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZD0iTTE4OCA4NGEzMiAzMiAwIDAgMC04IDFWNjBhMzIgMzIgMCAwIDAtNDMuMjEtMzBBMzIgMzIgMCAwIDAgNzYgNDR2MUEzMiAzMiAwIDAgMCAzNiA3NnY3NmE5MiA5MiAwIDAgMCAxODQgMFYxMTZBMzIgMzIgMCAwIDAgMTg4IDg0Wm04IDY4YTY4IDY4IDAgMCAxLTEzNiAwVjc2YTggOCAwIDAgMSAxNiAwdjQwYTEyIDEyIDAgMCAwIDI0IDBWNDRhOCA4IDAgMCAxIDE2IDB2NjRhMTIgMTIgMCAwIDAgMjQgMFY2MGE4IDggMCAwIDEgMTYgMHY2NS40QTUyLjA5IDUyLjA5IDAgMCAwIDExNiAxNzZhMTIgMTIgMCAwIDAgMjQgMCAyOCAyOCAwIDAgMSAyOC0yOCAxMiAxMiAwIDAgMCAxMi0xMlYxMTZhOCA4IDAgMCAxIDE2IDBaIi8+PHBhdGggZmlsbD0iI2ZmZmZmZiIgZD0iTTE4OCA4NGEzMiAzMiAwIDAgMC04IDFWNjBhMzIgMzIgMCAwIDAtNDMuMjEtMzBBMzIgMzIgMCAwIDAgNzYgNDR2MUEzMiAzMiAwIDAgMCAzNiA3NnY3NmE5MiA5MiAwIDAgMCAxODQgMFYxMTZBMzIgMzIgMCAwIDAgMTg4IDg0Wm04IDY4YTY4IDY4IDAgMCAxLTEzNiAwVjc2YTggOCAwIDAgMSAxNiAwdjQwYTEyIDEyIDAgMCAwIDI0IDBWNDRhOCA4IDAgMCAxIDE2IDB2NjRhMTIgMTIgMCAwIDAgMjQgMFY2MGE4IDggMCAwIDEgMTYgMHY2NS40QTUyLjA5IDUyLjA5IDAgMCAwIDExNiAxNzZhMTIgMTIgMCAwIDAgMjQgMCAyOCAyOCAwIDAgMSAyOC0yOCAxMiAxMiAwIDAgMCAxMi0xMlYxMTZhOCA4IDAgMCAxIDE2IDBaIi8+PC9zdmc+") 14 14;
+}
+
+.campaign-map-canvas .leaflet-container:focus,
+.campaign-map-canvas .leaflet-container:focus-visible {
+  outline: none !important;
+}
+
+.tactical-text-static-wrapper {
+  width: max-content !important;
+  height: auto !important;
+  background: transparent !important;
+  border: 0 !important;
+}
+
+.tactical-text-static {
+  display: inline-block;
+  width: max-content;
+  font-weight: 700;
+  font-size: 14px;
+  white-space: nowrap;
+  padding: 1px 4px;
+  border-radius: 4px;
+  transition: background-color 120ms ease, box-shadow 120ms ease;
+  background-color: rgba(0, 0, 0, 0.55);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+
+.tactical-text-static:hover {
+  background-color: rgba(0, 0, 0, 0.7);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.22);
+}
+
+.leaflet-marker-icon.isr-satellite-marker,
+.isr-satellite-marker {
+  overflow: visible !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+.leaflet-marker-icon.isr-satellite-marker:hover,
+.leaflet-marker-icon.isr-satellite-marker:has(.isr-marker-group:hover) {
+  z-index: 999999 !important;
+}
+
+.isr-marker-group:hover .isr-hover-flyout {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+  z-index: 999999 !important;
+}
+
+.mission-map-tooltip.leaflet-tooltip {
+  background-color: #18181b !important;
+  color: #f4f4f5 !important;
+  border: 1px solid rgba(63, 63, 70, 0.9) !important;
+  box-shadow: 0 12px 28px -5px rgba(0, 0, 0, 0.85), 0 8px 10px -6px rgba(0, 0, 0, 0.85) !important;
+  border-radius: 0.5rem !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  white-space: normal !important;
+  min-width: 260px !important;
+  max-width: 360px !important;
+  width: max-content !important;
+  pointer-events: none !important;
+}
+
+.mission-map-tooltip.leaflet-tooltip-top::before {
+  border-top-color: #18181b !important;
+}
+.mission-map-tooltip.leaflet-tooltip-bottom::before {
+  border-bottom-color: #18181b !important;
+}
+.mission-map-tooltip.leaflet-tooltip-left::before {
+  border-left-color: #18181b !important;
+}
+.mission-map-tooltip.leaflet-tooltip-right::before {
+  border-right-color: #18181b !important;
+}
+
+.procedure-tooltip.leaflet-tooltip {
+  background-color: #0c0a09 !important;
+  color: #f5f5f4 !important;
+  border: 1px solid rgba(87, 83, 78, 0.7) !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(0, 0, 0, 0.8) !important;
+  border-radius: 0.5rem !important;
+  padding: 4px 8px !important;
+  pointer-events: none !important;
+}
+
+.procedure-tooltip.leaflet-tooltip-top::before {
+  border-top-color: #0c0a09 !important;
+}
+.procedure-tooltip.leaflet-tooltip-bottom::before {
+  border-bottom-color: #0c0a09 !important;
+}
+
+.tactical-shape-label.leaflet-tooltip {
+  background-color: rgba(15, 23, 42, 0.92) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  border-radius: 4px !important;
+  padding: 2px 7px !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.05em !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.95), 0 0 3px rgba(0, 0, 0, 0.9) !important;
+  box-shadow: 0 4px 8px -1px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(0, 0, 0, 0.5) !important;
+  white-space: nowrap !important;
+  pointer-events: none !important;
+}
+
+.tactical-text-box {
+  background-color: rgba(15, 23, 42, 0.92) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 4px !important;
+  padding: 2px 8px !important;
+  box-shadow: 0 4px 8px -1px rgba(0, 0, 0, 0.75) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.95) !important;
+  font-weight: 700 !important;
+  font-size: 12px !important;
+  white-space: nowrap !important;
+}
+
+.campaign-map-canvas .leaflet-pane > svg path.leaflet-interactive,
+.support-asset-orbit-track,
+path.support-asset-orbit-track,
+path.flight-plan-route-line,
+path.flight-plan-route-spine,
+path.measure-route-line,
+path.front-line-route-spine {
+  filter: drop-shadow(0 0 1.5px rgba(0, 0, 0, 0.7));
+}
+
+.airbase-icon,
+.airbase-map-icon,
+.bullseye-icon,
+.bullseye-map-icon,
+.threat-icon,
+.threat-map-icon,
+.sa-icon,
+.support-asset-anchor,
+.mission-icon,
+.objective-target-icon,
+.navaid-marker-icon,
+.logistics-icon,
+.f18-sa-vertex-icon,
+.f18-cap-anchor-icon,
+.f18-cap-rotate-icon,
+.f18-cap-arrow-icon,
+.f16-geo-vertex-icon,
+.f16-dest-point-icon,
+.f14-plot-vertex-icon,
+.jf17-airspace-vertex-icon {
+  background: transparent !important;
+  border: none !important;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.55));
+}
+
+.airbase-icon span,
+.airbase-map-icon span {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.flight-plan-route-line,
+.flight-plan-route-spine,
+.measure-route-line,
+path.flight-plan-route-line,
+path.flight-plan-route-spine,
+path.measure-route-line {
+  cursor: var(--cursor-hand-tap), pointer !important;
+}
+
+.flight-plan-point-marker,
+.flight-plan-point-marker div,
+.flight-plan-wp-icon,
+.measure-point-marker,
+.measure-point-marker div,
+.leaflet-marker-draggable,
+.leaflet-marker-draggable div {
+  cursor: var(--cursor-hand-palm), grab !important;
+}
+
+.flight-plan-point-marker:active,
+.flight-plan-point-marker:active div,
+.flight-plan-wp-icon:active,
+.measure-point-marker:active,
+.measure-point-marker:active div,
+.leaflet-dragging,
+.leaflet-dragging .leaflet-grab,
+.leaflet-dragging .leaflet-marker-draggable,
+.leaflet-dragging * {
+  cursor: var(--cursor-hand-grabbing), grabbing !important;
+}
+
+.procedure-fix-marker {
+  background: transparent !important;
+  border: none !important;
+  overflow: visible !important;
+}
+
+.procedure-fix-marker .fix-label {
+  opacity: 0;
+  transform: translateY(-50%) translateX(-4px);
+  pointer-events: none;
+  transition: opacity 0.15s ease-out, transform 0.15s ease-out;
+}
+
+.procedure-fix-marker.proc-hovered .fix-label,
+.procedure-fix-marker:hover .fix-label {
+  opacity: 1 !important;
+  transform: translateY(-50%) translateX(0) !important;
+  pointer-events: auto !important;
+}
+
+.procedure-nameplate-marker {
+  background: transparent !important;
+  border: none !important;
+  overflow: visible !important;
+  z-index: 850 !important;
+  cursor: pointer !important;
+}
+
+.procedure-nameplate-marker .procedure-nameplate {
+  display: inline-flex !important;
+  width: max-content !important;
+  max-width: none !important;
+  white-space: nowrap !important;
+  align-items: center !important;
+  background-color: #0c0a09 !important;
+  transform: translate(-50%, -50%);
+  transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+}
+
+.procedure-nameplate-marker:hover .procedure-nameplate,
+.procedure-nameplate-marker.proc-hovered .procedure-nameplate {
+  transform: translate(-50%, -50%) scale(1.06);
+}
+
+.procedure-track-line,
+path.procedure-track-line {
+  cursor: pointer !important;
 }

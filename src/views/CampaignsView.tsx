@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   AirplaneTakeoff,
   AirplaneTilt,
@@ -9,6 +9,7 @@ import {
   CaretRight,
   Crosshair,
   GlobeHemisphereWest,
+  MapTrifold,
   PushPin,
   PushPinSlash,
   Rows,
@@ -24,6 +25,7 @@ import { CampaignLoreTab } from './campaigns/CampaignLoreTab';
 import { CampaignMissionModal, MissionModalSection } from './campaigns/CampaignMissionModal';
 import { CampaignMissionsTab } from './campaigns/CampaignMissionsTab';
 import { CampaignOverviewTab } from './campaigns/CampaignOverviewTab';
+import { CampaignMapTab } from './campaigns/map/CampaignMapTab';
 import { getCampaignTotalIntelCount, getStatusBadgeClasses } from './campaigns/utils';
 
 function getPortalOrigin(): string {
@@ -63,6 +65,8 @@ export const CampaignsView: React.FC = () => {
       null
     );
   }, [activeCampaigns, selectedCampaignId]);
+
+  const [mapFocusMissionId, setMapFocusMissionId] = useState<number | null>(null);
 
   const portalOrigin = useMemo(() => getPortalOrigin(), []);
 
@@ -135,6 +139,14 @@ export const CampaignsView: React.FC = () => {
       subtitle:
         'Operational progress, logistics resource pools, active missions, and recent supply activity.',
       icon: <Rows className="w-3.5 h-3.5" />,
+    },
+    map: {
+      label: 'Campaign Map',
+      code: 'S2 - Operations // Campaigns // Tactical Map',
+      title: selectedCampaign ? `${selectedCampaign.name} — Campaign Map` : 'Campaign Map',
+      subtitle:
+        'Live interactive theater map, SAM threats, support orbits, ISR recon, and DCS flight plan editor.',
+      icon: <MapTrifold className="w-3.5 h-3.5" />,
     },
     lore: {
       label: 'Campaign Lore',
@@ -577,6 +589,17 @@ export const CampaignsView: React.FC = () => {
                 onOpenExternal={handleOpenExternal}
                 onNavigateSubTab={setActiveCampaignSubTab}
                 onInspectMission={handleInspectMission}
+                onOpenMissionOnMap={(missionId) => {
+                  setMapFocusMissionId(missionId);
+                  setActiveCampaignSubTab('map');
+                }}
+              />
+            )}
+            {activeCampaignSubTab === 'map' && (
+              <CampaignMapTab
+                campaign={selectedCampaign}
+                initialMissionId={mapFocusMissionId}
+                onConsumedInitialTarget={() => setMapFocusMissionId(null)}
               />
             )}
             {activeCampaignSubTab === 'lore' && (
@@ -619,6 +642,13 @@ export const CampaignsView: React.FC = () => {
             setSelectedCampaignMissionSection('overview');
           }}
           onOpenExternal={handleOpenExternal}
+          onOpenOnMap={(missionId) => {
+            setSelectedCampaignMissionId(null);
+            setSelectedCampaignMissionSection('overview');
+            setSelectedCampaignId(inspectedMissionContext.campaign.id);
+            setMapFocusMissionId(missionId);
+            setActiveCampaignSubTab('map');
+          }}
         />
       )}
     </div>

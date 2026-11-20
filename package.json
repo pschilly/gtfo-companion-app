@@ -18,6 +18,10 @@
     "@tauri-apps/plugin-notification": "^2.7.0",
     "@tauri-apps/plugin-process": "^2.4.0",
     "@tauri-apps/plugin-updater": "^2.14.0",
+    "@types/leaflet": "^1.9.22",
+    "geomagnetism": "^0.2.0",
+    "leaflet": "^1.9.4",
+    "mgrs": "^2.2.0",
     "pdfjs-dist": "^6.4.299",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
