@@ -1256,7 +1256,7 @@ export const EventCalendarView: React.FC = () => {
   }, [selectedEvent]);
 
   return (
-    <div className="space-y-6 pb-10 max-w-7xl mx-auto">
+    <div className="space-y-6 pb-10 w-full max-w-[2400px] mx-auto">
       {/* TOP HEADER BANNER */}
       <div className="relative rounded-3xl overflow-hidden border border-stone-800 bg-stone-900/90 shadow-2xl p-6 sm:p-7">
         <div className="absolute -top-28 -left-24 w-96 h-96 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
@@ -2864,29 +2864,6 @@ export const EventCalendarView: React.FC = () => {
                   >
                     <Target weight="duotone" className="w-4 h-4" />
                     <span>View Mission Briefing &amp; Objectives</span>
-                  </button>
-                )}
-
-                {selectedEvent.portal_url && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (!selectedEvent.portal_url) return;
-                      const fixedUrl = selectedEvent.portal_url
-                        .replace(
-                          /\/campaigns\/([^/]+)\/missions\/(\d+)$/,
-                          '/campaigns/$1/map?mission_id=$2'
-                        )
-                        .replace(
-                          /\/admin\/training-sorties$/,
-                          `/training-sorties/${selectedEvent.id}`
-                        );
-                      openExternalUrl(fixedUrl);
-                    }}
-                    className="px-3 py-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-800 text-stone-300 hover:text-amber-300 text-xs font-mono flex items-center gap-1.5 transition-colors cursor-pointer"
-                  >
-                    <span>Open in Member Portal</span>
-                    <ArrowSquareOut className="w-3.5 h-3.5" />
                   </button>
                 )}
               </div>

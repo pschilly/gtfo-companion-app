@@ -71,7 +71,7 @@ export const QualificationsView: React.FC = () => {
   const isAllExpanded = certificates.length > 0 && certificates.every((c) => expandedCertIds[c.id]);
 
   return (
-    <div className="space-y-6 pb-8 max-w-7xl mx-auto">
+    <div className="space-y-6 pb-8 w-full max-w-[2400px] mx-auto">
       {/* Header Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-800/80">
         <div>

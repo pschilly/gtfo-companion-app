@@ -22,6 +22,33 @@
   border-radius: 12px;
 }
 
+.leaflet-popup-content {
+  margin: 12px 14px !important;
+  color: #f4f4f5 !important;
+  min-width: 240px !important;
+  width: auto !important;
+}
+
+.leaflet-popup-content input,
+.leaflet-popup-content select,
+.leaflet-popup-content textarea {
+  color: #f4f4f5 !important;
+  background-color: #27272a !important;
+  border: 1px solid #3f3f46 !important;
+  border-radius: 0.375rem !important;
+  padding: 0.375rem 0.625rem !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  outline: none !important;
+}
+
+.leaflet-popup-content input:focus,
+.leaflet-popup-content select:focus,
+.leaflet-popup-content textarea:focus {
+  border-color: #f59e0b !important;
+  box-shadow: 0 0 0 1px #f59e0b !important;
+}
+
 .leaflet-popup-close-button {
   color: #a8a29e !important;
 }
@@ -109,6 +136,12 @@
 .campaign-map-canvas .leaflet-container:focus,
 .campaign-map-canvas .leaflet-container:focus-visible {
   outline: none !important;
+}
+
+.gtfo-map-picking .leaflet-container:not(.leaflet-dragging),
+.gtfo-map-picking .leaflet-grab:not(.leaflet-dragging),
+.gtfo-map-picking .leaflet-interactive:not(.leaflet-dragging) {
+  cursor: crosshair !important;
 }
 
 .tactical-text-static-wrapper {
@@ -246,6 +279,9 @@ path.front-line-route-spine {
 .threat-map-icon,
 .sa-icon,
 .support-asset-anchor,
+.support-asset-icon-live-plane,
+.tactical-custom-svg-marker,
+.tactical-text-marker-wrapper,
 .mission-icon,
 .objective-target-icon,
 .navaid-marker-icon,
@@ -282,6 +318,8 @@ path.measure-route-line {
 .flight-plan-wp-icon,
 .measure-point-marker,
 .measure-point-marker div,
+.tactical-custom-svg-marker,
+.tactical-custom-svg-marker div,
 .leaflet-marker-draggable,
 .leaflet-marker-draggable div {
   cursor: var(--cursor-hand-palm), grab !important;
@@ -292,11 +330,54 @@ path.measure-route-line {
 .flight-plan-wp-icon:active,
 .measure-point-marker:active,
 .measure-point-marker:active div,
+.tactical-custom-svg-marker:active,
+.tactical-custom-svg-marker:active div,
+.tactical-text-box:active,
+.leaflet-marker-draggable:active,
+.leaflet-marker-draggable:active div,
 .leaflet-dragging,
 .leaflet-dragging .leaflet-grab,
 .leaflet-dragging .leaflet-marker-draggable,
 .leaflet-dragging * {
   cursor: var(--cursor-hand-grabbing), grabbing !important;
+}
+
+/* Pure-Leaflet Interactive Vertex & Resize Edit Handles */
+.leaflet-editing-icon {
+  border-radius: 50% !important;
+  background: #fbbf24 !important;
+  border: 2px solid #0f172a !important;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.9), 0 0 8px rgba(251, 191, 36, 0.7) !important;
+  width: 12px !important;
+  height: 12px !important;
+  margin-left: -6px !important;
+  margin-top: -6px !important;
+  cursor: grab !important;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.leaflet-editing-icon:hover {
+  background: #ffffff !important;
+  border-color: #fbbf24 !important;
+  box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.8), 0 0 12px rgba(0, 0, 0, 0.9) !important;
+  cursor: grabbing !important;
+}
+
+.leaflet-editing-midpoint {
+  border-radius: 50% !important;
+  background: rgba(251, 191, 36, 0.55) !important;
+  border: 1.5px solid #0f172a !important;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.75) !important;
+  width: 9px !important;
+  height: 9px !important;
+  margin-left: -4.5px !important;
+  margin-top: -4.5px !important;
+  cursor: pointer !important;
+}
+
+.leaflet-editing-midpoint:hover {
+  background: #fbbf24 !important;
+  transform: scale(1.25);
 }
 
 .procedure-fix-marker {
@@ -346,4 +427,30 @@ path.measure-route-line {
 .procedure-track-line,
 path.procedure-track-line {
   cursor: pointer !important;
+}
+
+.segment-measure-label,
+.flight-path-tick-marker,
+.flight-plan-point-marker {
+  background: transparent !important;
+  border: none !important;
+  overflow: visible !important;
+}
+
+.tactical-map-tooltip.leaflet-tooltip {
+  background-color: rgba(12, 10, 9, 0.94) !important;
+  color: #f5f5f4 !important;
+  border: 1px solid #44403c !important;
+  border-radius: 6px !important;
+  padding: 4px 8px !important;
+  font-size: 11px !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.75) !important;
+}
+
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }

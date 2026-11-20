@@ -12,58 +12,82 @@ import {
   Path,
   Ruler,
   ShieldWarning,
+  SlidersHorizontal,
+  Target,
   WarningCircle,
   X,
 } from '@phosphor-icons/react';
 import { STATIC_CONFIG } from '../../../config/constants';
 import { useApp } from '../../../context/AppContext';
+import { applyDevOverridesToMapPayload } from '../../../utils/devPermissions';
 import {
   fetchCampaignMapPayload,
   fetchTerrainElevation,
+  saveCampaignTacticalMarking,
 } from '../../../services/campaignMapService';
 import { fetchFlightPlanDetail } from '../../../services/flightPlanService';
-import { openExternalUrl } from '../../../services/tauriBridge';
 import {
   CampaignItem,
   CampaignMapAirbase,
-  CampaignMapIsrRequest,
   CampaignMapPayload,
   CampaignMapPolygonGroup,
   CampaignMapProcedure,
+  CampaignMapTacticalMarking,
   FlightPlanDetail,
   FlightPlanRoutePoint,
 } from '../../../types';
 import {
   calculateBearingDegrees,
-  calculateDistanceKm,
   calculateDistanceNm,
   formatCoordinateDdm,
+  formatCoordinateDms,
+  formatDurationSeconds,
   lookupTerrariumElevationFt,
   toMgrs,
-  trueToMagnetic,
 } from './geodesy';
 import {
-  AvionicsPlotTarget,
-  appendPointToAvionicsTarget,
-  describeAvionicsPlotTarget,
-} from './AirframeAvionicsPanel';
+  ActiveFlightPlanMapController,
+} from './activeFlightPlanLayer';
+import {
+  SupportAssetsControllerStats,
+  SupportAssetsMapController,
+} from './activeSupportAssetsLayer';
+import {
+  TacticalDrawConfig,
+  TacticalMarkingsControllerCallbacks,
+  TacticalMarkingsMapController,
+  TacticalShapeType,
+} from './activeTacticalMarkingsLayer';
+import {
+  AvionicsDrawTarget,
+  DoghouseConfig,
+  TickConfig,
+  appendPointToAvionicsDrawTarget,
+  describeAvionicsDrawTarget,
+  getAvailableSequences,
+  getMaxSequences,
+  isAdditionalPoint,
+  isDivertPoint,
+  isF14Airframe,
+  isF16Airframe,
+  isF18Airframe,
+  isJf17Airframe,
+  isSequenceTrackPoint,
+  isTargetPoint,
+  normalizePlanForEditor,
+  recalculateTransitSpeeds,
+} from './flightPlanner/helpers';
 import {
   createDcsTileLayers,
-  IsrActiveOverlayState,
   renderAirbaseProceduresLayer,
   renderAirbasesLayer,
-  renderAirframeTacticalLayers,
   renderBullseyesLayer,
   renderClusteredFlightPlansLayer,
   renderFrontLineLayer,
-  renderIsrCapturesLayer,
-  renderIsrPreviewLayer,
   renderLogisticsLayer,
   renderMissionsLayer,
   renderNavaidsLayer,
   renderPolygonGroupsLayer,
-  renderSupportAssetsLayer,
-  renderTacticalMarkingsLayer,
   renderTheatreBounds,
   renderThreatsLayer,
 } from './portalLayers';
@@ -75,16 +99,12 @@ import {
 } from './CampaignMapLayerControls';
 import { CampaignMapHudFooter } from './CampaignMapHudFooter';
 import { MapLegendModal } from './MapLegendModal';
-import { FlightPlannerDrawer, PlannerPlotMode } from './FlightPlannerDrawer';
+import { FlightPlannerDrawer } from './FlightPlannerDrawer';
 import { CoordinateConverterDrawer } from './CoordinateConverterDrawer';
 import { MeasurePoint, MeasureToolDrawer } from './MeasureToolDrawer';
-import {
-  IsrReconLightboxModal,
-  IsrToolDrawer,
-  SupportAssetsDrawer,
-  TacticalMarkingsDrawer,
-  ThreatEditorDrawer,
-} from './TacticalEditorsDrawers';
+import { SupportAssetsDrawer } from './SupportAssetsDrawer';
+import { TacticalMarkingsDrawer } from './TacticalMarkingsDrawer';
+import { ThreatEditorDrawer } from './TacticalEditorsDrawers';
 
 interface CampaignMapTabProps {
   campaign: CampaignItem;
@@ -120,22 +140,34 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
     addNotification,
     setSelectedCampaignMissionId,
     setSelectedCampaignMissionSection,
+    devPermissionOverrides,
+    setLiveMapPermissions,
   } = useApp();
   const baseUrl = settings.memberPortalApiUrl || STATIC_CONFIG.portalBaseUrl;
   const authToken = userSession?.accessToken;
-  const discordId = memberProfile?.discordId || userSession?.id || null;
-
-  const portalMapUrl = useMemo(() => {
-    try {
-      const origin = new URL(baseUrl).origin;
-      return `${origin}/admin/campaigns/${campaign.id}/map`;
-    } catch {
-      return null;
-    }
-  }, [baseUrl, campaign.id]);
+  const discordId = userSession?.id || memberProfile?.discordId || null;
 
   // Core data & loading state
-  const [mapData, setMapData] = useState<CampaignMapPayload | null>(null);
+  const [rawMapData, setRawMapData] = useState<CampaignMapPayload | null>(null);
+  const setMapData = setRawMapData;
+  const mapData = useMemo(() => {
+    if (!rawMapData) return null;
+    if (!import.meta.env.DEV || !devPermissionOverrides.enabled) return rawMapData;
+    return applyDevOverridesToMapPayload(rawMapData, devPermissionOverrides);
+  }, [rawMapData, devPermissionOverrides]);
+
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    setLiveMapPermissions(rawMapData?.permissions ?? null);
+  }, [rawMapData?.permissions, setLiveMapPermissions]);
+
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    return () => {
+      setLiveMapPermissions(null);
+    };
+  }, [setLiveMapPermissions]);
+
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -164,34 +196,93 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
   const [windowOrder, setWindowOrder] = useState<WindowKey[]>([]);
 
   // Active flight plan & planner editing state
-  const [activePlan, setActivePlan] = useState<FlightPlanDetail | null>(null);
-  const [plotMode, setPlotMode] = useState<PlannerPlotMode>('none');
-  const [avionicsPlotTarget, setAvionicsPlotTarget] = useState<AvionicsPlotTarget | null>(null);
+  const [rawActivePlan, setRawActivePlan] = useState<FlightPlanDetail | null>(null);
+  const setActivePlan = setRawActivePlan;
+  const activePlan = useMemo(() => {
+    if (!rawActivePlan) return null;
+    if (
+      import.meta.env.DEV &&
+      devPermissionOverrides.enabled &&
+      devPermissionOverrides.forceRecordsReadOnly
+    ) {
+      return { ...rawActivePlan, can_edit: false };
+    }
+    return rawActivePlan;
+  }, [rawActivePlan, devPermissionOverrides]);
+  const [activeSequence, setActiveSequence] = useState<number>(1);
+  const [userCreatedSequences, setUserCreatedSequences] = useState<number[]>([1]);
+  const [sequenceColors, setSequenceColors] = useState<Record<number, string>>({});
+  const [tickConfig, setTickConfig] = useState<TickConfig>(() => {
+    try {
+      const saved = localStorage.getItem('gtfo_tick_config');
+      if (saved) return JSON.parse(saved) as TickConfig;
+    } catch {
+      // ignore storage errors
+    }
+    return { type: 'off', interval: 5 };
+  });
+  const [doghouseConfig, setDoghouseConfig] = useState<DoghouseConfig>(() => {
+    try {
+      const saved = localStorage.getItem('gtfo_doghouse_config');
+      if (saved === 'off' || saved === 'on') return saved;
+    } catch {
+      // ignore storage errors
+    }
+    return 'on';
+  });
+  const [avionicsDrawTarget, setAvionicsDrawTarget] = useState<AvionicsDrawTarget | null>(null);
+  const [dirtyVersion, setDirtyVersion] = useState<number>(0);
+  const [isPlanDirty, setIsPlanDirty] = useState<boolean>(false);
+  const [fpSettingsOpen, setFpSettingsOpen] = useState<boolean>(false);
 
   // Tool picking & tactical states
   const [measurePoints, setMeasurePoints] = useState<MeasurePoint[]>([]);
+  const [measureSpeedInput, setMeasureSpeedInput] = useState<string>('350');
   const [isPickingMeasure, setIsPickingMeasure] = useState(false);
 
+  const handleChangeUnit = useCallback(
+    (nextUnit: 'nm' | 'km') => {
+      if (nextUnit === unit) return;
+      setUnit(nextUnit);
+      setMeasureSpeedInput((prev) => {
+        const n = Number(prev);
+        if (!Number.isFinite(n) || n <= 0) return prev;
+        return nextUnit === 'km' ? String(Math.round(n * 1.852)) : String(Math.round(n / 1.852));
+      });
+    },
+    [unit]
+  );
+
   const [converterPick, setConverterPick] = useState<{ lat: number; lng: number } | null>(null);
+  const [converterPin, setConverterPin] = useState<{ lat: number; lng: number; seq: number } | null>(
+    null
+  );
   const [isPickingConverter, setIsPickingConverter] = useState(false);
 
   const [threatPick, setThreatPick] = useState<{ lat: number; lng: number } | null>(null);
   const [isPickingThreat, setIsPickingThreat] = useState(false);
   const [focusThreatIndex, setFocusThreatIndex] = useState<number | null>(null);
 
-  const [supportPick, setSupportPick] = useState<{ lat: number; lng: number } | null>(null);
-  const [isPickingSupport, setIsPickingSupport] = useState(false);
+  const [selectedSupportAssetType, setSelectedSupportAssetType] = useState<string>('tanker');
+  const [supportAssetStats, setSupportAssetStats] = useState<SupportAssetsControllerStats>({
+    confirmedCount: 0,
+    pendingCount: 0,
+    removedCount: 0,
+    undoCount: 0,
+    isDirty: false,
+  });
   const [focusAssetIndex, setFocusAssetIndex] = useState<number | null>(null);
 
-  const [markingDraftPoints, setMarkingDraftPoints] = useState<Array<{ lat: number; lng: number }>>([]);
-  const [isDrawingMarking, setIsDrawingMarking] = useState(false);
-
-  const [isrPick, setIsrPick] = useState<{ lat: number; lng: number } | null>(null);
-  const [isPickingIsr, setIsPickingIsr] = useState(false);
-  const [isrPreviewCenter, setIsrPreviewCenter] = useState<{ lat: number; lng: number } | null>(null);
-  const [isrPreviewKmSizes, setIsrPreviewKmSizes] = useState<number[]>([]);
-  const [activeIsrOverlays, setActiveIsrOverlays] = useState<Record<number, IsrActiveOverlayState>>({});
-  const [lightboxIsr, setLightboxIsr] = useState<CampaignMapIsrRequest | null>(null);
+  const [tmIsDrawing, setTmIsDrawing] = useState(false);
+  const [tmDrawShape, setTmDrawShape] = useState<TacticalShapeType | null>(null);
+  const [editingMarking, setEditingMarking] = useState<CampaignMapTacticalMarking | null>(null);
+  const editingMarkingIdRef = useRef<number | null>(null);
+  editingMarkingIdRef.current = editingMarking?.id ?? null;
+  const tmScopeRef = useRef<{
+    visibility: 'personal' | 'campaign' | 'mission' | 'sortie';
+    missionId: number | null;
+    sortieId: number | null;
+  }>({ visibility: 'personal', missionId: null, sortieId: null });
 
   // Context menu & Auto-refresh
   const [contextMenu, setContextMenu] = useState<{
@@ -206,10 +297,24 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
   // Map refs
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
+  const mapDataRef = useRef<CampaignMapPayload | null>(null);
+  mapDataRef.current = mapData;
+  const activePlanRef = useRef<FlightPlanDetail | null>(null);
+  activePlanRef.current = activePlan;
+  const activePlanControllerRef = useRef<ActiveFlightPlanMapController | null>(null);
+  const supportAssetsControllerRef = useRef<SupportAssetsMapController | null>(null);
+  const tacticalMarkingsControllerRef = useRef<TacticalMarkingsMapController | null>(null);
+  const openWindowsFlightRef = useRef(false);
+  openWindowsFlightRef.current = openWindows.flight;
+  const activeSequenceRef = useRef(1);
+  activeSequenceRef.current = activeSequence;
+  const handleInsertOrAppendWaypointRef = useRef<(latlng: L.LatLng, seq?: number) => void>(() => {});
   const tileMapRef = useRef<Record<string, L.Layer>>({});
   const activeTileLayerRef = useRef<L.Layer | null>(null);
+  const tileSignatureRef = useRef<string | null>(null);
   const initialFitDoneRef = useRef(false);
   const consumedTargetRef = useRef(false);
+  const prevCampaignIdRef = useRef<number | null>(null);
   const elevTimerRef = useRef<number | null>(null);
   const elevReqSeqRef = useRef(0);
 
@@ -228,9 +333,6 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
     airbaseProceduresPattern: L.LayerGroup;
     missions: L.LayerGroup;
     flightPlans: L.LayerGroup;
-    isr: L.LayerGroup;
-    isrOverlays: L.LayerGroup;
-    isrPreview: L.LayerGroup;
     logistics: L.LayerGroup;
     threats: L.LayerGroup;
     supportAssets: L.LayerGroup;
@@ -238,15 +340,40 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
     activePlan: L.LayerGroup;
     measure: L.LayerGroup;
     tacticalDraft: L.LayerGroup;
+    converterPin: L.LayerGroup;
   } | null>(null);
 
+  const [mapToast, setMapToast] = useState<{
+    level: 'info' | 'success' | 'warning' | 'error';
+    message: string;
+  } | null>(null);
+  const mapToastTimerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (mapToastTimerRef.current) {
+        window.clearTimeout(mapToastTimerRef.current);
+      }
+    };
+  }, []);
+
   const handleNotify = useCallback(
-    (_level: 'info' | 'success' | 'warning' | 'error', msg: string) => {
-      addNotification({
-        title: 'Campaign Map',
-        message: msg,
-        category: 'flight_plan',
-      });
+    (level: 'info' | 'success' | 'warning' | 'error', msg: string) => {
+      setMapToast({ level, message: msg });
+      if (mapToastTimerRef.current) {
+        window.clearTimeout(mapToastTimerRef.current);
+      }
+      mapToastTimerRef.current = window.setTimeout(() => {
+        setMapToast(null);
+      }, 3500);
+
+      if (level === 'success' || level === 'error') {
+        addNotification({
+          title: 'Campaign Map',
+          message: msg,
+          category: 'flight_plan',
+        });
+      }
     },
     [addNotification]
   );
@@ -256,6 +383,14 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
     if (!map) return;
     map.flyTo([lat, lng], zoom ?? Math.max(map.getZoom(), 11), { duration: 0.7 });
   }, []);
+
+  const handlePingConverterLocation = useCallback(
+    (lat: number, lng: number) => {
+      setConverterPin({ lat, lng, seq: Date.now() });
+      handleCenterMap(lat, lng);
+    },
+    [handleCenterMap]
+  );
 
   const bringToFront = useCallback((key: WindowKey) => {
     setWindowOrder((prev) => [...prev.filter((k) => k !== key), key]);
@@ -271,27 +406,56 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
 
   const openWindow = useCallback(
     (key: MapToolKey) => {
+      if (key === 'threats' && !mapDataRef.current?.permissions.canManageThreats) {
+        return;
+      }
+      if (key === 'support' && !mapDataRef.current?.permissions.canManageSupportAssets) {
+        return;
+      }
+      if (key === 'support') {
+        tacticalMarkingsControllerRef.current?.cancelDrawing();
+        setAvionicsDrawTarget(null);
+        setIsPickingMeasure(false);
+        setIsPickingConverter(false);
+        setIsPickingThreat(false);
+        setLayerStates((s) => (s.supportAssets ? s : { ...s, supportAssets: true }));
+      }
+      if (key === 'markings') {
+        setLayerStates((s) => (s.tacticalMarkings ? s : { ...s, tacticalMarkings: true }));
+      }
       setOpenWindows((prev) => ({ ...prev, [key]: true }));
       bringToFront(key);
     },
     [bringToFront]
   );
 
+  useEffect(() => {
+    if (!mapData) return;
+    if (!mapData.permissions.canManageThreats) {
+      setIsPickingThreat(false);
+      setFocusThreatIndex(null);
+      setOpenWindows((prev) => (prev.threats ? { ...prev, threats: false } : prev));
+    }
+    if (!mapData.permissions.canManageSupportAssets) {
+      setFocusAssetIndex(null);
+      setOpenWindows((prev) => (prev.support ? { ...prev, support: false } : prev));
+    }
+  }, [mapData]);
+
   const closeWindow = useCallback((key: MapToolKey) => {
     setOpenWindows((prev) => ({ ...prev, [key]: false }));
-    if (key === 'flight') setPlotMode('none');
-    if (key === 'measure') setIsPickingMeasure(false);
-    if (key === 'converter') setIsPickingConverter(false);
-    if (key === 'threats') setIsPickingThreat(false);
-    if (key === 'support') setIsPickingSupport(false);
-    if (key === 'isr') {
-      setIsPickingIsr(false);
-      setIsrPreviewCenter(null);
-      setIsrPreviewKmSizes([]);
+    if (key === 'flight') {
+      setAvionicsDrawTarget(null);
     }
+    if (key === 'measure') setIsPickingMeasure(false);
+    if (key === 'converter') {
+      setIsPickingConverter(false);
+      setConverterPin(null);
+    }
+    if (key === 'threats') setIsPickingThreat(false);
     if (key === 'markings') {
-      setIsDrawingMarking(false);
-      setMarkingDraftPoints([]);
+      tacticalMarkingsControllerRef.current?.cancelDrawing();
+      setEditingMarking(null);
     }
   }, []);
 
@@ -307,14 +471,11 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
   );
 
   const clearAllPickModes = useCallback(() => {
-    setPlotMode('none');
-    setAvionicsPlotTarget(null);
+    setAvionicsDrawTarget(null);
     setIsPickingMeasure(false);
     setIsPickingConverter(false);
     setIsPickingThreat(false);
-    setIsPickingSupport(false);
-    setIsPickingIsr(false);
-    setIsDrawingMarking(false);
+    tacticalMarkingsControllerRef.current?.cancelDrawing();
     setContextMenu(null);
   }, []);
 
@@ -322,7 +483,7 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
   const loadMapData = useCallback(
     async (refresh = false, silent = false) => {
       if (!silent) {
-        if (mapData) setIsRefreshing(true);
+        if (rawMapData) setIsRefreshing(true);
         else setIsLoading(true);
       } else {
         setIsRefreshing(true);
@@ -347,7 +508,7 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
           });
         }
       } catch (err) {
-        if (!silent || !mapData) {
+        if (!silent || !rawMapData) {
           setError(err instanceof Error ? err.message : 'Failed to load campaign map data');
         }
       } finally {
@@ -355,17 +516,22 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
         setIsRefreshing(false);
       }
     },
-    [baseUrl, campaign.id, discordId, authToken, mapData]
+    [baseUrl, campaign.id, discordId, authToken, rawMapData]
   );
 
   useEffect(() => {
-    initialFitDoneRef.current = false;
-    consumedTargetRef.current = false;
-    setMapData(null);
-    setActivePlan(null);
+    const campaignChanged = prevCampaignIdRef.current !== campaign.id;
+    prevCampaignIdRef.current = campaign.id;
+    if (campaignChanged) {
+      initialFitDoneRef.current = false;
+      consumedTargetRef.current = false;
+      setMapData(null);
+      setActivePlan(null);
+      setConverterPin(null);
+    }
     loadMapData(false, false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [campaign.id]);
+  }, [campaign.id, discordId, baseUrl]);
 
   // 10-second Auto-Refresh ring timer
   useEffect(() => {
@@ -418,9 +584,6 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
       airbaseProceduresPattern: L.layerGroup(),
       missions: L.layerGroup(),
       flightPlans: L.layerGroup(),
-      isr: L.layerGroup(),
-      isrOverlays: L.layerGroup().addTo(map),
-      isrPreview: L.layerGroup().addTo(map),
       logistics: L.layerGroup(),
       threats: L.layerGroup(),
       supportAssets: L.layerGroup(),
@@ -428,16 +591,69 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
       activePlan: L.layerGroup().addTo(map),
       measure: L.layerGroup().addTo(map),
       tacticalDraft: L.layerGroup().addTo(map),
+      converterPin: L.layerGroup().addTo(map),
     };
 
     layerGroupsRef.current = groups;
     mapRef.current = map;
 
+    const handleLayerAdd = (ev: L.LayerEvent) => {
+      const layer = ev.layer as any;
+      if (!layer || typeof layer.on !== 'function' || layer._ctrlClickAttached) return;
+      if (layer instanceof L.TileLayer) return;
+      if (
+        layer._isFlightRouteLine ||
+        layer._isFlightPlanWaypoint ||
+        layer._isMeasureLine ||
+        layer._isSpine
+      ) {
+        return;
+      }
+
+      layer._ctrlClickAttached = true;
+      layer.on('click', (clickEv: L.LeafletMouseEvent) => {
+        const isCtrlPressed = Boolean(
+          clickEv.originalEvent && (clickEv.originalEvent.ctrlKey || clickEv.originalEvent.metaKey)
+        );
+        if (!isCtrlPressed || !openWindowsFlightRef.current) return;
+        const plan = activePlanRef.current;
+        if (!plan || plan.can_edit === false) return;
+
+        if (clickEv.originalEvent && typeof clickEv.originalEvent.stopPropagation === 'function') {
+          clickEv.originalEvent.stopPropagation();
+        }
+        if (typeof layer.closePopup === 'function') {
+          layer.closePopup();
+        }
+        const clickLatLng =
+          clickEv.latlng || (typeof layer.getLatLng === 'function' ? layer.getLatLng() : null);
+        if (clickLatLng) {
+          handleInsertOrAppendWaypointRef.current(clickLatLng, activeSequenceRef.current || 1);
+        }
+      });
+    };
+
+    map.on('layeradd', handleLayerAdd);
+
     return () => {
+      map.off('layeradd', handleLayerAdd);
+      if (activePlanControllerRef.current) {
+        activePlanControllerRef.current.clear();
+        activePlanControllerRef.current = null;
+      }
+      if (supportAssetsControllerRef.current) {
+        supportAssetsControllerRef.current.clear();
+        supportAssetsControllerRef.current = null;
+      }
+      if (tacticalMarkingsControllerRef.current) {
+        tacticalMarkingsControllerRef.current.clear();
+        tacticalMarkingsControllerRef.current = null;
+      }
       map.remove();
       mapRef.current = null;
       layerGroupsRef.current = null;
       activeTileLayerRef.current = null;
+      tileSignatureRef.current = null;
       tileMapRef.current = {};
     };
   }, []);
@@ -447,6 +663,17 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
     const map = mapRef.current;
     const header = mapData?.campaign;
     if (!map || !header) return;
+
+    const theatreSig = JSON.stringify([
+      header.id,
+      header.theatre,
+      header.theatreDcsName,
+      header.bounds ?? null,
+    ]);
+    if (tileSignatureRef.current === theatreSig && activeTileLayerRef.current) {
+      return;
+    }
+    tileSignatureRef.current = theatreSig;
 
     const built = createDcsTileLayers(header.theatre, header.theatreDcsName, header.bounds);
     tileMapRef.current = built.layers;
@@ -507,12 +734,114 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
     return () => window.clearTimeout(t);
   }, [isFocusMode]);
 
+  // Keep Leaflet viewport synced cleanly on ultrawide / sidebar / monitor resizes
+  useEffect(() => {
+    const container = mapContainerRef.current;
+    if (!container || typeof ResizeObserver === 'undefined') return;
+    let rafId: number | null = null;
+    const observer = new ResizeObserver(() => {
+      if (rafId !== null) window.cancelAnimationFrame(rafId);
+      rafId = window.requestAnimationFrame(() => {
+        mapRef.current?.invalidateSize({ animate: false });
+      });
+    });
+    observer.observe(container);
+    return () => {
+      if (rafId !== null) window.cancelAnimationFrame(rafId);
+      observer.disconnect();
+    };
+  }, []);
+
   // Open a specific flight plan into activePlan + open Flight Planner floating window
+  const mutatePlan = useCallback(
+    (updater: (prev: FlightPlanDetail) => FlightPlanDetail) => {
+      setActivePlan((prev) => {
+        if (!prev) return prev;
+        return updater(prev);
+      });
+      setIsPlanDirty(true);
+      setDirtyVersion((v) => v + 1);
+    },
+    []
+  );
+
+  const handleMarkSaved = useCallback(() => {
+    setIsPlanDirty(false);
+  }, []);
+
+  const handlePlanChange = useCallback(
+    (nextPlan: FlightPlanDetail | null) => {
+      if (!nextPlan) {
+        setActivePlan(null);
+        setActiveSequence(1);
+        setUserCreatedSequences([1]);
+        setSequenceColors({});
+        setAvionicsDrawTarget(null);
+        return;
+      }
+      setActivePlan(nextPlan);
+    },
+    []
+  );
+
+  const autoFetchPointElevation = useCallback(
+    async (pointIndex: number, lat: number, lng: number, isTarget: boolean) => {
+      let elevFt: number | null = null;
+      try {
+        elevFt = await fetchTerrainElevation(baseUrl, lat, lng, authToken);
+      } catch {
+        elevFt = null;
+      }
+
+      if (elevFt === null) {
+        await new Promise<void>((resolve) => {
+          lookupTerrariumElevationFt(lat, lng, (resFt) => {
+            if (resFt !== null && Number.isFinite(resFt)) {
+              elevFt = Math.round(resFt);
+            }
+            resolve();
+          });
+        });
+      }
+
+      if (elevFt === null || !Number.isFinite(elevFt)) return;
+      const finalElev = Math.round(elevFt);
+
+      setActivePlan((prev) => {
+        if (!prev || !Array.isArray(prev.route_points) || !prev.route_points[pointIndex]) {
+          return prev;
+        }
+        const pts = [...prev.route_points];
+        const pt = { ...pts[pointIndex] };
+        pt.elev = finalElev;
+        if (isTarget) {
+          pt.alt = finalElev;
+        }
+        pts[pointIndex] = pt;
+        return { ...prev, route_points: pts };
+      });
+      setIsPlanDirty(true);
+      setDirtyVersion((v) => v + 1);
+    },
+    [baseUrl, discordId, authToken]
+  );
+
   const handleOpenFlightPlan = useCallback(
     async (planId: number) => {
       try {
-        const detail = await fetchFlightPlanDetail(baseUrl, planId, authToken);
-        setActivePlan(detail);
+        const detail = await fetchFlightPlanDetail(baseUrl, planId, authToken, discordId);
+        const af =
+          mapData?.airframesCatalog?.find((a) => Number(a.id) === Number(detail.airframe_id)) ||
+          null;
+        const normalized = mapData ? normalizePlanForEditor(detail, mapData, af) : detail;
+        setActivePlan(normalized);
+        setActiveSequence(1);
+        const seqs = getAvailableSequences(normalized.route_points || [], [1]);
+        setUserCreatedSequences(seqs);
+        setSequenceColors((normalized as any).sequence_colors || {});
+        setIsPlanDirty(false);
+        setDirtyVersion(0);
+        setAvionicsDrawTarget(null);
         openWindow('flight');
 
         const firstPt = detail.route_points?.[0];
@@ -529,7 +858,7 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
         });
       }
     },
-    [baseUrl, authToken, openWindow, addNotification]
+    [baseUrl, authToken, discordId, openWindow, addNotification]
   );
 
   // Consume deep links (`initialMissionId` / `initialFlightPlanId`) once data is loaded
@@ -558,79 +887,571 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
   }, [mapData, initialMissionId, initialFlightPlanId, handleOpenFlightPlan, onConsumedInitialTarget]);
 
   // Apply airbase SID/STAR/IAP/Overhead procedure to active flight plan
+  // Route & Waypoint Callbacks (1-for-1 Portal Parity)
+  const handleAddSequence = useCallback(() => {
+    const isF14 = isF14Airframe(activePlanRef.current, null);
+    const maxSeq = getMaxSequences(isF14);
+    const avail = getAvailableSequences(activePlanRef.current?.route_points || [], userCreatedSequences);
+    let nextSeq = 2;
+    while (avail.includes(nextSeq) && nextSeq <= maxSeq) nextSeq++;
+    if (nextSeq > maxSeq) {
+      handleNotify('warning', `Maximum ${maxSeq} sequences reached for this airframe.`);
+      return;
+    }
+    setUserCreatedSequences((prev) => Array.from(new Set([...prev, nextSeq])).sort((a, b) => a - b));
+    setActiveSequence(nextSeq);
+  }, [userCreatedSequences, handleNotify]);
+
+  const handleDeleteSequence = useCallback(
+    (seq: number) => {
+      if (seq <= 1) return;
+      mutatePlan((prev) => {
+        const nextPts = (prev.route_points || []).filter((p) => !isSequenceTrackPoint(p, seq));
+        return { ...prev, route_points: recalculateTransitSpeeds(nextPts) };
+      });
+      setUserCreatedSequences((prev) => prev.filter((s) => s !== seq));
+      setActiveSequence((prev) => (prev === seq ? 1 : prev));
+    },
+    [mutatePlan]
+  );
+
+  const handleSetSequenceColor = useCallback(
+    (seq: number, color: string) => {
+      setSequenceColors((prev) => ({ ...prev, [seq]: color }));
+      if (seq === 1) {
+        mutatePlan((p) => ({ ...p, color }));
+      } else {
+        setIsPlanDirty(true);
+        setDirtyVersion((v) => v + 1);
+      }
+    },
+    [mutatePlan]
+  );
+
+  const handleInsertOrAppendWaypoint = useCallback(
+    (latlng: L.LatLng, targetSeq = activeSequence) => {
+      const plan = activePlanRef.current;
+      const map = mapRef.current;
+      if (!plan || !map || !mapData?.permissions.canManageFlightPlans) return;
+
+      const af =
+        mapData.airframesCatalog.find((a) => Number(a.id) === Number(plan.airframe_id)) || null;
+      const isF14 = isF14Airframe(plan, af);
+      const pts = [...(plan.route_points || [])];
+
+      if (isF14) {
+        const trackPts = pts.filter(
+          (p) => !isTargetPoint(p) && !isAdditionalPoint(p) && !isDivertPoint(p)
+        );
+        if (trackPts.length >= 12) {
+          handleNotify('warning', 'F-14 Navigation Route limited to 12 waypoints.');
+          return;
+        }
+      }
+
+      const seqIndices = pts
+        .map((pt, globalIdx) => ({ pt, globalIdx }))
+        .filter(({ pt }) => isSequenceTrackPoint(pt, targetSeq));
+
+      let spliceAfterGlobalIdx: number | null = null;
+      let bestDistPx = 40;
+      const clickPt = map.latLngToLayerPoint(latlng);
+
+      for (let i = 0; i < seqIndices.length - 1; i++) {
+        const a = seqIndices[i].pt;
+        const b = seqIndices[i + 1].pt;
+        const p1 = map.latLngToLayerPoint([a.lat, a.lng]);
+        const p2 = map.latLngToLayerPoint([b.lat, b.lng]);
+        const dist = L.LineUtil.pointToSegmentDistance(clickPt, p1, p2);
+        if (dist < bestDistPx) {
+          bestDistPx = dist;
+          spliceAfterGlobalIdx = seqIndices[i].globalIdx;
+        }
+      }
+
+      const cleanLat = Number(latlng.lat.toFixed(6));
+      const cleanLng = Number(latlng.lng.toFixed(6));
+
+      let alt = 20000;
+      let speed = 350;
+      let insertAt = pts.length;
+
+      if (spliceAfterGlobalIdx !== null) {
+        insertAt = spliceAfterGlobalIdx + 1;
+        const prevWp = pts[spliceAfterGlobalIdx];
+        const nextWp = pts[spliceAfterGlobalIdx + 1];
+        if (prevWp && nextWp) {
+          alt = Math.round(((Number(prevWp.alt) || 20000) + (Number(nextWp.alt) || 20000)) / 2);
+          speed = Math.round(((Number(prevWp.speed) || 350) + (Number(nextWp.speed) || 350)) / 2);
+        }
+      } else if (seqIndices.length > 0) {
+        const lastSeq = seqIndices[seqIndices.length - 1];
+        insertAt = lastSeq.globalIdx + 1;
+        alt = Number(lastSeq.pt.alt) || 20000;
+        speed = Number(lastSeq.pt.speed) || 350;
+      } else {
+        // Place before trailing Targets / Additional / Diverts
+        const firstNonTrack = pts.findIndex(
+          (p) => isTargetPoint(p) || isAdditionalPoint(p) || isDivertPoint(p)
+        );
+        insertAt = firstNonTrack === -1 ? pts.length : firstNonTrack;
+      }
+
+      const newWp: FlightPlanRoutePoint = {
+        index: insertAt,
+        name: spliceAfterGlobalIdx !== null ? 'SPLICE PT' : `WP ${seqIndices.length + 1}`,
+        lat: cleanLat,
+        lng: cleanLng,
+        alt,
+        speed,
+        elev: 0,
+        action: 'Turning Point',
+        type: 'Turning Point',
+        sequence: targetSeq,
+        mgrs: toMgrs(cleanLat, cleanLng),
+        lldm: formatCoordinateDdm(cleanLat, cleanLng),
+        dms: formatCoordinateDms(cleanLat, cleanLng),
+      };
+
+      pts.splice(insertAt, 0, newWp);
+      const indexed = recalculateTransitSpeeds(
+        pts.map((p, idx) => ({ ...p, index: idx }))
+      );
+
+      setActivePlan((prev) => (prev ? { ...prev, route_points: indexed } : prev));
+      setIsPlanDirty(true);
+      setDirtyVersion((v) => v + 1);
+      void autoFetchPointElevation(insertAt, cleanLat, cleanLng, false);
+    },
+    [activeSequence, mapData, autoFetchPointElevation, handleNotify]
+  );
+
+  handleInsertOrAppendWaypointRef.current = handleInsertOrAppendWaypoint;
+
+  const handleAddPointFromCoords = useCallback(
+    (lat: number, lng: number, name?: string) => {
+      const plan = activePlanRef.current;
+      if (!plan || !mapData?.permissions.canManageFlightPlans) return;
+      const cleanLat = Number(lat.toFixed(6));
+      const cleanLng = Number(lng.toFixed(6));
+      const pts = [...(plan.route_points || [])];
+      const seqPts = pts.filter((p) => isSequenceTrackPoint(p, activeSequence));
+      const firstNonTrack = pts.findIndex(
+        (p) => isTargetPoint(p) || isAdditionalPoint(p) || isDivertPoint(p)
+      );
+      let lastSeqIdx = -1;
+      for (let i = pts.length - 1; i >= 0; i--) {
+        if (isSequenceTrackPoint(pts[i], activeSequence)) {
+          lastSeqIdx = i;
+          break;
+        }
+      }
+      const insertAt =
+        seqPts.length > 0 && lastSeqIdx >= 0
+          ? lastSeqIdx + 1
+          : firstNonTrack === -1
+            ? pts.length
+            : firstNonTrack;
+
+      const lastPt = seqPts[seqPts.length - 1];
+      const newWp: FlightPlanRoutePoint = {
+        index: insertAt,
+        name: name || `WP ${seqPts.length + 1}`,
+        lat: cleanLat,
+        lng: cleanLng,
+        alt: lastPt ? Number(lastPt.alt) || 20000 : 20000,
+        speed: lastPt ? Number(lastPt.speed) || 350 : 350,
+        elev: 0,
+        action: 'Turning Point',
+        type: 'Turning Point',
+        sequence: activeSequence,
+        mgrs: toMgrs(cleanLat, cleanLng),
+        lldm: formatCoordinateDdm(cleanLat, cleanLng),
+        dms: formatCoordinateDms(cleanLat, cleanLng),
+      };
+      pts.splice(insertAt, 0, newWp);
+      const indexed = recalculateTransitSpeeds(pts.map((p, i) => ({ ...p, index: i })));
+      setActivePlan((prev) => (prev ? { ...prev, route_points: indexed } : prev));
+      setIsPlanDirty(true);
+      setDirtyVersion((v) => v + 1);
+      mapRef.current?.panTo([cleanLat, cleanLng]);
+      void autoFetchPointElevation(insertAt, cleanLat, cleanLng, false);
+    },
+    [activeSequence, mapData, autoFetchPointElevation]
+  );
+
+  const handleAddTargetPoint = useCallback(
+    (coords: { lat: number; lng: number }, customData?: Partial<FlightPlanRoutePoint>) => {
+      const plan = activePlanRef.current;
+      if (!plan || !mapData?.permissions.canManageFlightPlans) return;
+      const cleanLat = Number(coords.lat.toFixed(6));
+      const cleanLng = Number(coords.lng.toFixed(6));
+      const pts = [...(plan.route_points || [])];
+      const existingTgts = pts.filter((p) => isTargetPoint(p));
+      const insertAt = pts.length;
+      const newTgt: FlightPlanRoutePoint = {
+        index: insertAt,
+        name: customData?.name || `TGT ${existingTgts.length + 1}`,
+        lat: cleanLat,
+        lng: cleanLng,
+        alt: Number(customData?.elev ?? customData?.alt ?? 0),
+        elev: Number(customData?.elev ?? 0),
+        drop_alt: customData?.drop_alt ?? 30000,
+        drop_spd: customData?.drop_spd ?? 450,
+        attack_heading: customData?.attack_heading ?? 0,
+        speed: Number(customData?.speed ?? 450),
+        action: 'TGT',
+        type: 'TARGET',
+        is_target: true,
+        sequence: 1,
+        weapon: customData?.weapon || '',
+        remarks: customData?.remarks || '',
+        notes: customData?.notes || '',
+        mgrs: toMgrs(cleanLat, cleanLng),
+        lldm: formatCoordinateDdm(cleanLat, cleanLng),
+        dms: formatCoordinateDms(cleanLat, cleanLng),
+        ...customData,
+      };
+      pts.push(newTgt);
+      const indexed = pts.map((p, i) => ({ ...p, index: i }));
+      setActivePlan((prev) => (prev ? { ...prev, route_points: indexed } : prev));
+      setIsPlanDirty(true);
+      setDirtyVersion((v) => v + 1);
+      void autoFetchPointElevation(insertAt, cleanLat, cleanLng, true);
+    },
+    [mapData, autoFetchPointElevation]
+  );
+
+  const handleAddAdditionalPoint = useCallback(
+    (coords: { lat: number; lng: number }, customData?: Partial<FlightPlanRoutePoint>) => {
+      const plan = activePlanRef.current;
+      if (!plan || !mapData?.permissions.canManageFlightPlans) return;
+      const pts = [...(plan.route_points || [])];
+      const existingAdd = pts.filter((p) => isAdditionalPoint(p));
+      if (existingAdd.length >= 40) {
+        handleNotify('warning', 'Maximum 40 Additional Points reached for F-14 plan.');
+        return;
+      }
+      const cleanLat = Number(coords.lat.toFixed(6));
+      const cleanLng = Number(coords.lng.toFixed(6));
+      const insertAt = pts.length;
+      const newPt: FlightPlanRoutePoint = {
+        index: insertAt,
+        name: customData?.name || `AP ${existingAdd.length + 1}`,
+        lat: cleanLat,
+        lng: cleanLng,
+        alt: 0,
+        elev: 0,
+        speed: 0,
+        type: 'LANTIRN',
+        action: 'Additional',
+        is_additional: true,
+        is_lantirn: true,
+        sequence: 1,
+        mgrs: toMgrs(cleanLat, cleanLng),
+        lldm: formatCoordinateDdm(cleanLat, cleanLng),
+        dms: formatCoordinateDms(cleanLat, cleanLng),
+        ...customData,
+      };
+      pts.push(newPt);
+      const indexed = pts.map((p, i) => ({ ...p, index: i }));
+      setActivePlan((prev) => (prev ? { ...prev, route_points: indexed } : prev));
+      setIsPlanDirty(true);
+      setDirtyVersion((v) => v + 1);
+      void autoFetchPointElevation(insertAt, cleanLat, cleanLng, false);
+    },
+    [mapData, autoFetchPointElevation, handleNotify]
+  );
+
+  const handleAddAdditionalAtCenter = useCallback(() => {
+    const center = mapRef.current?.getCenter();
+    if (!center) return;
+    handleAddAdditionalPoint({ lat: center.lat, lng: center.lng });
+  }, [handleAddAdditionalPoint]);
+
+  const handleReorderWaypoints = useCallback(
+    (seq: number, fromSeqIdx: number, toSeqIdx: number) => {
+      mutatePlan((prev) => {
+        const pts = [...(prev.route_points || [])];
+        const seqGlobalIndices = pts
+          .map((p, i) => ({ p, i }))
+          .filter(({ p }) => isSequenceTrackPoint(p, seq))
+          .map(({ i }) => i);
+        if (
+          fromSeqIdx < 0 ||
+          toSeqIdx < 0 ||
+          fromSeqIdx >= seqGlobalIndices.length ||
+          toSeqIdx >= seqGlobalIndices.length
+        ) {
+          return prev;
+        }
+        const reorderedItems = seqGlobalIndices.map((idx) => pts[idx]);
+        const [moved] = reorderedItems.splice(fromSeqIdx, 1);
+        reorderedItems.splice(toSeqIdx, 0, moved);
+        seqGlobalIndices.forEach((globalIdx, slot) => {
+          pts[globalIdx] = reorderedItems[slot];
+        });
+        return {
+          ...prev,
+          route_points: recalculateTransitSpeeds(pts.map((p, i) => ({ ...p, index: i }))),
+        };
+      });
+    },
+    [mutatePlan]
+  );
+
+  const handleUpdatePoint = useCallback(
+    (globalIdx: number, patch: Partial<FlightPlanRoutePoint>) => {
+      mutatePlan((prev) => {
+        const pts = [...(prev.route_points || [])];
+        if (!pts[globalIdx]) return prev;
+        pts[globalIdx] = { ...pts[globalIdx], ...patch };
+        return {
+          ...prev,
+          route_points: recalculateTransitSpeeds(pts.map((p, i) => ({ ...p, index: i }))),
+        };
+      });
+    },
+    [mutatePlan]
+  );
+
+  const handleDeletePoint = useCallback(
+    (globalIdx: number) => {
+      mutatePlan((prev) => {
+        const pts = (prev.route_points || []).filter((_, i) => i !== globalIdx);
+        return {
+          ...prev,
+          route_points: recalculateTransitSpeeds(pts.map((p, i) => ({ ...p, index: i }))),
+        };
+      });
+    },
+    [mutatePlan]
+  );
+
+  const handleSetWaypointSequence = useCallback(
+    (globalIdx: number, seq: number) => {
+      mutatePlan((prev) => {
+        const pts = [...(prev.route_points || [])];
+        if (!pts[globalIdx]) return prev;
+        pts[globalIdx] = { ...pts[globalIdx], sequence: seq };
+        return {
+          ...prev,
+          route_points: recalculateTransitSpeeds(pts.map((p, i) => ({ ...p, index: i }))),
+        };
+      });
+    },
+    [mutatePlan]
+  );
+
+  const handlePanToPoint = useCallback((globalIdx: number, openPopup = false) => {
+    if (openPopup && activePlanControllerRef.current) {
+      activePlanControllerRef.current.panAndOpenPopup(globalIdx);
+      return;
+    }
+    const pt = activePlanRef.current?.route_points?.[globalIdx];
+    if (pt && mapRef.current) {
+      mapRef.current.panTo([pt.lat, pt.lng]);
+    }
+  }, []);
+
+  const handleClearRoute = useCallback(() => {
+    mutatePlan((prev) => ({ ...prev, route_points: [] }));
+  }, [mutatePlan]);
+
+  const handleUpdateTickConfig = useCallback((next: TickConfig) => {
+    setTickConfig(next);
+    try {
+      localStorage.setItem('gtfo_tick_config', JSON.stringify(next));
+    } catch {
+      // ignore storage errors
+    }
+  }, []);
+
+  const handleUpdateDoghouseConfig = useCallback((next: DoghouseConfig) => {
+    setDoghouseConfig(next);
+    try {
+      localStorage.setItem('gtfo_doghouse_config', next);
+    } catch {
+      // ignore storage errors
+    }
+  }, []);
+
   const handleApplyProcedure = useCallback(
-    (proc: CampaignMapProcedure, mode: 'auto' | 'prepend' | 'append') => {
-      const procWps: FlightPlanRoutePoint[] = (proc.waypoints || [])
-        .filter((w) => Number.isFinite(Number(w.lat)) && Number.isFinite(Number(w.lng)))
-        .map((w, idx) => ({
-          index: idx + 1,
-          name: w.name || `${proc.name} ${idx + 1}`,
-          lat: Number(w.lat),
-          lng: Number(w.lng),
-          alt: w.alt !== undefined && w.alt !== null ? Number(w.alt) : 5000,
-          speed: w.speed !== undefined && w.speed !== null ? Number(w.speed) : 300,
-          type: 'waypoint',
-        }));
-
-      if (procWps.length === 0) {
-        addNotification({
-          title: 'Procedure Empty',
-          message: `Procedure "${proc.name}" has no valid waypoints.`,
-          category: 'flight_plan',
-        });
+    (
+      proc: CampaignMapProcedure,
+      mode: 'auto' | 'prepend' | 'append',
+      targetSeq = activeSequenceRef.current || 1
+    ) => {
+      if (!proc || !Array.isArray(proc.waypoints) || proc.waypoints.length === 0) {
+        handleNotify('warning', `Procedure "${proc?.name || 'Procedure'}" has no valid waypoints.`);
         return;
       }
 
-      if (!activePlan) {
+      const plan = activePlanRef.current;
+      if (!plan) {
         openWindow('flight');
-        addNotification({
-          title: 'Select or Create Flight Plan',
-          message: `Open a flight plan first to insert "${proc.name}", then re-click the procedure action.`,
-          category: 'flight_plan',
-        });
+        handleNotify(
+          'warning',
+          `Open a flight plan first to insert "${proc.name}", then re-click the procedure action.`
+        );
         return;
       }
 
+      const seq = targetSeq || 1;
+      const procType = (proc.type || '').toLowerCase();
       const resolvedMode: 'prepend' | 'append' =
         mode === 'auto'
-          ? proc.type === 'departure' || proc.type === 'sid'
+          ? procType === 'departure' || procType === 'sid'
             ? 'prepend'
             : 'append'
           : mode;
 
-      setActivePlan((prev) => {
-        if (!prev) return prev;
-        const existing = [...(prev.route_points || [])];
-        const merged =
-          resolvedMode === 'prepend' ? [...procWps, ...existing] : [...existing, ...procWps];
+      let relevantRaw: Array<Record<string, any>> = (proc.waypoints || []) as Array<
+        Record<string, any>
+      >;
+      if (procType === 'overhead_pattern') {
+        setLayerStates((prev) => ({ ...prev, airbaseProceduresPattern: true }));
+        const initialPt =
+          relevantRaw.find((pt) => String(pt.name || '').toUpperCase() === 'INITIAL') ||
+          relevantRaw[0];
+        relevantRaw = initialPt
+          ? [{ ...initialPt, name: 'INITIAL', is_fix: true, type: 'FIX' }]
+          : [];
+      } else {
+        relevantRaw = relevantRaw.filter((pt) => {
+          if (pt.type === 'CURVE' || pt.is_curve === true) return false;
+          const uName = String(pt.name || '')
+            .trim()
+            .toUpperCase();
+          if (uName.startsWith('PT ') && pt.is_fix === false) return false;
+          return true;
+        });
+      }
+
+      const procWps: FlightPlanRoutePoint[] = relevantRaw
+        .filter((w) => Number.isFinite(Number(w.lat)) && Number.isFinite(Number(w.lng)))
+        .map((w, idx) => {
+          const cleanLat = Number(Number(w.lat).toFixed(6));
+          const cleanLng = Number(Number(w.lng).toFixed(6));
+          const wpName = String(
+            w.name || (procType === 'overhead_pattern' ? 'INITIAL' : `FIX ${idx + 1}`)
+          );
+          const type =
+            wpName === 'FINAL' || wpName === 'ARR'
+              ? 'ARR'
+              : wpName === 'INITIAL' || wpName === 'DEP'
+                ? 'FIX'
+                : String(w.type || 'FIX');
+          return {
+            index: idx,
+            name: wpName,
+            lat: cleanLat,
+            lng: cleanLng,
+            alt:
+              w.alt !== undefined && w.alt !== null && String(w.alt) !== ''
+                ? Number(w.alt)
+                : proc.initial_altitude
+                  ? Number(proc.initial_altitude)
+                  : 5000,
+            speed:
+              w.speed !== undefined && w.speed !== null && String(w.speed) !== ''
+                ? Number(w.speed)
+                : 300,
+            elev: 0,
+            action: type,
+            type,
+            is_fix: true,
+            remarks: String(w.remarks || w.notes || proc.name || 'Procedure'),
+            sequence: seq,
+            mgrs: toMgrs(cleanLat, cleanLng),
+            lldm: formatCoordinateDdm(cleanLat, cleanLng),
+            dms: formatCoordinateDms(cleanLat, cleanLng),
+          };
+        });
+
+      if (procWps.length === 0) {
+        handleNotify('warning', `Procedure "${proc.name}" has no valid fix waypoints.`);
+        return;
+      }
+
+      mutatePlan((prev) => {
+        // Strip previous procedure curve clutter for this sequence
+        const cleaned = (prev.route_points || []).filter((fd) => {
+          const uName = (fd.name || '').trim().toUpperCase();
+          const isCurveClutter =
+            /^PT\s*\d+$/i.test(uName) &&
+            (fd.type === 'CURVE' ||
+              String(fd.remarks || '').includes('Overhead') ||
+              String(fd.remarks || '').includes('Turn'));
+          const sameSeq = Number(fd.sequence || 1) === seq;
+          return !(isCurveClutter && sameSeq);
+        });
+
+        const seqIndices = cleaned
+          .map((pt, globalIdx) => ({ pt, globalIdx }))
+          .filter(({ pt }) => isSequenceTrackPoint(pt, seq));
+
+        let insertAt = cleaned.length;
+        if (resolvedMode === 'prepend') {
+          const depItem = seqIndices.find(
+            ({ pt }) => String(pt.type || '').toUpperCase() === 'DEP'
+          );
+          if (depItem) {
+            insertAt = depItem.globalIdx + 1;
+          } else if (seqIndices.length > 0) {
+            insertAt = seqIndices[0].globalIdx;
+          } else {
+            const firstNonTrack = cleaned.findIndex(
+              (p) => isTargetPoint(p) || isAdditionalPoint(p) || isDivertPoint(p)
+            );
+            insertAt = firstNonTrack === -1 ? cleaned.length : firstNonTrack;
+          }
+        } else {
+          const arrItem = seqIndices.find(
+            ({ pt }) => String(pt.type || '').toUpperCase() === 'ARR'
+          );
+          if (arrItem) {
+            insertAt = arrItem.globalIdx;
+          } else if (seqIndices.length > 0) {
+            insertAt = seqIndices[seqIndices.length - 1].globalIdx + 1;
+          } else {
+            const firstNonTrack = cleaned.findIndex(
+              (p) => isTargetPoint(p) || isAdditionalPoint(p) || isDivertPoint(p)
+            );
+            insertAt = firstNonTrack === -1 ? cleaned.length : firstNonTrack;
+          }
+        }
+
+        const merged = [...cleaned];
+        merged.splice(insertAt, 0, ...procWps);
+        const recalculated = recalculateTransitSpeeds(
+          merged.map((pt, i) => ({ ...pt, index: i }))
+        );
+
         return {
           ...prev,
-          route_points: merged.map((pt, i) => ({ ...pt, index: i + 1 })),
+          ...(procType === 'overhead_pattern' ? { overhead_pattern: proc } : {}),
+          route_points: recalculated,
         };
       });
+
       openWindow('flight');
-      addNotification({
-        title: 'Procedure Applied',
-        message: `${resolvedMode === 'prepend' ? 'Prepended' : 'Appended'} ${procWps.length} waypoints from ${proc.name}. Save flight plan to persist.`,
-        category: 'flight_plan',
-      });
     },
-    [activePlan, openWindow, addNotification]
+    [mutatePlan, openWindow, handleNotify]
   );
 
   const handleSetAirbaseRole = useCallback(
     (airbase: CampaignMapAirbase, role: 'departure' | 'destination') => {
-      if (!activePlan) {
+      const plan = activePlanRef.current;
+      if (!plan) {
         openWindow('flight');
-        addNotification({
-          title: 'No Active Flight Plan',
-          message: `Create or select a flight plan in the Flight Planner window to set ${airbase.name} as ${role}.`,
-          category: 'flight_plan',
-        });
+        handleNotify(
+          'warning',
+          `Create or select a flight plan in the Flight Planner window to set ${airbase.name} as ${role}.`
+        );
         return;
       }
-      setActivePlan((prev) => {
-        if (!prev) return prev;
+      mutatePlan((prev) => {
         if (role === 'departure') {
           return {
             ...prev,
@@ -643,34 +1464,28 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
         };
       });
       openWindow('flight');
-      addNotification({
-        title: `Set ${role === 'departure' ? 'Departure' : 'Destination'} Airbase`,
-        message: `${airbase.name} assigned to active flight plan.`,
-        category: 'flight_plan',
-      });
     },
-    [activePlan, openWindow, addNotification]
+    [mutatePlan, openWindow, handleNotify]
   );
 
   const handleToggleDivert = useCallback(
     (airbase: CampaignMapAirbase) => {
-      if (!activePlan) {
+      const plan = activePlanRef.current;
+      if (!plan) {
         openWindow('flight');
-        addNotification({
-          title: 'No Active Flight Plan',
-          message: `Create or select a flight plan to toggle ${airbase.name} as a divert airfield.`,
-          category: 'flight_plan',
-        });
+        handleNotify(
+          'warning',
+          `Create or select a flight plan to toggle ${airbase.name} as a divert airfield.`
+        );
         return;
       }
       const matchKey = airbase.name.trim().toLowerCase();
       const icaoKey = (airbase.icao || '').trim().toLowerCase();
-      const exists = (activePlan.diverts || []).some((d) => {
+      const exists = (plan.diverts || []).some((d) => {
         const dName = (typeof d === 'string' ? d : d?.name || d?.icao || '').trim().toLowerCase();
         return dName === matchKey || (icaoKey !== '' && dName === icaoKey);
       });
-      setActivePlan((prev) => {
-        if (!prev) return prev;
+      mutatePlan((prev) => {
         const current = Array.isArray(prev.diverts) ? [...prev.diverts] : [];
         const nextDiverts = exists
           ? current.filter((d) => {
@@ -683,97 +1498,8 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
         return { ...prev, diverts: nextDiverts };
       });
       openWindow('flight');
-      addNotification({
-        title: exists ? 'Removed Divert Airfield' : 'Added Divert Airfield',
-        message: `${airbase.name} ${exists ? 'removed from' : 'added to'} active flight plan diverts.`,
-        category: 'flight_plan',
-      });
     },
-    [activePlan, openWindow, addNotification]
-  );
-
-  const handleAddIsrTargetToFlightPlan = useCallback(
-    (target: { label: string; notes?: string; lat: number; lon: number }) => {
-      if (!activePlan || !activePlan.can_edit) {
-        openWindow('flight');
-        addNotification({
-          title: 'Editable Flight Plan Required',
-          message: 'Open or create an editable flight plan first to push ISR targets.',
-          category: 'flight_plan',
-        });
-        return;
-      }
-      setActivePlan((prev) => {
-        if (!prev) return prev;
-        const nextIdx = (prev.route_points?.length || 0) + 1;
-        const newPt: FlightPlanRoutePoint = {
-          index: nextIdx,
-          name: `TGT ${target.label.toUpperCase()}`.slice(0, 24),
-          lat: Number(target.lat.toFixed(6)),
-          lng: Number(target.lon.toFixed(6)),
-          alt: 0,
-          speed: 0,
-          action: 'TGT',
-          type: 'TGT',
-          remarks: target.notes || undefined,
-        };
-        const nextPts = [...(prev.route_points || []), newPt].map((p, idx) => ({
-          ...p,
-          index: idx + 1,
-        }));
-        return { ...prev, route_points: nextPts };
-      });
-      openWindow('flight');
-      addNotification({
-        title: 'Target Pushed to Flight Plan',
-        message: `Added DMPI (${target.label}) to ${activePlan.identifier}. Save flight plan to persist.`,
-        category: 'flight_plan',
-      });
-    },
-    [activePlan, openWindow, addNotification]
-  );
-
-  const handleToggleIsrOverlay = useCallback((req: CampaignMapIsrRequest, url: string) => {
-    setActiveIsrOverlays((prev) => {
-      const next = { ...prev };
-      if (next[req.id]) {
-        delete next[req.id];
-      } else {
-        next[req.id] = {
-          requestId: req.id,
-          url,
-          opacity: 0.9,
-          filter: 'eo',
-        };
-      }
-      return next;
-    });
-  }, []);
-
-  const handleUpdateIsrOverlayStyle = useCallback(
-    (requestId: number, patch: Partial<Pick<IsrActiveOverlayState, 'opacity' | 'filter'>>) => {
-      setActiveIsrOverlays((prev) => {
-        const cur = prev[requestId];
-        if (!cur) return prev;
-        return { ...prev, [requestId]: { ...cur, ...patch } };
-      });
-    },
-    []
-  );
-
-  const handleIsrPreviewChange = useCallback(
-    (center: { lat: number; lng: number } | null, sizes: number[]) => {
-      setIsrPreviewCenter((prev) => {
-        if (!prev && !center) return prev;
-        if (prev && center && prev.lat === center.lat && prev.lng === center.lng) return prev;
-        return center;
-      });
-      setIsrPreviewKmSizes((prev) => {
-        if (prev.length === sizes.length && prev.every((v, i) => v === sizes[i])) return prev;
-        return sizes;
-      });
-    },
-    []
+    [mutatePlan, openWindow, handleNotify]
   );
 
   // Sync Leaflet LayerGroup mount state to layerStates
@@ -798,7 +1524,6 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
       ['threats', g.threats],
       ['missions', g.missions],
       ['flightPlans', g.flightPlans],
-      ['isr', g.isr],
       ['logistics', g.logistics],
     ];
 
@@ -824,7 +1549,7 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
     renderAirbasesLayer(
       { blue: g.airbasesBlue, red: g.airbasesRed, neutral: g.airbasesNeutral },
       mapData.airbases || [],
-      activePlan,
+      activePlanRef.current,
       {
         onApplyProcedure: handleApplyProcedure,
         onSetAirbaseRole: handleSetAirbaseRole,
@@ -852,7 +1577,7 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
       map,
       g.flightPlans,
       mapData.flightPlans?.allPlans || [],
-      activePlan?.id,
+      activePlanRef.current?.id,
       selectedMissionId,
       selectedSortieId,
       unit,
@@ -861,17 +1586,6 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
 
     renderLogisticsLayer(map, g.logistics, mapData.logisticsRequests || []);
 
-    renderIsrCapturesLayer(
-      g.isr,
-      g.isrOverlays,
-      mapData.isrRequests || [],
-      activeIsrOverlays,
-      {
-        onOpenLightbox: (req) => setLightboxIsr(req),
-        onToggleOverlay: handleToggleIsrOverlay,
-      }
-    );
-
     renderThreatsLayer(
       g.threats,
       mapData.threats || [],
@@ -879,43 +1593,21 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
       mapData.samSystems || [],
       mapData.permissions.canManageThreats,
       (_threat, idx) => {
+        if (!mapData.permissions.canManageThreats) return;
         setFocusThreatIndex(idx);
         openWindow('threats');
       }
-    );
-
-    renderSupportAssetsLayer(
-      g.supportAssets,
-      mapData.supportAssets || [],
-      mapData.supportAssetTypes || [],
-      mapData.samSystems || [],
-      unit,
-      mapData.permissions.canManageSupportAssets,
-      (_asset, idx) => {
-        setFocusAssetIndex(idx);
-        openWindow('support');
-      }
-    );
-
-    renderTacticalMarkingsLayer(
-      g.tacticalMarkings,
-      mapData.tacticalMarkings || [],
-      selectedSortieId
     );
   }, [
     mapData,
     polygonGroupStates,
     layerStates.navaids,
-    activePlan,
-    unit,
     selectedMissionId,
     selectedSortieId,
-    activeIsrOverlays,
     handleApplyProcedure,
     handleSetAirbaseRole,
     handleToggleDivert,
     handleOpenFlightPlan,
-    handleToggleIsrOverlay,
     setSelectedCampaignMissionId,
     setSelectedCampaignMissionSection,
     openWindow,
@@ -924,6 +1616,47 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
   useEffect(() => {
     renderAllLayers();
   }, [renderAllLayers]);
+
+  // Focused refresh for airbase indicators when flight plan departure/destination/diverts change
+  useEffect(() => {
+    const g = layerGroupsRef.current;
+    if (!g || !mapData) return;
+    renderAirbasesLayer(
+      { blue: g.airbasesBlue, red: g.airbasesRed, neutral: g.airbasesNeutral },
+      mapData.airbases || [],
+      activePlanRef.current,
+      {
+        onApplyProcedure: handleApplyProcedure,
+        onSetAirbaseRole: handleSetAirbaseRole,
+        onToggleDivert: handleToggleDivert,
+      }
+    );
+  }, [
+    activePlan?.departure_airfield,
+    activePlan?.destination_airfield,
+    activePlan?.diverts,
+    mapData,
+    handleApplyProcedure,
+    handleSetAirbaseRole,
+    handleToggleDivert,
+  ]);
+
+  // Focused refresh for inactive clustered flight plans when active plan ID switches
+  useEffect(() => {
+    const g = layerGroupsRef.current;
+    const map = mapRef.current;
+    if (!g || !map || !mapData) return;
+    renderClusteredFlightPlansLayer(
+      map,
+      g.flightPlans,
+      mapData.flightPlans?.allPlans || [],
+      activePlanRef.current?.id,
+      selectedMissionId,
+      selectedSortieId,
+      unit,
+      handleOpenFlightPlan
+    );
+  }, [activePlan?.id, mapData, selectedMissionId, selectedSortieId, unit, handleOpenFlightPlan]);
 
   // Zoom-dependent layer re-renders (NAVAIDs zoom >= 7, Logistics Bezier scaling, Flight Plan clustering)
   useEffect(() => {
@@ -939,7 +1672,7 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
         map,
         g.flightPlans,
         mapData.flightPlans?.allPlans || [],
-        activePlan?.id,
+        activePlanRef.current?.id,
         selectedMissionId,
         selectedSortieId,
         unit,
@@ -954,142 +1687,270 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
   }, [
     mapData,
     layerStates.navaids,
-    activePlan?.id,
     selectedMissionId,
     selectedSortieId,
     unit,
     handleOpenFlightPlan,
   ]);
 
-  // Render ISR request live multi-size preview
+  // Mount & sync ActiveFlightPlanMapController (persistent smooth drag + avionics overlays)
   useEffect(() => {
+    const map = mapRef.current;
     const g = layerGroupsRef.current;
-    if (!g) return;
-    renderIsrPreviewLayer(g.isrPreview, isrPreviewCenter, isrPreviewKmSizes, (lat, lng) => {
-      setIsrPreviewCenter({ lat, lng });
-      setIsrPick({ lat, lng });
-    });
-  }, [isrPreviewCenter, isrPreviewKmSizes]);
+    if (!map || !g) return;
 
-  // Render active editable Flight Plan route + draggable waypoints + airframe avionics overlays
-  useEffect(() => {
-    const g = layerGroupsRef.current;
-    if (!g) return;
-    g.activePlan.clearLayers();
-
-    if (!activePlan) return;
-
-    const editable = Boolean(
-      activePlan.can_edit && mapData?.permissions.canManageFlightPlans !== false
-    );
-    renderAirframeTacticalLayers(g.activePlan, activePlan, {
-      editable,
-      onMutatePlan: (updater) => setActivePlan((prev) => (prev ? updater(prev) : prev)),
-    });
-
-    const pts = (activePlan.route_points || []).filter(
-      (p) => Number.isFinite(p.lat) && Number.isFinite(p.lng)
-    );
-    if (pts.length === 0) return;
-
-    const color = activePlan.color || '#f59e0b';
-    const magDeclination = mapData?.campaign.magneticDeclination || 0;
-
-    if (pts.length >= 2) {
-      L.polyline(
-        pts.map((p) => [p.lat, p.lng] as [number, number]),
-        {
-          color,
-          weight: 3.5,
-          opacity: 0.95,
+    const callbacks = {
+      onInsertOrAppendWaypoint: (latlng: L.LatLng, seq: number) =>
+        handleInsertOrAppendWaypoint(latlng, seq),
+      onCommitPoints: (nextPoints: FlightPlanRoutePoint[]) => {
+        mutatePlan((prev) => ({ ...prev, route_points: nextPoints }));
+      },
+      onUpdatePoint: handleUpdatePoint,
+      onDeletePoint: handleDeletePoint,
+      onAutoFetchPointElevation: (idx: number, lat: number, lng: number, isTgt: boolean) => {
+        void autoFetchPointElevation(idx, lat, lng, isTgt);
+      },
+      onMutatePlan: mutatePlan,
+      onAvionicsDrawClick: (latlng: L.LatLng) => {
+        if (!avionicsDrawTarget || !activePlanRef.current) return;
+        const res = appendPointToAvionicsDrawTarget(
+          activePlanRef.current,
+          avionicsDrawTarget,
+          latlng.lat,
+          latlng.lng,
+          handleNotify
+        );
+        setActivePlan(res.plan);
+        setIsPlanDirty(true);
+        setDirtyVersion((v) => v + 1);
+        if (res.stopDraw) {
+          setAvionicsDrawTarget(null);
         }
-      ).addTo(g.activePlan);
+      },
+    };
 
-      for (let i = 0; i < pts.length - 1; i++) {
-        const p1 = pts[i];
-        const p2 = pts[i + 1];
-        const midLat = (p1.lat + p2.lat) / 2;
-        const midLng = (p1.lng + p2.lng) / 2;
-        const trueBrg = calculateBearingDegrees(p1.lat, p1.lng, p2.lat, p2.lng);
-        const magBrg = trueToMagnetic(trueBrg, magDeclination);
-        const distVal =
-          unit === 'km'
-            ? calculateDistanceKm(p1.lat, p1.lng, p2.lat, p2.lng)
-            : calculateDistanceNm(p1.lat, p1.lng, p2.lat, p2.lng);
-        if (distVal < 0.2) continue;
-
-        L.marker([midLat, midLng], {
-          interactive: false,
-          zIndexOffset: 2250,
-          icon: L.divIcon({
-            className: 'bg-transparent border-0 pointer-events-none',
-            iconSize: [78, 18],
-            iconAnchor: [39, 9],
-            html: `<div style="display:flex;align-items:center;justify-content:center;padding:1px 5px;border-radius:4px;background:rgba(12,10,9,0.88);border:1px solid ${color}80;color:#e7e5e4;font-family:monospace;font-size:9px;font-weight:700;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,0.7);">${String(
-              magBrg
-            ).padStart(3, '0')}°/${distVal.toFixed(1)}${unit === 'km' ? 'KM' : 'NM'}</div>`,
-          }),
-        }).addTo(g.activePlan);
-      }
+    if (!activePlanControllerRef.current) {
+      activePlanControllerRef.current = new ActiveFlightPlanMapController(map, g.activePlan, callbacks);
+    } else {
+      activePlanControllerRef.current.setCallbacks(callbacks);
     }
 
-    pts.forEach((pt, idx) => {
-      const actionUp = String(pt.action || '').toUpperCase();
-      const typeUp = String(pt.type || '').toUpperCase();
-      const isTarget = actionUp === 'TGT' || typeUp === 'TGT';
-      const isFix = Boolean((pt as any).is_fix) || ['FIX', 'IAF', 'FAF'].includes(typeUp);
-      const isIpt = idx === 0;
-      const numLabel = isTarget ? 'T' : isIpt ? '0' : String(idx);
+    const af =
+      mapData?.airframesCatalog?.find((a) => Number(a.id) === Number(activePlan?.airframe_id)) ||
+      null;
+    const isF14 = isF14Airframe(activePlan, af);
+    const isF16 = isF16Airframe(activePlan, af);
+    const isF18 = isF18Airframe(activePlan, af);
+    const isJf17 = isJf17Airframe(activePlan, af);
 
-      let markerHtml: string;
-      if (isTarget) {
-        markerHtml = `<div style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;"><div style="width:18px;height:18px;transform:rotate(45deg);background:#1c1917;border:2px solid #ef4444;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(239,68,68,0.55);"><span style="transform:rotate(-45deg);color:#fca5a5;font-size:9px;font-weight:800;">${idx}</span></div></div>`;
-      } else if (isFix) {
-        markerHtml = `<div style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;"><div style="width:18px;height:18px;transform:rotate(45deg);background:#0c0a09;border:2px solid #22d3ee;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(34,211,238,0.45);"><span style="transform:rotate(-45deg);color:#67e8f9;font-size:9px;font-weight:800;">${idx}</span></div></div>`;
-      } else {
-        markerHtml = `<div style="width:24px;height:24px;border-radius:9999px;background:#0c0a09;border:2px solid ${color};color:${color};font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.75);">${numLabel}</div>`;
-      }
-
-      const marker = L.marker([pt.lat, pt.lng], {
-        draggable: editable,
-        icon: L.divIcon({
-          className: 'bg-transparent border-0',
-          iconSize: [24, 24],
-          iconAnchor: [12, 12],
-          html: markerHtml,
-        }),
-        zIndexOffset: 2400,
-      }).addTo(g.activePlan);
-
-      marker.bindTooltip(
-        `<div style="font-weight:700;color:${isTarget ? '#fca5a5' : isFix ? '#67e8f9' : color}">${
-          isTarget ? `TGT ${idx}` : idx === 0 ? 'STPT 0' : `STPT ${idx}`
-        }: ${pt.name || 'WPT'}</div><div style="font-size:10px;color:#d6d3d1">${Math.round(
-          pt.alt || 0
-        )} ft | ${Math.round(pt.speed || 0)} kt</div>`,
-        { direction: 'top', offset: [0, -10], className: 'gtfo-map-tooltip' }
-      );
-
-      marker.on('dragend', (ev) => {
-        const pos = (ev.target as L.Marker).getLatLng();
-        setActivePlan((prev) => {
-          if (!prev) return prev;
-          const nextPts = [...(prev.route_points || [])];
-          if (!nextPts[idx]) return prev;
-          nextPts[idx] = {
-            ...nextPts[idx],
-            lat: Number(pos.lat.toFixed(6)),
-            lng: Number(pos.lng.toFixed(6)),
-          };
-          return { ...prev, route_points: nextPts };
-        });
-      });
+    activePlanControllerRef.current.sync({
+      plan: activePlan,
+      airframe: af,
+      mapData,
+      editable: Boolean(
+        activePlan && activePlan.can_edit !== false && mapData?.permissions.canManageFlightPlans
+      ),
+      isOpen: openWindows.flight,
+      unit,
+      activeSequence,
+      userCreatedSequences,
+      sequenceColors,
+      tickConfig,
+      doghouseConfig,
+      activeDrawTarget: avionicsDrawTarget,
+      isF14,
+      isF16,
+      isF18,
+      isJf17,
     });
   }, [
     activePlan,
-    mapData?.permissions.canManageFlightPlans,
-    mapData?.campaign.magneticDeclination,
+    mapData,
+    openWindows.flight,
     unit,
+    activeSequence,
+    userCreatedSequences,
+    sequenceColors,
+    tickConfig,
+    doghouseConfig,
+    avionicsDrawTarget,
+    handleInsertOrAppendWaypoint,
+    mutatePlan,
+    handleUpdatePoint,
+    handleDeletePoint,
+    autoFetchPointElevation,
+    handleNotify,
+  ]);
+
+  // Mount & sync SupportAssetsMapController (direct map click, smooth drag, inline popups)
+  useEffect(() => {
+    const map = mapRef.current;
+    const g = layerGroupsRef.current;
+    if (!map || !g) return;
+
+    if (!supportAssetsControllerRef.current) {
+      supportAssetsControllerRef.current = new SupportAssetsMapController(
+        map,
+        g.supportAssets,
+        setSupportAssetStats
+      );
+    } else {
+      supportAssetsControllerRef.current.setOnStatsChange(setSupportAssetStats);
+    }
+
+    supportAssetsControllerRef.current.setSelectedAssetType(selectedSupportAssetType);
+
+    if (mapData) {
+      supportAssetsControllerRef.current.sync({
+        campaignId: mapData.campaign.id,
+        assets: mapData.supportAssets || [],
+        supportAssetTypes: mapData.supportAssetTypes || [],
+        samSystems: mapData.samSystems || [],
+        unit,
+        editMode: Boolean(openWindows.support && mapData.permissions.canManageSupportAssets),
+        focusAssetIndex,
+      });
+    }
+  }, [mapData, unit, openWindows.support, selectedSupportAssetType, focusAssetIndex]);
+
+  // Mount & sync TacticalMarkingsMapController (pure-Leaflet interactive drawing & vertex handles)
+  useEffect(() => {
+    const map = mapRef.current;
+    const g = layerGroupsRef.current;
+    if (!map || !g) return;
+
+    const callbacks: TacticalMarkingsControllerCallbacks = {
+      onSelectMarking: (marking) => {
+        setEditingMarking(marking);
+        openWindow('markings');
+      },
+      onDeselectMarking: () => {
+        setEditingMarking(null);
+      },
+      onDrawStateChange: (isDrawing, shape) => {
+        setTmIsDrawing(isDrawing);
+        setTmDrawShape(shape);
+      },
+      onCompleteDraw: async (result) => {
+        const currentData = mapDataRef.current;
+        if (!currentData) return;
+        const prevIds = new Set((currentData.tacticalMarkings || []).map((m) => Number(m.id)));
+        const scope = tmScopeRef.current;
+        try {
+          const fresh = await saveCampaignTacticalMarking(
+            baseUrl,
+            currentData.campaign.id,
+            {
+              marking_type: result.marking_type,
+              geometry: result.geometry,
+              properties: result.properties,
+              visibility: scope.visibility,
+              mission_id: scope.visibility === 'mission' ? scope.missionId : null,
+              sortie_id: scope.visibility === 'sortie' ? scope.sortieId : null,
+            },
+            { discordId, token: authToken }
+          );
+          setMapData((prev) => (prev ? { ...prev, tacticalMarkings: fresh } : prev));
+          const created =
+            fresh.find((m) => !prevIds.has(Number(m.id)) && m.can_edit !== false) ||
+            null;
+          if (created) {
+            setEditingMarking(created);
+          }
+          handleNotify('success', 'Tactical marking saved.');
+        } catch (err: any) {
+          handleNotify('error', err?.message || 'Failed to save tactical marking.');
+        }
+      },
+      onCommitGeometry: async (markingId, geometry, propertyPatch) => {
+        const currentData = mapDataRef.current;
+        if (!currentData) return;
+        const existing = (currentData.tacticalMarkings || []).find(
+          (m) => Number(m.id) === Number(markingId)
+        );
+        if (!existing) return;
+
+        const mergedProperties = propertyPatch
+          ? { ...(existing.properties || {}), ...propertyPatch }
+          : { ...(existing.properties || {}) };
+        const optimistic: CampaignMapTacticalMarking = {
+          ...existing,
+          geometry,
+          properties: mergedProperties,
+        };
+
+        setMapData((prev) =>
+          prev
+            ? {
+                ...prev,
+                tacticalMarkings: (prev.tacticalMarkings || []).map((m) =>
+                  Number(m.id) === Number(markingId) ? optimistic : m
+                ),
+              }
+            : prev
+        );
+        if (editingMarkingIdRef.current === markingId) {
+          setEditingMarking(optimistic);
+        }
+
+        try {
+          const fresh = await saveCampaignTacticalMarking(
+            baseUrl,
+            currentData.campaign.id,
+            {
+              id: markingId,
+              marking_type: existing.marking_type,
+              geometry,
+              properties: mergedProperties,
+              visibility: existing.visibility,
+              mission_id: existing.mission_id ?? null,
+              sortie_id: existing.sortie_id ?? null,
+            },
+            { discordId, token: authToken }
+          );
+          setMapData((prev) => (prev ? { ...prev, tacticalMarkings: fresh } : prev));
+          const synced = fresh.find((m) => Number(m.id) === Number(markingId)) || null;
+          if (synced && editingMarkingIdRef.current === markingId) {
+            setEditingMarking(synced);
+          }
+        } catch (err: any) {
+          handleNotify('error', err?.message || 'Failed to update tactical marking geometry.');
+        }
+      },
+    };
+
+    if (!tacticalMarkingsControllerRef.current) {
+      tacticalMarkingsControllerRef.current = new TacticalMarkingsMapController(
+        map,
+        g.tacticalMarkings,
+        g.tacticalDraft,
+        callbacks
+      );
+    } else {
+      tacticalMarkingsControllerRef.current.setCallbacks(callbacks);
+    }
+
+    if (mapData) {
+      tacticalMarkingsControllerRef.current.sync({
+        markings: mapData.tacticalMarkings || [],
+        icons: mapData.tacticalIcons || {},
+        selectedMissionId,
+        selectedSortieId,
+        editingMarkingId: editingMarking?.id ?? null,
+        isModeActive: openWindows.markings,
+      });
+    }
+  }, [
+    mapData,
+    selectedMissionId,
+    selectedSortieId,
+    editingMarking,
+    openWindows.markings,
+    baseUrl,
+    discordId,
+    authToken,
+    openWindow,
+    handleNotify,
   ]);
 
   // Render Measure polyline & markers
@@ -1098,6 +1959,9 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
     if (!g) return;
     g.measure.clearLayers();
     if (measurePoints.length === 0) return;
+
+    const parsedSpeed = Number(measureSpeedInput);
+    const validSpeed = Number.isFinite(parsedSpeed) && parsedSpeed > 0 ? parsedSpeed : 0;
 
     const coords = measurePoints.map((p) => [p.lat, p.lng] as [number, number]);
     if (coords.length >= 2) {
@@ -1111,11 +1975,15 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
         const p1 = measurePoints[i];
         const p2 = measurePoints[i + 1];
         const distNm = calculateDistanceNm(p1.lat, p1.lng, p2.lat, p2.lng);
-        const brg = Math.round(calculateBearingDegrees(p1.lat, p1.lng, p2.lat, p2.lng));
-        const label =
-          unit === 'km'
-            ? `${(distNm * 1.852).toFixed(1)} KM / ${brg}°`
-            : `${distNm.toFixed(1)} NM / ${brg}°`;
+        const legDist = unit === 'km' ? distNm * 1.852 : distNm;
+        const distLabel = unit === 'km' ? `${legDist.toFixed(1)} KM` : `${legDist.toFixed(1)} NM`;
+        const brg = ((Math.round(calculateBearingDegrees(p1.lat, p1.lng, p2.lat, p2.lng)) % 360) + 360) % 360;
+        const brgStr = String(brg === 0 ? 360 : brg).padStart(3, '0');
+        const legEteHtml =
+          validSpeed > 0
+            ? `<span style="color:#34d399;margin-left:6px;">${formatDurationSeconds((legDist / validSpeed) * 3600)}</span>`
+            : '';
+        const label = `${distLabel} / ${brgStr}°${legEteHtml}`;
         const midLat = (p1.lat + p2.lat) / 2;
         const midLng = (p1.lng + p2.lng) / 2;
         L.marker([midLat, midLng], {
@@ -1139,29 +2007,41 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
         .bindTooltip(`M${idx + 1}`, { direction: 'top', className: 'gtfo-map-tooltip' })
         .addTo(g.measure);
     });
-  }, [measurePoints, unit]);
+  }, [measurePoints, unit, measureSpeedInput]);
 
-  // Render Tactical Marking draft vertices
+  // Render Coordinate Converter Ping / Pin marker
   useEffect(() => {
     const g = layerGroupsRef.current;
     if (!g) return;
-    g.tacticalDraft.clearLayers();
-    if (markingDraftPoints.length === 0) return;
+    g.converterPin.clearLayers();
+    if (!converterPin) return;
 
-    const coords = markingDraftPoints.map((p) => [p.lat, p.lng] as [number, number]);
-    if (coords.length >= 2) {
-      L.polyline(coords, { color: '#f59e0b', weight: 2, dashArray: '4, 4' }).addTo(g.tacticalDraft);
-    }
-    markingDraftPoints.forEach((pt) => {
-      L.circleMarker([pt.lat, pt.lng], {
-        radius: 4.5,
-        color: '#fbbf24',
-        fillColor: '#451a03',
-        fillOpacity: 1,
-        weight: 2,
-      }).addTo(g.tacticalDraft);
+    const icon = L.divIcon({
+      className: 'bg-transparent border-0',
+      iconSize: [40, 40],
+      iconAnchor: [20, 20],
+      html: `
+        <div class="relative w-10 h-10 flex items-center justify-center pointer-events-none">
+          <span class="absolute w-9 h-9 rounded-full border-2 border-sky-400 bg-sky-500/25 animate-ping"></span>
+          <span class="absolute w-7 h-7 rounded-full border border-sky-400/70 bg-sky-500/15"></span>
+          <span class="relative w-3 h-3 rounded-full bg-sky-500 border-2 border-white shadow-[0_0_12px_rgba(56,189,248,0.95)]"></span>
+        </div>
+      `,
     });
-  }, [markingDraftPoints]);
+
+    const marker = L.marker([converterPin.lat, converterPin.lng], {
+      icon,
+      zIndexOffset: 1500,
+    });
+    marker.on('click', (ev) => {
+      L.DomEvent.stopPropagation(ev);
+    });
+    marker.bindTooltip(
+      `${formatCoordinateDdm(converterPin.lat, converterPin.lng)} • ${toMgrs(converterPin.lat, converterPin.lng, 5)}`,
+      { direction: 'top', offset: [0, -14], className: 'gtfo-map-tooltip' }
+    );
+    marker.addTo(g.converterPin);
+  }, [converterPin]);
 
   // Interactive Map Pointer, Click, and Context Menu bindings
   useEffect(() => {
@@ -1199,42 +2079,51 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
     };
 
     const handleClick = (e: L.LeafletMouseEvent) => {
+      const origTarget = e.originalEvent?.target as HTMLElement | null;
+      if (origTarget?.closest('.leaflet-popup')) {
+        return;
+      }
       setContextMenu(null);
-      const lat = Number(e.latlng.lat.toFixed(6));
-      const lng = Number(e.latlng.lng.toFixed(6));
-
-      if (avionicsPlotTarget && activePlan) {
-        setActivePlan((prev) =>
-          prev ? appendPointToAvionicsTarget(prev, avionicsPlotTarget, lat, lng) : prev
-        );
+      setFpSettingsOpen(false);
+      if (activePlanControllerRef.current?.wasPolylineClickedRecently()) {
+        return;
+      }
+      if (
+        tacticalMarkingsControllerRef.current?.wasLayerClickedRecently() ||
+        tacticalMarkingsControllerRef.current?.isDrawing()
+      ) {
         return;
       }
 
-      if (plotMode !== 'none' && activePlan) {
-        const nextIdx = (activePlan.route_points?.length || 0) + 1;
-        const isTargetPlot = plotMode === 'target';
-        const newPt: FlightPlanRoutePoint = {
-          index: nextIdx,
-          name: isTargetPlot
-            ? `TGT ${nextIdx}`
-            : plotMode === 'drawing_point'
-              ? `DRAW ${nextIdx}`
-              : `WPT ${nextIdx}`,
+      const lat = Number(e.latlng.lat.toFixed(6));
+      const lng = Number(e.latlng.lng.toFixed(6));
+      const canEditPlan = Boolean(
+        activePlan && activePlan.can_edit !== false && mapData?.permissions.canManageFlightPlans
+      );
+
+      if (avionicsDrawTarget && activePlan && canEditPlan) {
+        const res = appendPointToAvionicsDrawTarget(
+          activePlan,
+          avionicsDrawTarget,
           lat,
           lng,
-          alt: isTargetPlot ? 0 : 20000,
-          speed: isTargetPlot ? 0 : 350,
-          action: isTargetPlot ? 'TGT' : nextIdx === 1 ? 'Takeoff' : 'Turning Point',
-          type: isTargetPlot ? 'TGT' : 'WAYPOINT',
-        };
-        setActivePlan((prev) => {
-          if (!prev) return prev;
-          const nextPts = [...(prev.route_points || []), newPt].map((p, idx) => ({
-            ...p,
-            index: idx + 1,
-          }));
-          return { ...prev, route_points: nextPts };
-        });
+          handleNotify
+        );
+        setActivePlan(res.plan);
+        setIsPlanDirty(true);
+        setDirtyVersion((v) => v + 1);
+        if (res.stopDraw) {
+          setAvionicsDrawTarget(null);
+        }
+        return;
+      }
+
+      const isCtrlPressed = Boolean(
+        e.originalEvent && (e.originalEvent.ctrlKey || e.originalEvent.metaKey)
+      );
+
+      if (isCtrlPressed && openWindows.flight && canEditPlan) {
+        handleInsertOrAppendWaypoint(e.latlng, activeSequence);
         return;
       }
 
@@ -1244,6 +2133,7 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
       }
       if (isPickingConverter) {
         setConverterPick({ lat, lng });
+        setConverterPin({ lat, lng, seq: Date.now() });
         setIsPickingConverter(false);
         return;
       }
@@ -1252,19 +2142,13 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
         setIsPickingThreat(false);
         return;
       }
-      if (isPickingSupport) {
-        setSupportPick({ lat, lng });
-        setIsPickingSupport(false);
+      if (openWindows.support && mapData?.permissions.canManageSupportAssets) {
+        supportAssetsControllerRef.current?.addPendingAt(lat, lng, true);
         return;
       }
-      if (isPickingIsr) {
-        setIsrPick({ lat, lng });
-        setIsrPreviewCenter({ lat, lng });
-        setIsPickingIsr(false);
+      if (openWindows.markings && editingMarkingIdRef.current !== null && !openWindows.flight) {
+        setEditingMarking(null);
         return;
-      }
-      if (isDrawingMarking) {
-        setMarkingDraftPoints((prev) => [...prev, { lat, lng }]);
       }
     };
 
@@ -1275,9 +2159,10 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
       const rect = container.getBoundingClientRect();
       const rawX = e.originalEvent.clientX - rect.left;
       const rawY = e.originalEvent.clientY - rect.top;
+      setFpSettingsOpen(false);
       setContextMenu({
         x: Math.min(Math.max(12, rawX), Math.max(12, rect.width - 230)),
-        y: Math.min(Math.max(12, rawY), Math.max(12, rect.height - 290)),
+        y: Math.min(Math.max(12, rawY), Math.max(12, rect.height - 340)),
         lat: Number(e.latlng.lat.toFixed(6)),
         lng: Number(e.latlng.lng.toFixed(6)),
       });
@@ -1296,15 +2181,19 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
   }, [
     baseUrl,
     authToken,
-    plotMode,
-    avionicsPlotTarget,
+    avionicsDrawTarget,
     activePlan,
+    openWindows.flight,
+    openWindows.support,
+    openWindows.markings,
+    activeSequence,
+    mapData?.permissions.canManageFlightPlans,
+    mapData?.permissions.canManageSupportAssets,
+    handleInsertOrAppendWaypoint,
+    handleNotify,
     isPickingMeasure,
     isPickingConverter,
     isPickingThreat,
-    isPickingSupport,
-    isPickingIsr,
-    isDrawingMarking,
   ]);
 
   // Keyboard shortcuts matching Member Portal (Alt+F, Alt+C, Alt+M, Alt+U, Alt+Enter, Escape)
@@ -1312,6 +2201,7 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         clearAllPickModes();
+        setEditingMarking(null);
         if (isFocusMode) setIsFocusMode(false);
         return;
       }
@@ -1328,7 +2218,7 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
         toggleWindow('measure');
       } else if (k === 'u') {
         e.preventDefault();
-        setUnit((u) => (u === 'nm' ? 'km' : 'nm'));
+        handleChangeUnit(unit === 'nm' ? 'km' : 'nm');
       } else if (e.key === 'Enter') {
         e.preventDefault();
         setIsFocusMode((f) => !f);
@@ -1336,7 +2226,7 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [clearAllPickModes, isFocusMode, toggleWindow]);
+  }, [clearAllPickModes, handleChangeUnit, isFocusMode, toggleWindow, unit]);
 
   // Bullseye HUD formatting
   const braaFormatted = useMemo(() => {
@@ -1386,53 +2276,36 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
   }, []);
 
   const activePickPrompt = useMemo(() => {
-    if (avionicsPlotTarget) {
-      return `${describeAvionicsPlotTarget(avionicsPlotTarget)} — Click map to add (Esc to stop)`;
-    }
-    if (plotMode !== 'none') {
-      const label =
-        plotMode === 'target'
-          ? 'Target Point'
-          : plotMode === 'drawing_point'
-            ? 'Avionics Vertex'
-            : 'Waypoint';
-      return `Plotting ${label} — Click anywhere on the map (Esc to stop)`;
+    if (avionicsDrawTarget) {
+      return `${describeAvionicsDrawTarget(avionicsDrawTarget)} — Click map to add (Esc to stop)`;
     }
     if (isPickingMeasure) return 'Measure Tool — Click points on the map to add legs (Esc to stop)';
     if (isPickingConverter) return 'Coordinate Converter — Click map to capture coordinates';
     if (isPickingThreat) return 'Threat Editor — Click map to set SAM/Threat position';
-    if (isPickingSupport) return 'Support Assets — Click map to position support asset';
-    if (isPickingIsr) return 'ISR Reconnaissance — Click map to position capture crosshair';
-    if (isDrawingMarking) {
-      return 'Tactical Markings — Click map to place vertices';
+    if (tmIsDrawing) {
+      return `Tactical Markings (${(tmDrawShape || 'shape').toUpperCase()}) — Click map to draw (Esc to cancel)`;
+    }
+    if (openWindows.support && mapData?.permissions.canManageSupportAssets) {
+      return 'Support Assets — Click map to place selected asset';
     }
     return null;
   }, [
-    avionicsPlotTarget,
-    plotMode,
+    avionicsDrawTarget,
     isPickingMeasure,
     isPickingConverter,
     isPickingThreat,
-    isPickingSupport,
-    isPickingIsr,
-    isDrawingMarking,
+    tmIsDrawing,
+    tmDrawShape,
+    openWindows.support,
+    mapData?.permissions.canManageSupportAssets,
   ]);
-
-  const syncedLightboxIsr = useMemo(() => {
-    if (!lightboxIsr) return null;
-    return mapData?.isrRequests.find((r) => r.id === lightboxIsr.id) || lightboxIsr;
-  }, [lightboxIsr, mapData?.isrRequests]);
 
   const copyCoordToClipboard = async (text: string, label: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      addNotification({ title: 'Copied', message: `${label}: ${text}`, category: 'flight_plan' });
+      handleNotify('info', `Copied ${label}: ${text}`);
     } catch {
-      addNotification({
-        title: 'Copy Failed',
-        message: 'Clipboard access denied.',
-        category: 'flight_plan',
-      });
+      handleNotify('warning', 'Clipboard access denied.');
     }
     setContextMenu(null);
   };
@@ -1443,18 +2316,20 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
 
   const wrapperClasses = isFocusMode
     ? 'fixed inset-0 !m-0 z-[1050] h-screen w-screen bg-stone-950 flex flex-col'
-    : 'relative isolate z-0 w-full h-[calc(100vh-145px)] min-h-[600px] rounded-xl overflow-hidden border border-stone-800 bg-stone-950 flex flex-col shadow-2xl';
+    : 'relative isolate z-0 w-full flex-1 min-h-[480px] rounded-xl overflow-hidden border border-stone-800 bg-stone-950 flex flex-col shadow-2xl';
 
   return (
     <>
       <div className={wrapperClasses}>
       {/* Main Map Viewport */}
-      <div className="relative flex-1 w-full overflow-hidden">
+      <div
+        className={`campaign-map-canvas relative flex-1 w-full overflow-hidden ${
+          activePickPrompt ? 'gtfo-map-picking' : ''
+        }`}
+      >
         <div
           ref={mapContainerRef}
-          className={`w-full h-full bg-[#09090b] ${
-            activePickPrompt ? 'cursor-crosshair' : ''
-          }`}
+          className="w-full h-full bg-[#09090b]"
         />
 
         {/* Top-Left Portal Toolbar */}
@@ -1463,9 +2338,6 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
             <CampaignMapToolbar
               allPlans={mapData.flightPlans?.allPlans || []}
               permissions={mapData.permissions}
-              threatsCount={(mapData.threats || []).length}
-              supportAssetsCount={(mapData.supportAssets || []).length}
-              isrCreditsBalance={mapData.campaign.isrCreditsBalance ?? 0}
               openWindows={openWindows}
               onToggleWindow={toggleWindow}
               onSelectSearchPlan={handleOpenFlightPlan}
@@ -1504,12 +2376,9 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
               layerStates={layerStates}
               onToggleLayer={handleToggleLayer}
               onToggleAllProcedures={handleToggleAllProcedures}
-              canViewIsr={Boolean(mapData.permissions.canViewIsr)}
               isTraining={Boolean(mapData.campaign.isTraining)}
               onManualRefresh={() => loadMapData(true, false)}
               isLoading={isRefreshing || isLoading}
-              portalUrl={portalMapUrl}
-              onOpenPortal={portalMapUrl ? () => openExternalUrl(portalMapUrl) : undefined}
             />
           </div>
         )}
@@ -1526,6 +2395,23 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
             >
               Done
             </button>
+          </div>
+        )}
+
+        {/* Transient In-Map Feedback Toast (non-blocking) */}
+        {mapToast && (
+          <div
+            className={`absolute bottom-12 left-1/2 -translate-x-1/2 z-[1060] pointer-events-none px-3.5 py-1.5 rounded-full border text-xs font-semibold shadow-2xl backdrop-blur-md transition-all ${
+              mapToast.level === 'error'
+                ? 'bg-red-950/90 border-red-500/60 text-red-200'
+                : mapToast.level === 'warning'
+                  ? 'bg-amber-950/90 border-amber-500/60 text-amber-200'
+                  : mapToast.level === 'success'
+                    ? 'bg-emerald-950/90 border-emerald-500/60 text-emerald-200'
+                    : 'bg-stone-900/90 border-stone-700/80 text-stone-200'
+            }`}
+          >
+            {mapToast.message}
           </div>
         )}
 
@@ -1616,33 +2502,166 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
               <span>Add Measure Point Here</span>
             </button>
 
-            {activePlan && mapData?.permissions.canManageFlightPlans && (
+            {activePlan &&
+              activePlan.can_edit !== false &&
+              mapData?.permissions.canManageFlightPlans && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleInsertOrAppendWaypoint(
+                        L.latLng(contextMenu.lat, contextMenu.lng),
+                        activeSequence
+                      );
+                      openWindow('flight');
+                      setContextMenu(null);
+                    }}
+                    className="w-full px-3 py-1.5 text-left hover:bg-stone-800/80 flex items-center gap-2 border-t border-stone-800 mt-1 pt-1.5 text-amber-300 cursor-pointer"
+                  >
+                    <Path className="w-3.5 h-3.5" />
+                    <span>Add Waypoint to Flight Plan</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleAddTargetPoint({ lat: contextMenu.lat, lng: contextMenu.lng });
+                      openWindow('flight');
+                      setContextMenu(null);
+                    }}
+                    className="w-full px-3 py-1.5 text-left hover:bg-stone-800/80 flex items-center gap-2 text-red-400 cursor-pointer"
+                  >
+                    <Target className="w-3.5 h-3.5" />
+                    <span>Add Target</span>
+                  </button>
+
+                  {isF14Airframe(
+                    activePlan,
+                    mapData?.airframesCatalog?.find(
+                      (a) => Number(a.id) === Number(activePlan.airframe_id)
+                    ) || null
+                  ) && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        handleAddAdditionalPoint({ lat: contextMenu.lat, lng: contextMenu.lng });
+                        openWindow('flight');
+                        setContextMenu(null);
+                      }}
+                      className="w-full px-3 py-1.5 text-left hover:bg-stone-800/80 flex items-center gap-2 text-purple-300 cursor-pointer"
+                    >
+                      <Crosshair className="w-3.5 h-3.5" />
+                      <span>Add Additional Point (F-14)</span>
+                    </button>
+                  )}
+                </>
+              )}
+
+            {/* Flight Path Settings (Ticks & Doghouses) */}
+            <div className="border-t border-stone-800 mt-1 pt-1">
               <button
                 type="button"
-                onClick={() => {
-                  setActivePlan((prev) => {
-                    if (!prev) return prev;
-                    const pts = [...(prev.route_points || [])];
-                    pts.push({
-                      index: pts.length + 1,
-                      name: `WPT ${pts.length + 1}`,
-                      lat: contextMenu.lat,
-                      lng: contextMenu.lng,
-                      alt: 20000,
-                      speed: 350,
-                      type: 'waypoint',
-                    });
-                    return { ...prev, route_points: pts };
-                  });
-                  openWindow('flight');
-                  setContextMenu(null);
-                }}
-                className="w-full px-3 py-1.5 text-left hover:bg-stone-800/80 flex items-center gap-2 border-t border-stone-800 mt-1 pt-1.5 text-amber-300 cursor-pointer"
+                onClick={() => setFpSettingsOpen((o) => !o)}
+                className="w-full px-3 py-1.5 text-left hover:bg-stone-800/80 flex items-center justify-between text-stone-200 cursor-pointer"
               >
-                <Path className="w-3.5 h-3.5" />
-                <span>Add Waypoint to Flight Plan</span>
+                <span className="flex items-center gap-2">
+                  <SlidersHorizontal className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Flight Path Settings</span>
+                </span>
+                <span className="text-[10px] text-stone-400">{fpSettingsOpen ? '▼' : '▶'}</span>
               </button>
-            )}
+
+              {fpSettingsOpen && (
+                <div className="px-3 py-2 bg-stone-900/95 border-t border-stone-800 space-y-2">
+                  <div>
+                    <div className="text-[10px] font-bold uppercase text-stone-400 mb-1">
+                      Doghouses
+                    </div>
+                    <div className="grid grid-cols-2 gap-1">
+                      {(['on', 'off'] as const).map((mode) => (
+                        <button
+                          key={mode}
+                          type="button"
+                          onClick={() => {
+                            handleUpdateDoghouseConfig(mode);
+                            setContextMenu(null);
+                          }}
+                          className={`px-2 py-1 rounded text-[10px] font-semibold border cursor-pointer ${
+                            doghouseConfig === mode
+                              ? 'bg-amber-500/20 border-amber-500 text-amber-300'
+                              : 'bg-stone-950 border-stone-800 text-stone-400 hover:text-stone-200'
+                          }`}
+                        >
+                          {mode === 'on' ? 'On' : 'Off'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="text-[10px] font-bold uppercase text-stone-400 mb-1">
+                      Route Ticks (
+                      {tickConfig.type === 'off'
+                        ? 'Off'
+                        : tickConfig.type === 'time'
+                          ? `${tickConfig.interval}m`
+                          : `${tickConfig.interval}nm`}
+                      )
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleUpdateTickConfig({ type: 'off', interval: 0 });
+                          setContextMenu(null);
+                        }}
+                        className={`px-1.5 py-0.5 rounded text-[10px] border cursor-pointer ${
+                          tickConfig.type === 'off'
+                            ? 'bg-amber-500/20 border-amber-500 text-amber-300'
+                            : 'bg-stone-950 border-stone-800 text-stone-400 hover:text-stone-200'
+                        }`}
+                      >
+                        Off
+                      </button>
+                      {[1, 5, 10, 15, 20, 30].map((m) => (
+                        <button
+                          key={`t_${m}`}
+                          type="button"
+                          onClick={() => {
+                            handleUpdateTickConfig({ type: 'time', interval: m });
+                            setContextMenu(null);
+                          }}
+                          className={`px-1.5 py-0.5 rounded text-[10px] border cursor-pointer ${
+                            tickConfig.type === 'time' && tickConfig.interval === m
+                              ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300'
+                              : 'bg-stone-950 border-stone-800 text-stone-400 hover:text-stone-200'
+                          }`}
+                        >
+                          {m}m
+                        </button>
+                      ))}
+                      {[1, 5, 10, 15, 25, 50].map((nm) => (
+                        <button
+                          key={`r_${nm}`}
+                          type="button"
+                          onClick={() => {
+                            handleUpdateTickConfig({ type: 'range', interval: nm });
+                            setContextMenu(null);
+                          }}
+                          className={`px-1.5 py-0.5 rounded text-[10px] border cursor-pointer ${
+                            tickConfig.type === 'range' && tickConfig.interval === nm
+                              ? 'bg-sky-500/20 border-sky-500 text-sky-300'
+                              : 'bg-stone-950 border-stone-800 text-stone-400 hover:text-stone-200'
+                          }`}
+                        >
+                          {nm}nm
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
 
             {mapData?.permissions.canManageThreats && (
               <button
@@ -1656,22 +2675,6 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
               >
                 <ShieldWarning className="w-3.5 h-3.5" />
                 <span>Place Threat Here</span>
-              </button>
-            )}
-
-            {mapData?.permissions.canRequestIsr && (
-              <button
-                type="button"
-                onClick={() => {
-                  setIsrPick({ lat: contextMenu.lat, lng: contextMenu.lng });
-                  setIsrPreviewCenter({ lat: contextMenu.lat, lng: contextMenu.lng });
-                  openWindow('isr');
-                  setContextMenu(null);
-                }}
-                className="w-full px-3 py-1.5 text-left hover:bg-stone-800/80 flex items-center gap-2 text-cyan-300 cursor-pointer"
-              >
-                <Crosshair className="w-3.5 h-3.5" />
-                <span>Target ISR Here</span>
               </button>
             )}
           </div>
@@ -1735,9 +2738,13 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
               onClose={() => closeWindow('flight')}
               zIndex={getZIndex('flight', 1120)}
               onFocus={() => bringToFront('flight')}
+              baseUrl={baseUrl}
+              authToken={authToken}
+              discordId={discordId}
               mapData={mapData}
               activePlan={activePlan}
-              onPlanChange={setActivePlan}
+              onPlanChange={handlePlanChange}
+              onMutatePlan={mutatePlan}
               onFlightPlansListChange={(nextList) =>
                 setMapData((prev) => (prev ? { ...prev, flightPlans: nextList } : prev))
               }
@@ -1745,77 +2752,103 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
                 setMapData((prev) => (prev ? { ...prev, loadoutPresets } : prev))
               }
               onSelectFlightPlan={(id) => handleOpenFlightPlan(Number(id))}
-              plotMode={plotMode}
-              onSetPlotMode={(mode) => {
-                clearAllPickModes();
-                setPlotMode(mode);
-              }}
-              avionicsPlotTarget={avionicsPlotTarget}
-              onSetAvionicsPlotTarget={(target) => {
-                clearAllPickModes();
-                setAvionicsPlotTarget(target);
-              }}
-              onCenterMap={handleCenterMap}
               unit={unit}
-              apiBaseUrl={baseUrl}
-              discordId={discordId}
-              token={authToken}
+              activeSequence={activeSequence}
+              setActiveSequence={setActiveSequence}
+              userCreatedSequences={userCreatedSequences}
+              onAddSequence={handleAddSequence}
+              onDeleteSequence={handleDeleteSequence}
+              sequenceColors={sequenceColors}
+              onSetSequenceColor={handleSetSequenceColor}
+              avionicsDrawTarget={avionicsDrawTarget}
+              onSetAvionicsDrawTarget={(target) => {
+                clearAllPickModes();
+                setAvionicsDrawTarget(target);
+              }}
+              dirtyVersion={dirtyVersion}
+              isPlanDirty={isPlanDirty}
+              onMarkSaved={handleMarkSaved}
+              onAddPointFromCoords={handleAddPointFromCoords}
+              onAddTargetPoint={handleAddTargetPoint}
+              onAddAdditionalAtCenter={handleAddAdditionalAtCenter}
+              onApplyProcedure={handleApplyProcedure}
+              onPanToPoint={handlePanToPoint}
+              onCenterMap={handleCenterMap}
+              onReorderWaypoints={handleReorderWaypoints}
+              onUpdatePoint={handleUpdatePoint}
+              onDeletePoint={handleDeletePoint}
+              onSetWaypointSequence={handleSetWaypointSequence}
+              onClearRoute={handleClearRoute}
               onNotify={handleNotify}
             />
 
-            <ThreatEditorDrawer
-              isOpen={openWindows.threats}
-              onClose={() => {
-                closeWindow('threats');
-                setFocusThreatIndex(null);
-              }}
-              zIndex={getZIndex('threats', 1130)}
-              onFocus={() => bringToFront('threats')}
-              apiBaseUrl={baseUrl}
-              discordId={discordId}
-              token={authToken}
-              mapData={mapData}
-              pickedCoords={threatPick}
-              isPicking={isPickingThreat}
-              onTogglePicking={() => {
-                const next = !isPickingThreat;
-                clearAllPickModes();
-                setIsPickingThreat(next);
-              }}
-              onThreatsChange={(threats) =>
-                setMapData((prev) => (prev ? { ...prev, threats } : prev))
-              }
-              focusThreatIndex={focusThreatIndex}
-              onCenterMap={handleCenterMap}
-              onNotify={handleNotify}
-            />
+            {mapData.permissions.canManageThreats && (
+              <ThreatEditorDrawer
+                isOpen={openWindows.threats}
+                onClose={() => {
+                  closeWindow('threats');
+                  setFocusThreatIndex(null);
+                }}
+                zIndex={getZIndex('threats', 1130)}
+                onFocus={() => bringToFront('threats')}
+                apiBaseUrl={baseUrl}
+                discordId={discordId}
+                token={authToken}
+                mapData={mapData}
+                pickedCoords={threatPick}
+                isPicking={isPickingThreat}
+                onTogglePicking={() => {
+                  const next = !isPickingThreat;
+                  clearAllPickModes();
+                  setIsPickingThreat(next);
+                }}
+                onThreatsChange={(threats) =>
+                  setMapData((prev) => (prev ? { ...prev, threats } : prev))
+                }
+                focusThreatIndex={focusThreatIndex}
+                onCenterMap={handleCenterMap}
+                onNotify={handleNotify}
+              />
+            )}
 
-            <SupportAssetsDrawer
-              isOpen={openWindows.support}
-              onClose={() => {
-                closeWindow('support');
-                setFocusAssetIndex(null);
-              }}
-              zIndex={getZIndex('support', 1140)}
-              onFocus={() => bringToFront('support')}
-              apiBaseUrl={baseUrl}
-              discordId={discordId}
-              token={authToken}
-              mapData={mapData}
-              pickedCoords={supportPick}
-              isPicking={isPickingSupport}
-              onTogglePicking={() => {
-                const next = !isPickingSupport;
-                clearAllPickModes();
-                setIsPickingSupport(next);
-              }}
-              onAssetsChange={(supportAssets) =>
-                setMapData((prev) => (prev ? { ...prev, supportAssets } : prev))
-              }
-              focusAssetIndex={focusAssetIndex}
-              onCenterMap={handleCenterMap}
-              onNotify={handleNotify}
-            />
+            {mapData.permissions.canManageSupportAssets && (
+              <SupportAssetsDrawer
+                isOpen={openWindows.support}
+                onClose={() => {
+                  closeWindow('support');
+                  setFocusAssetIndex(null);
+                }}
+                zIndex={getZIndex('support', 1140)}
+                onFocus={() => bringToFront('support')}
+                apiBaseUrl={baseUrl}
+                discordId={discordId}
+                token={authToken}
+                mapData={mapData}
+                selectedAssetType={selectedSupportAssetType}
+                onSelectAssetType={(type) => {
+                  setSelectedSupportAssetType(type);
+                  supportAssetsControllerRef.current?.setSelectedAssetType(type);
+                }}
+                stats={supportAssetStats}
+                onGetSavePayload={() =>
+                  supportAssetsControllerRef.current?.getSavePayload() || {
+                    supportAssets: [],
+                    removedIds: [],
+                  }
+                }
+                onAppliedSavedAssets={(fresh) => {
+                  supportAssetsControllerRef.current?.applySavedAssets(fresh);
+                  setMapData((prev) => (prev ? { ...prev, supportAssets: fresh } : prev));
+                }}
+                onQuickAddAt={(lat, lng) =>
+                  supportAssetsControllerRef.current?.addPendingAt(lat, lng, true)
+                }
+                onUndoRemoval={() => supportAssetsControllerRef.current?.undoRemoval()}
+                onDiscardPending={() => supportAssetsControllerRef.current?.discardPending()}
+                onCenterMap={handleCenterMap}
+                onNotify={handleNotify}
+              />
+            )}
 
             <TacticalMarkingsDrawer
               isOpen={openWindows.markings}
@@ -1826,55 +2859,47 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
               discordId={discordId}
               token={authToken}
               mapData={mapData}
-              draftPoints={markingDraftPoints}
-              onClearDraftPoints={() => setMarkingDraftPoints([])}
-              onUndoDraftPoint={() => setMarkingDraftPoints((prev) => prev.slice(0, -1))}
-              isDrawing={isDrawingMarking}
-              onToggleDrawing={() => {
-                const next = !isDrawingMarking;
-                clearAllPickModes();
-                setIsDrawingMarking(next);
+              unit={unit}
+              selectedMissionId={selectedMissionId}
+              selectedSortieId={selectedSortieId}
+              isDrawingActive={tmIsDrawing}
+              activeDrawingType={tmDrawShape}
+              editingMarking={
+                editingMarking &&
+                import.meta.env.DEV &&
+                devPermissionOverrides.enabled &&
+                devPermissionOverrides.forceRecordsReadOnly
+                  ? { ...editingMarking, can_edit: false }
+                  : editingMarking
+              }
+              onSelectEditingMarking={(m) => {
+                setEditingMarking(m);
+                tacticalMarkingsControllerRef.current?.setEditingMarkingId(m ? m.id : null);
               }}
+              onStartDraw={(config) => tacticalMarkingsControllerRef.current?.startDrawing(config)}
+              onUpdateDrawOptions={(partial) =>
+                tacticalMarkingsControllerRef.current?.updateDrawingOptions(partial)
+              }
+              onFinishDraw={() => tacticalMarkingsControllerRef.current?.finishDrawing()}
+              onCancelDraw={() => tacticalMarkingsControllerRef.current?.cancelDrawing()}
+              onUpdateEditingStyle={(markingId, style) =>
+                tacticalMarkingsControllerRef.current?.updateEditingStyle(markingId, style)
+              }
+              onFlyToMarking={(markingId) =>
+                tacticalMarkingsControllerRef.current?.flyToMarking(markingId)
+              }
               onMarkingsChange={(tacticalMarkings) =>
                 setMapData((prev) => (prev ? { ...prev, tacticalMarkings } : prev))
               }
-              onCenterMap={handleCenterMap}
-              onNotify={handleNotify}
-            />
-
-            <IsrToolDrawer
-              isOpen={openWindows.isr}
-              onClose={() => closeWindow('isr')}
-              zIndex={getZIndex('isr', 1160)}
-              onFocus={() => bringToFront('isr')}
-              apiBaseUrl={baseUrl}
-              discordId={discordId}
-              token={authToken}
-              mapData={mapData}
-              pickedCoords={isrPick}
-              isPicking={isPickingIsr}
-              onTogglePicking={() => {
-                const next = !isPickingIsr;
-                clearAllPickModes();
-                setIsPickingIsr(next);
+              onScopeChange={(scope) => {
+                tmScopeRef.current = scope;
               }}
-              onIsrUpdated={(isrRequests, balance) =>
+              onAorAssigned={({ missions, tacticalMarkings, aorPresets }) => {
+                setEditingMarking(null);
                 setMapData((prev) =>
-                  prev
-                    ? {
-                        ...prev,
-                        isrRequests,
-                        campaign: { ...prev.campaign, isrCreditsBalance: balance },
-                      }
-                    : prev
-                )
-              }
-              onOpenLightbox={(req) => setLightboxIsr(req)}
-              onPreviewChange={handleIsrPreviewChange}
-              activeOverlays={activeIsrOverlays}
-              onToggleOverlay={handleToggleIsrOverlay}
-              onUpdateOverlayStyle={handleUpdateIsrOverlayStyle}
-              onCenterMap={handleCenterMap}
+                  prev ? { ...prev, missions, tacticalMarkings, aorPresets } : prev
+                );
+              }}
               onNotify={handleNotify}
             />
 
@@ -1885,7 +2910,9 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
               onFocus={() => bringToFront('measure')}
               points={measurePoints}
               unit={unit}
-              onToggleUnit={setUnit}
+              onToggleUnit={handleChangeUnit}
+              speedInput={measureSpeedInput}
+              onSpeedChange={setMeasureSpeedInput}
               onUndoLast={() => setMeasurePoints((prev) => prev.slice(0, -1))}
               onClear={() => setMeasurePoints([])}
               campaignDate={mapData.campaign.campaignDate}
@@ -1912,7 +2939,9 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
               campaignDate={mapData.campaign.campaignDate}
               theatreDeclination={mapData.campaign.magneticDeclination}
               unit={unit}
-              onCenterMap={handleCenterMap}
+              onCenterMap={handlePingConverterLocation}
+              hasActivePin={Boolean(converterPin)}
+              onClearPin={() => setConverterPin(null)}
               isPicking={isPickingConverter}
               onTogglePicking={() => {
                 const next = !isPickingConverter;
@@ -1946,7 +2975,7 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
         braaFormatted={braaFormatted}
         cursorElevFt={cursorElevFt}
         unit={unit}
-        onToggleUnit={() => setUnit((u) => (u === 'nm' ? 'km' : 'nm'))}
+        onToggleUnit={() => handleChangeUnit(unit === 'nm' ? 'km' : 'nm')}
         onResetPosition={handleResetPosition}
         isFocusMode={isFocusMode}
         onToggleFocusMode={() => setIsFocusMode((f) => !f)}
@@ -1962,24 +2991,6 @@ export const CampaignMapTab: React.FC<CampaignMapTabProps> = ({
         }}
       />
       </div>
-
-      {/* ISR Optical/Thermal Reconnaissance Lightbox */}
-      <IsrReconLightboxModal
-        isrRequest={syncedLightboxIsr}
-        onClose={() => setLightboxIsr(null)}
-        campaignIdOrSlug={mapData?.campaign.id || campaign.id}
-        apiBaseUrl={baseUrl}
-        discordId={discordId}
-        token={authToken}
-        canMarkup={Boolean(mapData?.permissions.canMarkupIsr)}
-        isrTargetTypes={mapData?.isrTargetTypes}
-        activePlan={activePlan}
-        onIsrUpdated={(isrRequests) =>
-          setMapData((prev) => (prev ? { ...prev, isrRequests } : prev))
-        }
-        onAddTargetToFlightPlan={handleAddIsrTargetToFlightPlan}
-        onNotify={handleNotify}
-      />
     </>
   );
 };

@@ -3,7 +3,6 @@ import {
   ArrowRight,
   ArrowsLeftRight,
   Broadcast,
-  Crosshair,
   MagnifyingGlass,
   Path,
   PencilSimple,
@@ -24,9 +23,6 @@ export type MapToolKey =
 interface CampaignMapToolbarProps {
   allPlans: CampaignMapFlightPlanBrief[];
   permissions: CampaignMapPermissions;
-  threatsCount: number;
-  supportAssetsCount: number;
-  isrCreditsBalance: number;
   openWindows: Record<MapToolKey, boolean>;
   onToggleWindow: (tool: MapToolKey) => void;
   onSelectSearchPlan: (planId: number) => void;
@@ -39,9 +35,6 @@ interface CampaignMapToolbarProps {
 export const CampaignMapToolbar: React.FC<CampaignMapToolbarProps> = ({
   allPlans,
   permissions,
-  threatsCount,
-  supportAssetsCount,
-  isrCreditsBalance,
   openWindows,
   onToggleWindow,
   onSelectSearchPlan,
@@ -52,16 +45,22 @@ export const CampaignMapToolbar: React.FC<CampaignMapToolbarProps> = ({
 
   const searchResults = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
-    if (!q) return [];
+    if (!q) {
+      return allPlans.slice(0, 8);
+    }
     return allPlans
       .filter(
         (p) =>
           (p.identifier && p.identifier.toLowerCase().includes(q)) ||
           (p.callsign && p.callsign.toLowerCase().includes(q)) ||
           (p.name && p.name.toLowerCase().includes(q)) ||
+          (p.creator_name && p.creator_name.toLowerCase().includes(q)) ||
+          (p.airframe_name && p.airframe_name.toLowerCase().includes(q)) ||
+          (p.airframe_abbr && p.airframe_abbr.toLowerCase().includes(q)) ||
+          (p.mission_name && p.mission_name.toLowerCase().includes(q)) ||
           String(p.id).includes(q)
       )
-      .slice(0, 8);
+      .slice(0, 10);
   }, [allPlans, searchQuery]);
 
   const handlePick = (planId: number) => {
@@ -71,14 +70,21 @@ export const CampaignMapToolbar: React.FC<CampaignMapToolbarProps> = ({
     inputRef.current?.blur();
   };
 
+  const isExpanded = searchFocused || searchQuery.trim().length > 0;
+
   return (
     <div className="flex flex-wrap items-center gap-1.5">
       {/* Expandable Search Box Attached to Flight Planner */}
       <div className="relative flex items-stretch">
         <div className="relative flex items-center h-9">
-          <div className="absolute inset-y-0 left-0 w-9 flex items-center justify-center pointer-events-none text-stone-400">
+          <button
+            type="button"
+            onClick={() => inputRef.current?.focus()}
+            title="Search Flight Plans"
+            className="absolute inset-y-0 left-0 w-9 flex items-center justify-center text-stone-400 hover:text-amber-300 cursor-pointer z-10"
+          >
             <MagnifyingGlass className="w-4 h-4" weight="duotone" />
-          </div>
+          </button>
           <input
             ref={inputRef}
             type="search"
@@ -96,8 +102,10 @@ export const CampaignMapToolbar: React.FC<CampaignMapToolbarProps> = ({
                 handlePick(searchResults[0].flight_plan_id || searchResults[0].id);
               }
             }}
-            placeholder={searchFocused ? 'Search plans (FP-XXXXX or ID)...' : ''}
-            className="h-9 w-9 focus:w-56 pl-9 pr-2 text-xs bg-stone-900/90 text-stone-200 border border-r-0 border-stone-700 rounded-l-lg focus:outline-none focus:border-stone-500 transition-all duration-200 placeholder:text-stone-500 backdrop-blur-md"
+            placeholder={isExpanded ? 'Search plans (FP-XXXXX, callsign, pilot)...' : ''}
+            className={`h-9 ${
+              isExpanded ? 'w-60 pr-2.5' : 'w-9 pr-0 cursor-pointer'
+            } pl-9 text-xs bg-stone-900/90 text-stone-200 border border-r-0 border-stone-700 rounded-l-lg focus:outline-none focus:border-stone-500 transition-all duration-200 placeholder:text-stone-500 backdrop-blur-md`}
           />
         </div>
 
@@ -115,11 +123,20 @@ export const CampaignMapToolbar: React.FC<CampaignMapToolbarProps> = ({
           <span>Flight Planner</span>
         </button>
 
-        {searchFocused && searchQuery.trim().length > 0 && (
-          <div className="absolute top-full left-0 mt-1 w-80 max-h-64 overflow-y-auto bg-stone-900 border border-stone-700 rounded-lg shadow-2xl z-[1200] p-1 divide-y divide-stone-800">
+        {searchFocused && (
+          <div className="absolute top-full left-0 mt-1 w-84 max-h-72 overflow-y-auto bg-stone-900 border border-stone-700 rounded-lg shadow-2xl z-[1200] p-1 divide-y divide-stone-800">
+            <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-wider text-stone-400 flex items-center justify-between">
+              <span>
+                {searchQuery.trim()
+                  ? `Matching Flight Plans (${searchResults.length})`
+                  : `Campaign Flight Plans (${allPlans.length})`}
+              </span>
+            </div>
             {searchResults.length === 0 ? (
-              <div className="p-2 text-xs text-stone-400 italic text-center">
-                No flight plans match &apos;{searchQuery}&apos;
+              <div className="p-3 text-xs text-stone-400 italic text-center">
+                {allPlans.length === 0
+                  ? 'No flight plans in this campaign yet.'
+                  : `No flight plans match '${searchQuery}'`}
               </div>
             ) : (
               searchResults.map((p) => (
@@ -156,7 +173,7 @@ export const CampaignMapToolbar: React.FC<CampaignMapToolbarProps> = ({
       </div>
 
       {/* Threats */}
-      {(permissions.canManageThreats || threatsCount > 0) && (
+      {permissions.canManageThreats && (
         <button
           type="button"
           onClick={() => onToggleWindow('threats')}
@@ -173,7 +190,7 @@ export const CampaignMapToolbar: React.FC<CampaignMapToolbarProps> = ({
       )}
 
       {/* Support Assets */}
-      {(permissions.canManageSupportAssets || supportAssetsCount > 0) && (
+      {permissions.canManageSupportAssets && (
         <button
           type="button"
           onClick={() => onToggleWindow('support')}
@@ -203,26 +220,6 @@ export const CampaignMapToolbar: React.FC<CampaignMapToolbarProps> = ({
         <PencilSimple className="w-4 h-4 text-amber-400" weight="duotone" />
         <span>Markings</span>
       </button>
-
-      {/* ISR */}
-      {permissions.canViewIsr && (
-        <button
-          type="button"
-          onClick={() => onToggleWindow('isr')}
-          title="ISR Satellite Recon"
-          className={`h-9 px-3 rounded-lg border text-xs font-semibold flex items-center gap-1.5 backdrop-blur-md shadow-lg transition cursor-pointer ${
-            openWindows.isr
-              ? 'bg-cyan-600/25 border-cyan-500/80 text-cyan-200'
-              : 'bg-stone-900/90 border-stone-700 text-stone-200 hover:bg-stone-800'
-          }`}
-        >
-          <Crosshair className="w-4 h-4 text-cyan-400" weight="duotone" />
-          <span>ISR</span>
-          <span className="text-[10px] font-mono px-1 rounded bg-stone-950 text-cyan-300 border border-stone-700">
-            {isrCreditsBalance}
-          </span>
-        </button>
-      )}
 
       {/* Ruler / Measure */}
       <button

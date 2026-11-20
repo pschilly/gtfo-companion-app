@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   AirplaneTakeoff,
-  ArrowSquareOut,
   ArrowsClockwise,
   CalendarCheck,
   CaretDoubleLeft,
@@ -249,7 +248,7 @@ export const ServiceRecordView: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-6 pb-8 max-w-7xl mx-auto">
+    <div className="space-y-6 pb-8 w-full max-w-[2400px] mx-auto">
       {/* Header Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-800/80">
         <div>
@@ -277,16 +276,6 @@ export const ServiceRecordView: React.FC = () => {
             <ArrowsClockwise className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin text-amber-400' : ''}`} />
             <span>Sync</span>
           </button>
-
-          <a
-            href="https://members.globaltaskforceoverlord.org/personnel-record/service-record"
-            target="_blank"
-            rel="noreferrer"
-            className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-amber-400 font-mono text-xs flex items-center gap-1.5 transition-colors"
-          >
-            <span>Portal Service Record</span>
-            <ArrowSquareOut className="w-3.5 h-3.5" />
-          </a>
         </div>
       </div>
 

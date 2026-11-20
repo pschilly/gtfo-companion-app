@@ -303,7 +303,7 @@ export const HomeView: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 pb-10 max-w-7xl mx-auto">
+    <div className="space-y-8 pb-10 w-full max-w-[2400px] mx-auto">
       {/* WELCOME BACK & HERO SPOTLIGHT BANNER */}
       <div className="relative rounded-3xl overflow-hidden border border-stone-800 bg-stone-950 shadow-2xl min-h-[320px] sm:min-h-[360px] flex flex-col justify-between group">
         {/* Background Hero Image (if available) with smooth transition */}
@@ -548,7 +548,7 @@ export const HomeView: React.FC = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3">
               {HOME_WIDGET_CATALOG.map((entry) => {
                 const stateItem = orderedWidgets.find((w) => w.id === entry.id);
                 const isEnabled = stateItem?.enabled ?? entry.defaultEnabled;

@@ -355,23 +355,16 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
               </button>
             )}
 
-            <button
-              type="button"
-              onClick={() => {
-                if (onOpenOnMap) {
-                  onOpenOnMap(mission.id);
-                } else {
-                  onOpenExternal(
-                    mission.mapUrl,
-                    `/campaigns/${campaign.slug}/map?mission_id=${mission.id}`
-                  );
-                }
-              }}
-              className="px-3 py-1.5 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/35 text-sky-300 text-xs font-mono font-bold flex items-center gap-1.5 transition-colors"
-            >
-              <MapTrifold weight="duotone" className="w-4 h-4" />
-              <span>Open on Map</span>
-            </button>
+            {onOpenOnMap && (
+              <button
+                type="button"
+                onClick={() => onOpenOnMap(mission.id)}
+                className="px-3 py-1.5 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/35 text-sky-300 text-xs font-mono font-bold flex items-center gap-1.5 transition-colors"
+              >
+                <MapTrifold weight="duotone" className="w-4 h-4" />
+                <span>Open on Map</span>
+              </button>
+            )}
 
             <button
               type="button"

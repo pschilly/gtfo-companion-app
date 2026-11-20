@@ -8,7 +8,6 @@ import {
   Check,
   Clock,
   Compass,
-  Crosshair,
   CrosshairSimple,
   GlobeHemisphereWest,
   MagnifyingGlass,
@@ -64,7 +63,7 @@ export const DEFAULT_PORTAL_LAYER_STATES: PortalLayerStates = {
   threats: true,
   missions: true,
   flightPlans: true,
-  isr: true,
+  isr: false,
   logistics: true,
 };
 
@@ -83,12 +82,9 @@ interface CampaignMapLayerControlsProps {
   layerStates: PortalLayerStates;
   onToggleLayer: (key: keyof PortalLayerStates) => void;
   onToggleAllProcedures: (enabled: boolean) => void;
-  canViewIsr: boolean;
   isTraining: boolean;
   onManualRefresh: () => void;
   isLoading: boolean;
-  portalUrl?: string | null;
-  onOpenPortal?: () => void;
 }
 
 /**
@@ -112,12 +108,9 @@ export const CampaignMapLayerControls: React.FC<CampaignMapLayerControlsProps> =
   layerStates,
   onToggleLayer,
   onToggleAllProcedures,
-  canViewIsr,
   isTraining,
   onManualRefresh,
   isLoading,
-  portalUrl,
-  onOpenPortal,
 }) => {
   const [openMenu, setOpenMenu] = useState<'none' | 'sorties' | 'tiles' | 'layers'>('none');
   const [sortieSearch, setSortieSearch] = useState('');
@@ -232,7 +225,7 @@ export const CampaignMapLayerControls: React.FC<CampaignMapLayerControlsProps> =
                     className="w-full h-8 pl-8 pr-3 text-xs bg-stone-900 text-stone-200 border border-stone-700/80 rounded-lg focus:outline-none focus:border-amber-500 placeholder:text-stone-500"
                   />
                 </div>
-                {selectedSortieId && (
+                {(selectedSortieId || selectedMissionId) && (
                   <button
                     type="button"
                     onClick={() => {
@@ -594,9 +587,6 @@ export const CampaignMapLayerControls: React.FC<CampaignMapLayerControlsProps> =
                       ['threats', 'Threats', <WarningDiamond key="t" className="w-4 h-4 text-rose-500" />],
                       ['missions', 'Missions', <AirplaneTilt key="m" className="w-4 h-4 text-amber-400" />],
                       ['flightPlans', 'Flight Plans', <Path key="p" className="w-4 h-4 text-sky-400" />],
-                      ...(canViewIsr
-                        ? [['isr', 'ISR Captures', <Crosshair key="i" className="w-4 h-4 text-cyan-400" />]]
-                        : []),
                     ] as Array<[keyof PortalLayerStates, string, React.ReactNode]>
                   ).map(([key, label, icon]) => (
                     <label
@@ -717,7 +707,7 @@ export const CampaignMapLayerControls: React.FC<CampaignMapLayerControlsProps> =
         )}
       </div>
 
-      {/* Manual Refresh & Portal Shortcut */}
+      {/* Manual Refresh */}
       <button
         type="button"
         onClick={onManualRefresh}
@@ -727,17 +717,6 @@ export const CampaignMapLayerControls: React.FC<CampaignMapLayerControlsProps> =
       >
         <ArrowsClockwise className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
       </button>
-
-      {portalUrl && onOpenPortal && (
-        <button
-          type="button"
-          onClick={onOpenPortal}
-          title="Open Web Portal Map in Browser"
-          className="px-2.5 py-1.5 rounded-lg bg-stone-900/90 hover:bg-stone-800 border border-stone-700/80 text-[11px] font-semibold text-stone-300 hover:text-amber-300 shadow-xl backdrop-blur-md cursor-pointer"
-        >
-          Portal ↗
-        </button>
-      )}
     </div>
   );
 };

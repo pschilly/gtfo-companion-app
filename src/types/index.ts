@@ -294,10 +294,30 @@ export interface FlightPlanRoutePoint {
   tot?: string | null;
   mgrs?: string | null;
   ddm?: string | null;
+  lldm?: string | null;
+  dms?: string | null;
   remarks?: string | null;
   notes?: string | null;
   action?: string | null;
   type?: string | null;
+  sequence?: number | 'divert';
+  is_divert?: boolean;
+  is_lantirn?: boolean;
+  is_additional?: boolean;
+  is_target?: boolean;
+  is_fix?: boolean;
+  elev?: number | string | null;
+  drop_alt?: number | string | null;
+  drop_spd?: number | string | null;
+  attack_heading?: number | string | null;
+  weapon?: string | null;
+  station?: string | null;
+  activity?: string | null;
+  color?: string | null;
+  transitSpeed?: number | null;
+  R1?: boolean;
+  R2?: boolean;
+  R3?: boolean;
   x?: number;
   y?: number;
 }
@@ -441,11 +461,13 @@ export interface FlightPlanDetail extends FlightPlanSummary {
   comms_ladder_by_radio?: Record<string, FlightPlanCommsEntry[]>;
   gun_loadout?: string | null;
   countermeasures_loadout?: string | null;
+  flight_plan_id?: number;
   can_edit?: boolean;
   can_delete?: boolean;
   is_f18?: boolean;
   is_f16?: boolean;
   is_f14?: boolean;
+  is_f14_bu?: boolean;
   is_jf17?: boolean;
   has_cmds?: boolean;
   has_mids?: boolean;
@@ -1458,6 +1480,14 @@ export interface CampaignMapPermissions {
   isCouncil: boolean;
 }
 
+export interface DevPermissionOverrides {
+  enabled: boolean;
+  presetId: string;
+  tierOverride: 'default' | UserTier;
+  mapPermissions: Partial<CampaignMapPermissions>;
+  forceRecordsReadOnly: boolean;
+}
+
 export interface CampaignMapHeader {
   id: number;
   name: string;
@@ -1468,6 +1498,9 @@ export interface CampaignMapHeader {
   isTraining: boolean;
   magneticDeclination?: number | null;
   campaignDate?: string | null;
+  missionStartTime?: string | null;
+  weather?: string | null;
+  missionTime?: string | null;
   center: {
     lat: number;
     lng: number;
@@ -1506,7 +1539,7 @@ export interface CampaignMapAirbase {
   name: string;
   icao?: string | null;
   code?: string | null;
-  coalition: 'blue' | 'red' | 'neutral' | string;
+  coalition: 'blue' | 'red' | 'neutral' | number | string | null;
   lat: number;
   lng: number;
   category?: string;
@@ -1648,6 +1681,8 @@ export interface CampaignMapTacticalIcon {
   name?: string;
   label?: string;
   category?: string;
+  defaultColor?: string;
+  bladeIcon?: string;
   svg?: string;
   url?: string;
   [key: string]: any;
@@ -1814,6 +1849,8 @@ export interface CampaignMapMission {
   earned_rewards_summary?: string | null;
   description?: string | null;
   remarks?: string | null;
+  weather?: string | null;
+  mission_time?: string | null;
   sorties: CampaignMapMissionSortie[];
 }
 
@@ -1861,6 +1898,7 @@ export interface CampaignMapAirframeCatalogItem {
   is_f18: boolean;
   is_f16: boolean;
   is_f14: boolean;
+  is_f14_bu?: boolean;
   is_jf17: boolean;
   has_mids: boolean;
   has_cmds: boolean;
@@ -1911,7 +1949,7 @@ export interface CampaignMapPayload {
   supportAssets: CampaignMapSupportAsset[];
   supportAssetTypes: CampaignMapSupportAssetTypeOption[];
   tacticalMarkings: CampaignMapTacticalMarking[];
-  tacticalIcons: CampaignMapTacticalIcon[];
+  tacticalIcons: Record<string, CampaignMapTacticalIcon> | CampaignMapTacticalIcon[];
   isrRequests: CampaignMapIsrRequest[];
   isrTargetTypes: Record<string, string> | Array<{ value: string; label: string }>;
   logisticsRequests: CampaignMapLogisticsRequest[];
@@ -1923,6 +1961,13 @@ export interface CampaignMapPayload {
   };
   airframesCatalog: CampaignMapAirframeCatalogItem[];
   loadoutPresets: CampaignMapLoadoutPreset[];
+  warehouseItems?: Array<{ id: number; name: string; dcs_entity?: string | null }>;
+  aorPresets?: Array<{
+    id: string;
+    name: string;
+    source: string;
+    points: Array<{ lat: number; lng: number }>;
+  }>;
   taskings: CampaignMapTasking[];
   fetchedAt?: string;
 }

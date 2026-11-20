@@ -384,10 +384,10 @@ export const ThreatEditorDrawer: React.FC<ThreatEditorDrawerProps> = ({
             >
               <div className="min-w-0">
                 <div className="font-semibold text-stone-100 truncate">
-                  {t.title || t.sam_name || t.type.toUpperCase()}
+                  {t.title || t.sam_name || String(t.type || '').toUpperCase()}
                 </div>
                 <div className="text-[10px] font-mono text-stone-400 truncate">
-                  {t.sam_name ? `${t.sam_name} (${t.range} NM)` : t.type.toUpperCase()} ·{' '}
+                  {t.sam_name ? `${t.sam_name} (${t.range} NM)` : String(t.type || '').toUpperCase()} ·{' '}
                   {formatCoordinateDdm(t.lat, t.lng)}
                 </div>
               </div>
@@ -712,10 +712,10 @@ export const SupportAssetsDrawer: React.FC<SupportAssetsDrawerProps> = ({
             >
               <div className="min-w-0">
                 <div className="font-semibold text-stone-100 truncate">
-                  {a.title || a.type.toUpperCase()}
+                  {a.title || String(a.type || '').toUpperCase()}
                 </div>
                 <div className="text-[10px] font-mono text-stone-400 truncate">
-                  {a.type.toUpperCase()} · {a.tacan_channel || 'No TCN'} ·{' '}
+                  {String(a.type || '').toUpperCase()} · {a.tacan_channel || 'No TCN'} ·{' '}
                   {a.radio_freq || 'No Freq'}
                 </div>
               </div>
@@ -789,6 +789,9 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
   const [isBusy, setIsBusy] = useState(false);
 
   const isMultiPoint = shape === 'polyline' || shape === 'polygon' || shape === 'arrow';
+  const tacticalIconList = Array.isArray(mapData.tacticalIcons)
+    ? mapData.tacticalIcons
+    : Object.values(mapData.tacticalIcons || {});
 
   const handleSaveMarking = async () => {
     if (draftPoints.length === 0) {
@@ -820,7 +823,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
             coordinates: [draftPoints[0].lng, draftPoints[0].lat],
           };
 
-      const iconObj = mapData.tacticalIcons.find(
+      const iconObj = tacticalIconList.find(
         (ic) => (ic.key || ic.id || ic.name) === selectedIconKey
       );
 
@@ -1003,14 +1006,14 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
               />
             </div>
           )}
-          {shape === 'marker' && mapData.tacticalIcons.length > 0 && (
+          {shape === 'marker' && tacticalIconList.length > 0 && (
             <select
               value={selectedIconKey}
               onChange={(e) => setSelectedIconKey(e.target.value)}
               className="flex-1 min-w-0 px-2 py-1 rounded bg-stone-950 border border-stone-800 text-[11px] text-stone-100"
             >
               <option value="">Standard Pin</option>
-              {mapData.tacticalIcons.map((ic, idx) => {
+              {tacticalIconList.map((ic, idx) => {
                 const k = ic.key || ic.id || ic.name || `icon-${idx}`;
                 return (
                   <option key={k} value={k}>
@@ -1395,7 +1398,7 @@ export const IsrToolDrawer: React.FC<IsrToolDrawerProps> = ({
               >
                 <div className="flex items-center justify-between gap-2">
                   <div className="font-semibold text-stone-100 truncate">
-                    {req.sensor_label || req.sensor.toUpperCase()} · {req.km_size}km Box
+                    {req.sensor_label || String(req.sensor || '').toUpperCase()} · {req.km_size}km Box
                   </div>
                   <span className="px-1.5 py-0.5 rounded bg-stone-950 border border-stone-700 text-[10px] font-bold uppercase text-cyan-300">
                     {req.status_label || req.status}

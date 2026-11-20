@@ -46,7 +46,7 @@ export const MapLegendModal: React.FC<MapLegendModalProps> = ({
       onClose={onClose}
       initialPos={{ x: 480, y: 140 }}
       widthClass="w-[440px] max-w-[94vw]"
-      maxHeightClass="max-h-[calc(100%-96px)]"
+      maxHeightClass="max-h-[75vh]"
       zIndex={zIndex}
       onFocus={onFocus}
     >

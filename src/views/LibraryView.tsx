@@ -58,7 +58,7 @@ export const LibraryView: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 pb-8 max-w-7xl mx-auto">
+    <div className="space-y-6 pb-8 w-full max-w-[2400px] mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-800/80">
         <div>
           <h1 className="font-display text-2xl font-bold bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent">

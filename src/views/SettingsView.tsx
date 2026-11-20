@@ -146,7 +146,7 @@ export const SettingsView: React.FC = () => {
   ];
 
   return (
-    <div className="max-w-3xl space-y-6 pb-12 mx-auto">
+    <div className="w-full max-w-5xl space-y-6 pb-12 mx-auto">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-stone-800/80">
         <div>
@@ -1122,23 +1122,6 @@ export const SettingsView: React.FC = () => {
                   </div>
                   <div className="text-[11px] font-mono text-stone-500">
                     kb.globaltaskforceoverlord.org
-                  </div>
-                </div>
-                <ArrowSquareOut className="w-4 h-4 text-stone-500 group-hover:text-amber-400 transition-colors" />
-              </a>
-
-              <a
-                href={STATIC_CONFIG.portalBaseUrl.replace('/api/v1/companion', '')}
-                target="_blank"
-                rel="noreferrer"
-                className="p-3.5 rounded-xl bg-stone-950 hover:bg-stone-800/80 border border-stone-800 hover:border-amber-500/50 transition-all flex items-center justify-between group"
-              >
-                <div>
-                  <div className="text-xs font-display font-semibold text-stone-200 group-hover:text-amber-300">
-                    Member Portal
-                  </div>
-                  <div className="text-[11px] font-mono text-stone-500">
-                    members.globaltaskforceoverlord.org
                   </div>
                 </div>
                 <ArrowSquareOut className="w-4 h-4 text-stone-500 group-hover:text-amber-400 transition-colors" />

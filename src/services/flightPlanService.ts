@@ -246,10 +246,12 @@ export async function updateFlightPlanName(
 export async function fetchFlightPlanDetail(
   baseUrl: string,
   idOrIdentifier: string | number,
-  token?: string
+  token?: string,
+  discordId?: string | null
 ): Promise<FlightPlanDetail> {
   const cleanBase = normalizeCompanionBaseUrl(baseUrl);
-  const endpoint = `${cleanBase}/flight-plans/${encodeURIComponent(String(idOrIdentifier))}`;
+  const qs = discordId ? `?discord_id=${encodeURIComponent(discordId)}` : '';
+  const endpoint = `${cleanBase}/flight-plans/${encodeURIComponent(String(idOrIdentifier))}${qs}`;
 
   if (isTauriRuntime()) {
     try {

@@ -27,8 +27,9 @@ import { SquadronsView } from './views/SquadronsView';
 import { TaskForceRosterView } from './views/TaskForceRosterView';
 
 const MainShell: React.FC = () => {
-  const { activeTab, setActiveTab, userSession } = useApp();
+  const { activeTab, activeCampaignSubTab, userSession } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
+  const isCampaignMapView = activeTab === 'campaigns' && activeCampaignSubTab === 'map';
 
   useEffect(() => {
     const handleDocumentClick = (e: MouseEvent) => {
@@ -67,7 +68,13 @@ const MainShell: React.FC = () => {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-topo">
         <TopBar searchQuery={searchQuery} onSearchChange={handleSearchChange} />
 
-        <main className="flex-1 overflow-y-auto p-6">
+        <main
+          className={
+            isCampaignMapView
+              ? 'flex-1 overflow-hidden p-3 sm:p-4 flex flex-col min-h-0'
+              : 'flex-1 overflow-y-auto p-4 sm:p-6'
+          }
+        >
           {activeTab === 'home' && <HomeView />}
           {activeTab === 'calendar' && <EventCalendarView />}
           {activeTab === 'dashboard' && <DashboardView />}

@@ -3,7 +3,6 @@ import {
   AirplaneTakeoff,
   AirplaneTilt,
   ArrowRight,
-  ArrowSquareOut,
   Binoculars,
   BookOpen,
   CheckCircle,
@@ -15,8 +14,6 @@ import {
   PushPinSlash,
   Receipt,
   Target,
-  HardDriveIcon,
-  MapTrifoldIcon,
 } from '@phosphor-icons/react';
 import {
   CampaignItem,
@@ -40,7 +37,6 @@ interface CampaignOverviewTabProps {
   campaign: CampaignItem;
   isPinned: boolean;
   onTogglePin: () => void;
-  onOpenExternal: (url?: string | null, fallbackPath?: string) => void;
   onNavigateSubTab: (subTab: CampaignSubTab) => void;
   onInspectMission: (mission: CampaignMissionItem, section?: MissionModalSection) => void;
   onOpenMissionOnMap?: (missionId: number) => void;
@@ -50,7 +46,6 @@ export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
   campaign,
   isPinned,
   onTogglePin,
-  onOpenExternal,
   onNavigateSubTab,
   onInspectMission,
   onOpenMissionOnMap,
@@ -85,7 +80,7 @@ export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
                   </span>
 
                   <span className="px-2 py-0.5 text-[10px] font-black uppercase tracking-wider rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                    <MapTrifoldIcon className="size-4 inline mr-1" />
+                    <MapTrifold className="size-4 inline mr-1" />
                     {campaign.theatre || 'Active Theatre'}
                   </span>
 
@@ -147,16 +142,6 @@ export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
               >
                 <MapTrifold weight="duotone" className="w-4 h-4" />
                 <span>Campaign Map &amp; Planner</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => onOpenExternal(campaign.portalUrl, `/campaigns/${campaign.slug}`)}
-                className="px-3 py-2 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-800 hover:border-stone-700 text-stone-300 text-xs font-mono flex items-center gap-1.5 transition-colors"
-                title="Open full campaign page on Member Portal"
-              >
-                <span>Portal</span>
-                <ArrowSquareOut className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
@@ -579,16 +564,7 @@ export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
                 )}
               </div>
 
-              <button
-                type="button"
-                onClick={() =>
-                  onOpenExternal(undefined, `/campaigns/${campaign.slug}/supply-orders`)
-                }
-                className="text-xs text-stone-400 hover:text-amber-300 font-medium flex items-center gap-1 transition-colors"
-              >
-                <span>All Orders</span>
-                <ArrowRight className="w-3 h-3" />
-              </button>
+
             </div>
 
             <div className="space-y-3.5">
@@ -736,7 +712,7 @@ export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
                           </div>
                         ) : (
                           <div className="p-2.5 text-center text-xs text-stone-500 border border-dashed border-stone-800 rounded-xl bg-stone-950/40">
-                            Hold empty. Manage manifest cargo on the Member Portal.
+                            Hold empty.
                           </div>
                         )}
                       </div>

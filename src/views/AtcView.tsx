@@ -1110,7 +1110,7 @@ export const AtcView: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="space-y-6 w-full max-w-[2400px] mx-auto">
       {/* Top Header Banner */}
       <div className="relative rounded-2xl overflow-hidden border border-stone-800 bg-stone-900/85 p-6 shadow-xl">
         <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />

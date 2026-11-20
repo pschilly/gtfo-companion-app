@@ -305,7 +305,7 @@ export const TaskForceRosterView: React.FC = () => {
     rosterCounts.communityCount || Math.max(0, totalCount - coreCount);
 
   return (
-    <div className="space-y-6 pb-12 max-w-7xl mx-auto">
+    <div className="space-y-6 pb-12 w-full max-w-[2400px] mx-auto">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-800/80">
         <div>
@@ -510,7 +510,7 @@ export const TaskForceRosterView: React.FC = () => {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 3xl:grid-cols-5 gap-4">
             {paginatedMembers.map((member) => {
               const isCurrentAviator =
                 Boolean(memberProfile.callsign) &&

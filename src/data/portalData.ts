@@ -130,7 +130,6 @@ export const GTFO_SQUADRONS: Record<string, SquadronAssignment> = {
     primaryAirframe: 'F-16C Viper',
     radioCallsign: 'Dagger / Hammer / Spear',
     emblemUrl: 'https://cdn.globaltaskforceoverlord.org/squadron-logos/pU9xtFLUuU8r5Ep840diEtdpkdoG6n7jm7bk4Ueb.png',
-    rosterUrl: 'https://members.globaltaskforceoverlord.org/member/squadrons/507th-fighter-squadron/roster',
   },
   '449th TFS': {
     code: '449th TFS',
@@ -301,9 +300,6 @@ export function resolveSquadronAssignment(
             liveEmblemUrl || liveSq.emblemUrl || liveSq.emblem_url,
             'https://cdn.globaltaskforceoverlord.org/GTFO-Logo.png'
           ),
-          rosterUrl: liveSq.slug
-            ? `https://members.globaltaskforceoverlord.org/member/squadrons/${liveSq.slug}/roster`
-            : undefined,
         };
       }
     }
@@ -635,7 +631,7 @@ export function normalizeMemberPortalProfile(
     (raw.companion_preferences as Record<string, unknown> | undefined)?.home_layout;
 
   return {
-    discordId: String(raw.discordId || raw.discord_id || session?.id || ''),
+    discordId: String(session?.id || raw.discordId || raw.discord_id || ''),
     callsign: String(
       raw.callsign || raw.name || session?.globalName || session?.username || 'Aviator'
     ),

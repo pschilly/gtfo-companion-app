@@ -32,6 +32,8 @@ interface CoordinateConverterDrawerProps {
   theatreDeclination?: number | null;
   unit: 'nm' | 'km';
   onCenterMap: (lat: number, lng: number) => void;
+  hasActivePin?: boolean;
+  onClearPin?: () => void;
   isPicking: boolean;
   onTogglePicking: () => void;
 }
@@ -49,6 +51,8 @@ export const CoordinateConverterDrawer: React.FC<CoordinateConverterDrawerProps>
   theatreDeclination,
   unit,
   onCenterMap,
+  hasActivePin = false,
+  onClearPin,
   isPicking,
   onTogglePicking,
 }) => {
@@ -245,13 +249,26 @@ export const CoordinateConverterDrawer: React.FC<CoordinateConverterDrawerProps>
           </div>
         )}
 
-        <button
-          onClick={() => coords && onCenterMap(coords.lat, coords.lng)}
-          disabled={!coords}
-          className="w-full py-2 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/50 text-amber-300 text-xs font-bold uppercase tracking-wider transition disabled:opacity-40"
-        >
-          Center &amp; Ping Map Location
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => coords && onCenterMap(coords.lat, coords.lng)}
+            disabled={!coords}
+            className="flex-1 py-2 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/50 text-amber-300 text-xs font-bold uppercase tracking-wider transition disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed"
+          >
+            Center &amp; Ping Map Location
+          </button>
+          {hasActivePin && onClearPin && (
+            <button
+              type="button"
+              onClick={onClearPin}
+              className="px-3 py-2 rounded-lg bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-300 hover:text-sky-300 text-xs font-semibold transition cursor-pointer shrink-0"
+              title="Clear converter map pin"
+            >
+              Clear Pin
+            </button>
+          )}
+        </div>
       </div>
     </FloatingToolWindow>
   );

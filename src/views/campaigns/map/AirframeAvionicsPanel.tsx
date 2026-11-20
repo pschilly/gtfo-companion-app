@@ -454,7 +454,6 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
           else caps.push(item);
           return { ...p, sa_settings: { ...sa, cap_points: caps } };
         });
-        onNotify('success', `Centered CAP ${f18SlotNum} on ${preset.label}.`);
         return;
       }
 
@@ -473,7 +472,6 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
         else arr.push(item);
         return { ...p, sa_settings: { ...sa, [f18Section]: arr } };
       });
-      onNotify('success', `Imported ${pts.length} vertices from ${preset.label}.`);
       return;
     }
 
@@ -490,7 +488,6 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
             elev: 0,
           })),
         }));
-        onNotify('success', `Imported ${pts.length} DEST points from ${preset.label}.`);
         return;
       }
 
@@ -504,7 +501,6 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
         lines[f16LineNum] = pts;
         return { ...p, geo_lines_settings: { ...geo, lines } };
       });
-      onNotify('success', `Imported ${pts.length} vertices into GEO Line ${f16LineNum}.`);
       return;
     }
 
@@ -517,7 +513,6 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
           [f14LineNum]: { closed: preset.closed, points: pts },
         },
       }));
-      onNotify('success', `Imported ${pts.length} vertices into TID Plot Line ${f14LineNum}.`);
       return;
     }
 
@@ -538,7 +533,6 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
           },
         };
       });
-      onNotify('success', `Imported ${pts.length} vertices into JF-17 ${jf17Key}.`);
       return;
     }
 
@@ -550,7 +544,6 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
         points: pts.map((pt, idx) => ({ name: `AV ${idx + 1}`, ...pt })),
       },
     }));
-    onNotify('success', `Imported ${pts.length} points from ${preset.label}.`);
   };
 
   // Render reusable vertex editor

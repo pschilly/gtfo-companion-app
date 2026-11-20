@@ -21,6 +21,7 @@ import {
   X,
 } from '@phosphor-icons/react';
 import { useApp } from '../context/AppContext';
+import { DevPermissionsDropdown } from './DevPermissionsDropdown';
 import { NotificationCenterDropdown } from './NotificationCenterDropdown';
 import {
   AssetItem,
@@ -268,7 +269,7 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
   return (
     <header className="relative z-40 h-16 bg-stone-950/95 backdrop-blur-md border-b border-stone-800/80 px-6 flex items-center justify-between gap-4 shrink-0">
       {/* Global Omnisearch Search Bar */}
-      <div ref={searchContainerRef} className="relative flex-1 max-w-xl">
+      <div ref={searchContainerRef} className="relative flex-1 max-w-2xl 2xl:max-w-3xl">
         <MagnifyingGlass className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
         <input
           ref={searchInputRef}
@@ -797,6 +798,9 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
             </span>
           )}
         </button> */}
+
+        {/* Dev-Only Permission Switcher */}
+        {import.meta.env.DEV && <DevPermissionsDropdown />}
 
         {/* Member Readiness Shortcut Button */}
         <button

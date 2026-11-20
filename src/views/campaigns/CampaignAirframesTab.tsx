@@ -2,7 +2,6 @@ import React from 'react';
 import {
   AirplaneTakeoff,
   AirplaneTilt,
-  ArrowSquareOut,
   Compass,
   ShieldChevron,
 } from '@phosphor-icons/react';
@@ -10,12 +9,10 @@ import { CampaignItem } from '../../types';
 
 interface CampaignAirframesTabProps {
   campaign: CampaignItem;
-  onOpenExternal: (url?: string | null, fallbackPath?: string) => void;
 }
 
 export const CampaignAirframesTab: React.FC<CampaignAirframesTabProps> = ({
   campaign,
-  onOpenExternal,
 }) => {
   const groups = campaign.airframeSquadronGroups || [];
   const totalAll = groups.reduce((sum, g) => sum + (g.totalCount || 0), 0);
@@ -33,7 +30,7 @@ export const CampaignAirframesTab: React.FC<CampaignAirframesTabProps> = ({
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-6">
           {groups.map((group, gIdx) => (
             <div
               key={group.id ?? `group-${gIdx}`}

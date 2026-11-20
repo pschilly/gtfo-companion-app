@@ -45,18 +45,9 @@ export const CampaignLoreTab: React.FC<CampaignLoreTabProps> = ({
             No Published Chronicles Yet
           </h3>
           <p className="text-xs text-stone-400 max-w-md mx-auto">
-            No lore chapters have been published for {campaign.name}. Check back as operations
-            unfold or view the chronicles on the Member Portal.
+            No lore chapters have been published for {campaign.name}. Check back as operations unfold.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => onOpenExternal(undefined, `/campaigns/${campaign.slug}/lore`)}
-          className="px-4 py-2 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-700 text-stone-200 font-mono text-xs inline-flex items-center gap-1.5"
-        >
-          <span>Open Lore on Portal</span>
-          <ArrowSquareOut className="w-3.5 h-3.5" />
-        </button>
       </div>
     );
   }
@@ -114,16 +105,6 @@ export const CampaignLoreTab: React.FC<CampaignLoreTabProps> = ({
                 Chronicles &amp; Lore
               </h3>
             </div>
-
-            <button
-              type="button"
-              onClick={() => onOpenExternal(undefined, `/campaigns/${campaign.slug}/lore`)}
-              className="text-xs font-mono text-amber-400 hover:text-amber-300 flex items-center gap-1"
-              title="Open Lore Book on Member Portal"
-            >
-              <span>Portal</span>
-              <ArrowSquareOut className="w-3.5 h-3.5" />
-            </button>
           </div>
 
           <div className="space-y-2 max-h-[560px] overflow-y-auto pr-1">

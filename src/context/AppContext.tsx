@@ -48,10 +48,12 @@ import {
   AtcFlightPlanPackage,
   CalendarEventItem,
   CampaignItem,
+  CampaignMapPermissions,
   CampaignSubTab,
   ChecklistSummary,
   DcsEnvironmentInfo,
   DcsNicknameInfo,
+  DevPermissionOverrides,
   DiscordUserSession,
   DownloadProgressEvent,
   FlightPlanDetail,
@@ -70,6 +72,11 @@ import {
   TelemetryLogEntry,
   UserTier,
 } from '../types';
+import {
+  DEFAULT_DEV_PERMISSION_OVERRIDES,
+  loadDevPermissionOverrides,
+  saveDevPermissionOverrides,
+} from '../utils/devPermissions';
 import { fetchCalendarEvents } from '../services/calendarService';
 import { fetchCampaigns } from '../services/campaignService';
 import {
@@ -139,7 +146,13 @@ interface AppContextValue {
   dcsEnv: DcsEnvironmentInfo | null;
   refreshDcsEnv: (overridePath?: string, overrideWorldPath?: string) => Promise<void>;
   userSession: DiscordUserSession | null;
+  liveEffectiveTier: UserTier;
   effectiveTier: UserTier;
+  devPermissionOverrides: DevPermissionOverrides;
+  setDevPermissionOverrides: (next: DevPermissionOverrides) => void;
+  resetDevPermissionOverrides: () => void;
+  liveMapPermissions: CampaignMapPermissions | null;
+  setLiveMapPermissions: (perms: CampaignMapPermissions | null) => void;
   memberProfile: MemberPortalProfile;
   isPortalLive: boolean;
   syncMemberPortal: () => Promise<void>;
@@ -519,7 +532,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     );
   });
 
-  const effectiveTier: UserTier = useMemo(() => {
+  const [devPermissionOverrides, setDevPermissionOverridesState] =
+    useState<DevPermissionOverrides>(() =>
+      import.meta.env.DEV ? loadDevPermissionOverrides() : DEFAULT_DEV_PERMISSION_OVERRIDES
+    );
+  const [liveMapPermissions, setLiveMapPermissions] = useState<CampaignMapPermissions | null>(null);
+
+  const setDevPermissionOverrides = useCallback((next: DevPermissionOverrides) => {
+    if (!import.meta.env.DEV) return;
+    setDevPermissionOverridesState(next);
+    saveDevPermissionOverrides(next);
+  }, []);
+
+  const resetDevPermissionOverrides = useCallback(() => {
+    if (!import.meta.env.DEV) return;
+    setDevPermissionOverridesState(DEFAULT_DEV_PERMISSION_OVERRIDES);
+    saveDevPermissionOverrides(DEFAULT_DEV_PERMISSION_OVERRIDES);
+  }, []);
+
+  const liveEffectiveTier: UserTier = useMemo(() => {
     if (!userSession || !userSession.isGuildMember || baseDiscordTier === 'guest') {
       return 'guest';
     }
@@ -531,6 +562,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
     return baseDiscordTier;
   }, [baseDiscordTier, memberProfile?.rosterTier, userSession]);
+
+  const effectiveTier: UserTier = useMemo(() => {
+    if (
+      import.meta.env.DEV &&
+      devPermissionOverrides.enabled &&
+      devPermissionOverrides.tierOverride !== 'default'
+    ) {
+      return devPermissionOverrides.tierOverride;
+    }
+    return liveEffectiveTier;
+  }, [devPermissionOverrides, liveEffectiveTier]);
 
   const addLog = useCallback(
     (
@@ -2253,9 +2295,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
                   .join(' / ')
               : prev.squadronAssignment.radioCallsign,
             emblemUrl: liveMatch.emblemUrl,
-            rosterUrl: liveMatch.slug
-              ? `https://members.globaltaskforceoverlord.org/member/squadrons/${liveMatch.slug}/roster`
-              : prev.squadronAssignment.rosterUrl,
           };
           const updated = { ...prev, squadronAssignment: updatedSq };
           localStorage.setItem(STORAGE_KEYS.PORTAL_PROFILE, JSON.stringify(updated));
@@ -2473,7 +2512,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         dcsEnv,
         refreshDcsEnv,
         userSession,
+        liveEffectiveTier,
         effectiveTier,
+        devPermissionOverrides,
+        setDevPermissionOverrides,
+        resetDevPermissionOverrides,
+        liveMapPermissions,
+        setLiveMapPermissions,
         memberProfile,
         isPortalLive,
         syncMemberPortal,

@@ -3,6 +3,7 @@ import {
   CampaignMapIsrRequest,
   CampaignMapIsrTarget,
   CampaignMapLoadoutPreset,
+  CampaignMapMission,
   CampaignMapPayload,
   CampaignMapSupportAsset,
   CampaignMapTacticalMarking,
@@ -318,6 +319,50 @@ export async function deleteCampaignTacticalMarking(
 }
 
 /**
+ * POST /api/v1/companion/campaigns/{campaign}/tactical-markings/{marking}/assign-aor
+ */
+export async function assignCampaignTacticalMarkingAsAor(
+  baseUrl: string,
+  campaignIdOrSlug: string | number,
+  markingId: number,
+  payload: {
+    mission_id: number;
+    target_type: 'mission' | 'objective';
+    objective_index?: number | null;
+  },
+  options: CampaignMapAuthOptions = {}
+): Promise<{
+  missions: CampaignMapMission[];
+  tacticalMarkings: CampaignMapTacticalMarking[];
+  aorPresets: NonNullable<CampaignMapPayload['aorPresets']>;
+}> {
+  const cleanBase = normalizeCompanionBaseUrl(baseUrl);
+  const endpoint = `${cleanBase}/campaigns/${encodeURIComponent(
+    String(campaignIdOrSlug)
+  )}/tactical-markings/${markingId}/assign-aor`;
+
+  const res = await sendPortalApiRequest<{
+    missions?: CampaignMapMission[];
+    tacticalMarkings?: CampaignMapTacticalMarking[];
+    aorPresets?: CampaignMapPayload['aorPresets'];
+  }>(
+    endpoint,
+    'POST',
+    {
+      ...payload,
+      discord_id: options.discordId || undefined,
+    },
+    options.token || undefined
+  );
+
+  return {
+    missions: res?.missions || [],
+    tacticalMarkings: res?.tacticalMarkings || [],
+    aorPresets: res?.aorPresets || [],
+  };
+}
+
+/**
  * POST /api/v1/companion/campaigns/{campaign}/isr-requests
  */
 export async function submitCampaignIsrRequest(
@@ -472,7 +517,7 @@ export async function pullCampaignAirfieldComms(
   baseUrl: string,
   campaignIdOrSlug: string | number,
   payload: {
-    radio_key?: 'comm1' | 'comm2';
+    radio_key?: string;
     airframe_id?: number | null;
     airbase_id?: number | null;
     departure_airfield?: string | null;
@@ -541,6 +586,9 @@ export async function importCampaignDtcFlightPlan(
     airframe_id?: number | null;
     name?: string | null;
     is_opfor?: boolean;
+    mission_id?: number | null;
+    sortie_id?: number | null;
+    color?: string | null;
   },
   options: CampaignMapAuthOptions = {}
 ): Promise<{

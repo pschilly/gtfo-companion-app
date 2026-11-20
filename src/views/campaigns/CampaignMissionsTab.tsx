@@ -2,7 +2,6 @@ import React, { useMemo, useState } from 'react';
 import {
   AirplaneTakeoff,
   AirplaneTilt,
-  ArrowSquareOut,
   CalendarBlank,
   CheckCircle,
   Clock,
@@ -25,16 +24,16 @@ import {
 
 interface CampaignMissionsTabProps {
   campaign: CampaignItem;
-  onOpenExternal: (url?: string | null, fallbackPath?: string) => void;
   onInspectMission: (mission: CampaignMissionItem, section?: MissionModalSection) => void;
+  onOpenOnMap: (missionId: number) => void;
 }
 
 type MissionStatusFilter = 'all' | 'active_open' | 'completed' | 'has_aar';
 
 export const CampaignMissionsTab: React.FC<CampaignMissionsTabProps> = ({
   campaign,
-  onOpenExternal,
   onInspectMission,
+  onOpenOnMap,
 }) => {
   const { userSession, upcomingCalendarEvents, openSortieInCalendar } = useApp();
   const [statusFilter, setStatusFilter] = useState<MissionStatusFilter>('all');
@@ -190,13 +189,8 @@ export const CampaignMissionsTab: React.FC<CampaignMissionsTabProps> = ({
 
             <button
               type="button"
-              onClick={() =>
-                onOpenExternal(
-                  mission.mapUrl,
-                  `/campaigns/${campaign.slug}/map?mission_id=${mission.id}`
-                )
-              }
-              className="px-3 py-2 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/35 text-xs font-mono font-bold text-sky-300 flex items-center gap-1.5 transition-colors"
+              onClick={() => onOpenOnMap(mission.id)}
+              className="px-3 py-2 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/35 text-xs font-mono font-bold text-sky-300 flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               <MapTrifold weight="duotone" className="w-4 h-4" />
               <span>Map</span>
@@ -217,7 +211,7 @@ export const CampaignMissionsTab: React.FC<CampaignMissionsTabProps> = ({
                 inspect full roster &rarr;
               </button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-2">
               {missionSorties.map((sortie) => {
                 const isAttending = Boolean(
                   calendarAttendeeByUid.get(sortie.calendarEventUid) ||
@@ -328,7 +322,7 @@ export const CampaignMissionsTab: React.FC<CampaignMissionsTabProps> = ({
                 full breakdown &rarr;
               </button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-2">
               {mission.objectives.slice(0, 6).map((obj, idx) => (
                 <div
                   key={`${mission.id}-card-obj-${idx}`}
@@ -445,15 +439,6 @@ export const CampaignMissionsTab: React.FC<CampaignMissionsTabProps> = ({
               </p>
             </div>
           </div>
-
-          <button
-            type="button"
-            onClick={() => onOpenExternal(undefined, `/campaigns/${campaign.slug}/missions`)}
-            className="px-3 py-1.5 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-800 hover:border-sky-500/40 text-xs font-mono text-sky-400 flex items-center gap-1.5 self-start md:self-auto"
-          >
-            <span>Open on Portal</span>
-            <ArrowSquareOut className="w-3.5 h-3.5" />
-          </button>
         </div>
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-stone-800/80">

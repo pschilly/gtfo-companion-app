@@ -36,6 +36,7 @@ interface CampaignIntelTabProps {
     mission: CampaignMissionItem,
     section?: MissionModalSection
   ) => void;
+  onOpenOnMap?: (missionId: number) => void;
 }
 
 type IntelRecencyWindow = 'current' | '14d' | 'all';
@@ -187,6 +188,7 @@ export const CampaignIntelTab: React.FC<CampaignIntelTabProps> = ({
   campaign,
   onOpenExternal,
   onInspectMission,
+  onOpenOnMap,
 }) => {
   const [recencyWindow, setRecencyWindow] = useState<IntelRecencyWindow>('current');
   const [typeFilter, setTypeFilter] = useState<string>('all');
@@ -438,17 +440,6 @@ export const CampaignIntelTab: React.FC<CampaignIntelTabProps> = ({
               </p>
             </div>
           </div>
-
-          <button
-            type="button"
-            onClick={() =>
-              onOpenExternal(undefined, `/campaigns/${campaign.slug}/intelligence-reports`)
-            }
-            className="px-3 py-1.5 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-800 hover:border-emerald-500/40 text-xs font-mono text-emerald-400 flex items-center gap-1.5 self-start md:self-auto"
-          >
-            <span>Open on Portal</span>
-            <ArrowSquareOut className="w-3.5 h-3.5" />
-          </button>
         </div>
 
         {/* Relevance / Recency Window Selector */}
@@ -577,7 +568,7 @@ export const CampaignIntelTab: React.FC<CampaignIntelTabProps> = ({
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-5">
             {paginatedEntries.map((entry) => {
             if (entry.kind === 'sortie_aar') {
               const { mission, sortie } = entry;
@@ -804,14 +795,13 @@ export const CampaignIntelTab: React.FC<CampaignIntelTabProps> = ({
                           <ArrowSquareOut className="w-3 h-3" />
                         </button>
                       )}
-                      {mission.mapUrl && (
+                      {onOpenOnMap && (
                         <button
                           type="button"
-                          onClick={() => onOpenExternal(mission.mapUrl)}
+                          onClick={() => onOpenOnMap(mission.id)}
                           className="text-amber-400 hover:text-amber-300 flex items-center gap-1"
                         >
                           <span>Map</span>
-                          <ArrowSquareOut className="w-3 h-3" />
                         </button>
                       )}
                     </div>
@@ -1014,16 +1004,7 @@ export const CampaignIntelTab: React.FC<CampaignIntelTabProps> = ({
                         <ArrowSquareOut className="w-3 h-3" />
                       </button>
                     )}
-                    {report.portalUrl && (
-                      <button
-                        type="button"
-                        onClick={() => onOpenExternal(report.portalUrl)}
-                        className="text-amber-400 hover:text-amber-300 flex items-center gap-1"
-                      >
-                        <span>Portal</span>
-                        <ArrowSquareOut className="w-3 h-3" />
-                      </button>
-                    )}
+
                   </div>
                 </div>
               </div>

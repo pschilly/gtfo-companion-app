@@ -29,7 +29,7 @@ export const ChecklistView: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 pb-8 max-w-7xl mx-auto">
+    <div className="space-y-6 pb-8 w-full max-w-[2400px] mx-auto">
       {/* Hero Header Card */}
       <div className="relative rounded-2xl overflow-hidden border border-stone-800 bg-stone-900/90 shadow-2xl p-6 sm:p-7">
         {/* Atmospheric Lighting */}
