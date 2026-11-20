@@ -2,6 +2,11 @@
 
 All notable changes to the GTFO Companion App are documented in this file.
 
+## [0.0.16] - 2026-11-20
+- **Build/Release**:
+  - Inject CARTO_KEY into CI builds (fixes map API-key overlay).
+  - Release now ships the installer only (no portable exe).
+
 ## [0.0.15] - 2026-11-20
 - **S2 Operations - Campaign Map**:
   - Added flight planning tool.

@@ -1,4 +1,4 @@
-name: Build Portable GTFO Companion App Executable
+name: Build GTFO Companion App Executable
 
 on:
   push:
@@ -64,12 +64,7 @@ jobs:
           VITE_DISCORD_GUILD_ID: ${{ secrets.VITE_DISCORD_GUILD_ID }}
           VITE_DISCORD_COMMUNITY_ROLE_ID: ${{ secrets.VITE_DISCORD_COMMUNITY_ROLE_ID }}
           VITE_DISCORD_CORE_ROLE_ID: ${{ secrets.VITE_DISCORD_CORE_ROLE_ID }}
-
-      - name: Upload Portable Executable Artifact (.exe)
-        uses: actions/upload-artifact@v5
-        with:
-          name: GTFO-Companion-App-Portable-Exe
-          path: src-tauri/target/release/gtfo-companion-app.exe
+          CARTO_KEY: ${{ secrets.CARTO_KEY }}
 
       - name: Create GitHub Release on Tag
         if: startsWith(github.ref, 'refs/tags/v')
@@ -80,7 +75,6 @@ jobs:
             src-tauri/target/release/bundle/nsis/*.zip
             src-tauri/target/release/bundle/nsis/*.sig
             src-tauri/target/release/latest.json
-            src-tauri/target/release/gtfo-companion-app.exe
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
