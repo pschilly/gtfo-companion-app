@@ -1,6 +1,7 @@
-• Event Calendar (Operations & Training Sorties): Added a unified Event Calendar displaying both Campaign Operations (OP) and S3 Training Sorties (TRG) with interactive Monthly Grid and Upcoming Schedule Agenda views
-• Direct Sortie RSVP & Flight Roster Management: RSVP directly from the Companion App with qualified/in-training aircraft selection, crew position (Pilot, Crew/RIO/WSO/CPG, Instructor, Student), BLUFOR/OPFOR side assignment, and training remarks
-• Authorized Squadron Callsigns & Element Numbering: Automatically resolves authorized squadron callsigns by airframe and pre-assigns sequential flight & element numbers (1-1 through 1-4, then 2-1, etc.) with full custom callsign override support
-• Compact Single-Row Calendar Pills & External Deep Links: Streamlined multi-event calendar days into compact single-row pills and fixed external browser deep-links for Discord Events, Briefing Threads, AARs, and Member Portal pages
-• Unified DCS Asset Manager: Consolidated Liveries, Kneeboards, Mods, and Soundpacks into a single unified Asset Manager view with category filtering and batch operations
-• A-10C Custom Airspace Fix: Disabled unsupported Custom Airspace tab for A-10C flight plans
+### v0.0.15 - 2026-11-21
+- **S2 Operations - Campaign Map**:
+  - Added flight planning tool.
+  - Added threats & assets (Support Assets & Threats (Enemy IRs)) to the map.
+  - Added coordinate converter.
+- **General App Changes**:
+  - Overall Style changes for screen widths.
