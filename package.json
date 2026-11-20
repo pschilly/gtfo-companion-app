@@ -1,8 +1,8 @@
 {
   "name": "gtfo-companion-app",
   "private": true,
-  "version": "0.0.13",
-  "description": "GTFO Companion App — DCS Asset Installer, Member Profile",
+  "version": "0.0.14",
+  "description": "GTFO Companion App",
   "type": "module",
   "scripts": {
     "dev": "vite",

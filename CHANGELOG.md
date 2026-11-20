@@ -2,6 +2,14 @@
 
 All notable changes to the GTFO Companion App are documented in this file.
 
+## [0.0.14] - 2026-11-20
+- **S2 Operations - Campaign Map**:
+  - Added flight planning tool.
+  - Added threats & assets (Support Assets & Threats (Enemy IRs)) to the map.
+  - Added coordinate converter.
+- **General App Changes**:
+  - Overall Style changes for screen widths.
+
 ## [0.0.13] - 2026-11-18
 
 ### Added
