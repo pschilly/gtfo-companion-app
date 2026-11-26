@@ -148,7 +148,7 @@ export const SupportAssetsDrawer: React.FC<SupportAssetsDrawerProps> = ({
     >
       <div className="p-3 text-xs text-stone-200 bg-stone-800/80 overflow-y-auto space-y-3">
         {!canEdit && (
-          <div className="p-2.5 rounded-lg bg-amber-950/40 border border-amber-700/50 text-amber-300 flex items-center gap-2 text-[11px]">
+          <div className="p-2.5 rounded-lg bg-amber-950/40 border border-amber-700/50 text-amber-300 flex items-center gap-2 text-xs">
             <Lock className="w-4 h-4 shrink-0 text-amber-400" weight="duotone" />
             <span>Read-only: Support Asset management permission required to edit or place assets.</span>
           </div>
@@ -160,7 +160,7 @@ export const SupportAssetsDrawer: React.FC<SupportAssetsDrawerProps> = ({
             !canEdit ? 'opacity-50 pointer-events-none' : ''
           }`}
         >
-          <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider">
+          <label className="block text-[11px] font-semibold text-stone-400 uppercase tracking-wider">
             Asset Type to Place
           </label>
           <select
@@ -175,7 +175,7 @@ export const SupportAssetsDrawer: React.FC<SupportAssetsDrawerProps> = ({
               </option>
             ))}
           </select>
-          <p className="text-[10px] text-stone-500 italic">
+          <p className="text-xs text-stone-500 italic">
             Newly placed assets will default to this type.
           </p>
         </div>
@@ -187,11 +187,11 @@ export const SupportAssetsDrawer: React.FC<SupportAssetsDrawerProps> = ({
           }`}
         >
           <div className="flex items-center justify-between">
-            <label className="text-[10px] font-bold text-stone-400 uppercase tracking-wider flex items-center gap-1.5">
+            <label className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider flex items-center gap-1.5">
               <span className="size-1.5 rounded-full bg-sky-500" />
               <span>Quick Add by Coordinates</span>
             </label>
-            <span className="text-[9px] text-stone-500 font-mono">
+            <span className="text-[11px] text-stone-500 font-mono">
               MGRS &bull; DDM &bull; DMS &bull; Lat/Lon
             </span>
           </div>
@@ -234,7 +234,7 @@ export const SupportAssetsDrawer: React.FC<SupportAssetsDrawerProps> = ({
               <span>Add</span>
             </button>
           </div>
-          <p className="text-[10px] text-stone-500 italic">
+          <p className="text-xs text-stone-500 italic">
             Press Enter to place asset at coordinates, or click map directly.
           </p>
         </div>
@@ -248,19 +248,19 @@ export const SupportAssetsDrawer: React.FC<SupportAssetsDrawerProps> = ({
         {/* Stats Overview Cards */}
         <div className="grid grid-cols-3 gap-2">
           <div className="bg-stone-900/90 border border-stone-800 rounded-lg p-2 flex flex-col items-center justify-center">
-            <span className="text-[10px] uppercase font-bold text-stone-400">Confirmed</span>
+            <span className="text-[11px] uppercase font-semibold tracking-wider text-stone-400">Confirmed</span>
             <span className="font-mono text-emerald-400 font-bold text-base mt-0.5">
               {stats.confirmedCount}
             </span>
           </div>
           <div className="bg-stone-900/90 border border-stone-800 rounded-lg p-2 flex flex-col items-center justify-center">
-            <span className="text-[10px] uppercase font-bold text-stone-400">Pending</span>
+            <span className="text-[11px] uppercase font-semibold tracking-wider text-stone-400">Pending</span>
             <span className="font-mono text-amber-400 font-bold text-base mt-0.5">
               {stats.pendingCount}
             </span>
           </div>
           <div className="bg-stone-900/90 border border-stone-800 rounded-lg p-2 flex flex-col items-center justify-center">
-            <span className="text-[10px] uppercase font-bold text-stone-400">Removal</span>
+            <span className="text-[11px] uppercase font-semibold tracking-wider text-stone-400">Removal</span>
             <span className="font-mono text-red-400 font-bold text-base mt-0.5">
               {stats.removedCount}
             </span>

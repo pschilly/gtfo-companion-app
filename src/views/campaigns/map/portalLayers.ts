@@ -374,7 +374,7 @@ export function getAirbaseMarkerIcon(
 
   const { isDeparture, isDestination, isDivert } = matchAirbaseRole(airbase, activePlan);
   const icaoBadge = airbase.icao
-    ? `<span class="text-stone-200 font-bold text-[10px] bg-stone-950/90 border border-stone-700 px-1 rounded shadow mt-0.5 whitespace-nowrap pointer-events-none">${escapeHtml(
+    ? `<span class="text-stone-200 font-bold text-[11px] bg-stone-950/90 border border-stone-700 px-1 rounded shadow mt-0.5 whitespace-nowrap pointer-events-none">${escapeHtml(
         airbase.icao
       )}</span>`
     : '';
@@ -383,7 +383,7 @@ export function getAirbaseMarkerIcon(
     return L.divIcon({
       className: 'airbase-icon group airbase-dep-dest-marker',
       html: `<div class="flex flex-col items-center justify-center relative">
-        <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 flex items-center gap-0.5 bg-sky-500 text-stone-950 px-1.5 py-0.5 rounded font-black text-[9px] uppercase tracking-wider shadow-md border border-sky-300 pointer-events-none animate-pulse whitespace-nowrap">${SVG_TAKEOFF(
+        <div class="absolute -top-4 left-1/2 -translate-x-1/2 flex items-center gap-0.5 bg-sky-500 text-stone-950 px-1.5 py-0.5 rounded font-black text-[11px] uppercase tracking-wider shadow-md border border-sky-300 pointer-events-none animate-pulse whitespace-nowrap">${SVG_TAKEOFF(
           'w-3 h-3 inline fill-current'
         )} HOME &amp; DEST</div>
         ${icaoBadge}
@@ -401,7 +401,7 @@ export function getAirbaseMarkerIcon(
     return L.divIcon({
       className: 'airbase-icon group airbase-departure-marker',
       html: `<div class="flex flex-col items-center justify-center relative">
-        <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 flex items-center gap-0.5 bg-sky-500 text-stone-950 px-1.5 py-0.5 rounded font-black text-[9px] uppercase tracking-wider shadow-md border border-sky-300 pointer-events-none animate-pulse whitespace-nowrap">${SVG_TAKEOFF(
+        <div class="absolute -top-4 left-1/2 -translate-x-1/2 flex items-center gap-0.5 bg-sky-500 text-stone-950 px-1.5 py-0.5 rounded font-black text-[11px] uppercase tracking-wider shadow-md border border-sky-300 pointer-events-none animate-pulse whitespace-nowrap">${SVG_TAKEOFF(
           'w-3 h-3 inline fill-current'
         )} DEPARTURE</div>
         ${icaoBadge}
@@ -419,7 +419,7 @@ export function getAirbaseMarkerIcon(
     return L.divIcon({
       className: 'airbase-icon group airbase-destination-marker',
       html: `<div class="flex flex-col items-center justify-center relative">
-        <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 flex items-center gap-0.5 bg-indigo-500 text-white px-1.5 py-0.5 rounded font-black text-[9px] uppercase tracking-wider shadow-md border border-indigo-300 pointer-events-none animate-pulse whitespace-nowrap">${SVG_LANDING(
+        <div class="absolute -top-4 left-1/2 -translate-x-1/2 flex items-center gap-0.5 bg-indigo-500 text-white px-1.5 py-0.5 rounded font-black text-[11px] uppercase tracking-wider shadow-md border border-indigo-300 pointer-events-none animate-pulse whitespace-nowrap">${SVG_LANDING(
           'w-3 h-3 inline fill-current'
         )} DESTINATION</div>
         ${icaoBadge}
@@ -437,7 +437,7 @@ export function getAirbaseMarkerIcon(
     return L.divIcon({
       className: 'airbase-icon group airbase-divert-marker',
       html: `<div class="flex flex-col items-center justify-center relative">
-        <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 flex items-center gap-0.5 bg-amber-500 text-stone-950 px-1.5 py-0.5 rounded font-black text-[9px] uppercase tracking-wider shadow-md border border-amber-300 pointer-events-none animate-pulse whitespace-nowrap">${SVG_LANDING(
+        <div class="absolute -top-4 left-1/2 -translate-x-1/2 flex items-center gap-0.5 bg-amber-500 text-stone-950 px-1.5 py-0.5 rounded font-black text-[11px] uppercase tracking-wider shadow-md border border-amber-300 pointer-events-none animate-pulse whitespace-nowrap">${SVG_LANDING(
           'w-3 h-3 inline fill-current'
         )} DIVERT</div>
         ${icaoBadge}
@@ -472,13 +472,13 @@ function buildAirbasePopupHtml(airbase: CampaignMapAirbase, activePlan: FlightPl
   if (isDeparture && isDestination) {
     html += `<div class="mb-2 px-2 py-1 rounded bg-sky-950/80 border border-sky-500/60 text-sky-300 text-xs font-bold flex items-center justify-between">${SVG_TAKEOFF(
       'w-4 h-4 text-sky-400 inline fill-current'
-    )} <span>Launch &amp; Recovery</span><span class="text-[9px] font-mono px-1 rounded bg-sky-500/20">HOME &amp; DEST</span></div>`;
+    )} <span>Launch &amp; Recovery</span><span class="text-[11px] px-1 rounded bg-sky-500/20">HOME &amp; DEST</span></div>`;
   } else if (isDeparture) {
-    html += `<div class="mb-2 px-2 py-1 rounded bg-sky-950/80 border border-sky-500/60 text-sky-300 text-xs font-bold flex items-center justify-between"><span>Designated Departure</span><span class="text-[9px] font-mono px-1 rounded bg-sky-500/20">HOME PLATE</span></div>`;
+    html += `<div class="mb-2 px-2 py-1 rounded bg-sky-950/80 border border-sky-500/60 text-sky-300 text-xs font-bold flex items-center justify-between"><span>Designated Departure</span><span class="text-[11px] px-1 rounded bg-sky-500/20">HOME PLATE</span></div>`;
   } else if (isDestination) {
-    html += `<div class="mb-2 px-2 py-1 rounded bg-indigo-950/80 border border-indigo-500/60 text-indigo-300 text-xs font-bold flex items-center justify-between"><span>Designated Recovery</span><span class="text-[9px] font-mono px-1 rounded bg-indigo-500/20">DESTINATION</span></div>`;
+    html += `<div class="mb-2 px-2 py-1 rounded bg-indigo-950/80 border border-indigo-500/60 text-indigo-300 text-xs font-bold flex items-center justify-between"><span>Designated Recovery</span><span class="text-[11px] px-1 rounded bg-indigo-500/20">DESTINATION</span></div>`;
   } else if (isDivert) {
-    html += `<div class="mb-2 px-2 py-1 rounded bg-amber-950/80 border border-amber-500/60 text-amber-300 text-xs font-bold flex items-center justify-between"><span>Designated Divert</span><span class="text-[9px] font-mono px-1 rounded bg-amber-500/20">ALTERNATE</span></div>`;
+    html += `<div class="mb-2 px-2 py-1 rounded bg-amber-950/80 border border-amber-500/60 text-amber-300 text-xs font-bold flex items-center justify-between"><span>Designated Divert</span><span class="text-[11px] px-1 rounded bg-amber-500/20">ALTERNATE</span></div>`;
   }
 
   html += `<h3 class="font-extrabold text-base border-b border-stone-700/80 mb-2 pb-1 text-white">${escapeHtml(
@@ -499,7 +499,7 @@ function buildAirbasePopupHtml(airbase: CampaignMapAirbase, activePlan: FlightPl
   }
 
   if (airbase.runways && airbase.runways.length > 0) {
-    html += `<div class="mb-2.5"><span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-1">Runways</span><div class="flex flex-wrap gap-1.5">${airbase.runways
+    html += `<div class="mb-2.5"><span class="text-xs font-bold text-stone-400 uppercase tracking-wider block mb-1">Runways</span><div class="flex flex-wrap gap-1.5">${airbase.runways
       .map(
         (r: any) =>
           `<span class="px-2 py-0.5 rounded bg-stone-800 border border-stone-700 text-xs font-mono font-semibold text-stone-200">${escapeHtml(
@@ -536,27 +536,27 @@ function buildAirbasePopupHtml(airbase: CampaignMapAirbase, activePlan: FlightPl
     const mhz = typeof hz === 'number' && hz > 10000 ? (hz / 1000000).toFixed(3) : String(hz);
     const mod = typeof f === 'object' && (f.modulation || f.type) ? f.modulation || f.type : 'AM';
     const lbl = typeof f === 'object' && (f.name || f.label) ? f.name || f.label : 'ATC';
-    return `<div class="flex items-center justify-between text-[11px] gap-1 py-0.5">
+    return `<div class="flex items-center justify-between text-xs gap-1 py-0.5">
       <span class="text-stone-300 truncate max-w-[90px]" title="${escapeHtml(lbl)}">${escapeHtml(
       lbl
     )}</span>
       <span class="flex items-center gap-1"><b class="font-mono text-amber-400">${escapeHtml(
         mhz
-      )}</b><span class="text-[9px] text-stone-400 uppercase px-1 rounded bg-stone-900 border border-stone-800">${escapeHtml(
+      )}</b><span class="text-[11px] text-stone-400 uppercase px-1 rounded bg-stone-900 border border-stone-800">${escapeHtml(
       mod
     )}</span></span>
     </div>`;
   };
 
   if (customFreqs.length > 0 || dcsFreqs.length > 0) {
-    html += `<div class="mb-2"><span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-1">Frequencies</span>`;
+    html += `<div class="mb-2"><span class="text-xs font-bold text-stone-400 uppercase tracking-wider block mb-1">Frequencies</span>`;
     if (customFreqs.length > 0) {
       html += `<div class="grid grid-cols-2 gap-x-3 gap-y-0.5">${customFreqs
         .map(renderFreqRow)
         .join('')}</div>`;
     }
     if (dcsFreqs.length > 0) {
-      html += `<details class="mt-1 pt-1 border-t border-stone-800 text-[10px]"><summary class="cursor-pointer text-stone-400 hover:text-stone-200 select-none">Show DCS Synced (${dcsFreqs.length})</summary><div class="grid grid-cols-2 gap-x-3 gap-y-0.5 mt-1">${dcsFreqs
+      html += `<details class="mt-1 pt-1 border-t border-stone-800 text-xs"><summary class="cursor-pointer text-stone-400 hover:text-stone-200 select-none">Show DCS Synced (${dcsFreqs.length})</summary><div class="grid grid-cols-2 gap-x-3 gap-y-0.5 mt-1">${dcsFreqs
         .map(renderFreqRow)
         .join('')}</div></details>`;
     }
@@ -565,9 +565,9 @@ function buildAirbasePopupHtml(airbase: CampaignMapAirbase, activePlan: FlightPl
 
   if (airbase.procedures && airbase.procedures.length > 0) {
     html += `<div class="mt-2 pt-1.5 border-t border-stone-800">
-      <div class="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-cyan-400 mb-1">
+      <div class="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-cyan-400 mb-1">
         <span>Procedures &amp; Patterns</span>
-        <span class="text-stone-400 font-mono text-[9px]">${airbase.procedures.length} available</span>
+        <span class="text-stone-400 font-normal text-[11px] tabular-nums">${airbase.procedures.length} available</span>
       </div>
       <div class="space-y-1 max-h-36 overflow-y-auto pr-0.5">
         ${airbase.procedures
@@ -577,15 +577,15 @@ function buildAirbasePopupHtml(airbase: CampaignMapAirbase, activePlan: FlightPl
             const typeLabel = proc.type_label || String(proc.type || 'PROC').toUpperCase();
             return `<div class="p-1.5 rounded bg-stone-900/90 border border-stone-800 flex items-center justify-between gap-1.5">
               <div class="min-w-0 flex-1">
-                <div class="font-bold text-[11px] text-white truncate">${escapeHtml(proc.name)}</div>
-                <div class="text-[9px] text-stone-400 font-mono flex items-center gap-1">
+                <div class="font-bold text-xs text-white truncate">${escapeHtml(proc.name)}</div>
+                <div class="text-[11px] text-stone-400 font-mono flex items-center gap-1">
                   <span class="inline-block w-1.5 h-1.5 rounded-full" style="background-color:${procColor}"></span>
                   <span>${escapeHtml(typeLabel)}${
               proc.runway ? ` • RWY ${escapeHtml(proc.runway)}` : ''
             } • ${(proc.waypoints || []).length} fixes</span>
                 </div>
               </div>
-              <button type="button" data-proc-apply="${pIdx}" class="px-2 py-0.5 rounded bg-sky-700 hover:bg-sky-600 text-white font-bold text-[10px] uppercase cursor-pointer">+ Plan</button>
+              <button type="button" data-proc-apply="${pIdx}" class="px-2 py-0.5 rounded bg-sky-700 hover:bg-sky-600 text-white font-bold text-[11px] uppercase cursor-pointer">+ Plan</button>
             </div>`;
           })
           .join('')}
@@ -595,13 +595,13 @@ function buildAirbasePopupHtml(airbase: CampaignMapAirbase, activePlan: FlightPl
 
   if (activePlan && activePlan.can_edit) {
     html += `<div class="mt-2.5 pt-2 border-t border-stone-800 grid grid-cols-2 gap-1.5">
-      <button type="button" data-ab-set-dep="1" class="px-2 py-1 rounded bg-sky-950 hover:bg-sky-900 text-sky-300 border border-sky-700/60 text-[10px] font-bold cursor-pointer">Set Departure</button>
-      <button type="button" data-ab-set-dest="1" class="px-2 py-1 rounded bg-indigo-950 hover:bg-indigo-900 text-indigo-300 border border-indigo-700/60 text-[10px] font-bold cursor-pointer">Set Destination</button>
+      <button type="button" data-ab-set-dep="1" class="px-2 py-1 rounded bg-sky-950 hover:bg-sky-900 text-sky-300 border border-sky-700/60 text-xs font-bold cursor-pointer">Set Departure</button>
+      <button type="button" data-ab-set-dest="1" class="px-2 py-1 rounded bg-indigo-950 hover:bg-indigo-900 text-indigo-300 border border-indigo-700/60 text-xs font-bold cursor-pointer">Set Destination</button>
       <button type="button" data-ab-toggle-divert="1" class="col-span-2 px-2 py-1 rounded ${
         isDivert
           ? 'bg-rose-950/80 hover:bg-rose-900 text-rose-300 border border-rose-700/60'
           : 'bg-amber-950/70 hover:bg-amber-900 text-amber-300 border border-amber-700/60'
-      } text-[10px] font-bold cursor-pointer">${
+      } text-xs font-bold cursor-pointer">${
       isDivert ? 'Remove Divert Airfield' : '+ Add Divert Airfield'
     }</button>
     </div>`;
@@ -767,7 +767,7 @@ export function renderAirbaseProceduresLayer(
               <div class="fix-diamond w-3 h-3 rotate-45 rounded-[1.5px] border-2 border-stone-900 shadow-md transition-transform duration-150 group-hover:scale-125" style="width:12px;height:12px;margin:1px;background-color:${
                 proc.color || '#38bdf8'
               }"></div>
-              <div class="fix-label absolute left-4.5 top-1/2 -translate-y-1/2 flex items-center gap-1 px-1.5 py-0.5 rounded bg-stone-950/95 border border-stone-700/80 shadow-lg text-[10px] font-mono whitespace-nowrap leading-tight z-50">
+              <div class="fix-label absolute left-4.5 top-1/2 -translate-y-1/2 flex items-center gap-1 px-1.5 py-0.5 rounded bg-stone-950/95 border border-stone-700/80 shadow-lg text-[11px] font-mono whitespace-nowrap leading-tight z-50">
                 <span class="font-bold text-white tracking-wider">${escapeHtml(fixName)}</span>
                 ${
                   badgeAlt
@@ -787,9 +787,9 @@ export function renderAirbaseProceduresLayer(
           fm.bindTooltip(
             `<div class="p-1.5 text-xs font-mono min-w-[150px]"><div class="font-bold text-white flex justify-between gap-2"><span>${escapeHtml(
               fixName
-            )}</span><span class="text-[10px] text-stone-400 font-normal">${escapeHtml(
+            )}</span><span class="text-[11px] font-sans text-stone-400 font-normal">${escapeHtml(
               proc.name
-            )}</span></div><div class="text-[10px] text-stone-400 font-sans">${escapeHtml(
+            )}</span></div><div class="text-[11px] text-stone-400 font-sans">${escapeHtml(
               ab.name
             )}</div></div>`,
             { direction: 'top', offset: [0, -12], className: 'procedure-tooltip' }
@@ -835,7 +835,7 @@ export function renderAirbaseProceduresLayer(
               Number(initPt.lat) + (Number(brkPt.lat) - Number(initPt.lat)) * 0.7,
               Number(initPt.lng) + (Number(brkPt.lng) - Number(initPt.lng)) * 0.7,
               rwyHdg,
-              `<b>Initial / Run-in Leg</b><br><span class="text-[10px] text-purple-300">Track ${rwyHdg}°</span>`
+              `<b>Initial / Run-in Leg</b><br><span class="text-[11px] text-purple-300">Track ${rwyHdg}°</span>`
             )
           );
         }
@@ -851,7 +851,7 @@ export function renderAirbaseProceduresLayer(
               (Number(dwPt.lat) + Number(bsPt.lat)) / 2,
               (Number(dwPt.lng) + Number(bsPt.lng)) / 2,
               dwHdg,
-              `<b>Downwind Leg</b><br><span class="text-[10px] text-purple-300">Track ${dwHdg}°</span>`
+              `<b>Downwind Leg</b><br><span class="text-[11px] text-purple-300">Track ${dwHdg}°</span>`
             )
           );
         }
@@ -900,11 +900,11 @@ export function renderAirbaseProceduresLayer(
           proc.color || '#38bdf8'
         }"><span class="w-2 h-2 rotate-45 rounded-[1px] shrink-0" style="background-color:${
           proc.color || '#38bdf8'
-        }"></span><span class="font-mono font-bold text-[11px] text-white tracking-wider">${escapeHtml(
+        }"></span><span class="font-mono font-bold text-xs text-white tracking-wider">${escapeHtml(
           nameplateText
         )}</span>${
           proc.initial_altitude
-            ? `<span class="font-mono text-[9px] font-semibold text-sky-400 border-l border-stone-800 pl-1.5">${escapeHtml(
+            ? `<span class="font-mono text-[11px] font-semibold text-sky-400 border-l border-stone-800 pl-1.5">${escapeHtml(
                 proc.initial_altitude
               )}ft</span>`
             : ''
@@ -917,16 +917,16 @@ export function renderAirbaseProceduresLayer(
 
       const popupHtml = `<div class="p-2 text-xs text-stone-200 min-w-[250px] max-w-[300px]">
         <div class="flex items-center justify-between gap-2 mb-1">
-          <span class="px-2 py-0.5 rounded text-[10px] font-bold font-mono uppercase" style="color:${
+          <span class="px-2 py-0.5 rounded text-[11px] font-bold uppercase" style="color:${
             proc.color || '#38bdf8'
           };border:1px solid ${proc.color || '#38bdf8'}66">${escapeHtml(
         proc.type_label || proc.type
       )}</span>
-          ${proc.runway ? `<span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-stone-800 border border-stone-700">RWY ${escapeHtml(proc.runway)}</span>` : ''}
+          ${proc.runway ? `<span class="text-[11px] font-mono px-1.5 py-0.5 rounded bg-stone-800 border border-stone-700">RWY ${escapeHtml(proc.runway)}</span>` : ''}
         </div>
         <div class="font-bold text-sm text-white">${escapeHtml(proc.name)}</div>
-        <div class="text-[11px] text-stone-400 mb-2">${escapeHtml(ab.name)}</div>
-        <div class="border-t border-stone-800 pt-1.5 max-h-28 overflow-y-auto space-y-0.5 font-mono text-[11px]">
+        <div class="text-xs text-stone-400 mb-2">${escapeHtml(ab.name)}</div>
+        <div class="border-t border-stone-800 pt-1.5 max-h-28 overflow-y-auto space-y-0.5 font-mono text-xs">
           ${rawPoints
             .slice(0, 12)
             .map(
@@ -938,8 +938,8 @@ export function renderAirbaseProceduresLayer(
             .join('')}
         </div>
         <div class="mt-2.5 pt-2 border-t border-stone-800 grid grid-cols-2 gap-1.5">
-          <button type="button" data-proc-mode="prepend" class="px-2 py-1 rounded bg-stone-800 hover:bg-stone-700 text-[10px] font-bold uppercase text-stone-200 cursor-pointer">Insert Start</button>
-          <button type="button" data-proc-mode="append" class="px-2 py-1 rounded bg-sky-600 hover:bg-sky-500 text-[10px] font-bold uppercase text-white cursor-pointer">Append End</button>
+          <button type="button" data-proc-mode="prepend" class="px-2 py-1 rounded bg-stone-800 hover:bg-stone-700 text-xs font-bold uppercase text-stone-200 cursor-pointer">Insert Start</button>
+          <button type="button" data-proc-mode="append" class="px-2 py-1 rounded bg-sky-600 hover:bg-sky-500 text-xs font-bold uppercase text-white cursor-pointer">Append End</button>
         </div>
       </div>`;
 
@@ -1002,7 +1002,7 @@ export function renderBullseyesLayer(
       className: 'bullseye-icon',
       html: `<div class="flex flex-col items-center justify-center">
         <div class="${colorClass}">${SVG_BULLSEYE}</div>
-        <div class="text-[9px] font-mono font-bold text-stone-200 bg-stone-900/90 px-1 rounded border border-stone-700 -mt-1">${escapeHtml(
+        <div class="text-[11px] font-mono font-bold text-stone-200 bg-stone-900/90 px-1 rounded border border-stone-700 -mt-1">${escapeHtml(
           bName
         )}</div>
       </div>`,
@@ -1178,11 +1178,11 @@ export function renderMissionsLayer(
           `<div class="p-3 text-xs text-stone-200 min-w-[260px] max-w-[340px] space-y-1.5 font-sans">
             <div class="flex items-center justify-between gap-2 border-b border-stone-800 pb-1">
               <div class="font-extrabold text-sm text-white">${escapeHtml(m.name)}</div>
-              <span class="px-1.5 py-0.5 rounded text-[9px] font-mono uppercase font-bold" style="background:${missionColor}20;color:${missionColor};border:1px solid ${missionColor}60">${escapeHtml(
+              <span class="px-1.5 py-0.5 rounded text-[11px] uppercase font-bold" style="background:${missionColor}20;color:${missionColor};border:1px solid ${missionColor}60">${escapeHtml(
             m.status_label || m.status
           )}</span>
             </div>
-            <div class="flex justify-between text-[10px] font-mono text-sky-300 bg-sky-950/40 px-2 py-1 rounded border border-sky-800/60">
+            <div class="flex justify-between text-[11px] font-mono text-sky-300 bg-sky-950/40 px-2 py-1 rounded border border-sky-800/60">
               <span class="font-bold">PRIMARY MISSION AOR</span>
               <span>${escapeHtml(areaStr)}</span>
             </div>
@@ -1246,7 +1246,7 @@ export function renderMissionsLayer(
           objLayer.bindTooltip(
             `<div class="p-2.5 text-xs text-stone-200 min-w-[240px] space-y-1 font-sans">
               <div class="font-bold text-white">OBJ #${idx + 1}: ${escapeHtml(obj.objective)}</div>
-              <div class="text-[10px] font-mono text-amber-300">Objective AOR ${escapeHtml(
+              <div class="text-[11px] font-mono text-amber-300">Objective AOR ${escapeHtml(
                 formatAorArea(obj.aor)
               )}</div>
             </div>`,
@@ -1277,7 +1277,7 @@ export function renderMissionsLayer(
           <div class="w-8 h-8 rounded-full flex items-center justify-center font-mono font-black text-xs text-white shadow-lg bg-stone-900/95" style="border:2px solid ${missionColor}">
             <span style="color:${objColor}">${glyph}</span>
           </div>
-          <div class="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full flex items-center justify-center text-[8px] font-black bg-stone-950 border" style="color:${prioColor};border-color:${prioColor}">${prioSymbol}</div>
+          <div class="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black bg-stone-950 border absolute -top-1 -right-1" style="color:${prioColor};border-color:${prioColor}">${prioSymbol}</div>
           <div class="absolute -inset-2 rounded-full animate-ping -z-10 pointer-events-none" style="background-color:${objColor}1a"></div>
         </div>`,
         iconSize: [32, 32],
@@ -1294,21 +1294,21 @@ export function renderMissionsLayer(
             <div class="font-extrabold text-sm text-white">OBJ #${idx + 1}: ${escapeHtml(
           obj.objective
         )}</div>
-            <span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase font-mono shrink-0" style="background:${objColor}20;color:${objColor};border:1px solid ${objColor}60">${escapeHtml(
+            <span class="px-1.5 py-0.5 rounded text-[11px] font-bold uppercase shrink-0" style="background:${objColor}20;color:${objColor};border:1px solid ${objColor}60">${escapeHtml(
           st
         )}</span>
           </div>
-          <div class="text-[11px] font-mono text-stone-400">Mission: <b class="text-white">${escapeHtml(
+          <div class="text-xs text-stone-400">Mission: <b class="text-white">${escapeHtml(
             m.name
           )}</b></div>
           ${
             obj.mgrs
-              ? `<div class="text-[11px] font-mono text-amber-300 font-bold">Grid: ${escapeHtml(
+              ? `<div class="text-xs font-mono text-amber-300 font-bold">Grid: ${escapeHtml(
                   obj.mgrs
                 )}</div>`
               : ''
           }
-          <div class="flex justify-between text-[11px] font-mono pt-1 border-t border-stone-800">
+          <div class="flex justify-between text-xs pt-1 border-t border-stone-800">
             <span>Priority: <b style="color:${prioColor}">${prioSymbol}</b></span>
             ${
               obj.points && obj.points > 0
@@ -1362,23 +1362,23 @@ export function renderMissionsLayer(
       `<div class="p-2.5 text-xs text-stone-200 min-w-[260px] max-w-[320px] space-y-1.5 font-sans">
         <div class="flex items-start justify-between gap-2 border-b border-stone-800 pb-1.5">
           <div class="font-extrabold text-sm text-white">${escapeHtml(m.name)}</div>
-          <span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase font-mono shrink-0" style="background:${missionColor}20;color:${missionColor};border:1px solid ${missionColor}60">${escapeHtml(
+          <span class="px-1.5 py-0.5 rounded text-[11px] font-bold uppercase shrink-0" style="background:${missionColor}20;color:${missionColor};border:1px solid ${missionColor}60">${escapeHtml(
         m.tasking_label || 'Mission'
       )}</span>
         </div>
         ${
           m.squadron_name
-            ? `<div class="text-[11px] font-mono text-amber-300">${escapeHtml(m.squadron_name)}</div>`
+            ? `<div class="text-xs text-amber-300">${escapeHtml(m.squadron_name)}</div>`
             : ''
         }
         ${
           m.scheduled_date
-            ? `<div class="text-[11px] font-mono text-cyan-300">${escapeHtml(m.scheduled_date)}</div>`
+            ? `<div class="text-xs font-mono text-cyan-300">${escapeHtml(m.scheduled_date)}</div>`
             : ''
         }
         ${
           m.rewards_summary && m.rewards_summary !== 'None'
-            ? `<div class="text-[11px] font-mono text-emerald-300">Earnings: <b>${escapeHtml(
+            ? `<div class="text-xs font-mono text-emerald-300">Earnings: <b>${escapeHtml(
                 m.rewards_summary
               )}</b></div>`
             : ''
@@ -1386,7 +1386,7 @@ export function renderMissionsLayer(
         ${
           totalObjs > 0
             ? `<div class="pt-1 border-t border-stone-800 space-y-1">
-                <div class="flex justify-between text-[10px] font-mono"><span class="text-stone-400">Objective Progress:</span><b>${completedObjs}/${totalObjs} (${pct}%)</b></div>
+                <div class="flex justify-between text-[11px]"><span class="text-stone-400">Objective Progress:</span><b class="font-mono tabular-nums">${completedObjs}/${totalObjs} (${pct}%)</b></div>
                 <div class="w-full bg-stone-950 rounded-full h-1.5 overflow-hidden border border-stone-800"><div class="${barColor} h-1.5 rounded-full" style="width:${pct}%"></div></div>
               </div>`
             : ''
@@ -1574,7 +1574,7 @@ export function renderThreatsLayer(
         <h3 class="font-bold text-base text-red-400 mb-0.5">${escapeHtml(
           t.title || samName || 'Threat'
         )}</h3>
-        <p class="text-[10px] text-stone-400 uppercase font-mono font-bold">${escapeHtml(
+        <p class="text-xs text-stone-400 uppercase font-bold">${escapeHtml(
           typeCfg?.label || t.type
         )}${rangeNm > 0 ? ` · ${rangeNm.toFixed(1)} NM` : ''}</p>
         ${t.description ? `<p class="mt-2 text-xs text-stone-300">${escapeHtml(t.description)}</p>` : ''}
@@ -1739,12 +1739,12 @@ export function renderSupportAssetsLayer(
             sa.title || sa.sam_name || 'Support Asset'
           )}</h3>
           <div class="flex items-center gap-1.5 flex-wrap mt-1">
-            <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-sky-950/90 text-sky-400 border border-sky-800/60">${escapeHtml(
+            <span class="text-[11px] font-bold uppercase px-2 py-0.5 rounded bg-sky-950/90 text-sky-400 border border-sky-800/60">${escapeHtml(
               sa.type
             )}</span>
             ${
               sa.aircraft_type
-                ? `<span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-amber-950/90 text-amber-300 border border-amber-800/60">${escapeHtml(
+                ? `<span class="text-[11px] font-semibold px-2 py-0.5 rounded bg-amber-950/90 text-amber-300 border border-amber-800/60">${escapeHtml(
                     sa.aircraft_type
                   )}</span>`
                 : ''
@@ -1800,7 +1800,7 @@ export function renderNavaidsLayer(
       className: 'navaid-marker-icon',
       html: `<div class="flex items-center gap-1.5 cursor-pointer select-none">
         <svg class="w-3.5 h-3.5 text-amber-400 fill-amber-400/80 stroke-amber-200 stroke-[1.5]" viewBox="0 0 24 24"><polygon points="12,2 22,20 2,20" /></svg>
-        <span class="text-[10px] font-mono font-bold text-amber-300 bg-stone-950/80 px-1 rounded border border-amber-500/30 whitespace-nowrap">${escapeHtml(
+        <span class="text-[11px] font-mono font-bold text-amber-300 bg-stone-950/80 px-1 rounded border border-amber-500/30 whitespace-nowrap">${escapeHtml(
           ident
         )}</span>
       </div>`,
@@ -1812,14 +1812,14 @@ export function renderNavaidsLayer(
     marker.bindPopup(
       `<div class="p-1 min-w-[220px] space-y-2 font-sans">
         <div class="flex items-center gap-2 border-b border-zinc-800 pb-1.5">
-          <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-amber-500/20 text-amber-400 border border-amber-500/30">NAVAID</span>
+          <span class="px-2 py-0.5 rounded text-[11px] font-bold uppercase bg-amber-500/20 text-amber-400 border border-amber-500/30">NAVAID</span>
           <h3 class="text-sm font-bold text-zinc-100 font-mono">${escapeHtml(ident)}</h3>
         </div>
-        <div class="bg-zinc-800/60 border border-zinc-800 rounded-md p-2 space-y-1 font-mono text-[11px]">
-          <div class="flex justify-between"><span class="text-zinc-400">MGRS:</span><b class="text-amber-400 select-all">${escapeHtml(mgrsVal)}</b></div>
-          <div class="flex justify-between border-t border-zinc-800/80 pt-1"><span class="text-zinc-400">LAT:</span><span class="select-all">${lat.toFixed(6)}°</span></div>
-          <div class="flex justify-between border-t border-zinc-800/80 pt-1"><span class="text-zinc-400">LON:</span><span class="select-all">${lon.toFixed(6)}°</span></div>
-          <div class="flex justify-between border-t border-zinc-800/80 pt-1 text-[10px] text-zinc-400"><span>DMS:</span><span class="select-all font-sans">${escapeHtml(dmsVal)}</span></div>
+        <div class="bg-zinc-800/60 border border-zinc-800 rounded-md p-2 space-y-1 font-mono text-xs">
+          <div class="flex justify-between"><span class="text-zinc-400 font-sans">MGRS:</span><b class="text-amber-400 select-all">${escapeHtml(mgrsVal)}</b></div>
+          <div class="flex justify-between border-t border-zinc-800/80 pt-1"><span class="text-zinc-400 font-sans">LAT:</span><span class="select-all">${lat.toFixed(6)}°</span></div>
+          <div class="flex justify-between border-t border-zinc-800/80 pt-1"><span class="text-zinc-400 font-sans">LON:</span><span class="select-all">${lon.toFixed(6)}°</span></div>
+          <div class="flex justify-between border-t border-zinc-800/80 pt-1 text-[11px] text-zinc-400"><span class="font-sans">DMS:</span><span class="select-all">${escapeHtml(dmsVal)}</span></div>
         </div>
       </div>`
     );
@@ -1931,16 +1931,16 @@ export function renderClusteredFlightPlansLayer(
               <span class="text-xs font-bold text-amber-300 font-mono whitespace-nowrap">${escapeHtml(
                 f.callsign || f.name || f.identifier
               )}</span>
-              ${f.is_opfor ? `<span class="text-[9px] font-mono font-bold px-1 rounded bg-red-950/80 text-red-400 border border-red-700/80">OPFOR</span>` : ''}
+              ${f.is_opfor ? `<span class="text-[11px] font-bold px-1 rounded bg-red-950/80 text-red-400 border border-red-700/80">OPFOR</span>` : ''}
               ${
                 f.airframe_abbr || f.airframe_name
-                  ? `<span class="text-[9px] font-mono font-semibold px-1 rounded bg-sky-950/80 text-sky-300 border border-sky-800/80 whitespace-nowrap">${escapeHtml(
+                  ? `<span class="text-[11px] font-semibold px-1 rounded bg-sky-950/80 text-sky-300 border border-sky-800/80 whitespace-nowrap">${escapeHtml(
                       f.airframe_abbr || f.airframe_name
                     )}</span>`
                   : ''
               }
             </div>
-            <span class="text-[9.5px] text-stone-400 font-mono mt-0.5">${f._calcDist} • ${
+            <span class="text-[11px] text-stone-400 font-mono mt-0.5">${f._calcDist} • ${
           f._calcTime
         }</span>
           </div>
@@ -1959,19 +1959,19 @@ export function renderClusteredFlightPlansLayer(
       marker.bindPopup(
         `<div class="p-2 min-w-[270px] space-y-2.5 font-sans">
           <div class="flex items-center justify-between border-b border-stone-700 pb-1.5">
-            <span class="text-xs font-mono font-bold uppercase text-amber-400">FLIGHT PLAN</span>
-            <span class="text-[10px] font-mono text-stone-400">${cluster.lat.toFixed(
+            <span class="text-xs font-bold uppercase text-amber-400">FLIGHT PLAN</span>
+            <span class="text-[11px] font-mono text-stone-400">${cluster.lat.toFixed(
               3
             )}, ${cluster.lon.toFixed(3)}</span>
           </div>
-          <div class="text-xs font-mono space-y-1">
+          <div class="text-xs space-y-1">
             <div class="text-sm font-bold text-white">${escapeHtml(
               f.callsign || f.name || f.identifier
             )}</div>
-            <div class="flex justify-between"><span class="text-stone-400 font-sans">Tasking:</span><b class="text-amber-400">${escapeHtml(
+            <div class="flex justify-between"><span class="text-stone-400">Tasking:</span><b class="text-amber-400">${escapeHtml(
               f.tasking_label || 'N/A'
             )}</b></div>
-            <div class="flex justify-between"><span class="text-stone-400 font-sans">Distance:</span><b>${
+            <div class="flex justify-between"><span class="text-stone-400">Distance:</span><b class="font-mono">${
               f._calcDist
             }</b></div>
             <div class="flex justify-between"><span class="text-stone-400 font-sans">Est. Time:</span><b>${
@@ -1999,15 +1999,15 @@ export function renderClusteredFlightPlansLayer(
               : ''
           }
           <div class="flex flex-col text-left leading-tight">
-            <span class="text-xs font-bold text-amber-300 font-mono">${count} Flight Plans</span>
-            <span class="text-[9.5px] text-stone-400 font-mono truncate max-w-[140px]">${escapeHtml(
+            <span class="text-xs font-bold text-amber-300 tabular-nums">${count} Flight Plans</span>
+            <span class="text-[11px] text-stone-400 font-mono truncate max-w-[140px]">${escapeHtml(
               cluster.flights
                 .slice(0, 2)
                 .map((fl) => fl.callsign || fl.identifier)
                 .join(', ')
             )}${count > 2 ? ` +${count - 2}` : ''}</span>
           </div>
-          <span class="text-[9.5px] font-bold font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">${count}x</span>
+          <span class="text-[11px] font-bold font-mono tabular-nums px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">${count}x</span>
         </div>`,
         iconSize: [200, 48],
         iconAnchor: [100, 24],
@@ -2021,8 +2021,8 @@ export function renderClusteredFlightPlansLayer(
       marker.bindPopup(
         `<div class="p-2 min-w-[330px] max-w-[380px] space-y-2 font-sans">
           <div class="flex items-center justify-between border-b border-stone-700 pb-1.5">
-            <span class="text-xs font-mono font-bold uppercase text-amber-400">FLIGHT PLANS (${count})</span>
-            <span class="text-[10px] font-mono text-stone-400">${cluster.lat.toFixed(
+            <span class="text-xs font-bold uppercase text-amber-400 tabular-nums">FLIGHT PLANS (${count})</span>
+            <span class="text-[11px] font-mono text-stone-400">${cluster.lat.toFixed(
               3
             )}, ${cluster.lon.toFixed(3)}</span>
           </div>
@@ -2031,10 +2031,10 @@ export function renderClusteredFlightPlansLayer(
               .map(
                 (fl) => `<div data-fp-row="${fl.id}" class="p-2 bg-stone-900/95 hover:bg-stone-800 rounded-lg border border-stone-700/80 flex items-center justify-between gap-2">
                   <div class="min-w-0 flex-1">
-                    <div class="font-bold text-xs text-stone-100 font-mono truncate">${escapeHtml(
+                    <div class="font-bold text-xs text-stone-100 truncate">${escapeHtml(
                       fl.callsign || fl.name || fl.identifier
                     )}</div>
-                    <div class="text-[10px] font-mono text-stone-400">${fl._calcDist} • ${
+                    <div class="text-[11px] font-mono text-stone-400">${fl._calcDist} • ${
                   fl._calcTime
                 }${fl.airframe_abbr ? ` • ${escapeHtml(fl.airframe_abbr)}` : ''}</div>
                   </div>
@@ -2132,18 +2132,18 @@ export function renderLogisticsLayer(
     const popupHtml = `<div class="p-1 w-[305px] text-stone-200 font-sans">
       <div class="border-b border-stone-700/80 pb-2 mb-2">
         <div class="flex items-center justify-between mb-1">
-          <span class="text-xs font-bold text-amber-400 uppercase font-mono">Logistics Sortie</span>
-          <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-stone-900 border border-stone-700 font-bold">${escapeHtml(
+          <span class="text-xs font-bold text-amber-400 uppercase">Logistics Sortie</span>
+          <span class="text-[11px] font-mono px-1.5 py-0.5 rounded bg-stone-900 border border-stone-700 font-bold">${escapeHtml(
             r.identifier
           )}</span>
         </div>
-        <div class="flex justify-between text-[10px] font-mono">
+        <div class="flex justify-between text-[11px]">
           <span class="uppercase font-bold">${escapeHtml(r.status_label || r.status)}</span>
-          <span class="text-amber-400 font-bold">${r.distance_nm ?? '--'} NM</span>
+          <span class="text-amber-400 font-mono font-bold">${r.distance_nm ?? '--'} NM</span>
           <span class="text-stone-400">${escapeHtml(r.created_at || 'Recently')}</span>
         </div>
       </div>
-      <div class="bg-stone-950/80 rounded border border-stone-800 p-2 mb-2 font-mono text-xs space-y-1">
+      <div class="bg-stone-950/80 rounded border border-stone-800 p-2 mb-2 text-xs space-y-1">
         <div class="flex justify-between"><span class="text-stone-500">Origin:</span><b>${escapeHtml(
           r.origin.name
         )}</b></div>
@@ -2154,8 +2154,8 @@ export function renderLogisticsLayer(
           r.delivering_pilots_summary || r.pilot || 'Open Sortie'
         )}</b></div>
       </div>
-      <div class="p-2 rounded bg-stone-950/80 border border-stone-800 mb-2 font-mono">
-        <div class="flex justify-between text-[10px] mb-1"><span class="text-stone-400">Progress</span><b class="text-amber-400">${
+      <div class="p-2 rounded bg-stone-950/80 border border-stone-800 mb-2">
+        <div class="flex justify-between text-[11px] mb-1"><span class="text-stone-400">Progress</span><b class="text-amber-400 tabular-nums">${
           r.delivered_units
         }/${r.total_units} (${r.progress_percent}%)</b></div>
         <div class="w-full bg-stone-900 rounded-full h-1.5 overflow-hidden"><div class="h-full bg-gradient-to-r from-amber-500 to-emerald-400" style="width:${Math.min(
@@ -2167,14 +2167,14 @@ export function renderLogisticsLayer(
         r.items && r.items.length > 0
           ? `<div class="space-y-1 max-h-32 overflow-y-auto">${r.items
               .map(
-                (item) => `<div class="px-2 py-1 rounded bg-stone-950/90 border border-stone-800 text-[11px] font-mono flex justify-between"><span class="truncate">${escapeHtml(
+                (item) => `<div class="px-2 py-1 rounded bg-stone-950/90 border border-stone-800 text-xs flex justify-between"><span class="truncate">${escapeHtml(
                   item.name
-                )}</span><b class="${
+                )}</span><b class="tabular-nums ${
                   item.is_completed ? 'text-emerald-400' : 'text-amber-300'
                 }">${item.delivered_quantity}/${item.quantity}</b></div>`
               )
               .join('')}</div>`
-          : `<div class="text-[11px] text-stone-400 font-mono">${escapeHtml(
+          : `<div class="text-xs text-stone-400">${escapeHtml(
               r.items_summary || ''
             )}</div>`
       }
@@ -2314,14 +2314,14 @@ export function renderIsrCapturesLayer(
               : ''
           }
           <div class="flex-1 min-w-0">
-            <div class="text-[10px] font-bold font-mono text-cyan-300">${Number(
+            <div class="text-[11px] font-bold font-mono text-cyan-300">${Number(
               req.km_size
             ).toFixed(1)}k FOV · ${escapeHtml(String(req.sensor).toUpperCase())}</div>
-            <div class="text-[9px] font-mono text-stone-400">${req.targets.length} Targets</div>
+            <div class="text-[11px] text-stone-400 tabular-nums">${req.targets.length} Targets</div>
           </div>
           ${
             firstUrl
-              ? `<button type="button" data-isr-fly-ov="${req.id}" class="px-1.5 py-0.5 text-[9px] font-mono rounded bg-cyan-950 border border-cyan-700 text-cyan-300 cursor-pointer">Map</button>`
+              ? `<button type="button" data-isr-fly-ov="${req.id}" class="px-1.5 py-0.5 text-[11px] rounded bg-cyan-950 border border-cyan-700 text-cyan-300 cursor-pointer">Map</button>`
               : ''
           }
         </div>`;
@@ -2338,7 +2338,7 @@ export function renderIsrCapturesLayer(
         count > 1 ? '#38bdf8' : '#2dd4bf'
       };padding:1px 4px;border-radius:4px;border:1px solid #14b8a6;">${badge}</span>
         <div class="isr-hover-flyout opacity-0 pointer-events-none transition-all duration-200" style="position:absolute;bottom:38px;left:50%;transform:translateX(-50%);width:270px;background:rgba(12,10,9,0.96);border:1px solid #00ffcc66;border-radius:10px;padding:8px;box-shadow:0 10px 25px rgba(0,0,0,0.85);">
-          <div class="text-[11px] font-bold font-mono text-cyan-300 uppercase border-b border-stone-800 pb-1 mb-1.5">ISR Recon (${count})</div>
+          <div class="text-xs font-bold text-cyan-300 uppercase border-b border-stone-800 pb-1 mb-1.5">ISR Recon (${count})</div>
           <div class="max-h-48 overflow-y-auto">${hoverRows}</div>
         </div>
       </div>`,
@@ -2381,7 +2381,7 @@ export function renderIsrCapturesLayer(
       return `<div class="p-1 w-[300px] text-stone-200 font-sans space-y-2">
         <div class="flex items-center justify-between border-b border-stone-700 pb-1.5">
           <span class="text-xs font-bold text-cyan-300 uppercase">ISR Imagery</span>
-          <span class="text-[10px] font-mono text-stone-400">${count} ${
+          <span class="text-[11px] tabular-nums text-stone-400">${count} ${
         count === 1 ? 'Capture' : 'Captures'
       }</span>
         </div>
@@ -2390,7 +2390,7 @@ export function renderIsrCapturesLayer(
             ? `<div class="flex flex-wrap gap-1">${cluster.requests
                 .map(
                   (r, i) =>
-                    `<button type="button" data-isr-pick="${r.id}" class="px-2 py-0.5 rounded text-[10px] font-mono border ${
+                    `<button type="button" data-isr-pick="${r.id}" class="px-2 py-0.5 rounded text-[11px] font-mono border ${
                       i === 0
                         ? 'bg-cyan-950 text-cyan-300 border-cyan-700'
                         : 'bg-stone-900 text-stone-400 border-stone-800'
@@ -2408,7 +2408,7 @@ export function renderIsrCapturesLayer(
               )}" data-isr-open="${first.id}" class="w-full h-32 object-cover rounded border border-stone-700 cursor-pointer" />`
             : ''
         }
-        <div class="flex items-center justify-between text-[10px] font-mono text-stone-400">
+        <div class="flex items-center justify-between text-[11px] text-stone-400">
           <span class="text-amber-300 font-bold">${first.targets.length} Targets</span>
           <span>${escapeHtml(first.created_at_human || '')}</span>
         </div>
@@ -3056,7 +3056,7 @@ export function renderAirframeTacticalLayers(
         zIndexOffset: 2320,
         icon: L.divIcon({
           className: 'f16-dest-point-icon bg-transparent border-0',
-          html: `<div class="flex items-center gap-1 text-[10px] font-mono text-amber-300"><span class="w-3 h-3 rotate-45 border-2 border-amber-400 bg-stone-950 inline-block"></span><span class="bg-stone-950/90 px-1 rounded border border-amber-500/50">${escapeHtml(
+          html: `<div class="flex items-center gap-1 text-[11px] font-mono text-amber-300"><span class="w-3 h-3 rotate-45 border-2 border-amber-400 bg-stone-950 inline-block"></span><span class="bg-stone-950/90 px-1 rounded border border-amber-500/50">${escapeHtml(
             pt.text || `D${pt.stpt || 81 + idx}`
           )}</span></div>`,
         }),

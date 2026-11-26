@@ -80,7 +80,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({ category, searchQuery 
 
         {/* Requirement Level & Status Funnel Pills */}
         <div className="flex flex-wrap items-center gap-2">
-          <div className="flex items-center bg-stone-900 border border-stone-800 rounded-xl p-1 text-xs font-mono">
+          <div className="flex items-center bg-stone-900 border border-stone-800 rounded-xl p-1 text-xs">
             <button
               onClick={() => setReqFilter('all')}
               className={`px-3 py-1 rounded-lg transition-colors ${
@@ -125,7 +125,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({ category, searchQuery 
             </button>
           </div>
 
-          <div className="flex items-center bg-stone-900 border border-stone-800 rounded-xl p-1 text-xs font-mono">
+          <div className="flex items-center bg-stone-900 border border-stone-800 rounded-xl p-1 text-xs">
             <button
               onClick={() => setStatusFilter('all')}
               className={`px-2.5 py-1 rounded-lg ${
@@ -158,14 +158,14 @@ export const CatalogView: React.FC<CatalogViewProps> = ({ category, searchQuery 
 
       {/* Aircraft / Module Funnel Chips */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1">
-        <span className="text-xs font-mono text-stone-500 flex items-center gap-1 shrink-0 mr-1">
+        <span className="text-xs text-stone-400 flex items-center gap-1 shrink-0 mr-1">
           <Stack className="w-3.5 h-3.5 text-amber-400" /> Module:
         </span>
         {modules.map((mod) => (
           <button
             key={mod}
             onClick={() => setModuleFilter(mod)}
-            className={`px-3 py-1.5 rounded-xl text-xs font-mono whitespace-nowrap border transition-all ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap border transition-all ${
               moduleFilter === mod
                 ? 'bg-amber-500/20 border-amber-500/50 text-amber-300 font-semibold'
                 : 'bg-stone-900/90 border-stone-800 text-stone-400 hover:text-stone-200 hover:border-stone-700'

@@ -54,10 +54,10 @@ export const MapLegendModal: React.FC<MapLegendModalProps> = ({
         {/* MISSION TASKINGS */}
         {mapData && mapData.taskings.length > 0 && (
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-2 border-b border-stone-700 pb-1">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-stone-400 mb-2 border-b border-stone-700 pb-1">
               Mission Taskings
             </p>
-            <p className="text-[10px] text-stone-400 mb-2">
+            <p className="text-xs text-stone-400 mb-2">
               Missions appear as circular markers on the map. The border color and icon indicate the
               tasking type.
             </p>
@@ -78,7 +78,7 @@ export const MapLegendModal: React.FC<MapLegendModalProps> = ({
                     <div className="flex-1 min-w-0">
                       <span className="font-semibold text-xs text-stone-100">{task.label}</span>
                       {task.description && (
-                        <span className="text-[10px] text-stone-400 ml-1">
+                        <span className="text-xs text-stone-400 ml-1">
                           — {task.description}
                         </span>
                       )}
@@ -92,7 +92,7 @@ export const MapLegendModal: React.FC<MapLegendModalProps> = ({
 
         {/* AIRFIELDS & NAVIGATION */}
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-2 border-b border-stone-700 pb-1">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-stone-400 mb-2 border-b border-stone-700 pb-1">
             Airfields &amp; Navigation
           </p>
           <div className="space-y-1.5">
@@ -104,7 +104,7 @@ export const MapLegendModal: React.FC<MapLegendModalProps> = ({
                 <span className="font-semibold text-xs text-sky-400">
                   Departure Airfield (Home Plate)
                 </span>
-                <span className="text-[10px] text-stone-400 ml-1">
+                <span className="text-xs text-stone-400 ml-1">
                   — Designated launch airfield for active flight plan.
                 </span>
               </div>
@@ -117,7 +117,7 @@ export const MapLegendModal: React.FC<MapLegendModalProps> = ({
                 <span className="font-semibold text-xs text-indigo-400">
                   Destination Airfield (Recovery)
                 </span>
-                <span className="text-[10px] text-stone-400 ml-1">
+                <span className="text-xs text-stone-400 ml-1">
                   — Designated recovery airfield for active flight plan.
                 </span>
               </div>
@@ -128,7 +128,7 @@ export const MapLegendModal: React.FC<MapLegendModalProps> = ({
               </div>
               <div className="flex-1 min-w-0">
                 <span className="font-semibold text-xs text-amber-400">Divert Airfield</span>
-                <span className="text-[10px] text-stone-400 ml-1">
+                <span className="text-xs text-stone-400 ml-1">
                   — Alternate recovery airfield.
                 </span>
               </div>
@@ -139,7 +139,7 @@ export const MapLegendModal: React.FC<MapLegendModalProps> = ({
               </div>
               <div className="flex-1 min-w-0">
                 <span className="font-semibold text-xs text-stone-100">Bullseye</span>
-                <span className="text-[10px] text-stone-400 ml-1">
+                <span className="text-xs text-stone-400 ml-1">
                   — Reference point for BRAA calls (click footer box to cycle).
                 </span>
               </div>
@@ -150,7 +150,7 @@ export const MapLegendModal: React.FC<MapLegendModalProps> = ({
               </div>
               <div className="flex-1 min-w-0">
                 <span className="font-semibold text-xs text-stone-100">Keyboard Shortcuts</span>
-                <span className="text-[10px] text-stone-400 ml-1">
+                <span className="text-xs text-stone-400 ml-1">
                   — Alt+F Flight Planner, Alt+C Converter, Alt+M Ruler, Alt+U Units, Alt+Enter Focus
                 </span>
               </div>
@@ -161,13 +161,13 @@ export const MapLegendModal: React.FC<MapLegendModalProps> = ({
         {/* ENEMY THREATS */}
         {Object.keys(threatGroups).length > 0 && (
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-2 border-b border-stone-700 pb-1">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-stone-400 mb-2 border-b border-stone-700 pb-1">
               Enemy Threats <span className="text-red-400">(Red)</span>
             </p>
             <div className="space-y-2.5">
               {Object.entries(threatGroups).map(([category, list]) => (
                 <div key={category} className="space-y-1">
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-red-400/80">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-red-400/80">
                     {category}
                   </span>
                   <div className="space-y-1 pl-1">
@@ -191,7 +191,7 @@ export const MapLegendModal: React.FC<MapLegendModalProps> = ({
                 <div className="shrink-0 w-7 h-7 flex items-center justify-center">
                   <div className="w-5 h-5 rounded-full border-2 border-dashed border-red-500 opacity-60" />
                 </div>
-                <span className="text-[10px] text-stone-400">
+                <span className="text-xs text-stone-400">
                   Dashed ring / Patriot fan = threat engagement range
                 </span>
               </div>
@@ -202,7 +202,7 @@ export const MapLegendModal: React.FC<MapLegendModalProps> = ({
         {/* SUPPORT ASSETS */}
         {mapData && mapData.supportAssetTypes.length > 0 && (
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-2 border-b border-stone-700 pb-1">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-stone-400 mb-2 border-b border-stone-700 pb-1">
               Friendly Support Assets <span className="text-blue-400">(Blue)</span>
             </p>
             <div className="space-y-1.5">

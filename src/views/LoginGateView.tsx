@@ -47,10 +47,10 @@ export const LoginGateView: React.FC = () => {
             />
           </div>
 
-          <h1 className="font-display font-bold tracking-tight text-2xl bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent">
+          <h1 className="font-display font-bold tracking-wide text-2xl sm:text-3xl bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent">
             {STATIC_CONFIG.appTitle}
           </h1>
-          <div className="text-xs font-mono uppercase tracking-widest text-stone-300 mt-1">
+          <div className="text-xs font-medium uppercase tracking-wider text-stone-300 mt-1">
             {STATIC_CONFIG.fullName}
           </div>
           {/* <p className="text-xs text-stone-400 mt-2">
@@ -74,7 +74,7 @@ export const LoginGateView: React.FC = () => {
           {isGuestSession ? (
             <div className="space-y-4">
               <div className="p-4 rounded-xl bg-amber-950/25 border border-amber-500/40 space-y-2.5">
-                <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase text-amber-300">
+                <div className="flex items-center gap-2 text-xs font-bold uppercase text-amber-300">
                   <Lock className="w-4 h-4 text-amber-400 shrink-0" />
                   <span>Insufficient Server Clearance</span>
                 </div>
@@ -94,7 +94,7 @@ export const LoginGateView: React.FC = () => {
                 <button
                   onClick={handleLogin}
                   disabled={isLoading}
-                  className="w-full py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-stone-950 font-display font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition-all"
+                  className="w-full py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-stone-950 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition-all"
                 >
                   {isLoading ? (
                     <>
@@ -111,7 +111,7 @@ export const LoginGateView: React.FC = () => {
 
                 <button
                   onClick={logoutDiscord}
-                  className="w-full py-2.5 px-4 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-800 text-stone-300 hover:text-red-300 text-xs font-mono flex items-center justify-center gap-2 transition-colors"
+                  className="w-full py-2.5 px-4 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-800 text-stone-300 hover:text-red-300 text-xs font-medium flex items-center justify-center gap-2 transition-colors"
                 >
                   <SignOut className="w-3.5 h-3.5" />
                   <span>Sign Out / Switch Discord Account</span>
@@ -155,7 +155,7 @@ export const LoginGateView: React.FC = () => {
         </div>
 
         {/* Footer */}
-        <div className="px-7 py-4 bg-stone-950 border-t border-stone-800/80 flex items-center justify-between text-[11px] font-mono text-stone-500">
+        <div className="px-7 py-4 bg-stone-950 border-t border-stone-800/80 flex items-center justify-between text-xs text-stone-500">
           <span>GTFO COMPANION APP</span>
           <span>DISCORD OAUTH2</span>
         </div>

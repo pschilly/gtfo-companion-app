@@ -431,7 +431,7 @@ export const RoutesTab: React.FC<RoutesTabProps> = ({
                       <span className="font-bold text-stone-100 truncate">{item.name}</span>
                     </div>
                     {item.code && (
-                      <span className="ml-2 font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-stone-800 text-amber-400 border border-stone-700">
+                      <span className="ml-2 font-mono text-[11px] font-bold px-1.5 py-0.5 rounded bg-stone-800 text-amber-400 border border-stone-700">
                         {item.code}
                       </span>
                     )}
@@ -444,7 +444,7 @@ export const RoutesTab: React.FC<RoutesTabProps> = ({
                       <span className="font-bold font-mono text-amber-300">{item.ident}</span>
                     </div>
                     {item.mgrs && (
-                      <span className="font-mono text-[10px] text-stone-400">{item.mgrs}</span>
+                      <span className="font-mono text-[11px] text-stone-400">{item.mgrs}</span>
                     )}
                   </div>
                 )}
@@ -456,16 +456,16 @@ export const RoutesTab: React.FC<RoutesTabProps> = ({
                         style={{ backgroundColor: item.color }}
                       />
                       <span className="font-bold text-cyan-300 truncate">{item.name}</span>
-                      <span className="text-[10px] text-stone-400 truncate">
+                      <span className="text-xs text-stone-400 truncate">
                         {item.airbase_name}
                       </span>
                     </div>
                     <div className="flex items-center gap-1 shrink-0 ml-2">
-                      <span className="font-mono text-[9px] font-bold px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">
+                      <span className="font-mono text-[11px] font-bold px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">
                         {item.proc_type}
                       </span>
                       {item.runway && (
-                        <span className="font-mono text-[9px] px-1 py-0.5 rounded bg-stone-800 text-stone-300 border border-stone-700">
+                        <span className="font-mono text-[11px] px-1 py-0.5 rounded bg-stone-800 text-stone-300 border border-stone-700">
                           RWY {item.runway}
                         </span>
                       )}
@@ -485,7 +485,7 @@ export const RoutesTab: React.FC<RoutesTabProps> = ({
             <MapPin className="size-4" weight="duotone" />
           </div>
           <div>
-            <span className="text-[10px] text-stone-400 uppercase font-bold block">Waypoints</span>
+            <span className="text-[11px] text-stone-400 uppercase font-bold block">Waypoints</span>
             <span className="text-xs font-mono font-bold text-white">{stats.count}</span>
           </div>
         </div>
@@ -494,7 +494,7 @@ export const RoutesTab: React.FC<RoutesTabProps> = ({
             <Path className="size-4" weight="duotone" />
           </div>
           <div>
-            <span className="text-[10px] text-stone-400 uppercase font-bold block">Distance</span>
+            <span className="text-[11px] text-stone-400 uppercase font-bold block">Distance</span>
             <span className="text-xs font-mono font-bold text-white">{stats.distDisplay}</span>
           </div>
         </div>
@@ -503,7 +503,7 @@ export const RoutesTab: React.FC<RoutesTabProps> = ({
             <Clock className="size-4" weight="duotone" />
           </div>
           <div>
-            <span className="text-[10px] text-stone-400 uppercase font-bold block">Est. Time</span>
+            <span className="text-[11px] text-stone-400 uppercase font-bold block">Est. Time</span>
             <span className="text-xs font-mono font-bold text-white">{stats.timeDisplay}</span>
           </div>
         </div>
@@ -531,7 +531,7 @@ export const RoutesTab: React.FC<RoutesTabProps> = ({
                   {isF14 ? 'Plan ' : 'Seq '}
                   {seq.number}
                 </span>
-                <span className="font-mono text-[10px] text-stone-400">({seq.count})</span>
+                <span className="font-mono text-[11px] tabular-nums text-stone-400">({seq.count})</span>
               </button>
 
               {canEdit && (
@@ -566,7 +566,7 @@ export const RoutesTab: React.FC<RoutesTabProps> = ({
           <button
             type="button"
             onClick={onAddSequence}
-            className="px-2.5 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-[10px] font-bold border border-amber-500/40 transition-colors shrink-0 flex items-center gap-1 cursor-pointer"
+            className="px-2.5 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-[11px] font-bold border border-amber-500/40 transition-colors shrink-0 flex items-center gap-1 cursor-pointer"
           >
             <Plus className="size-3" weight="bold" />
             <span>{isF14 ? 'Add Plan' : 'Add Seq'}</span>
@@ -582,15 +582,15 @@ export const RoutesTab: React.FC<RoutesTabProps> = ({
               <AirplaneLanding className="size-3.5" weight="duotone" />
             </span>
             <div>
-              <div className="text-[11px] font-bold text-stone-200 uppercase tracking-wider flex items-center gap-1.5">
+              <div className="text-xs font-bold text-stone-200 uppercase tracking-wider flex items-center gap-1.5">
                 <span>Recovery Pattern</span>
                 {overhead && (
-                  <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-purple-950 text-purple-300 border border-purple-800">
+                  <span className="text-[11px] px-1.5 py-0.2 rounded bg-purple-950 text-purple-300 border border-purple-800">
                     Assigned
                   </span>
                 )}
               </div>
-              <div className="text-[10px] text-stone-400">Overhead visual circuit parameters</div>
+              <div className="text-xs text-stone-400">Overhead visual circuit parameters</div>
             </div>
           </div>
 
@@ -606,7 +606,7 @@ export const RoutesTab: React.FC<RoutesTabProps> = ({
                     onCenterMap(Number(p0.lat), Number(p0.lng), 13);
                   }
                 }}
-                className="px-2 py-0.5 rounded bg-stone-800 hover:bg-stone-700 text-stone-300 text-[10px] font-medium border border-stone-700 transition-colors cursor-pointer"
+                className="px-2 py-0.5 rounded bg-stone-800 hover:bg-stone-700 text-stone-300 text-[11px] font-medium border border-stone-700 transition-colors cursor-pointer"
               >
                 Pan
               </button>
@@ -614,7 +614,7 @@ export const RoutesTab: React.FC<RoutesTabProps> = ({
                 <button
                   type="button"
                   onClick={handleAddOverheadInitial}
-                  className="px-2 py-0.5 rounded bg-purple-600 hover:bg-purple-500 text-white text-[10px] font-bold transition-colors cursor-pointer"
+                  className="px-2 py-0.5 rounded bg-purple-600 hover:bg-purple-500 text-white text-[11px] font-bold transition-colors cursor-pointer"
                 >
                   + INITIAL Fix
                 </button>
@@ -623,7 +623,7 @@ export const RoutesTab: React.FC<RoutesTabProps> = ({
                 <button
                   type="button"
                   onClick={() => onMutatePlan((p) => ({ ...p, overhead_pattern: null }))}
-                  className="px-2 py-0.5 rounded bg-red-950/60 hover:bg-red-900/80 text-red-300 text-[10px] font-bold border border-red-800/50 transition-colors cursor-pointer"
+                  className="px-2 py-0.5 rounded bg-red-950/60 hover:bg-red-900/80 text-red-300 text-[11px] font-bold border border-red-800/50 transition-colors cursor-pointer"
                 >
                   Remove
                 </button>
@@ -636,7 +636,7 @@ export const RoutesTab: React.FC<RoutesTabProps> = ({
                 setShowProceduresModal(true);
                 setProcedureSearch('overhead');
               }}
-              className="px-2 py-0.5 rounded bg-purple-950/60 hover:bg-purple-900/70 text-purple-300 text-[10px] font-bold border border-purple-800/50 cursor-pointer"
+              className="px-2 py-0.5 rounded bg-purple-950/60 hover:bg-purple-900/70 text-purple-300 text-[11px] font-bold border border-purple-800/50 cursor-pointer"
             >
               Browse Overhead Patterns
             </button>
@@ -644,9 +644,9 @@ export const RoutesTab: React.FC<RoutesTabProps> = ({
         </div>
 
         {overhead && (
-          <div className="px-2 py-1 rounded bg-stone-950/70 border border-stone-800 text-[11px] flex items-center justify-between text-stone-300">
+          <div className="px-2 py-1 rounded bg-stone-950/70 border border-stone-800 text-xs flex items-center justify-between text-stone-300">
             <span className="font-bold text-purple-300 truncate">{overhead.name}</span>
-            <span className="font-mono text-[10px] text-stone-400">
+            <span className="font-mono text-[11px] text-stone-400">
               {overhead.altitude_ft ? `${overhead.altitude_ft} ft` : '1,500 ft'} ·{' '}
               {overhead.speed_kts ? `${overhead.speed_kts} kts` : '300 kts'} ·{' '}
               {String(overhead.turn_direction || 'LEFT').toUpperCase()} BREAK
@@ -656,14 +656,14 @@ export const RoutesTab: React.FC<RoutesTabProps> = ({
       </div>
 
       {/* Waypoint Placement Guide */}
-      <div className="px-2.5 py-1.5 rounded bg-stone-950/70 border border-stone-800 text-[11px] text-stone-300 flex items-center justify-between">
+      <div className="px-2.5 py-1.5 rounded bg-stone-950/70 border border-stone-800 text-xs text-stone-300 flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <kbd className="px-1.5 py-0.5 rounded bg-stone-800 text-amber-400 font-mono font-bold text-[10px] border border-stone-700 shadow-sm">
+          <kbd className="px-1.5 py-0.5 rounded bg-stone-800 text-amber-400 font-mono font-bold text-[11px] border border-stone-700 shadow-sm">
             CTRL + CLICK
           </kbd>
           <span>on the map to place / split a waypoint</span>
         </div>
-        <div className="hidden sm:flex items-center gap-2 text-[10px] text-stone-400">
+        <div className="hidden sm:flex items-center gap-2 text-[11px] text-stone-400">
           <span className="flex items-center gap-1 text-amber-400/90 font-medium">
             <DotsSixVertical className="size-3 inline" weight="bold" /> Drag to reorder
           </span>
@@ -675,14 +675,14 @@ export const RoutesTab: React.FC<RoutesTabProps> = ({
       {/* Airfield Procedures Quick Insert */}
       <div ref={procWrapRef} className="space-y-1">
         <div className="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded bg-stone-900/80 border border-stone-800">
-          <div className="flex items-center gap-1.5 text-[11px] text-stone-300">
+          <div className="flex items-center gap-1.5 text-xs text-stone-300">
             <span className="text-amber-400 font-bold">SID/STAR:</span>
             <span className="text-stone-400">Load Airfield Procedures</span>
           </div>
           <button
             type="button"
             onClick={() => setShowProceduresModal((v) => !v)}
-            className="px-2 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-[10px] font-bold border border-amber-500/40 transition-colors flex items-center gap-1 cursor-pointer"
+            className="px-2 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-[11px] font-bold border border-amber-500/40 transition-colors flex items-center gap-1 cursor-pointer"
           >
             <Path className="size-3" weight="duotone" />
             <span>Procedures</span>
@@ -692,7 +692,7 @@ export const RoutesTab: React.FC<RoutesTabProps> = ({
         {showProceduresModal && (
           <div className="p-2.5 rounded-lg bg-stone-950 border border-stone-700 shadow-2xl space-y-2 mt-1">
             <div className="flex items-center justify-between gap-2">
-              <span className="text-[11px] font-bold text-stone-200 uppercase tracking-wider">
+              <span className="text-xs font-bold text-stone-200 uppercase tracking-wider">
                 Select Procedure
               </span>
               <input
@@ -700,13 +700,13 @@ export const RoutesTab: React.FC<RoutesTabProps> = ({
                 value={procedureSearch}
                 onChange={(e) => setProcedureSearch(e.target.value)}
                 placeholder="Filter SID / STAR / IAP..."
-                className="w-40 bg-stone-900 border border-stone-700 rounded px-2 py-0.5 text-[10px] text-stone-100 placeholder:text-stone-500 focus:border-amber-500 focus:outline-none"
+                className="w-40 bg-stone-900 border border-stone-700 rounded px-2 py-0.5 text-xs text-stone-100 placeholder:text-stone-500 focus:border-amber-500 focus:outline-none"
               />
             </div>
 
             <div className="max-h-48 overflow-y-auto space-y-1.5 pr-1 text-xs">
               {availableProcedures.length === 0 ? (
-                <div className="text-stone-500 text-[10px] italic p-2 text-center">
+                <div className="text-stone-500 text-xs italic p-2 text-center">
                   No airfield procedures found matching filter.
                 </div>
               ) : (
@@ -723,7 +723,7 @@ export const RoutesTab: React.FC<RoutesTabProps> = ({
                         />
                         <span className="font-bold text-stone-200 truncate">{p.name}</span>
                         <span
-                          className={`text-[9px] uppercase px-1 py-0.2 rounded font-mono font-bold border ${
+                          className={`text-[11px] uppercase px-1 py-0.2 rounded font-bold border ${
                             p.type === 'departure'
                               ? 'bg-blue-950 text-blue-300 border-blue-800'
                               : p.type === 'arrival'
@@ -736,12 +736,12 @@ export const RoutesTab: React.FC<RoutesTabProps> = ({
                           {p.type}
                         </span>
                         {p.match_role && (
-                          <span className="text-[8px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-1 rounded">
+                          <span className="text-[11px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-1 rounded">
                             {p.match_role}
                           </span>
                         )}
                       </div>
-                      <div className="text-[9px] text-stone-400 mt-0.5 flex items-center gap-2">
+                      <div className="text-[11px] text-stone-400 mt-0.5 flex items-center gap-2">
                         <span>{p.airbase_name}</span>
                         {p.runway && (
                           <span>
@@ -764,7 +764,7 @@ export const RoutesTab: React.FC<RoutesTabProps> = ({
                           onApplyProcedure(p, 'auto', activeSequence);
                           setShowProceduresModal(false);
                         }}
-                        className={`px-2 py-1 rounded font-bold text-[10px] transition-colors shadow-sm cursor-pointer shrink-0 ${
+                        className={`px-2 py-1 rounded font-bold text-[11px] transition-colors shadow-sm cursor-pointer shrink-0 ${
                           p.type === 'overhead_pattern'
                             ? 'bg-purple-600 hover:bg-purple-500 text-white'
                             : 'bg-amber-500 hover:bg-amber-400 text-stone-950'
@@ -783,7 +783,7 @@ export const RoutesTab: React.FC<RoutesTabProps> = ({
 
       {/* F-16 NAV PTS Banner */}
       {isF16 && (
-        <div className="px-2.5 py-1.5 rounded bg-stone-950/80 border border-stone-800 text-[11px] text-stone-300 flex items-center justify-between">
+        <div className="px-2.5 py-1.5 rounded bg-stone-950/80 border border-stone-800 text-xs text-stone-300 flex items-center justify-between">
           <div className="flex items-center gap-1.5">
             <span className="text-sky-400 font-bold">NAV PTS:</span>
             <span className="text-stone-400">Steerpoints 1–25:</span>
@@ -795,7 +795,7 @@ export const RoutesTab: React.FC<RoutesTabProps> = ({
               {nonDivertWpCount} / 25
             </span>
           </div>
-          <span className="text-[10px] text-stone-400">
+          <span className="text-[11px] text-stone-400">
             Routes 1, 2, or 3 (mutually exclusive)
           </span>
         </div>
@@ -877,7 +877,7 @@ export const RoutesTab: React.FC<RoutesTabProps> = ({
                   {fix ? (
                     <span
                       style={{ backgroundColor: seqColor }}
-                      className="w-4 h-4 rotate-45 rounded-[2px] text-white font-bold text-[9px] flex items-center justify-center shrink-0 border border-white/70 shadow-sm mr-0.5"
+                      className="w-5 h-5 rotate-45 rounded-[2px] text-white font-bold text-[11px] flex items-center justify-center shrink-0 border border-white/70 shadow-sm mr-0.5"
                       title={`Nav Fix: ${wp.name}`}
                     >
                       <span className="-rotate-45 block leading-none font-mono">{idx + 1}</span>
@@ -885,7 +885,7 @@ export const RoutesTab: React.FC<RoutesTabProps> = ({
                   ) : (
                     <span
                       style={{ backgroundColor: seqColor }}
-                      className="w-5 h-5 rounded-full text-white font-bold text-[10px] flex items-center justify-center shrink-0 border border-white/40 shadow-sm"
+                      className="w-5 h-5 rounded-full text-white font-bold text-[11px] font-mono flex items-center justify-center shrink-0 border border-white/40 shadow-sm"
                     >
                       {idx + 1}
                     </span>
@@ -904,27 +904,27 @@ export const RoutesTab: React.FC<RoutesTabProps> = ({
                         {wp.name || (idx === 0 ? 'DEP' : `WP${idx + 1}`)}
                       </span>
                       {typeUp === 'DEP' && (
-                        <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-sky-950 text-sky-300 border border-sky-700">
+                        <span className="text-[11px] font-bold px-1.5 py-0.2 rounded bg-sky-950 text-sky-300 border border-sky-700">
                           DEP
                         </span>
                       )}
                       {typeUp === 'ARR' && (
-                        <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-indigo-950 text-indigo-300 border border-indigo-700">
+                        <span className="text-[11px] font-bold px-1.5 py-0.2 rounded bg-indigo-950 text-indigo-300 border border-indigo-700">
                           ARR
                         </span>
                       )}
                       {fix && typeUp !== 'DEP' && typeUp !== 'ARR' && (
-                        <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-cyan-950 text-cyan-300 border border-cyan-700">
+                        <span className="text-[11px] font-bold px-1.5 py-0.2 rounded bg-cyan-950 text-cyan-300 border border-cyan-700">
                           FIX
                         </span>
                       )}
                       {additional && (
-                        <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-purple-950 text-purple-300 border border-purple-700">
+                        <span className="text-[11px] font-bold px-1.5 py-0.2 rounded bg-purple-950 text-purple-300 border border-purple-700">
                           ADDITIONAL
                         </span>
                       )}
                     </div>
-                    <div className="text-[10px] font-mono text-stone-400 mt-0.5 flex gap-2">
+                    <div className="text-[11px] font-mono text-stone-400 mt-0.5 flex gap-2">
                       <span>
                         {wp.alt
                           ? unit === 'km'
@@ -992,7 +992,7 @@ export const RoutesTab: React.FC<RoutesTabProps> = ({
                             e.stopPropagation();
                             onSetWaypointSequence(globalIdx, rNum);
                           }}
-                          className={`px-1.5 py-0.5 text-[9px] font-bold rounded transition-colors cursor-pointer ${
+                          className={`px-1.5 py-0.5 text-[11px] font-bold rounded transition-colors cursor-pointer ${
                             Number(wp.sequence || 1) === rNum
                               ? 'bg-amber-500 text-stone-950 shadow-sm'
                               : 'text-stone-400 hover:text-stone-200'

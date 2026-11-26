@@ -2,6 +2,12 @@
 
 All notable changes to the GTFO Companion App are documented in this file.
 
+## [0.0.17] - 2026-11-25
+- **Typography & Readability**:
+  - Replaced `Inter`, `Lexend`, and `JetBrains Mono` with `Barlow Semi Condensed` (headings/display), `IBM Plex Sans` (UI/body), and `IBM Plex Mono` (telemetry, coordinates, and technical data) across the app and PDF kneeboard generator.
+  - Bumped unreadable sub-12px micro-text across views, components, modals, tactical map drawers, and Leaflet popups while preserving compact fixed-pixel map pin markers.
+  - Removed unnecessary monospace styling from buttons, tabs, form labels, status badges, and prose while retaining monospace and tabular numerals for operational flight data.
+
 ## [0.0.16] - 2026-11-20
 - **Build/Release**:
   - Inject CARTO_KEY into CI builds (fixes map API-key overlay).

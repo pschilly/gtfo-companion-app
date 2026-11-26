@@ -1128,7 +1128,7 @@ export const AtcView: React.FC = () => {
             <button
               onClick={() => syncFlightPlans()}
               disabled={isLoadingFlightPlans}
-              className="px-4 py-2.5 rounded-xl bg-stone-800 hover:bg-stone-700 border border-stone-700 text-stone-200 text-xs font-mono font-semibold flex items-center gap-2 transition-all disabled:opacity-50"
+              className="px-4 py-2.5 rounded-xl bg-stone-800 hover:bg-stone-700 border border-stone-700 text-stone-200 text-xs font-semibold flex items-center gap-2 transition-all disabled:opacity-50"
             >
               <ArrowsClockwise
                 className={`w-4 h-4 text-amber-400 ${isLoadingFlightPlans ? 'animate-spin' : ''}`}
@@ -1154,7 +1154,7 @@ export const AtcView: React.FC = () => {
             >
               <User className="w-4 h-4" />
               <span>My Plans</span>
-              <span className="px-1.5 py-0.2 rounded-full bg-stone-900/60 text-[10px] font-mono">
+              <span className="px-1.5 py-0.2 rounded-full bg-stone-900/60 text-[11px] font-mono tabular-nums">
                 {memberFlightPlans.length}
               </span>
             </button>
@@ -1172,7 +1172,7 @@ export const AtcView: React.FC = () => {
             >
               <Broadcast className="w-4 h-4" />
               <span>ATC Filed Plans</span>
-              <span className="px-1.5 py-0.2 rounded-full bg-stone-900/60 text-[10px] font-mono">
+              <span className="px-1.5 py-0.2 rounded-full bg-stone-900/60 text-[11px] font-mono tabular-nums">
                 {filedFlightPlans.length}
               </span>
             </button>
@@ -1180,23 +1180,23 @@ export const AtcView: React.FC = () => {
 
           {/* Stat Badges for Active Mode */}
           {viewMode === 'member' && (
-            <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono">
+            <div className="flex flex-wrap items-center gap-2 text-xs tabular-nums">
               <span className="px-2.5 py-1 rounded-lg bg-stone-950 border border-stone-800 text-stone-300">
-                Missions: <strong className="text-amber-400">{memberFlightPlansMeta.missions_count}</strong>
+                Missions: <strong className="font-mono text-amber-400">{memberFlightPlansMeta.missions_count}</strong>
               </span>
               <span className="px-2.5 py-1 rounded-lg bg-stone-950 border border-stone-800 text-stone-300">
-                Authored: <strong className="text-amber-400">{memberFlightPlansMeta.authored_count}</strong>
+                Authored: <strong className="font-mono text-amber-400">{memberFlightPlansMeta.authored_count}</strong>
               </span>
               <span className="px-2.5 py-1 rounded-lg bg-stone-950 border border-stone-800 text-stone-300">
-                Private: <strong className="text-purple-400">{memberFlightPlansMeta.private_count}</strong>
+                Private: <strong className="font-mono text-purple-400">{memberFlightPlansMeta.private_count}</strong>
               </span>
             </div>
           )}
 
           {viewMode === 'filed' && (
-            <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono">
+            <div className="flex flex-wrap items-center gap-2 text-xs tabular-nums">
               <span className="px-2.5 py-1 rounded-lg bg-stone-950 border border-stone-800 text-stone-300">
-                Total Filed: <strong className="text-emerald-400">{filedFlightPlans.length}</strong>
+                Total Filed: <strong className="font-mono text-emerald-400">{filedFlightPlans.length}</strong>
               </span>
             </div>
           )}
@@ -1216,7 +1216,7 @@ export const AtcView: React.FC = () => {
                 placeholder="Filter callsign, airframe, airfield..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-8 pr-7 py-1.5 rounded-lg bg-stone-950 border border-stone-800 text-stone-200 text-xs font-mono placeholder-stone-500 focus:outline-none focus:border-amber-500/60"
+                className="w-full pl-8 pr-7 py-1.5 rounded-lg bg-stone-950 border border-stone-800 text-stone-200 text-xs placeholder-stone-500 focus:outline-none focus:border-amber-500/60"
               />
               {searchQuery && (
                 <button
@@ -1233,7 +1233,7 @@ export const AtcView: React.FC = () => {
               <select
                 value={selectedSquadron}
                 onChange={(e) => setSelectedSquadron(e.target.value)}
-                className="w-1/2 px-2 py-1 rounded-lg bg-stone-950 border border-stone-800 text-stone-300 text-[11px] font-mono focus:outline-none focus:border-amber-500 truncate"
+                className="w-1/2 px-2 py-1 rounded-lg bg-stone-950 border border-stone-800 text-stone-300 text-xs focus:outline-none focus:border-amber-500 truncate"
               >
                 <option value="ALL">All Squadrons</option>
                 {squadronFilterOptions.map((sq) => (
@@ -1246,7 +1246,7 @@ export const AtcView: React.FC = () => {
               <select
                 value={selectedAirframe}
                 onChange={(e) => setSelectedAirframe(e.target.value)}
-                className="w-1/2 px-2 py-1 rounded-lg bg-stone-950 border border-stone-800 text-stone-300 text-[11px] font-mono focus:outline-none focus:border-amber-500 truncate"
+                className="w-1/2 px-2 py-1 rounded-lg bg-stone-950 border border-stone-800 text-stone-300 text-xs focus:outline-none focus:border-amber-500 truncate"
               >
                 <option value="ALL">All Airframes</option>
                 {airframeFilterOptions.map((af) => (
@@ -1262,7 +1262,7 @@ export const AtcView: React.FC = () => {
             <h2 className="font-display text-xs font-semibold uppercase tracking-wider text-amber-400">
               {viewMode === 'member' ? 'My Plans' : 'ATC Filed Plans'} ({filteredPlans.length})
             </h2>
-            <span className="text-[10px] font-mono text-stone-500">
+            <span className="text-[11px] text-stone-500">
               {filteredPlans.length > 0 ? 'Select to inspect' : ''}
             </span>
           </div>
@@ -1270,7 +1270,7 @@ export const AtcView: React.FC = () => {
           {/* Dedicated Scrollable List Container */}
           <div className="overflow-y-auto pr-1.5 space-y-1.5 max-h-[calc(100vh-22rem)] min-h-[360px] scrollbar-thin scrollbar-thumb-stone-800 scrollbar-track-stone-950/40">
             {filteredPlans.length === 0 ? (
-              <div className="p-8 rounded-xl border border-stone-800 bg-stone-900/40 text-center text-xs font-mono text-stone-500">
+              <div className="p-8 rounded-xl border border-stone-800 bg-stone-900/40 text-center text-xs text-stone-500">
                 No flight plans matched your criteria.
               </div>
             ) : (
@@ -1295,7 +1295,7 @@ export const AtcView: React.FC = () => {
                     {/* Top Row: Identifier, Callsign/Name, Status Badges */}
                     <div className="flex items-center justify-between gap-2 min-w-0">
                       <div className="flex items-center gap-1.5 min-w-0">
-                        <span className="font-mono bg-stone-950 border border-stone-800 text-amber-400 px-1.5 py-0.5 rounded text-[10px] font-bold shrink-0">
+                        <span className="font-mono bg-stone-950 border border-stone-800 text-amber-400 px-1.5 py-0.5 rounded text-[11px] font-bold shrink-0">
                           #{plan.identifier || `FP-${plan.id}`}
                         </span>
                         <h3 className={`text-xs font-semibold truncate ${isSelected ? 'text-amber-200' : 'text-stone-100'}`}>
@@ -1309,24 +1309,24 @@ export const AtcView: React.FC = () => {
                       <div className="flex items-center gap-1 shrink-0">
                         {plan.is_filed ? (
                           <span
-                            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[9px] font-mono font-semibold"
+                            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[11px] font-semibold"
                             title={`Filed with ATC at ${plan.filed_at || ''}`}
                           >
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                             <span>{formatFiledTime(plan.filed_at) ? `Filed ${formatFiledTime(plan.filed_at)}` : 'Filed'}</span>
                           </span>
                         ) : (
-                          <span className="px-1.5 py-0.5 rounded bg-stone-950 text-stone-500 border border-stone-800/80 text-[9px] font-mono">
+                          <span className="px-1.5 py-0.5 rounded bg-stone-950 text-stone-500 border border-stone-800/80 text-[11px] font-medium">
                             Draft
                           </span>
                         )}
                         {plan.is_opfor && (
-                          <span className="px-1 py-0.2 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 text-[8px] font-mono font-bold">
+                          <span className="px-1 py-0.2 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 text-[11px] font-bold leading-tight">
                             OPFOR
                           </span>
                         )}
                         {plan.is_private && (
-                          <span className="px-1 py-0.2 rounded bg-purple-500/20 text-purple-300 border border-purple-500/40 text-[8px] font-mono font-bold">
+                          <span className="px-1 py-0.2 rounded bg-purple-500/20 text-purple-300 border border-purple-500/40 text-[11px] font-bold leading-tight">
                             PRIV
                           </span>
                         )}
@@ -1334,28 +1334,28 @@ export const AtcView: React.FC = () => {
                     </div>
 
                     {/* Bottom Row: Airframe, Route, WPT count & DTC */}
-                    <div className="flex items-center justify-between gap-2 mt-1 text-[11px] font-mono text-stone-400">
+                    <div className="flex items-center justify-between gap-2 mt-1 text-xs text-stone-400">
                       <div className="flex items-center gap-1.5 truncate">
                         <span className="text-stone-300 font-medium shrink-0">
                           {plan.airframe?.abbreviation || plan.airframe?.name || 'Aircraft'}
                         </span>
                         <span className="text-stone-600">•</span>
-                        <span className="truncate text-stone-400">
+                        <span className="truncate font-mono text-[11px] text-stone-400">
                           {plan.departure_airfield || 'DEP'} ➔ {plan.destination_airfield || 'ARR'}
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-1 shrink-0 text-[10px]">
+                      <div className="flex items-center gap-1 shrink-0 text-[11px] font-mono">
                         <span className="text-stone-500">
                           {plan.route_summary?.waypoint_count || 0} wpts
                         </span>
                         {isJf17Airframe(plan) ? (
-                          <span className="px-1 py-0.2 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 text-[9px]">
+                          <span className="px-1 py-0.2 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 text-[11px]">
                             AIRSPACE
                           </span>
                         ) : (
                           isDtcCapablePlan(plan) && (
-                            <span className="px-1 py-0.2 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[9px]">
+                            <span className="px-1 py-0.2 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[11px]">
                               DTC
                             </span>
                           )
@@ -1396,14 +1396,14 @@ export const AtcView: React.FC = () => {
                         >
                           #{selectedDetail.identifier}
                         </span>
-                        <span className="px-2.5 py-0.5 rounded-full bg-stone-800 text-stone-300 text-[11px] font-mono">
+                        <span className="px-2.5 py-0.5 rounded-full bg-stone-800 text-stone-300 text-[11px] font-medium">
                           {selectedDetail.squadron?.name}
                         </span>
-                        <span className="px-2.5 py-0.5 rounded-full bg-stone-800 text-stone-300 text-[11px] font-mono">
+                        <span className="px-2.5 py-0.5 rounded-full bg-stone-800 text-stone-300 text-[11px] font-medium">
                           {selectedDetail.airframe?.name}
                         </span>
                         {selectedDetail.flight_rules && (
-                          <span className="px-2 py-0.5 rounded bg-stone-800 text-amber-400 text-[10px] font-mono">
+                          <span className="px-2 py-0.5 rounded bg-stone-800 text-amber-400 text-[11px] font-mono font-semibold">
                             {selectedDetail.flight_rules}
                           </span>
                         )}
@@ -1413,17 +1413,17 @@ export const AtcView: React.FC = () => {
                           ? `${selectedDetail.callsign} // ${selectedDetail.name}`
                           : selectedDetail.callsign || selectedDetail.name}
                       </h2>
-                      <p className="text-xs font-mono text-stone-400">
+                      <p className="text-xs text-stone-400">
                         Launch:{' '}
-                        <span className="text-stone-200 font-semibold">
+                        <span className="font-mono text-stone-200 font-semibold">
                           {selectedDetail.launch_time || '—'}
                         </span>{' '}
                         &bull; Fuel:{' '}
-                        <span className="text-amber-400 font-semibold">
+                        <span className="font-mono text-amber-400 font-semibold">
                           {selectedDetail.fuel_amount ? `${selectedDetail.fuel_amount} lbs` : 'Standard'}
                         </span>{' '}
                         &bull; Theatre:{' '}
-                        <span className="text-stone-200">{activeTheatre}</span>
+                        <span className="text-stone-200 font-medium">{activeTheatre}</span>
                       </p>
                     </div>
                   </div>
@@ -1432,25 +1432,25 @@ export const AtcView: React.FC = () => {
                   <div className="flex flex-col items-end gap-2 shrink-0">
                     {/* Read-Only ATC Filing Badge */}
                     {selectedDetail.is_filed ? (
-                      <span className="px-3 py-1.5 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold flex items-center gap-1.5 shadow-sm">
+                      <span className="px-3 py-1.5 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-semibold flex items-center gap-1.5 shadow-sm">
                         <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
                         <span>Filed with ATC • {formatFiledTime(selectedDetail.filed_at)}</span>
                       </span>
                     ) : (
-                      <span className="px-3 py-1.5 rounded-lg bg-stone-950 border border-stone-800 text-stone-400 text-xs font-mono flex items-center gap-1.5">
+                      <span className="px-3 py-1.5 rounded-lg bg-stone-950 border border-stone-800 text-stone-400 text-xs font-medium flex items-center gap-1.5">
                         <span className="w-2 h-2 rounded-full bg-stone-600" />
                         <span>Draft / Unfiled</span>
                       </span>
                     )}
 
-                    <div className="flex items-center gap-2 text-[11px] font-mono">
+                    <div className="flex items-center gap-2 text-xs">
                       {selectedDetail.mission ? (
                         <span className="text-amber-400 font-semibold flex items-center gap-1.5">
                           <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
                           Mission: {selectedDetail.mission.name}
                         </span>
                       ) : (
-                        <span className="text-purple-300 bg-purple-500/15 border border-purple-500/30 px-2 py-0.5 rounded text-[10px]">
+                        <span className="text-purple-300 bg-purple-500/15 border border-purple-500/30 px-2 py-0.5 rounded text-[11px] font-medium">
                           Standalone / Private Plan
                         </span>
                       )}
@@ -1461,49 +1461,49 @@ export const AtcView: React.FC = () => {
                 {/* Tactical Parameters Strip */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
                   <div className="p-3 rounded-xl bg-stone-950/80 border border-stone-800/80">
-                    <div className="text-[10px] font-mono uppercase text-stone-400">
+                    <div className="text-[11px] font-medium tracking-wider uppercase text-stone-400">
                       Departure / Destination
                     </div>
                     <div className="text-xs font-mono font-semibold text-stone-200 mt-1 truncate">
                       {selectedDetail.departure_airfield || '—'}
                     </div>
-                    <div className="text-[11px] font-mono text-stone-400 truncate">
+                    <div className="text-xs font-mono text-stone-400 truncate">
                       ARR: {selectedDetail.destination_airfield || '—'}
                     </div>
                   </div>
 
                   <div className="p-3 rounded-xl bg-stone-950/80 border border-stone-800/80">
-                    <div className="text-[10px] font-mono uppercase text-stone-400">
+                    <div className="text-[11px] font-medium tracking-wider uppercase text-stone-400">
                       Diverts &amp; Alternates
                     </div>
                     <div className="text-xs font-mono font-semibold text-stone-200 mt-1 truncate">
                       {formatDiverts(selectedDetail.diverts)}
                     </div>
-                    <div className="text-[11px] font-mono text-amber-400/90 truncate">
+                    <div className="text-xs tabular-nums text-amber-400/90 truncate">
                       {selectedDetail.diverts?.length || 0} Alternate(s)
                     </div>
                   </div>
 
                   <div className="p-3 rounded-xl bg-stone-950/80 border border-stone-800/80">
-                    <div className="text-[10px] font-mono uppercase text-stone-400">
+                    <div className="text-[11px] font-medium tracking-wider uppercase text-stone-400">
                       Route Altitude
                     </div>
                     <div className="text-xs font-mono font-semibold text-stone-200 mt-1 truncate">
                       {selectedDetail.route_summary?.min_altitude_feet} - {selectedDetail.route_summary?.max_altitude_feet} FT
                     </div>
-                    <div className="text-[11px] font-mono text-stone-400 truncate">
+                    <div className="text-xs font-mono text-stone-400 truncate">
                       Speed: {selectedDetail.route_summary?.min_speed_knots} - {selectedDetail.route_summary?.max_speed_knots} KTS
                     </div>
                   </div>
 
                   <div className="p-3 rounded-xl bg-stone-950/80 border border-stone-800/80">
-                    <div className="text-[10px] font-mono uppercase text-stone-400">
+                    <div className="text-[11px] font-medium tracking-wider uppercase text-stone-400">
                       Airframe / Exports
                     </div>
                     <div className="text-xs font-mono font-semibold text-amber-300 mt-1 truncate">
                       {selectedDetail.airframe?.dcs_entity}
                     </div>
-                    <div className="text-[11px] font-mono text-stone-400 truncate">
+                    <div className="text-xs text-stone-400 truncate">
                       {isJf17
                         ? 'Route, Kneeboard & Airspace'
                         : hasDtc
@@ -1516,13 +1516,13 @@ export const AtcView: React.FC = () => {
                 {/* Remarks & Loadout */}
                 <div className="space-y-2">
                   {selectedDetail.remarks && (
-                    <div className="p-3.5 rounded-xl bg-stone-950/90 border-l-2 border-amber-500 text-xs text-stone-300 leading-relaxed font-mono">
+                    <div className="p-3.5 rounded-xl bg-stone-950/90 border-l-2 border-amber-500 text-xs text-stone-300 leading-relaxed">
                       <span className="font-bold uppercase text-amber-400 mr-2">Dispatch Remarks:</span>
                       {selectedDetail.remarks}
                     </div>
                   )}
                   {cleanLoadoutSummary && (
-                    <div className="px-3.5 py-2 rounded-xl bg-stone-950/60 border border-stone-800 text-xs font-mono text-stone-300 flex items-center gap-2">
+                    <div className="px-3.5 py-2 rounded-xl bg-stone-950/60 border border-stone-800 text-xs text-stone-300 flex items-center gap-2">
                       <span className="text-amber-400 font-semibold uppercase shrink-0">Loadout:</span>
                       <span className="truncate" title={cleanLoadoutSummary}>
                         {cleanLoadoutSummary}
@@ -1549,7 +1549,7 @@ export const AtcView: React.FC = () => {
                           <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
                         )}
                       </div>
-                      <span className="inline-block mt-1.5 px-2 py-0.5 rounded bg-stone-900 border border-stone-800 text-[10px] font-mono text-amber-300">
+                      <span className="inline-block mt-1.5 px-2 py-0.5 rounded bg-stone-900 border border-stone-800 text-[11px] font-medium text-amber-300">
                         Prepends route preset
                       </span>
                     </div>
@@ -1558,7 +1558,7 @@ export const AtcView: React.FC = () => {
                       <button
                         onClick={handleSaveRouteToDcs}
                         disabled={isSavingRoute}
-                        className="w-full py-2 px-3 rounded-lg bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono font-bold text-xs transition-all flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/10 disabled:opacity-50"
+                        className="w-full py-2 px-3 rounded-lg bg-amber-500 hover:bg-amber-400 text-stone-950 font-semibold text-xs transition-all flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/10 disabled:opacity-50"
                       >
                         <DownloadSimple className="w-3.5 h-3.5" />
                         <span>{isSavingRoute ? 'Saving Route...' : 'Save Route to DCS'}</span>
@@ -1566,7 +1566,7 @@ export const AtcView: React.FC = () => {
 
                       <button
                         onClick={handleCopyPresetsPath}
-                        className="w-full py-1.5 px-3 rounded-lg bg-stone-900 hover:bg-stone-800 text-stone-300 font-mono text-[11px] transition-all flex items-center justify-center gap-1.5 border border-stone-800"
+                        className="w-full py-1.5 px-3 rounded-lg bg-stone-900 hover:bg-stone-800 text-stone-300 text-xs font-medium transition-all flex items-center justify-center gap-1.5 border border-stone-800"
                       >
                         {hasCopiedPath ? (
                           <>
@@ -1583,7 +1583,7 @@ export const AtcView: React.FC = () => {
                     </div>
 
                     {routeSavedPath && (
-                      <p className="text-[10px] font-mono text-emerald-400 truncate mt-1">
+                      <p className="text-[11px] font-mono text-emerald-400 truncate mt-1">
                         Saved to: {routeSavedPath}
                       </p>
                     )}
@@ -1603,7 +1603,7 @@ export const AtcView: React.FC = () => {
                           )}
                         </div>
                         <div className="flex items-center gap-2 mt-1.5">
-                          <span className="inline-block px-2 py-0.5 rounded bg-cyan-950/50 border border-cyan-800/60 text-[10px] font-mono text-cyan-300 font-semibold">
+                          <span className="inline-block px-2 py-0.5 rounded bg-cyan-950/50 border border-cyan-800/60 text-[11px] font-medium text-cyan-300">
                             {activeAirspaceTerrain} Airspace
                           </span>
                         </div>
@@ -1613,7 +1613,7 @@ export const AtcView: React.FC = () => {
                         <button
                           onClick={handleSaveAirspaceToDcs}
                           disabled={isSavingAirspace}
-                          className="w-full py-2 px-3 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-stone-950 font-mono font-bold text-xs transition-all flex items-center justify-center gap-1.5 shadow-md shadow-cyan-500/10 disabled:opacity-50 cursor-pointer"
+                          className="w-full py-2 px-3 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-stone-950 font-semibold text-xs transition-all flex items-center justify-center gap-1.5 shadow-md shadow-cyan-500/10 disabled:opacity-50 cursor-pointer"
                         >
                           <DownloadSimple className="w-3.5 h-3.5" />
                           <span>{isSavingAirspace ? 'Saving Airspace...' : 'Save Airspace to DCS'}</span>
@@ -1622,7 +1622,7 @@ export const AtcView: React.FC = () => {
                         <div className="flex items-center gap-1.5">
                           <button
                             onClick={handleDownloadAirspaceFile}
-                            className="w-1/2 py-1.5 px-2 rounded-lg bg-stone-900 hover:bg-stone-800 text-stone-300 font-mono text-[11px] transition-all flex items-center justify-center gap-1 border border-stone-800 cursor-pointer"
+                            className="w-1/2 py-1.5 px-2 rounded-lg bg-stone-900 hover:bg-stone-800 text-stone-300 text-xs font-medium transition-all flex items-center justify-center gap-1 border border-stone-800 cursor-pointer"
                             title="Download .lua file for manual placement"
                           >
                             <FileCode className="w-3.5 h-3.5 text-cyan-400" />
@@ -1630,7 +1630,7 @@ export const AtcView: React.FC = () => {
                           </button>
                           <button
                             onClick={handleCopyAirspacePath}
-                            className="w-1/2 py-1.5 px-2 rounded-lg bg-stone-900 hover:bg-stone-800 text-stone-300 font-mono text-[11px] transition-all flex items-center justify-center gap-1 border border-stone-800 cursor-pointer"
+                            className="w-1/2 py-1.5 px-2 rounded-lg bg-stone-900 hover:bg-stone-800 text-stone-300 text-xs font-medium transition-all flex items-center justify-center gap-1 border border-stone-800 cursor-pointer"
                             title="Copy target airspace folder path"
                           >
                             {hasCopiedAirspacePath ? (
@@ -1649,7 +1649,7 @@ export const AtcView: React.FC = () => {
                       </div>
 
                       {airspaceSavedPath && (
-                        <p className="text-[10px] font-mono text-emerald-400 truncate mt-1">
+                        <p className="text-[11px] font-mono text-emerald-400 truncate mt-1">
                           Saved to: {airspaceSavedPath}
                         </p>
                       )}
@@ -1669,7 +1669,7 @@ export const AtcView: React.FC = () => {
                             <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
                           )}
                         </div>
-                        <span className="inline-block mt-1.5 px-2 py-0.5 rounded bg-stone-900 border border-stone-800 text-emerald-400 text-[10px] font-mono">
+                        <span className="inline-block mt-1.5 px-2 py-0.5 rounded bg-stone-900 border border-stone-800 text-emerald-400 text-[11px] font-medium">
                           DTC Supported
                         </span>
                       </div>
@@ -1678,7 +1678,7 @@ export const AtcView: React.FC = () => {
                         <button
                           onClick={handleSaveDtcToDcs}
                           disabled={isSavingDtc}
-                          className="w-full py-2 px-3 rounded-lg bg-stone-800 hover:bg-stone-700 disabled:opacity-40 text-stone-200 font-mono font-semibold text-xs transition-all flex items-center justify-center gap-1.5 border border-stone-700"
+                          className="w-full py-2 px-3 rounded-lg bg-stone-800 hover:bg-stone-700 disabled:opacity-40 text-stone-200 font-semibold text-xs transition-all flex items-center justify-center gap-1.5 border border-stone-700"
                         >
                           <DownloadSimple className="w-3.5 h-3.5 text-amber-400" />
                           <span>{isSavingDtc ? 'Saving DTC...' : 'Save DTC to DCS'}</span>
@@ -1686,7 +1686,7 @@ export const AtcView: React.FC = () => {
 
                         <button
                           onClick={handleDownloadDtc}
-                          className="w-full py-1.5 px-3 rounded-lg bg-stone-900 hover:bg-stone-800 text-stone-300 font-mono text-[11px] transition-all flex items-center justify-center gap-1.5 border border-stone-800"
+                          className="w-full py-1.5 px-3 rounded-lg bg-stone-900 hover:bg-stone-800 text-stone-300 text-xs font-medium transition-all flex items-center justify-center gap-1.5 border border-stone-800"
                         >
                           <FileCode className="w-3.5 h-3.5 text-stone-400" />
                           <span>Download .dtc File</span>
@@ -1694,7 +1694,7 @@ export const AtcView: React.FC = () => {
                       </div>
 
                       {dtcSavedPath && (
-                        <p className="text-[10px] font-mono text-emerald-400 truncate mt-1">
+                        <p className="text-[11px] font-mono text-emerald-400 truncate mt-1">
                           Saved to: {dtcSavedPath}
                         </p>
                       )}
@@ -1709,7 +1709,7 @@ export const AtcView: React.FC = () => {
                           Kneeboard PDF
                         </span>
                       </div>
-                      <span className="inline-block mt-1.5 px-2 py-0.5 rounded bg-stone-900 border border-stone-800 text-[10px] font-mono text-stone-300">
+                      <span className="inline-block mt-1.5 px-2 py-0.5 rounded bg-stone-900 border border-stone-800 text-[11px] font-medium text-stone-300">
                         Aircraft Briefing Card
                       </span>
                     </div>
@@ -1718,7 +1718,7 @@ export const AtcView: React.FC = () => {
                       <button
                         onClick={handleOpenPdf}
                         disabled={isOpeningPdf}
-                        className="w-full py-2 px-3 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 font-mono font-semibold text-xs transition-all flex items-center justify-center gap-1.5 border border-stone-700"
+                        className="w-full py-2 px-3 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 font-semibold text-xs transition-all flex items-center justify-center gap-1.5 border border-stone-700"
                       >
                         <Eye className="w-3.5 h-3.5 text-amber-400" />
                         <span>{isOpeningPdf ? 'Opening PDF...' : 'Open PDF in Viewer'}</span>
@@ -1727,7 +1727,7 @@ export const AtcView: React.FC = () => {
                       <div className="flex items-center gap-1.5">
                         <button
                           onClick={handleDownloadPdf}
-                          className="w-1/2 py-1.5 px-2 rounded-lg bg-stone-900 hover:bg-stone-800 text-stone-300 font-mono text-[11px] transition-all flex items-center justify-center gap-1 border border-stone-800"
+                          className="w-1/2 py-1.5 px-2 rounded-lg bg-stone-900 hover:bg-stone-800 text-stone-300 text-xs font-medium transition-all flex items-center justify-center gap-1 border border-stone-800"
                         >
                           <FilePdf className="w-3.5 h-3.5 text-stone-400" />
                           <span>PDF</span>
@@ -1735,7 +1735,7 @@ export const AtcView: React.FC = () => {
                         <button
                           onClick={handleExportToKneeboardFolder}
                           disabled={isExportingKneeboard}
-                          className={`w-1/2 py-1.5 px-2 rounded-lg font-mono text-[11px] transition-all flex items-center justify-center gap-1 border disabled:opacity-50 ${
+                          className={`w-1/2 py-1.5 px-2 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-1 border disabled:opacity-50 ${
                             hasExportedKneeboard
                               ? 'bg-emerald-500/25 text-emerald-300 border-emerald-500/60 shadow-sm shadow-emerald-500/20 font-bold'
                               : isExportingKneeboard
@@ -1765,28 +1765,28 @@ export const AtcView: React.FC = () => {
 
                       {kneeboardExportResult && (
                         <div className="p-2.5 rounded-lg bg-emerald-950/40 border border-emerald-500/40 space-y-1.5">
-                          <div className="flex items-center justify-between gap-1 text-[11px] font-mono font-semibold text-emerald-300">
+                          <div className="flex items-center justify-between gap-1 text-xs font-semibold text-emerald-300">
                             <span className="flex items-center gap-1.5">
                               <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0" weight="bold" />
                               <span>Exported {kneeboardExportResult.pageCount} Page(s)</span>
                             </span>
                             <button
                               onClick={() => openLocalPath(kneeboardExportResult.targetDirectory)}
-                              className="px-1.5 py-0.5 rounded bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-[10px] font-mono border border-emerald-500/30 hover:border-emerald-500/50 transition-colors flex items-center gap-1"
+                              className="px-1.5 py-0.5 rounded bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-[11px] font-medium border border-emerald-500/30 hover:border-emerald-500/50 transition-colors flex items-center gap-1"
                               title="Open kneeboard directory in Windows Explorer"
                             >
                               <FolderSimple className="w-3 h-3" />
                               <span>Open Folder</span>
                             </button>
                           </div>
-                          <div className="text-[10px] font-mono text-stone-400 space-y-0.5">
+                          <div className="text-[11px] font-mono text-stone-400 space-y-0.5">
                             {kneeboardExportResult.fileNames.map((name) => (
                               <div key={name} className="truncate text-stone-300 flex items-center gap-1">
                                 <span className="text-emerald-500 font-bold">•</span>
                                 <span className="truncate">{name}</span>
                               </div>
                             ))}
-                            <p className="text-[9px] text-stone-500 truncate pt-0.5" title={kneeboardExportResult.targetDirectory}>
+                            <p className="text-[11px] text-stone-500 truncate pt-0.5" title={kneeboardExportResult.targetDirectory}>
                               {kneeboardExportResult.targetDirectory}
                             </p>
                           </div>
@@ -1824,7 +1824,7 @@ export const AtcView: React.FC = () => {
                   >
                     <Path className="w-3.5 h-3.5" />
                     <span>Routes</span>
-                    <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-stone-800 text-stone-300">
+                    <span className="px-1.5 py-0.2 rounded-full text-[11px] font-mono bg-stone-800 text-stone-300">
                       {selectedDetail.route_points?.length || 0}
                     </span>
                   </button>
@@ -1841,7 +1841,7 @@ export const AtcView: React.FC = () => {
                     <Target className="w-3.5 h-3.5 text-red-400" />
                     <span>Targets</span>
                     {targetPoints.length > 0 && (
-                      <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-red-500/20 text-red-300 border border-red-500/30">
+                      <span className="px-1.5 py-0.2 rounded-full text-[11px] font-bold tabular-nums bg-red-500/20 text-red-300 border border-red-500/30">
                         {targetPoints.length}
                       </span>
                     )}
@@ -1860,7 +1860,7 @@ export const AtcView: React.FC = () => {
                       <Crosshair className="w-3.5 h-3.5" />
                       <span>Loadout</span>
                       {stationLoadoutItems.length > 0 && (
-                        <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-stone-800 text-stone-300">
+                        <span className="px-1.5 py-0.2 rounded-full text-[11px] font-mono bg-stone-800 text-stone-300">
                           {stationLoadoutItems.length}
                         </span>
                       )}
@@ -1892,7 +1892,7 @@ export const AtcView: React.FC = () => {
                     >
                       <Broadcast className="w-3.5 h-3.5 text-cyan-400" />
                       <span>MIDS</span>
-                      <span className="text-[9px] px-1 py-0.2 rounded bg-cyan-500/20 text-cyan-300 font-mono">L16</span>
+                      <span className="text-[11px] px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 font-mono">L16</span>
                     </button>
                   )}
 
@@ -1908,7 +1908,7 @@ export const AtcView: React.FC = () => {
                   >
                     <Compass className="w-3.5 h-3.5 text-emerald-400" />
                     <span>SA</span>
-                    <span className="text-[9px] px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-mono">DTC</span>
+                    <span className="text-[11px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-mono">DTC</span>
                   </button>
                   )}
 
@@ -1924,7 +1924,7 @@ export const AtcView: React.FC = () => {
                     >
                       <AirplaneLanding className="w-3.5 h-3.5 text-indigo-400" />
                       <span>DEST PTS</span>
-                      <span className="text-[9px] px-1 py-0.2 rounded bg-indigo-500/20 text-indigo-300 font-mono">DTC</span>
+                      <span className="text-[11px] px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-300 font-mono">DTC</span>
                     </button>
                   )}
 
@@ -1940,7 +1940,7 @@ export const AtcView: React.FC = () => {
                     >
                       <MapPin className="w-3.5 h-3.5 text-orange-400" />
                       <span>ADD PTS</span>
-                      <span className="text-[9px] px-1 py-0.2 rounded bg-orange-500/20 text-orange-300 font-mono">
+                      <span className="text-[11px] px-1.5 py-0.2 rounded bg-orange-500/20 text-orange-300 font-mono">
                         {resolvedAdditionalPoints.length > 0 ? resolvedAdditionalPoints.length : '14BU'}
                       </span>
                     </button>
@@ -1958,7 +1958,7 @@ export const AtcView: React.FC = () => {
                     >
                       <ShieldCheck className="w-3.5 h-3.5 text-rose-400" />
                       <span>CMDS</span>
-                      <span className="text-[9px] px-1 py-0.2 rounded bg-rose-500/20 text-rose-300 font-mono">EW</span>
+                      <span className="text-[11px] px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-300 font-mono">EW</span>
                     </button>
                   )}
 
@@ -1974,7 +1974,7 @@ export const AtcView: React.FC = () => {
                     >
                       <GlobeHemisphereWest className="w-3.5 h-3.5 text-cyan-400" />
                       <span>AIRSPACE</span>
-                      <span className="text-[9px] px-1 py-0.2 rounded bg-cyan-500/20 text-cyan-300 font-mono">JF-17</span>
+                      <span className="text-[11px] px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 font-mono">JF-17</span>
                     </button>
                   )}
 
@@ -2000,7 +2000,7 @@ export const AtcView: React.FC = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                         {/* Callsign & Rules */}
                         <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-2">
-                          <span className="text-[10px] font-mono uppercase tracking-wider text-stone-500 block">
+                          <span className="text-[11px] font-medium uppercase tracking-wider text-stone-500 block">
                             Flight Identity
                           </span>
                           <div className="flex items-center gap-2">
@@ -2014,7 +2014,7 @@ export const AtcView: React.FC = () => {
                           </div>
                           <div className="flex items-center gap-2 pt-1 text-[11px] font-mono">
                             <span
-                              className={`px-2 py-0.5 rounded font-bold ${
+                              className={`px-2 py-0.5 rounded font-sans font-bold ${
                                 selectedDetail.is_opfor
                                   ? 'bg-red-500/20 text-red-400 border border-red-500/30'
                                   : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
@@ -2025,7 +2025,7 @@ export const AtcView: React.FC = () => {
                             <span className="px-2 py-0.5 rounded bg-stone-900 border border-stone-800 text-stone-300">
                               {selectedDetail.flight_rules || 'VFR'}
                             </span>
-                            <span className="text-stone-500 font-mono text-[10px] truncate">
+                            <span className="text-stone-500 font-mono text-[11px] truncate">
                               ID: {selectedDetail.identifier || `#${selectedDetail.id}`}
                             </span>
                           </div>
@@ -2033,13 +2033,13 @@ export const AtcView: React.FC = () => {
 
                         {/* Airframe & Squadron */}
                         <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-2">
-                          <span className="text-[10px] font-mono uppercase tracking-wider text-stone-500 block">
+                          <span className="text-[11px] font-medium uppercase tracking-wider text-stone-500 block">
                             Airframe &amp; Squadron
                           </span>
                           <div className="font-display font-bold text-stone-100 text-sm truncate">
                             {selectedDetail.airframe?.name || 'Standard Airframe'}
                           </div>
-                          <div className="text-[11px] font-mono text-stone-400 space-y-0.5">
+                          <div className="text-xs text-stone-400 space-y-0.5">
                             <div className="text-amber-400/90 font-semibold truncate">
                               {selectedDetail.squadron?.name || selectedDetail.squadron?.abbreviation || 'Tactical Wing'}
                             </div>
@@ -2048,18 +2048,18 @@ export const AtcView: React.FC = () => {
 
                         {/* Mission & Sortie */}
                         <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-2">
-                          <span className="text-[10px] font-mono uppercase tracking-wider text-stone-500 block">
+                          <span className="text-[11px] font-medium uppercase tracking-wider text-stone-500 block">
                             Mission Tasking
                           </span>
                           <div className="font-display font-bold text-stone-100 text-sm truncate">
                             {selectedDetail.mission?.name || 'Assigned Campaign Mission'}
                           </div>
-                          <div className="text-[11px] font-mono text-stone-400 space-y-0.5">
+                          <div className="text-xs text-stone-400 space-y-0.5">
                             <div className="text-stone-300">
                               Sortie: {selectedDetail.sortie?.name || 'General Sortie'}
                             </div>
                             {selectedDetail.launch_time && (
-                              <div className="text-stone-500 text-[10px]">
+                              <div className="text-stone-500 font-mono text-[11px]">
                                 Launch: {selectedDetail.launch_time}
                               </div>
                             )}
@@ -2068,7 +2068,7 @@ export const AtcView: React.FC = () => {
 
                         {/* Route Summary */}
                         <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-2">
-                          <span className="text-[10px] font-mono uppercase tracking-wider text-stone-500 block">
+                          <span className="text-[11px] font-medium uppercase tracking-wider text-stone-500 block">
                             Route Nav Profile
                           </span>
                           <div className="flex items-baseline gap-2">
@@ -2083,7 +2083,7 @@ export const AtcView: React.FC = () => {
                               </span>
                             )}
                           </div>
-                          <div className="flex items-center gap-3 text-[10px] font-mono text-stone-400 pt-0.5">
+                          <div className="flex items-center gap-3 text-xs tabular-nums text-stone-400 pt-0.5">
                             <span>
                               Waypoints:{' '}
                               <strong className="text-stone-200">
@@ -2113,21 +2113,21 @@ export const AtcView: React.FC = () => {
                         </h4>
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs font-mono">
                           <div className="p-3 rounded-lg bg-stone-900/60 border border-stone-800/80">
-                            <span className="text-[10px] text-stone-500 uppercase block">Departure</span>
+                            <span className="font-sans text-[11px] font-medium text-stone-500 uppercase tracking-wider block">Departure</span>
                             <span className="font-bold text-stone-200">{selectedDetail.departure_airfield || '—'}</span>
                           </div>
                           <div className="p-3 rounded-lg bg-stone-900/60 border border-stone-800/80">
-                            <span className="text-[10px] text-stone-500 uppercase block">Destination</span>
+                            <span className="font-sans text-[11px] font-medium text-stone-500 uppercase tracking-wider block">Destination</span>
                             <span className="font-bold text-stone-200">{selectedDetail.destination_airfield || '—'}</span>
                           </div>
                           <div className="p-3 rounded-lg bg-stone-900/60 border border-stone-800/80">
-                            <span className="text-[10px] text-stone-500 uppercase block">Planned Fuel</span>
+                            <span className="font-sans text-[11px] font-medium text-stone-500 uppercase tracking-wider block">Planned Fuel</span>
                             <span className="font-bold text-stone-200">
                               {selectedDetail.fuel_amount ? `${selectedDetail.fuel_amount} lbs` : 'Standard'}
                             </span>
                           </div>
                           <div className="p-3 rounded-lg bg-stone-900/60 border border-stone-800/80">
-                            <span className="text-[10px] text-stone-500 uppercase block">Diverts</span>
+                            <span className="font-sans text-[11px] font-medium text-stone-500 uppercase tracking-wider block">Diverts</span>
                             <span className="font-bold text-stone-200">
                               {formatDiverts(selectedDetail.diverts)}
                             </span>
@@ -2142,12 +2142,12 @@ export const AtcView: React.FC = () => {
                             Briefing Remarks &amp; Objectives
                           </h4>
                           {selectedDetail.description && (
-                            <p className="text-xs font-mono text-stone-300 leading-relaxed">
+                            <p className="text-xs text-stone-300 leading-relaxed">
                               {selectedDetail.description}
                             </p>
                           )}
                           {selectedDetail.remarks && (
-                            <p className="text-xs font-mono text-stone-400 border-t border-stone-800/80 pt-2 italic">
+                            <p className="text-xs text-stone-400 border-t border-stone-800/80 pt-2 italic">
                               {selectedDetail.remarks}
                             </p>
                           )}
@@ -2164,7 +2164,7 @@ export const AtcView: React.FC = () => {
                           <h3 className="font-display text-sm font-semibold text-stone-200">
                             Steerpoint Sequence — {selectedDetail.callsign}
                           </h3>
-                          <p className="text-xs font-mono text-stone-400">
+                          <p className="text-xs text-stone-400">
                             Exact geographic coordinates with copy shortcuts for DCS cockpit entry.
                           </p>
                         </div>
@@ -2173,7 +2173,7 @@ export const AtcView: React.FC = () => {
                       <div className="rounded-xl border border-stone-800 bg-stone-950 overflow-hidden">
                         <table className="w-full text-left border-collapse text-xs font-mono">
                           <thead>
-                            <tr className="border-b border-stone-800 bg-stone-900/80 text-[11px] text-stone-400 uppercase tracking-wider">
+                            <tr className="border-b border-stone-800 bg-stone-900/80 font-sans text-[11px] font-semibold text-stone-400 uppercase tracking-wider">
                               <th className="py-2.5 px-3">#</th>
                               <th className="py-2.5 px-3">Name</th>
                               <th className="py-2.5 px-3">Coordinates (DD / DDM)</th>
@@ -2189,10 +2189,10 @@ export const AtcView: React.FC = () => {
                             {(selectedDetail.route_points || []).map((wp, idx) => (
                               <tr key={wp.index ?? idx} className="hover:bg-stone-900/50 transition-colors">
                                 <td className="py-2.5 px-3 text-amber-400 font-bold">{wp.index ?? idx}</td>
-                                <td className="py-2.5 px-3 font-semibold text-stone-200">{wp.name}</td>
+                                <td className="py-2.5 px-3 font-sans font-semibold text-stone-200">{wp.name}</td>
                                 <td className="py-2.5 px-3 text-stone-300">
                                   <div>{wp.ddm || `${wp.lat.toFixed(4)}°, ${wp.lng.toFixed(4)}°`}</div>
-                                  <div className="text-[10px] text-stone-400">
+                                  <div className="text-[11px] text-stone-400">
                                     {wp.lat.toFixed(4)}, {wp.lng.toFixed(4)}
                                   </div>
                                 </td>
@@ -2241,7 +2241,7 @@ export const AtcView: React.FC = () => {
                             </span>
                           )}
                         </h3>
-                        <p className="text-xs font-mono text-stone-400">
+                        <p className="text-xs text-stone-400">
                           Target points and attack ingress/egress waypoints designated for ground strikes and CAS.
                         </p>
                       </div>
@@ -2250,7 +2250,7 @@ export const AtcView: React.FC = () => {
                         <div className="rounded-xl border border-stone-800 bg-stone-950 overflow-hidden">
                           <table className="w-full text-left border-collapse text-xs font-mono">
                             <thead>
-                              <tr className="border-b border-stone-800 bg-stone-900/80 text-[11px] text-stone-400 uppercase tracking-wider">
+                              <tr className="border-b border-stone-800 bg-stone-900/80 font-sans font-semibold text-[11px] text-stone-400 uppercase tracking-wider">
                                 <th className="py-2.5 px-3">#</th>
                                 <th className="py-2.5 px-3">Target Name</th>
                                 <th className="py-2.5 px-3">Coordinates (DD / DDM)</th>
@@ -2270,7 +2270,7 @@ export const AtcView: React.FC = () => {
                                   </td>
                                   <td className="py-2.5 px-3 text-stone-300">
                                     <div>{wp.ddm || `${wp.lat.toFixed(4)}°, ${wp.lng.toFixed(4)}°`}</div>
-                                    <div className="text-[10px] text-stone-400">
+                                    <div className="text-[11px] text-stone-400">
                                       {wp.lat.toFixed(4)}, {wp.lng.toFixed(4)}
                                     </div>
                                   </td>
@@ -2278,8 +2278,8 @@ export const AtcView: React.FC = () => {
                                   <td className="py-2.5 px-3 text-stone-300">
                                     {wp.alt} ft <span className="text-stone-400">({Math.round(wp.alt * 0.3048)}m)</span>
                                   </td>
-                                  <td className="py-2.5 px-3 text-stone-400">
-                                    <span className="px-1.5 py-0.5 rounded bg-red-500/10 text-red-300 border border-red-500/20 text-[10px] mr-1.5 font-bold">
+                                  <td className="py-2.5 px-3 font-sans text-stone-400">
+                                    <span className="px-1.5 py-0.5 rounded font-sans bg-red-500/10 text-red-300 border border-red-500/20 text-[11px] mr-1.5 font-semibold">
                                       {wp.action || wp.type || 'STRIKE'}
                                     </span>
                                     {wp.remarks || '—'}
@@ -2308,7 +2308,7 @@ export const AtcView: React.FC = () => {
                           <h4 className="font-display text-sm font-semibold text-stone-300">
                             No Specific Target Waypoints Designated
                           </h4>
-                          <p className="text-xs font-mono text-stone-500 max-w-md mx-auto">
+                          <p className="text-xs text-stone-500 max-w-md mx-auto">
                             This flight plan does not have dedicated ground strike target steerpoints flagged.
                             All navigation waypoints and legs can be inspected in the Routes tab.
                           </p>
@@ -2331,11 +2331,11 @@ export const AtcView: React.FC = () => {
                                 key={item.station}
                                 className="p-3.5 rounded-xl bg-stone-950 border border-stone-800 space-y-1 flex flex-col justify-between"
                               >
-                                <span className="text-[10px] font-mono uppercase text-amber-400 font-bold tracking-wider">
+                                <span className="text-[11px] uppercase text-amber-400 font-semibold tracking-wider">
                                   Station {item.station}
                                 </span>
                                 <p
-                                  className="text-xs font-mono text-stone-100 font-medium leading-snug break-words"
+                                  className="text-xs text-stone-100 font-medium leading-snug break-words"
                                   title={item.weaponName}
                                 >
                                   {item.weaponName}
@@ -2345,7 +2345,7 @@ export const AtcView: React.FC = () => {
                           </div>
                         ) : (
                           <div className="p-4 rounded-xl bg-stone-950 border border-stone-800">
-                            <p className="text-xs font-mono text-stone-200">
+                            <p className="text-xs text-stone-200">
                               {cleanLoadoutSummary || 'Standard configuration.'}
                             </p>
                           </div>
@@ -2374,7 +2374,7 @@ export const AtcView: React.FC = () => {
                             Flight Radio Comms Ladder
                           </h4>
                           {(commsData.comm1.length > 0 || commsData.comm2.length > 0) && (
-                            <div className="flex items-center gap-1 bg-stone-950 p-1 rounded-lg border border-stone-800 text-[11px] font-mono">
+                            <div className="flex items-center gap-1 bg-stone-950 p-1 rounded-lg border border-stone-800 text-xs font-medium tabular-nums">
                               <button
                                 onClick={() => setActiveCommRadio('all')}
                                 className={`px-2 py-0.5 rounded transition-colors ${
@@ -2424,7 +2424,7 @@ export const AtcView: React.FC = () => {
                           if (!list || list.length === 0) {
                             return (
                               <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 text-center">
-                                <p className="text-xs font-mono text-stone-500">
+                                <p className="text-xs text-stone-500">
                                   No tactical radio channels configured in custom ladder. Review default task force and airfield frequencies below.
                                 </p>
                               </div>
@@ -2443,16 +2443,16 @@ export const AtcView: React.FC = () => {
                                   >
                                     <div className="space-y-1 min-w-0">
                                       <div className="flex items-center gap-1.5 flex-wrap">
-                                        <span className="text-[10px] font-mono uppercase text-stone-400 font-semibold truncate">
+                                        <span className="text-[11px] uppercase text-stone-400 font-semibold tracking-wider truncate">
                                           {c.name || c.label || `Channel ${c.channel || i + 1}`}
                                         </span>
                                         {c.band && (
-                                          <span className="text-[9px] px-1 py-0.2 rounded bg-stone-900 border border-stone-800 text-stone-400 font-mono">
+                                          <span className="text-[11px] px-1.5 py-0.2 rounded bg-stone-900 border border-stone-800 text-stone-400 font-mono">
                                             {c.band}
                                           </span>
                                         )}
                                         {c.source && (
-                                          <span className="text-[9px] px-1 py-0.2 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 font-mono">
+                                          <span className="text-[11px] px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 font-mono">
                                             {c.source}
                                           </span>
                                         )}
@@ -2461,14 +2461,14 @@ export const AtcView: React.FC = () => {
                                         {c.frequency} <span className="text-xs font-normal text-amber-400/80">{c.modulation || 'AM'}</span>
                                       </div>
                                       {c.notes && (
-                                        <p className="text-[10px] font-mono text-stone-400 line-clamp-2 leading-relaxed">
+                                        <p className="text-xs text-stone-400 line-clamp-2 leading-relaxed">
                                           {c.notes}
                                         </p>
                                       )}
                                     </div>
                                     <div className="flex flex-col items-end gap-1.5 shrink-0">
                                       {c.channel !== undefined && c.channel !== null && (
-                                        <span className="px-2 py-0.5 rounded bg-stone-900 border border-stone-800 text-[10px] font-mono text-stone-300 font-bold">
+                                        <span className="px-2 py-0.5 rounded bg-stone-900 border border-stone-800 text-[11px] font-mono text-stone-300 font-bold">
                                           CH {c.channel}
                                         </span>
                                       )}
@@ -2503,7 +2503,7 @@ export const AtcView: React.FC = () => {
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                             {/* Task Force Common */}
                             <div className="p-3.5 rounded-xl bg-stone-950 border border-stone-800 space-y-2">
-                              <span className="text-[10px] font-mono uppercase font-bold text-stone-300 block border-b border-stone-800 pb-1">
+                              <span className="text-[11px] uppercase font-semibold tracking-wider text-stone-300 block border-b border-stone-800 pb-1">
                                 Task Force Common
                               </span>
                               {normalizedDefaultComms.task_force.length > 0 ? (
@@ -2511,10 +2511,10 @@ export const AtcView: React.FC = () => {
                                   const copyKey = `tf-${i}-${tf.frequency}`;
                                   const isCopied = copiedFreqKey === copyKey;
                                   return (
-                                    <div key={i} className="flex items-center justify-between text-xs font-mono py-0.5">
+                                    <div key={i} className="flex items-center justify-between text-xs py-0.5">
                                       <span className="text-stone-400 truncate max-w-[130px]">{tf.label || tf.name}</span>
                                       <div className="flex items-center gap-1.5 shrink-0">
-                                        <span className="text-amber-400 font-bold">{tf.frequency}</span>
+                                        <span className="font-mono text-amber-400 font-bold">{tf.frequency}</span>
                                         <button
                                           onClick={() => handleCopyFrequency(tf.frequency, copyKey)}
                                           title={`Copy ${tf.frequency}`}
@@ -2642,7 +2642,7 @@ export const AtcView: React.FC = () => {
                           <Broadcast className="w-4 h-4 text-cyan-400" />
                           <span>Link 16 / MIDS Datalink Network Configuration</span>
                         </h3>
-                        <p className="text-xs font-mono text-stone-400">
+                        <p className="text-xs text-stone-400">
                           Tactical digital information link settings and channel assignments.
                         </p>
                       </div>
@@ -2656,36 +2656,36 @@ export const AtcView: React.FC = () => {
                           return (
                             <div className="space-y-3">
                               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                                <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-1.5 text-xs font-mono">
-                                  <span className="text-[10px] uppercase font-bold text-stone-500 block">MIDS A Channel</span>
-                                  <span className="text-xl font-bold text-cyan-300">
+                                <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-1.5 text-xs">
+                                  <span className="text-[11px] uppercase tracking-wider font-semibold text-stone-500 block">MIDS A Channel</span>
+                                  <span className="text-xl font-mono font-bold text-cyan-300">
                                     {mids.mids_a_channel || 'N/A'}
                                   </span>
                                   {(mids.mids_a_name || mids.mids_a_notes) && (
-                                    <p className="text-[11px] text-stone-400 pt-0.5 leading-relaxed">
+                                    <p className="text-xs text-stone-400 pt-0.5 leading-relaxed">
                                       {mids.mids_a_name ? `${mids.mids_a_name}: ` : ''}
                                       {mids.mids_a_notes || ''}
                                     </p>
                                   )}
                                 </div>
-                                <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-1.5 text-xs font-mono">
-                                  <span className="text-[10px] uppercase font-bold text-stone-500 block">MIDS B Channel</span>
-                                  <span className="text-xl font-bold text-cyan-300">
+                                <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-1.5 text-xs">
+                                  <span className="text-[11px] uppercase tracking-wider font-semibold text-stone-500 block">MIDS B Channel</span>
+                                  <span className="text-xl font-mono font-bold text-cyan-300">
                                     {mids.mids_b_channel || 'N/A'}
                                   </span>
                                   {(mids.mids_b_name || mids.mids_b_notes) && (
-                                    <p className="text-[11px] text-stone-400 pt-0.5 leading-relaxed">
+                                    <p className="text-xs text-stone-400 pt-0.5 leading-relaxed">
                                       {mids.mids_b_name ? `${mids.mids_b_name}: ` : ''}
                                       {mids.mids_b_notes || ''}
                                     </p>
                                   )}
                                 </div>
-                                <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-1.5 text-xs font-mono">
-                                  <span className="text-[10px] uppercase font-bold text-stone-500 block">Network / Airframe Label</span>
-                                  <span className="text-xl font-bold text-cyan-300">
+                                <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-1.5 text-xs">
+                                  <span className="text-[11px] uppercase tracking-wider font-semibold text-stone-500 block">Network / Airframe Label</span>
+                                  <span className="text-xl font-mono font-bold text-cyan-300">
                                     {mids.net_label || (isJf17 ? 'THUNDER-LINK' : 'STRIKE')}
                                   </span>
-                                  <p className="text-[10px] text-stone-500 pt-0.5">
+                                  <p className="text-xs text-stone-500 pt-0.5">
                                     {isJf17 ? 'JF-17 Datalink Terminal' : 'Hornet Link 16 MIDS Terminal'}
                                   </p>
                                 </div>
@@ -2694,21 +2694,21 @@ export const AtcView: React.FC = () => {
                               {(mids.voice_1 || mids.voice_2 || mids.crypto) && (
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                   {mids.voice_1 && (
-                                    <div className="p-3 rounded-xl bg-stone-950 border border-stone-800 font-mono text-xs">
-                                      <span className="text-[10px] uppercase text-stone-500 block font-bold">Voice 1 Net</span>
-                                      <span className="text-stone-200 font-semibold">{mids.voice_1}</span>
+                                    <div className="p-3 rounded-xl bg-stone-950 border border-stone-800 text-xs">
+                                      <span className="text-[11px] uppercase tracking-wider text-stone-500 block font-semibold">Voice 1 Net</span>
+                                      <span className="font-mono text-stone-200 font-semibold">{mids.voice_1}</span>
                                     </div>
                                   )}
                                   {mids.voice_2 && (
-                                    <div className="p-3 rounded-xl bg-stone-950 border border-stone-800 font-mono text-xs">
-                                      <span className="text-[10px] uppercase text-stone-500 block font-bold">Voice 2 Net</span>
-                                      <span className="text-stone-200 font-semibold">{mids.voice_2}</span>
+                                    <div className="p-3 rounded-xl bg-stone-950 border border-stone-800 text-xs">
+                                      <span className="text-[11px] uppercase tracking-wider text-stone-500 block font-semibold">Voice 2 Net</span>
+                                      <span className="font-mono text-stone-200 font-semibold">{mids.voice_2}</span>
                                     </div>
                                   )}
                                   {mids.crypto && (
-                                    <div className="p-3 rounded-xl bg-stone-950 border border-stone-800 font-mono text-xs">
-                                      <span className="text-[10px] uppercase text-stone-500 block font-bold">Crypto / Mode</span>
-                                      <span className="text-emerald-400 font-bold">{mids.crypto}</span>
+                                    <div className="p-3 rounded-xl bg-stone-950 border border-stone-800 text-xs">
+                                      <span className="text-[11px] uppercase tracking-wider text-stone-500 block font-semibold">Crypto / Mode</span>
+                                      <span className="font-mono text-emerald-400 font-bold">{mids.crypto}</span>
                                     </div>
                                   )}
                                 </div>
@@ -2719,7 +2719,7 @@ export const AtcView: React.FC = () => {
                       ) : (
                         <div className="p-8 rounded-xl border border-stone-800 bg-stone-950 text-center space-y-2">
                           <Broadcast className="w-8 h-8 text-stone-600 mx-auto" />
-                          <p className="text-xs font-mono text-stone-400">
+                          <p className="text-xs text-stone-400">
                             No Link 16 / MIDS parameters configured for this flight plan.
                           </p>
                         </div>
@@ -2736,7 +2736,7 @@ export const AtcView: React.FC = () => {
                             <Compass className="w-4 h-4 text-emerald-400" />
                             <span>Situational Awareness Tactical Overlays (F/A-18C SA DTC)</span>
                           </h3>
-                          <p className="text-xs font-mono text-stone-400">
+                          <p className="text-xs text-stone-400">
                             Forward Line of Own Troops (FLOT), Fighter Area of Responsibility (FAOR), CAP stations, and safe corridors.
                           </p>
                         </div>
@@ -2762,56 +2762,56 @@ export const AtcView: React.FC = () => {
                           <div className="flex items-center gap-2 border-b border-stone-800 pb-2">
                             <button
                               onClick={() => setActiveSaSubTab('flot')}
-                              className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-colors flex items-center gap-1.5 ${
+                              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5 ${
                                 activeSaSubTab === 'flot'
                                   ? 'bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40'
                                   : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800/50'
                               }`}
                             >
                               <span>FLOT Points</span>
-                              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-stone-900 text-stone-300">
+                              <span className="px-1.5 py-0.2 rounded-full text-[11px] font-mono bg-stone-900 text-stone-300">
                                 {saData.flot.length}
                               </span>
                             </button>
 
                             <button
                               onClick={() => setActiveSaSubTab('faor')}
-                              className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-colors flex items-center gap-1.5 ${
+                              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5 ${
                                 activeSaSubTab === 'faor'
                                   ? 'bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40'
                                   : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800/50'
                               }`}
                             >
                               <span>FAOR Boundary</span>
-                              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-stone-900 text-stone-300">
+                              <span className="px-1.5 py-0.2 rounded-full text-[11px] font-mono bg-stone-900 text-stone-300">
                                 {saData.faor.length}
                               </span>
                             </button>
 
                             <button
                               onClick={() => setActiveSaSubTab('cap')}
-                              className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-colors flex items-center gap-1.5 ${
+                              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5 ${
                                 activeSaSubTab === 'cap'
                                   ? 'bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40'
                                   : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800/50'
                               }`}
                             >
                               <span>CAP Stations</span>
-                              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-stone-900 text-stone-300">
+                              <span className="px-1.5 py-0.2 rounded-full text-[11px] font-mono bg-stone-900 text-stone-300">
                                 {saData.cap_points.length}
                               </span>
                             </button>
 
                             <button
                               onClick={() => setActiveSaSubTab('corridors')}
-                              className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-colors flex items-center gap-1.5 ${
+                              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5 ${
                                 activeSaSubTab === 'corridors'
                                   ? 'bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40'
                                   : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800/50'
                               }`}
                             >
                               <span>Safe Corridors</span>
-                              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-stone-900 text-stone-300">
+                              <span className="px-1.5 py-0.2 rounded-full text-[11px] font-mono bg-stone-900 text-stone-300">
                                 {saData.corridors.length}
                               </span>
                             </button>
@@ -2820,14 +2820,14 @@ export const AtcView: React.FC = () => {
                           {/* Sub-tab 1: FLOT */}
                           {activeSaSubTab === 'flot' && (
                             <div className="space-y-3">
-                              <div className="text-xs font-mono text-stone-400">
+                              <div className="text-xs text-stone-400">
                                 Forward Line of Own Troops (FLOT) coordinates rendered on the Hornet SA display.
                               </div>
                               {saData.flot.length > 0 ? (
                                 <div className="rounded-xl border border-stone-800 bg-stone-950 overflow-hidden">
                                   <table className="w-full text-left border-collapse text-xs font-mono">
                                     <thead>
-                                      <tr className="border-b border-stone-800 bg-stone-900/80 text-[11px] text-stone-400 uppercase tracking-wider">
+                                      <tr className="border-b border-stone-800 bg-stone-900/80 font-sans text-[11px] font-semibold text-stone-400 uppercase tracking-wider">
                                         <th className="py-2 px-3">Point #</th>
                                         <th className="py-2 px-3">FLOT Station Name</th>
                                         <th className="py-2 px-3">Latitude / Longitude</th>
@@ -2842,7 +2842,7 @@ export const AtcView: React.FC = () => {
                                         return (
                                           <tr key={i} className="hover:bg-stone-900/50 transition-colors">
                                             <td className="py-2 px-3 text-emerald-400 font-bold">{i + 1}</td>
-                                            <td className="py-2 px-3 font-semibold text-stone-200">{pt.name || `FLOT Point ${i + 1}`}</td>
+                                            <td className="py-2 px-3 font-sans font-semibold text-stone-200">{pt.name || `FLOT Point ${i + 1}`}</td>
                                             <td className="py-2 px-3 text-stone-300">
                                               {pt.lat?.toFixed ? `${pt.lat.toFixed(4)}°, ${pt.lng.toFixed(4)}°` : `${pt.lat}, ${pt.lng}`}
                                             </td>
@@ -2863,7 +2863,7 @@ export const AtcView: React.FC = () => {
                                   </table>
                                 </div>
                               ) : (
-                                <p className="text-xs font-mono text-stone-500 p-4 rounded-xl bg-stone-950 border border-stone-800">
+                                <p className="text-xs text-stone-500 p-4 rounded-xl bg-stone-950 border border-stone-800">
                                   No FLOT boundary coordinates defined.
                                 </p>
                               )}
@@ -2873,7 +2873,7 @@ export const AtcView: React.FC = () => {
                           {/* Sub-tab 2: FAOR */}
                           {activeSaSubTab === 'faor' && (
                             <div className="space-y-3">
-                              <div className="text-xs font-mono text-stone-400">
+                              <div className="text-xs text-stone-400">
                                 Fighter Area of Responsibility (FAOR) boundary polygon vertices.
                               </div>
                               {saData.faor.length > 0 ? (
@@ -2884,7 +2884,7 @@ export const AtcView: React.FC = () => {
                                     return (
                                       <div key={i} className="p-3.5 rounded-xl bg-stone-950 border border-stone-800 space-y-1.5 font-mono text-xs">
                                         <div className="flex items-center justify-between">
-                                          <span className="text-[10px] uppercase font-bold text-emerald-400">Vertex {i + 1}</span>
+                                          <span className="font-sans text-[11px] uppercase font-bold text-emerald-400">Vertex {i + 1}</span>
                                           <button
                                             onClick={() => handleCopyFrequency(`${pt.lat}, ${pt.lng}`, copyKey)}
                                             className="p-1 rounded bg-stone-900 hover:bg-stone-800 text-stone-400 hover:text-emerald-400 border border-stone-800"
@@ -2892,8 +2892,8 @@ export const AtcView: React.FC = () => {
                                             {isCopied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
                                           </button>
                                         </div>
-                                        <div className="font-bold text-stone-200">{pt.name || `FAOR Corner ${i + 1}`}</div>
-                                        <div className="text-stone-400 text-[11px]">
+                                        <div className="font-sans font-bold text-stone-200">{pt.name || `FAOR Corner ${i + 1}`}</div>
+                                        <div className="text-stone-400 text-xs">
                                           {pt.lat?.toFixed ? `${pt.lat.toFixed(4)}°, ${pt.lng.toFixed(4)}°` : `${pt.lat}, ${pt.lng}`}
                                         </div>
                                       </div>
@@ -2901,7 +2901,7 @@ export const AtcView: React.FC = () => {
                                   })}
                                 </div>
                               ) : (
-                                <p className="text-xs font-mono text-stone-500 p-4 rounded-xl bg-stone-950 border border-stone-800">
+                                <p className="text-xs text-stone-500 p-4 rounded-xl bg-stone-950 border border-stone-800">
                                   No FAOR boundary vertices assigned.
                                 </p>
                               )}
@@ -2911,7 +2911,7 @@ export const AtcView: React.FC = () => {
                           {/* Sub-tab 3: CAP Stations */}
                           {activeSaSubTab === 'cap' && (
                             <div className="space-y-3">
-                              <div className="text-xs font-mono text-stone-400">
+                              <div className="text-xs text-stone-400">
                                 Designated Combat Air Patrol (CAP) holding stations and racetrack profiles.
                               </div>
                               {saData.cap_points.length > 0 ? (
@@ -2934,25 +2934,25 @@ export const AtcView: React.FC = () => {
                                             {isCopied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                                           </button>
                                         </div>
-                                        <div className="grid grid-cols-2 gap-2 text-[11px] pt-1 border-t border-stone-800">
+                                        <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-stone-800">
                                           <div>
-                                            <span className="text-stone-500 block text-[10px]">Altitude:</span>
+                                            <span className="font-sans text-stone-500 block text-[11px]">Altitude:</span>
                                             <span className="text-emerald-300 font-bold">{cap.alt ? `${cap.alt.toLocaleString()} FT` : 'FL280'}</span>
                                           </div>
                                           <div>
-                                            <span className="text-stone-500 block text-[10px]">Speed:</span>
+                                            <span className="font-sans text-stone-500 block text-[11px]">Speed:</span>
                                             <span className="text-stone-200 font-bold">{cap.speed ? `${cap.speed} KTS` : '420 KTS'}</span>
                                           </div>
                                           <div>
-                                            <span className="text-stone-500 block text-[10px]">Leg Distance:</span>
+                                            <span className="font-sans text-stone-500 block text-[11px]">Leg Distance:</span>
                                             <span className="text-stone-200">{cap.leg_distance ? `${cap.leg_distance} NM` : '20 NM'}</span>
                                           </div>
                                           <div>
-                                            <span className="text-stone-500 block text-[10px]">Orbit Time:</span>
+                                            <span className="font-sans text-stone-500 block text-[11px]">Orbit Time:</span>
                                             <span className="text-amber-400 font-bold">{cap.leg_time || '4 min'}</span>
                                           </div>
                                         </div>
-                                        <div className="text-[10px] text-stone-400 pt-1">
+                                        <div className="text-xs text-stone-400 pt-1">
                                           Coords: {cap.lat?.toFixed ? `${cap.lat.toFixed(4)}°, ${cap.lng.toFixed(4)}°` : `${cap.lat}, ${cap.lng}`}
                                         </div>
                                       </div>
@@ -2960,7 +2960,7 @@ export const AtcView: React.FC = () => {
                                   })}
                                 </div>
                               ) : (
-                                <p className="text-xs font-mono text-stone-500 p-4 rounded-xl bg-stone-950 border border-stone-800">
+                                <p className="text-xs text-stone-500 p-4 rounded-xl bg-stone-950 border border-stone-800">
                                   No CAP stations loaded.
                                 </p>
                               )}
@@ -2970,7 +2970,7 @@ export const AtcView: React.FC = () => {
                           {/* Sub-tab 4: Safe Corridors */}
                           {activeSaSubTab === 'corridors' && (
                             <div className="space-y-3">
-                              <div className="text-xs font-mono text-stone-400">
+                              <div className="text-xs text-stone-400">
                                 Designated ingress/egress safe passage corridors and altitude containment blocks.
                               </div>
                               {saData.corridors.length > 0 ? (
@@ -2990,19 +2990,19 @@ export const AtcView: React.FC = () => {
                                             {isCopied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                                           </button>
                                         </div>
-                                        <div className="grid grid-cols-2 gap-2 text-[11px] pt-1 border-t border-stone-800">
+                                        <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-stone-800">
                                           <div>
-                                            <span className="text-stone-500 block text-[10px]">Corridor Width:</span>
+                                            <span className="font-sans text-stone-500 block text-[11px]">Corridor Width:</span>
                                             <span className="text-emerald-300 font-bold">{c.width_nm ? `${c.width_nm} NM` : '10 NM'}</span>
                                           </div>
                                           <div>
-                                            <span className="text-stone-500 block text-[10px]">Safe Altitudes:</span>
+                                            <span className="font-sans text-stone-500 block text-[11px]">Safe Altitudes:</span>
                                             <span className="text-amber-400 font-bold">
                                               {c.min_alt && c.max_alt ? `${c.min_alt} - ${c.max_alt} FT` : 'FL160 - FL240'}
                                             </span>
                                           </div>
                                         </div>
-                                        <div className="text-[10px] text-stone-400 pt-1">
+                                        <div className="text-xs text-stone-400 pt-1">
                                           Center Anchor: {c.lat?.toFixed ? `${c.lat.toFixed(4)}°, ${c.lng.toFixed(4)}°` : `${c.lat}, ${c.lng}`}
                                         </div>
                                       </div>
@@ -3010,7 +3010,7 @@ export const AtcView: React.FC = () => {
                                   })}
                                 </div>
                               ) : (
-                                <p className="text-xs font-mono text-stone-500 p-4 rounded-xl bg-stone-950 border border-stone-800">
+                                <p className="text-xs text-stone-500 p-4 rounded-xl bg-stone-950 border border-stone-800">
                                   No safe transit corridors designated.
                                 </p>
                               )}
@@ -3020,7 +3020,7 @@ export const AtcView: React.FC = () => {
                       ) : (
                         <div className="p-8 rounded-xl border border-stone-800 bg-stone-950 text-center space-y-2">
                           <Compass className="w-8 h-8 text-stone-600 mx-auto" />
-                          <p className="text-xs font-mono text-stone-400">
+                          <p className="text-xs text-stone-400">
                             No Hornet SA display overlays configured for this flight plan.
                           </p>
                         </div>
@@ -3036,7 +3036,7 @@ export const AtcView: React.FC = () => {
                           <AirplaneLanding className="w-4 h-4 text-indigo-400" />
                           <span>Destination &amp; Alternate Recovery Points</span>
                         </h3>
-                        <p className="text-xs font-mono text-stone-400">
+                        <p className="text-xs text-stone-400">
                           Bullseye reference coordinates and Viper alternate recovery points.
                         </p>
                       </div>
@@ -3052,7 +3052,7 @@ export const AtcView: React.FC = () => {
                       ) : (
                         <div className="p-8 rounded-xl border border-stone-800 bg-stone-950 text-center space-y-2">
                           <AirplaneLanding className="w-8 h-8 text-stone-600 mx-auto" />
-                          <p className="text-xs font-mono text-stone-400">
+                          <p className="text-xs text-stone-400">
                             No custom destination points loaded for this airframe.
                           </p>
                         </div>
@@ -3069,7 +3069,7 @@ export const AtcView: React.FC = () => {
                             <MapPin className="w-4 h-4 text-orange-400" />
                             <span>F-14 / 14BU Additional Steerpoints &amp; LANTIRN Target Points</span>
                           </h3>
-                          <p className="text-xs font-mono text-stone-400">
+                          <p className="text-xs text-stone-400">
                             Tactical Computer &amp; AWG-9 / LANTIRN Additional Points (AP 1–40 / XL 1–40) for targeting and offset navigation.
                           </p>
                         </div>
@@ -3084,7 +3084,7 @@ export const AtcView: React.FC = () => {
                         <div className="rounded-xl border border-stone-800 bg-stone-950 overflow-hidden">
                           <table className="w-full text-left border-collapse text-xs font-mono">
                             <thead>
-                              <tr className="border-b border-stone-800 bg-stone-900/80 text-[11px] text-stone-400 uppercase tracking-wider">
+                              <tr className="border-b border-stone-800 bg-stone-900/80 font-sans text-[11px] font-semibold text-stone-400 uppercase tracking-wider">
                                 <th className="py-2.5 px-3">Point #</th>
                                 <th className="py-2.5 px-3">Point / Target Name</th>
                                 <th className="py-2.5 px-3">Coordinates (DD / DDM)</th>
@@ -3105,13 +3105,13 @@ export const AtcView: React.FC = () => {
                                         ? pt.name.split(' ')[0]
                                         : `AP ${pt.index ?? idx + 1}`}
                                     </td>
-                                    <td className="py-2.5 px-3 font-semibold text-stone-200 flex items-center gap-1.5">
+                                    <td className="py-2.5 px-3 font-sans font-semibold text-stone-200 flex items-center gap-1.5">
                                       <Crosshair className="w-3.5 h-3.5 text-orange-400 shrink-0" />
                                       <span>{pt.name}</span>
                                     </td>
                                     <td className="py-2.5 px-3 text-stone-300">
                                       <div>{pt.ddm || (pt.lat?.toFixed ? `${pt.lat.toFixed(4)}°, ${pt.lng.toFixed(4)}°` : `${pt.lat}, ${pt.lng}`)}</div>
-                                      <div className="text-[10px] text-stone-500">
+                                      <div className="text-[11px] text-stone-500">
                                         {pt.lat?.toFixed ? `${pt.lat.toFixed(4)}, ${pt.lng.toFixed(4)}` : `${pt.lat}, ${pt.lng}`}
                                       </div>
                                     </td>
@@ -3119,8 +3119,8 @@ export const AtcView: React.FC = () => {
                                     <td className="py-2.5 px-3 text-stone-300">
                                       {pt.alt !== undefined ? `${pt.alt} ft` : '—'}
                                     </td>
-                                    <td className="py-2.5 px-3 text-stone-400">
-                                      <span className="px-1.5 py-0.5 rounded bg-orange-500/10 text-orange-300 border border-orange-500/20 text-[10px] mr-1.5 font-bold">
+                                    <td className="py-2.5 px-3 font-sans text-stone-400">
+                                      <span className="px-1.5 py-0.5 rounded font-sans bg-orange-500/10 text-orange-300 border border-orange-500/20 text-[11px] mr-1.5 font-semibold">
                                         {pt.type || (pt.name?.toUpperCase().startsWith('XL') ? 'LANTIRN' : 'ADDITIONAL')}
                                       </span>
                                       {pt.remarks || '—'}
@@ -3146,7 +3146,7 @@ export const AtcView: React.FC = () => {
                           <h4 className="font-display text-sm font-semibold text-stone-300">
                             No Additional Points Designated in Flight Plan
                           </h4>
-                          <p className="text-xs font-mono text-stone-500 max-w-md mx-auto">
+                          <p className="text-xs text-stone-500 max-w-md mx-auto">
                             The F-14 Tomcat AWG-9 / LANTIRN navigation computer supports up to 40 additional target points (AP 1–40 / XL 1–40) designated in the dispatch route or entered directly in the RIO cockpit.
                           </p>
                         </div>
@@ -3163,7 +3163,7 @@ export const AtcView: React.FC = () => {
                             <ShieldCheck className="w-4 h-4 text-rose-400" />
                             <span>Countermeasures Dispenser Programs (CMDS)</span>
                           </h3>
-                          <p className="text-xs font-mono text-stone-400">
+                          <p className="text-xs text-stone-400">
                             Chaff and flare expenditure bursts, dispense intervals, salvo presets, and bingo reserves.
                           </p>
                         </div>
@@ -3182,23 +3182,23 @@ export const AtcView: React.FC = () => {
 
                       {cmdsData && cmdsData.bingo && (
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                          <div className="p-3.5 rounded-xl bg-stone-950 border border-stone-800 font-mono">
-                            <span className="text-[10px] uppercase text-stone-500 font-bold block">Chaff Bingo</span>
-                            <span className="text-lg font-bold text-stone-200">{cmdsData.bingo.ChaffNum ?? '—'}</span>
+                          <div className="p-3.5 rounded-xl bg-stone-950 border border-stone-800">
+                            <span className="text-[11px] uppercase tracking-wider text-stone-500 font-semibold block">Chaff Bingo</span>
+                            <span className="text-lg font-mono font-bold text-stone-200">{cmdsData.bingo.ChaffNum ?? '—'}</span>
                           </div>
-                          <div className="p-3.5 rounded-xl bg-stone-950 border border-stone-800 font-mono">
-                            <span className="text-[10px] uppercase text-stone-500 font-bold block">Flare Bingo</span>
-                            <span className="text-lg font-bold text-amber-300">{cmdsData.bingo.FlaresNum ?? '—'}</span>
+                          <div className="p-3.5 rounded-xl bg-stone-950 border border-stone-800">
+                            <span className="text-[11px] uppercase tracking-wider text-stone-500 font-semibold block">Flare Bingo</span>
+                            <span className="text-lg font-mono font-bold text-amber-300">{cmdsData.bingo.FlaresNum ?? '—'}</span>
                           </div>
-                          <div className="p-3.5 rounded-xl bg-stone-950 border border-stone-800 font-mono">
-                            <span className="text-[10px] uppercase text-stone-500 font-bold block">Bingo Audio Warning</span>
-                            <span className={`text-sm font-bold ${cmdsData.bingo.BINGO ? 'text-emerald-400' : 'text-stone-500'}`}>
+                          <div className="p-3.5 rounded-xl bg-stone-950 border border-stone-800">
+                            <span className="text-[11px] uppercase tracking-wider text-stone-500 font-semibold block">Bingo Audio Warning</span>
+                            <span className={`text-sm font-mono font-bold ${cmdsData.bingo.BINGO ? 'text-emerald-400' : 'text-stone-500'}`}>
                               {cmdsData.bingo.BINGO ? 'ENABLED' : 'OFF'}
                             </span>
                           </div>
-                          <div className="p-3.5 rounded-xl bg-stone-950 border border-stone-800 font-mono">
-                            <span className="text-[10px] uppercase text-stone-500 font-bold block">Feedback Audio</span>
-                            <span className={`text-sm font-bold ${cmdsData.bingo.FDBK ? 'text-emerald-400' : 'text-stone-500'}`}>
+                          <div className="p-3.5 rounded-xl bg-stone-950 border border-stone-800">
+                            <span className="text-[11px] uppercase tracking-wider text-stone-500 font-semibold block">Feedback Audio</span>
+                            <span className={`text-sm font-mono font-bold ${cmdsData.bingo.FDBK ? 'text-emerald-400' : 'text-stone-500'}`}>
                               {cmdsData.bingo.FDBK ? 'ENABLED' : 'OFF'}
                             </span>
                           </div>
@@ -3217,7 +3217,7 @@ export const AtcView: React.FC = () => {
                                 className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-3 font-mono text-xs hover:border-stone-700 transition-colors"
                               >
                                 <div className="border-b border-stone-800 pb-2">
-                                  <span className="text-[10px] uppercase font-bold text-rose-400 block tracking-wider">
+                                  <span className="text-[11px] uppercase font-bold text-rose-400 block tracking-wider">
                                     {progKey}
                                   </span>
                                   <div className="font-display font-semibold text-stone-200 text-xs truncate">
@@ -3227,8 +3227,8 @@ export const AtcView: React.FC = () => {
 
                                 {/* Chaff Expenditure */}
                                 <div className="p-2.5 rounded-lg bg-stone-900/60 border border-stone-800/80 space-y-1">
-                                  <div className="flex items-center justify-between text-[11px]">
-                                    <span className="font-bold text-stone-300">Chaff</span>
+                                  <div className="flex items-center justify-between text-xs">
+                                    <span className="font-sans font-bold text-stone-300">Chaff</span>
                                     {typeof chaff === 'object' && chaff !== null ? (
                                       <span className="text-amber-400 font-bold">
                                         {chaff.quantity !== undefined && chaff.repeat !== undefined
@@ -3242,7 +3242,7 @@ export const AtcView: React.FC = () => {
                                     )}
                                   </div>
                                   {typeof chaff === 'object' && chaff !== null && (
-                                    <div className="text-[10px] text-stone-400 space-y-0.5">
+                                    <div className="text-[11px] text-stone-400 space-y-0.5">
                                       {chaff.quantity !== undefined && (
                                         <div>Qty: {chaff.quantity} × {chaff.repeat} reps @ {chaff.interval}s</div>
                                       )}
@@ -3255,8 +3255,8 @@ export const AtcView: React.FC = () => {
 
                                 {/* Flare Expenditure */}
                                 <div className="p-2.5 rounded-lg bg-stone-900/60 border border-stone-800/80 space-y-1">
-                                  <div className="flex items-center justify-between text-[11px]">
-                                    <span className="font-bold text-stone-300">Flare</span>
+                                  <div className="flex items-center justify-between text-xs">
+                                    <span className="font-sans font-bold text-stone-300">Flare</span>
                                     {typeof flare === 'object' && flare !== null ? (
                                       <span className="text-amber-400 font-bold">
                                         {flare.quantity !== undefined && flare.repeat !== undefined
@@ -3270,7 +3270,7 @@ export const AtcView: React.FC = () => {
                                     )}
                                   </div>
                                   {typeof flare === 'object' && flare !== null && (
-                                    <div className="text-[10px] text-stone-400 space-y-0.5">
+                                    <div className="text-[11px] text-stone-400 space-y-0.5">
                                       {flare.quantity !== undefined && (
                                         <div>Qty: {flare.quantity} × {flare.repeat} reps @ {flare.interval}s</div>
                                       )}
@@ -3287,7 +3287,7 @@ export const AtcView: React.FC = () => {
                       ) : (
                         <div className="p-8 rounded-xl border border-stone-800 bg-stone-950 text-center space-y-2">
                           <ShieldCheck className="w-8 h-8 text-stone-600 mx-auto" />
-                          <p className="text-xs font-mono text-stone-400">
+                          <p className="text-xs text-stone-400">
                             No CMDS dispense programs configured for this airframe.
                           </p>
                         </div>
@@ -3314,7 +3314,7 @@ export const AtcView: React.FC = () => {
                         <div className="flex items-center gap-2 shrink-0">
                           <button
                             onClick={handleCopyAirspaceSnippet}
-                            className="px-3 py-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 font-mono text-xs flex items-center gap-1.5 border border-stone-700 transition-colors cursor-pointer"
+                            className="px-3 py-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs font-medium flex items-center gap-1.5 border border-stone-700 transition-colors cursor-pointer"
                           >
                             {hasCopiedAirspaceSnippet ? (
                               <>
@@ -3331,7 +3331,7 @@ export const AtcView: React.FC = () => {
 
                           <button
                             onClick={handleDownloadAirspaceFile}
-                            className="px-3 py-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 font-mono text-xs flex items-center gap-1.5 border border-stone-700 transition-colors cursor-pointer"
+                            className="px-3 py-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs font-medium flex items-center gap-1.5 border border-stone-700 transition-colors cursor-pointer"
                           >
                             <FileCode className="w-3.5 h-3.5 text-cyan-400" />
                             <span>Download</span>
@@ -3340,7 +3340,7 @@ export const AtcView: React.FC = () => {
                           <button
                             onClick={handleSaveAirspaceToDcs}
                             disabled={isSavingAirspace}
-                            className="px-4 py-1.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-stone-950 font-mono font-bold text-xs flex items-center gap-1.5 shadow transition-all cursor-pointer disabled:opacity-50"
+                            className="px-4 py-1.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-stone-950 font-semibold text-xs flex items-center gap-1.5 shadow transition-all cursor-pointer disabled:opacity-50"
                           >
                             <DownloadSimple className="w-3.5 h-3.5" />
                             <span>{isSavingAirspace ? 'Saving...' : 'Save to DCS'}</span>
@@ -3349,45 +3349,45 @@ export const AtcView: React.FC = () => {
                       </div>
 
                       {airspaceSavedPath && (
-                        <div className="p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-xs font-mono text-emerald-300 flex items-center gap-2">
+                        <div className="p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-xs text-emerald-300 flex items-center gap-2">
                           <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
-                          <span>Custom Airspace deployed to: <code className="text-stone-100">{airspaceSavedPath}</code></span>
+                          <span>Custom Airspace deployed to: <code className="font-mono text-stone-100">{airspaceSavedPath}</code></span>
                         </div>
                       )}
 
                       {/* Airspace Properties & Overview */}
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <div className="p-3.5 rounded-xl bg-stone-950 border border-stone-800 font-mono">
-                          <span className="text-[10px] text-stone-400 uppercase block">Airframe Target</span>
-                          <span className="text-xs font-bold text-cyan-300 mt-1 block">JF-17 Thunder</span>
-                          <span className="text-[10px] text-stone-500">Customization / Airspace</span>
+                        <div className="p-3.5 rounded-xl bg-stone-950 border border-stone-800">
+                          <span className="text-[11px] font-medium tracking-wider text-stone-400 uppercase block">Airframe Target</span>
+                          <span className="text-xs font-mono font-bold text-cyan-300 mt-1 block">JF-17 Thunder</span>
+                          <span className="text-xs font-mono text-stone-500">Customization / Airspace</span>
                         </div>
-                        <div className="p-3.5 rounded-xl bg-stone-950 border border-stone-800 font-mono">
-                          <span className="text-[10px] text-stone-400 uppercase block">Target File Name</span>
-                          <span className="text-xs font-bold text-stone-200 mt-1 block truncate">
+                        <div className="p-3.5 rounded-xl bg-stone-950 border border-stone-800">
+                          <span className="text-[11px] font-medium tracking-wider text-stone-400 uppercase block">Target File Name</span>
+                          <span className="text-xs font-mono font-bold text-stone-200 mt-1 block truncate">
                             {activeAirspaceFileName}
                           </span>
-                          <span className="text-[10px] text-stone-500">Terrain: {activeAirspaceTerrain} (.lua)</span>
+                          <span className="text-xs font-mono text-stone-500">Terrain: {activeAirspaceTerrain} (.lua)</span>
                         </div>
-                        <div className="p-3.5 rounded-xl bg-stone-950 border border-stone-800 font-mono">
-                          <span className="text-[10px] text-stone-400 uppercase block">Airspace Route Points</span>
-                          <span className="text-xs font-bold text-emerald-400 mt-1 block">
+                        <div className="p-3.5 rounded-xl bg-stone-950 border border-stone-800">
+                          <span className="text-[11px] font-medium tracking-wider text-stone-400 uppercase block">Airspace Route Points</span>
+                          <span className="text-xs font-mono font-bold text-emerald-400 mt-1 block">
                             {selectedDetail.route_points?.length || 0} Waypoints
                           </span>
-                          <span className="text-[10px] text-stone-500">Bound to HSD Airspace Preset</span>
+                          <span className="text-xs text-stone-500">Bound to HSD Airspace Preset</span>
                         </div>
                       </div>
 
                       {/* Raw Airspace Lua Preview */}
                       <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-2">
-                        <div className="flex items-center justify-between text-xs font-mono text-stone-400">
-                          <span className="uppercase tracking-wider text-cyan-400 font-bold">
+                        <div className="flex items-center justify-between text-xs text-stone-400">
+                          <span className="uppercase tracking-wider text-cyan-400 font-semibold">
                             Airspace Lua Configuration:
                           </span>
                           <button
                             type="button"
                             onClick={handleCopyAirspacePath}
-                            className="text-[11px] text-stone-400 hover:text-cyan-300 flex items-center gap-1 transition-colors cursor-pointer"
+                            className="text-xs text-stone-400 hover:text-cyan-300 flex items-center gap-1 transition-colors cursor-pointer"
                           >
                             <Copy className="w-3 h-3 text-cyan-400" />
                             {hasCopiedAirspacePath ? 'Copied Folder Path!' : 'Copy Target Folder Path'}
@@ -3408,15 +3408,15 @@ export const AtcView: React.FC = () => {
                           <Notepad className="w-4 h-4 text-amber-400" />
                           <span>Flight Plan Notes &amp; Dispatch Remarks</span>
                         </h3>
-                        <p className="text-xs font-mono text-stone-400">
+                        <p className="text-xs text-stone-400">
                           Special instructions, mission objectives, and operational dispatch notes.
                         </p>
                       </div>
 
                       <div className="space-y-4">
                         {selectedDetail.remarks && (
-                          <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-1.5 font-mono text-xs">
-                            <span className="text-[10px] uppercase font-bold text-amber-400 block">
+                          <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-1.5 text-xs">
+                            <span className="text-[11px] uppercase tracking-wider font-bold text-amber-400 block">
                               Dispatch Remarks
                             </span>
                             <p className="text-stone-300 leading-relaxed whitespace-pre-wrap">
@@ -3426,8 +3426,8 @@ export const AtcView: React.FC = () => {
                         )}
 
                         {selectedDetail.description && (
-                          <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-1.5 font-mono text-xs">
-                            <span className="text-[10px] uppercase font-bold text-stone-400 block">
+                          <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-1.5 text-xs">
+                            <span className="text-[11px] uppercase tracking-wider font-bold text-stone-400 block">
                               Mission Objective / Description
                             </span>
                             <p className="text-stone-300 leading-relaxed whitespace-pre-wrap">
@@ -3439,7 +3439,7 @@ export const AtcView: React.FC = () => {
                         {!selectedDetail.remarks && !selectedDetail.description && (
                           <div className="p-8 rounded-xl border border-stone-800 bg-stone-950 text-center space-y-2">
                             <Notepad className="w-8 h-8 text-stone-600 mx-auto" />
-                            <p className="text-xs font-mono text-stone-400">
+                            <p className="text-xs text-stone-400">
                               No special dispatch remarks or notes recorded for this flight plan.
                             </p>
                           </div>
@@ -3456,7 +3456,7 @@ export const AtcView: React.FC = () => {
               <h3 className="font-display text-base font-semibold text-stone-200">
                 {isLoadingDetail ? 'Loading Flight Plan Dossier...' : 'Select a Flight Plan'}
               </h3>
-              <p className="text-xs font-mono text-stone-400 max-w-sm mx-auto">
+              <p className="text-xs text-stone-400 max-w-sm mx-auto">
                 Choose an assigned or filed flight plan on the left to inspect waypoints, communications,
                 avionics, and export files to DCS.
               </p>

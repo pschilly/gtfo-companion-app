@@ -104,7 +104,7 @@ export const DashboardView: React.FC = () => {
             <button
               onClick={handlePortalRefresh}
               disabled={isSyncingPortal}
-              className="px-3 py-1 rounded-lg bg-stone-900 hover:bg-stone-800 border border-stone-800 text-stone-300 text-[11px] font-mono flex items-center gap-1.5 transition-all"
+              className="px-3 py-1 rounded-lg bg-stone-900 hover:bg-stone-800 border border-stone-800 text-stone-300 text-xs font-medium flex items-center gap-1.5 transition-all"
             >
               <ArrowsClockwise
                 className={`w-3 h-3 text-amber-400 ${isSyncingPortal ? 'animate-spin' : ''}`}
@@ -116,7 +116,7 @@ export const DashboardView: React.FC = () => {
               href={STATIC_CONFIG.kbUrl}
               target="_blank"
               rel="noreferrer"
-              className="px-3 py-1 rounded-lg bg-stone-900 hover:bg-stone-800 border border-stone-800 text-amber-400 text-[11px] font-mono flex items-center gap-1 transition-all"
+              className="px-3 py-1 rounded-lg bg-stone-900 hover:bg-stone-800 border border-stone-800 text-amber-400 text-xs font-medium flex items-center gap-1 transition-all"
             >
               <span>Knowledge Base</span>
               <ArrowSquareOut className="w-3 h-3" />
@@ -131,22 +131,22 @@ export const DashboardView: React.FC = () => {
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-1.5">
                 {memberProfile.isCouncilMember && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/25 border border-amber-500/50 text-amber-300 text-[10px] font-mono font-bold uppercase tracking-wider shrink-0">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/25 border border-amber-500/50 text-amber-300 text-[11px] font-bold uppercase tracking-wider shrink-0">
                     <Sparkle className="w-3 h-3 text-amber-300" />
                     Council Member
                   </span>
                 )}
                 {memberProfile.isSquadronLeader && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-mono font-bold uppercase tracking-wider shrink-0">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[11px] font-bold uppercase tracking-wider shrink-0">
                     Squadron Leadership
                   </span>
                 )}
                 {effectiveTier === 'core' ? (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-mono font-bold uppercase tracking-wider shrink-0">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[11px] font-bold uppercase tracking-wider shrink-0">
                     CORE Roster
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-stone-800 border border-stone-700 text-stone-200 text-[10px] font-mono font-bold uppercase tracking-wider shrink-0">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-stone-800 border border-stone-700 text-stone-200 text-[11px] font-bold uppercase tracking-wider shrink-0">
                     Community Roster
                   </span>
                 )}
@@ -167,28 +167,28 @@ export const DashboardView: React.FC = () => {
               )}
 
               <div className="min-w-0 flex-1 space-y-0.5">
-                <h1 className="font-display text-xl font-bold tracking-tight bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent truncate">
+                <h1 className="font-display text-2xl font-bold bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent truncate">
                   {memberProfile.callsign}
                 </h1>
                 {memberProfile.adminPosition ? (
-                  <div className="text-xs font-mono font-semibold text-amber-300 truncate">
+                  <div className="text-xs font-semibold text-amber-300 truncate">
                     {memberProfile.adminPosition}
                   </div>
                 ) : (
-                  <div className="text-xs font-mono text-amber-400 truncate">
+                  <div className="text-xs text-amber-400 truncate">
                     {memberProfile.position}
                   </div>
                 )}
-                <div className="text-xs font-mono text-stone-400 truncate">
+                <div className="text-xs text-stone-400 truncate">
                   {memberProfile.adminPositions && memberProfile.adminPositions.length > 1
                     ? `${memberProfile.adminPositions.filter((p) => p !== memberProfile.adminPosition)[0]}`
                     : ''}
                 </div>
 
-                <div className="flex items-center gap-1.5 pt-1 text-[11px] font-mono">
+                <div className="flex items-center gap-1.5 pt-1 text-xs">
                   <span className="text-stone-400">DCS Tag:</span>
                   <span
-                    className={`font-semibold truncate max-w-[120px] ${
+                    className={`font-mono font-semibold truncate max-w-[120px] ${
                       isNicknameMatching ? 'text-emerald-400' : 'text-amber-400'
                     }`}
                     title={dcsNicknameInfo?.currentNickname || expectedDcsNickname}
@@ -202,7 +202,7 @@ export const DashboardView: React.FC = () => {
                   ) : (
                     <button
                       onClick={() => updateDcsNickname(expectedDcsNickname)}
-                      className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30 transition-colors shrink-0"
+                      className="text-[11px] font-medium px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30 transition-colors shrink-0"
                       title="Set DCS Nickname in nicknames.lua slot #1"
                     >
                       Fix Tag
@@ -212,10 +212,10 @@ export const DashboardView: React.FC = () => {
               </div>
             </div>
 
-            <div className="pt-2.5 border-t border-stone-800/80 flex items-center justify-between text-[11px] font-mono">
+            <div className="pt-2.5 border-t border-stone-800/80 flex items-center justify-between text-xs">
               <span className="text-stone-400">
                 Time Served:{' '}
-                <strong className="text-stone-200">
+                <strong className="text-stone-200 tabular-nums">
                   {memberProfile.timeServedLabel || `${memberProfile.timeServedMonths} mo`}
                 </strong>
               </span>
@@ -237,7 +237,7 @@ export const DashboardView: React.FC = () => {
             <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-stone-800/60">
               <button
                 onClick={() => setActiveTab('airframes')}
-                className="px-2 py-0.5 rounded bg-stone-900 hover:bg-stone-800 border border-stone-800 text-[10px] font-mono text-stone-300 flex items-center gap-1 transition-colors hover:text-amber-300"
+                className="px-2 py-0.5 rounded bg-stone-900 hover:bg-stone-800 border border-stone-800 text-[11px] font-medium tabular-nums text-stone-300 flex items-center gap-1 transition-colors hover:text-amber-300"
                 title="View Qualified Airframes"
               >
                 <AirplaneTilt className="w-3 h-3 text-amber-400" />
@@ -245,7 +245,7 @@ export const DashboardView: React.FC = () => {
               </button>
               <button
                 onClick={() => setActiveTab('qualifications')}
-                className="px-2 py-0.5 rounded bg-stone-900 hover:bg-stone-800 border border-stone-800 text-[10px] font-mono text-stone-300 flex items-center gap-1 transition-colors hover:text-amber-300"
+                className="px-2 py-0.5 rounded bg-stone-900 hover:bg-stone-800 border border-stone-800 text-[11px] font-medium tabular-nums text-stone-300 flex items-center gap-1 transition-colors hover:text-amber-300"
                 title="View Combat Qualifications"
               >
                 <Certificate className="w-3 h-3 text-amber-400" />
@@ -253,7 +253,7 @@ export const DashboardView: React.FC = () => {
               </button>
               <button
                 onClick={() => setActiveTab('awards')}
-                className="px-2 py-0.5 rounded bg-stone-900 hover:bg-stone-800 border border-stone-800 text-[10px] font-mono text-stone-300 flex items-center gap-1 transition-colors hover:text-amber-300"
+                className="px-2 py-0.5 rounded bg-stone-900 hover:bg-stone-800 border border-stone-800 text-[11px] font-medium tabular-nums text-stone-300 flex items-center gap-1 transition-colors hover:text-amber-300"
                 title="View Awards & Ribbons"
               >
                 <Medal className="w-3 h-3 text-amber-400" />
@@ -283,13 +283,13 @@ export const DashboardView: React.FC = () => {
                 />
               </div>
               <div className="space-y-1 min-w-0">
-                <div className="font-display text-lg font-bold text-stone-100">
+                <div className="font-display text-xl font-bold text-stone-100">
                   {memberProfile.gradeTitle}
                 </div>
                 <div className="text-xs font-mono text-amber-400">
                   {(memberProfile.xp || 0).toLocaleString()} XP Earned
                 </div>
-                {/* <p className="text-xs font-mono text-stone-400 truncate">
+                {/* <p className="text-xs text-stone-400 truncate">
                   {memberProfile.nextGrade && typeof memberProfile.remainingXp === 'number'
                     ? `${memberProfile.remainingXp.toLocaleString()} XP remaining to ${
                         memberProfile.nextGrade.grade
@@ -300,15 +300,15 @@ export const DashboardView: React.FC = () => {
             </div>
 
             <div className="space-y-1.5 pt-2.5 border-t border-stone-800/80">
-              <div className="flex items-center justify-between text-[11px] font-mono">
+              <div className="flex items-center justify-between text-xs tabular-nums">
                 <span className="text-stone-400">
-                  Current: <strong className="text-stone-200">{memberProfile.grade}</strong>
+                  Current: <strong className="text-stone-200 font-mono">{memberProfile.grade}</strong>
                 </span>
                 <span className="text-stone-400">
                   {memberProfile.nextGrade ? (
                     <>
                       Next:{' '}
-                      <strong className="text-amber-400">
+                      <strong className="text-amber-400 font-mono">
                         {memberProfile.nextGrade.grade} (
                         {memberProfile.nextGrade.xpRequired.toLocaleString()} XP)
                       </strong>{' '}
@@ -340,11 +340,11 @@ export const DashboardView: React.FC = () => {
                 <span>Squadron Assignment</span>
               </span>
               {memberProfile.squadronAssignment ? (
-                <span className="px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-[10px] font-mono font-bold uppercase shrink-0">
+                <span className="px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-[11px] font-mono font-bold uppercase shrink-0">
                   {memberProfile.squadronAssignment.code}
                 </span>
               ) : (
-                <span className="px-2 py-0.5 rounded bg-stone-800 text-stone-400 text-[10px] font-mono uppercase shrink-0">
+                <span className="px-2 py-0.5 rounded bg-stone-800 text-stone-400 text-[11px] font-semibold uppercase shrink-0">
                   UNASSIGNED
                 </span>
               )}
@@ -365,24 +365,24 @@ export const DashboardView: React.FC = () => {
                     className="w-16 h-16 rounded-xl object-contain bg-stone-900 p-1.5 border border-stone-800 shrink-0"
                   />
                   <div className="min-w-0 space-y-1">
-                    <div className="font-display text-base font-bold text-stone-100 truncate">
+                    <div className="font-display text-lg font-bold text-stone-100 truncate">
                       {memberProfile.squadronAssignment.name}
                     </div>
                     {memberProfile.squadronAssignment.nickname && (
-                      <div className="text-xs font-mono text-amber-400 font-semibold truncate">
+                      <div className="text-xs text-amber-400 font-semibold truncate">
                         &quot;{memberProfile.squadronAssignment.nickname}&quot;
                       </div>
                     )}
                     {(memberProfile.squadronAssignment.primaryAirframe ||
                       memberProfile.squadronAssignment.radioCallsign) && (
-                      <div className="text-xs font-mono text-stone-400 truncate">
+                      <div className="text-xs text-stone-400 truncate">
                         {memberProfile.squadronAssignment.primaryAirframe}
                         {memberProfile.squadronAssignment.primaryAirframe &&
                         memberProfile.squadronAssignment.radioCallsign
                           ? ' • '
                           : ''}
                         {memberProfile.squadronAssignment.radioCallsign && (
-                          <span className="text-stone-200">
+                          <span className="text-stone-200 font-mono">
                             {memberProfile.squadronAssignment.radioCallsign}
                           </span>
                         )}
@@ -391,13 +391,13 @@ export const DashboardView: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="pt-2.5 border-t border-stone-800/80 flex items-center justify-between text-[11px] font-mono">
+                <div className="pt-2.5 border-t border-stone-800/80 flex items-center justify-between text-xs">
                   <span className="text-stone-400">
                     Billet: <strong className="text-stone-200">{memberProfile.position}</strong>
                   </span>
                   <span className="text-stone-400">
                     Flight ID:{' '}
-                    <strong className="text-amber-400">
+                    <strong className="text-amber-400 font-mono">
                       {memberProfile.flightIdentifier
                         ? `${memberProfile.flightIdentifier}`
                         : memberProfile.position}
@@ -416,7 +416,7 @@ export const DashboardView: React.FC = () => {
                     Flying as a General Community Member without a fixed CORE squadron billet.
                   </p>
                 </div>
-                <div className="pt-2.5 border-t border-stone-800/80 flex items-center justify-between text-[11px] font-mono text-stone-400">
+                <div className="pt-2.5 border-t border-stone-800/80 flex items-center justify-between text-xs text-stone-400">
                   <span>Status: Community Wing</span>
                   <span className="text-amber-400">Unassigned</span>
                 </div>
@@ -431,7 +431,7 @@ export const DashboardView: React.FC = () => {
             {missingRequiredAssets.length > 0 && (
               <button
                 onClick={installAllRequiredForUser}
-                className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-mono font-bold text-xs flex items-center gap-2 transition-colors shadow"
+                className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs flex items-center gap-2 transition-colors shadow"
               >
                 <DownloadSimple className="w-4 h-4" />
                 <span>Deploy {missingRequiredAssets.length} Required Package(s)</span>
@@ -439,21 +439,21 @@ export const DashboardView: React.FC = () => {
             )}
             <button
               onClick={() => setActiveTab('liveries')}
-              className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-bold text-xs flex items-center gap-2 transition-colors shadow"
+              className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs flex items-center gap-2 transition-colors shadow"
             >
               <PaintBrush className="w-4 h-4" />
               <span>Airframe Liveries</span>
             </button>
             <button
               onClick={() => setActiveTab('mods')}
-              className="px-4 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 border border-stone-700 text-stone-200 font-display font-semibold text-xs flex items-center gap-2 transition-colors"
+              className="px-4 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 border border-stone-700 text-stone-200 font-semibold text-xs flex items-center gap-2 transition-colors"
             >
               <Package className="w-4 h-4 text-amber-400" />
               <span>Mods</span>
             </button>
             <button
               onClick={() => setActiveTab('library')}
-              className="px-4 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 border border-stone-700 text-stone-200 font-display font-semibold text-xs flex items-center gap-2 transition-colors"
+              className="px-4 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 border border-stone-700 text-stone-200 font-semibold text-xs flex items-center gap-2 transition-colors"
             >
               <Folder className="w-4 h-4 text-amber-400" />
               <span>Installed Library ({installedCount})</span>
@@ -463,7 +463,7 @@ export const DashboardView: React.FC = () => {
           {outdatedAssets.length > 0 && (
             <button
               onClick={updateAllOutdated}
-              className="px-4 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/50 text-amber-300 font-mono font-bold text-xs flex items-center gap-1.5"
+              className="px-4 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/50 text-amber-300 font-bold text-xs flex items-center gap-1.5"
             >
               <ArrowCircleUp className="w-4 h-4" />
               <span>Update {outdatedAssets.length} Outdated Package(s)</span>
@@ -485,10 +485,10 @@ export const DashboardView: React.FC = () => {
                 <AirplaneTilt className="w-5 h-5 text-amber-400" />
               </div>
               <div className="min-w-0">
-                <h3 className="font-display font-bold text-stone-100 text-sm group-hover:text-amber-400 transition-colors truncate">
+                <h3 className="font-display font-bold text-stone-100 text-base group-hover:text-amber-400 transition-colors truncate">
                   Qualified Airframes
                 </h3>
-                <p className="text-[11px] font-mono text-stone-400 truncate">
+                <p className="text-xs text-stone-400 truncate">
                   {primaryAirframe?.name || 'Airframe Ratings'}
                 </p>
               </div>
@@ -497,7 +497,7 @@ export const DashboardView: React.FC = () => {
               {airframes.length}
             </span>
           </div>
-          <div className="flex items-center justify-between text-xs font-mono text-stone-400 pt-2.5 border-t border-stone-800/80">
+          <div className="flex items-center justify-between text-xs text-stone-400 pt-2.5 border-t border-stone-800/80">
             <span>{airframes.filter((a) => a.isInstructor).length > 0 ? 'Instructor Rated' : 'Standard Pilot'}</span>
             <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform flex items-center gap-1 font-semibold">
               Open Hangar <ArrowRight className="w-3.5 h-3.5" />
@@ -516,10 +516,10 @@ export const DashboardView: React.FC = () => {
                 <Certificate className="w-5 h-5 text-amber-400" />
               </div>
               <div className="min-w-0">
-                <h3 className="font-display font-bold text-stone-100 text-sm group-hover:text-amber-400 transition-colors truncate">
+                <h3 className="font-display font-bold text-stone-100 text-base group-hover:text-amber-400 transition-colors truncate">
                   Certifications
                 </h3>
-                <p className="text-[11px] font-mono text-stone-400 truncate">
+                <p className="text-xs text-stone-400 truncate">
                   Earned Flight Credentials
                 </p>
               </div>
@@ -528,8 +528,8 @@ export const DashboardView: React.FC = () => {
               {certificates.length}
             </span>
           </div>
-          <div className="flex items-center justify-between text-xs font-mono text-stone-400 pt-2.5 border-t border-stone-800/80">
-            <span>+{totalCertXp.toLocaleString()} XP Earned</span>
+          <div className="flex items-center justify-between text-xs text-stone-400 pt-2.5 border-t border-stone-800/80">
+            <span className="tabular-nums">+{totalCertXp.toLocaleString()} XP Earned</span>
             <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform flex items-center gap-1 font-semibold">
               View Certificates <ArrowRight className="w-3.5 h-3.5" />
             </span>
@@ -547,10 +547,10 @@ export const DashboardView: React.FC = () => {
                 <Medal className="w-5 h-5 text-amber-400" />
               </div>
               <div className="min-w-0">
-                <h3 className="font-display font-bold text-stone-100 text-sm group-hover:text-amber-400 transition-colors truncate">
+                <h3 className="font-display font-bold text-stone-100 text-base group-hover:text-amber-400 transition-colors truncate">
                   Awards &amp; Ribbons
                 </h3>
-                <p className="text-[11px] font-mono text-stone-400 truncate">
+                <p className="text-xs text-stone-400 truncate">
                   Campaigns &amp; Medals
                 </p>
               </div>
@@ -559,8 +559,8 @@ export const DashboardView: React.FC = () => {
               {awards.length}
             </span>
           </div>
-          <div className="flex items-center justify-between text-xs font-mono text-stone-400 pt-2.5 border-t border-stone-800/80">
-            <span>+{totalAwardXp.toLocaleString()} XP Bonus</span>
+          <div className="flex items-center justify-between text-xs text-stone-400 pt-2.5 border-t border-stone-800/80">
+            <span className="tabular-nums">+{totalAwardXp.toLocaleString()} XP Bonus</span>
             <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform flex items-center gap-1 font-semibold">
               Ribbon Rack <ArrowRight className="w-3.5 h-3.5" />
             </span>

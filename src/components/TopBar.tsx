@@ -296,13 +296,13 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
               onSearchChange('');
               setIsSearchOpen(false);
             }}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-mono text-stone-400 hover:text-stone-200 p-1"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-stone-400 hover:text-stone-200 p-1"
             title="Clear search"
           >
             <X className="w-3.5 h-3.5" />
           </button>
         ) : (
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono text-stone-600 border border-stone-800 bg-stone-950 px-1.5 py-0.5 rounded">
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-mono text-stone-500 border border-stone-800 bg-stone-950 px-1.5 py-0.5 rounded">
             ESC
           </span>
         )}
@@ -312,7 +312,7 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
           <div className="absolute left-0 top-full mt-2 w-full min-w-[340px] sm:min-w-[560px] max-w-2xl bg-stone-950/98 backdrop-blur-xl border border-stone-800 rounded-2xl shadow-2xl shadow-stone-950/90 overflow-hidden z-50 divide-y divide-stone-800/80 animate-in fade-in zoom-in-95 duration-100">
             {/* Filter Tabs Header */}
             <div className="p-2.5 bg-stone-900/95 border-b border-stone-800 flex items-center justify-between gap-2 text-xs">
-              <div className="flex items-center gap-1 overflow-x-auto scrollbar-none font-mono">
+              <div className="flex items-center gap-1 overflow-x-auto scrollbar-none">
                 <button
                   onClick={() => setCategoryFilter('all')}
                   className={`px-2.5 py-1 rounded-lg text-xs transition-colors flex items-center gap-1.5 ${
@@ -322,7 +322,7 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
                   }`}
                 >
                   <span>All</span>
-                  <span className="text-[10px] opacity-75">({totalMatchesCount})</span>
+                  <span className="text-[11px] tabular-nums opacity-75">({totalMatchesCount})</span>
                 </button>
                 {matchingCampaigns.length > 0 && (
                   <button
@@ -335,7 +335,7 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
                   >
                     <Crosshair className="w-3 h-3" />
                     <span>Campaigns</span>
-                    <span className="text-[10px] opacity-75">({matchingCampaigns.length})</span>
+                    <span className="text-[11px] tabular-nums opacity-75">({matchingCampaigns.length})</span>
                   </button>
                 )}
                 {matchingFlightPlans.length > 0 && (
@@ -349,7 +349,7 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
                   >
                     <Compass className="w-3 h-3" />
                     <span>Flight Plans</span>
-                    <span className="text-[10px] opacity-75">({matchingFlightPlans.length})</span>
+                    <span className="text-[11px] tabular-nums opacity-75">({matchingFlightPlans.length})</span>
                   </button>
                 )}
                 {matchingCertificates.length > 0 && (
@@ -363,7 +363,7 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
                   >
                     <Certificate className="w-3 h-3" />
                     <span>Certs</span>
-                    <span className="text-[10px] opacity-75">({matchingCertificates.length})</span>
+                    <span className="text-[11px] tabular-nums opacity-75">({matchingCertificates.length})</span>
                   </button>
                 )}
                 {matchingLiveries.length > 0 && (
@@ -377,7 +377,7 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
                   >
                     <PaintBrush className="w-3 h-3" />
                     <span>Liveries</span>
-                    <span className="text-[10px] opacity-75">({matchingLiveries.length})</span>
+                    <span className="text-[11px] tabular-nums opacity-75">({matchingLiveries.length})</span>
                   </button>
                 )}
                 {matchingMods.length > 0 && (
@@ -391,11 +391,11 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
                   >
                     <Cpu className="w-3 h-3" />
                     <span>Mods</span>
-                    <span className="text-[10px] opacity-75">({matchingMods.length})</span>
+                    <span className="text-[11px] tabular-nums opacity-75">({matchingMods.length})</span>
                   </button>
                 )}
               </div>
-              <span className="text-[10px] font-mono text-stone-500 shrink-0 hidden sm:inline">
+              <span className="text-xs text-stone-500 tabular-nums shrink-0 hidden sm:inline">
                 {totalMatchesCount} result{totalMatchesCount === 1 ? '' : 's'}
               </span>
             </div>
@@ -418,12 +418,12 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
                   {(categoryFilter === 'all' || categoryFilter === 'campaigns') &&
                     matchingCampaigns.length > 0 && (
                       <div className="p-2 space-y-1">
-                        <div className="px-2 py-1 text-[10px] font-mono font-bold uppercase tracking-wider text-amber-400/90 flex items-center justify-between">
+                        <div className="px-2 py-1 text-[11px] font-semibold uppercase tracking-wider text-amber-400/90 flex items-center justify-between">
                           <span className="flex items-center gap-1.5">
                             <Crosshair className="w-3.5 h-3.5 text-amber-400" />
                             <span>Operations // Campaigns</span>
                           </span>
-                          <span className="text-stone-500">
+                          <span className="text-stone-500 tabular-nums">
                             {matchingCampaigns.length} match{matchingCampaigns.length === 1 ? '' : 'es'}
                           </span>
                         </div>
@@ -442,17 +442,17 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
                                   <h4 className="text-sm font-semibold text-stone-100 truncate group-hover:text-amber-300 transition-colors">
                                     {camp.name}
                                   </h4>
-                                  <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-stone-900 border border-stone-800 text-amber-300">
+                                  <span className="px-1.5 py-0.5 rounded text-[11px] font-medium bg-stone-900 border border-stone-800 text-amber-300">
                                     {camp.statusLabel}
                                   </span>
                                 </div>
-                                <p className="text-xs text-stone-400 truncate mt-0.5 font-mono">
+                                <p className="text-xs text-stone-400 truncate mt-0.5">
                                   {camp.theatre || 'Active Theatre'} &bull; {camp.progressPercentage}% complete
                                 </p>
                               </div>
                             </div>
-                            <div className="flex items-center gap-1.5 text-xs text-stone-500 group-hover:text-amber-400 font-mono shrink-0">
-                              <span className="hidden sm:inline text-[11px]">Overview</span>
+                            <div className="flex items-center gap-1.5 text-xs text-stone-500 group-hover:text-amber-400 shrink-0">
+                              <span className="hidden sm:inline text-xs font-medium">Overview</span>
                               <ArrowRight className="w-3.5 h-3.5" />
                             </div>
                           </div>
@@ -464,12 +464,12 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
                   {(categoryFilter === 'all' || categoryFilter === 'flight_plans') &&
                     matchingFlightPlans.length > 0 && (
                       <div className="p-2 space-y-1">
-                        <div className="px-2 py-1 text-[10px] font-mono font-bold uppercase tracking-wider text-amber-400/90 flex items-center justify-between">
+                        <div className="px-2 py-1 text-[11px] font-semibold uppercase tracking-wider text-amber-400/90 flex items-center justify-between">
                           <span className="flex items-center gap-1.5">
                             <Compass className="w-3.5 h-3.5 text-amber-400" />
                             <span>Flight Plans</span>
                           </span>
-                          <span className="text-stone-500">{matchingFlightPlans.length} match{matchingFlightPlans.length === 1 ? '' : 'es'}</span>
+                          <span className="text-stone-500 tabular-nums">{matchingFlightPlans.length} match{matchingFlightPlans.length === 1 ? '' : 'es'}</span>
                         </div>
                         {matchingFlightPlans.map((plan) => (
                           <div
@@ -490,11 +490,11 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
                                     {plan.callsign} {plan.name && plan.name !== plan.callsign ? `(${plan.name})` : ''}
                                   </h4>
                                   {plan.is_filed ? (
-                                    <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                                    <span className="px-1.5 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                                       FILED
                                     </span>
                                   ) : (
-                                    <span className="px-1.5 py-0.5 rounded text-[9px] font-mono text-stone-500 bg-stone-900 border border-stone-800">
+                                    <span className="px-1.5 py-0.5 rounded text-[11px] text-stone-400 bg-stone-900 border border-stone-800">
                                       DRAFT
                                     </span>
                                   )}
@@ -504,8 +504,8 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
                                 </p>
                               </div>
                             </div>
-                            <div className="flex items-center gap-1.5 text-xs text-stone-500 group-hover:text-amber-400 font-mono shrink-0">
-                              <span className="hidden sm:inline text-[11px]">Open in ATC</span>
+                            <div className="flex items-center gap-1.5 text-xs text-stone-500 group-hover:text-amber-400 shrink-0">
+                              <span className="hidden sm:inline text-xs font-medium">Open in ATC</span>
                               <ArrowRight className="w-3.5 h-3.5" />
                             </div>
                           </div>
@@ -517,12 +517,12 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
                   {(categoryFilter === 'all' || categoryFilter === 'certificates') &&
                     matchingCertificates.length > 0 && (
                       <div className="p-2 space-y-1">
-                        <div className="px-2 py-1 text-[10px] font-mono font-bold uppercase tracking-wider text-amber-400/90 flex items-center justify-between">
+                        <div className="px-2 py-1 text-[11px] font-semibold uppercase tracking-wider text-amber-400/90 flex items-center justify-between">
                           <span className="flex items-center gap-1.5">
                             <Certificate className="w-3.5 h-3.5 text-amber-400" />
                             <span>Certifications &amp; Credentials</span>
                           </span>
-                          <span className="text-stone-500">{matchingCertificates.length} match{matchingCertificates.length === 1 ? '' : 'es'}</span>
+                          <span className="text-stone-500 tabular-nums">{matchingCertificates.length} match{matchingCertificates.length === 1 ? '' : 'es'}</span>
                         </div>
                         {matchingCertificates.map((cert) => (
                           <div
@@ -543,8 +543,8 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
                                     {cert.name}
                                   </h4>
                                   {cert.isIssued && (
-                                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-mono font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                                      <CheckCircle className="w-2.5 h-2.5" />
+                                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                                      <CheckCircle className="w-3 h-3" />
                                       <span>ISSUED</span>
                                     </span>
                                   )}
@@ -554,8 +554,8 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
                                 </p>
                               </div>
                             </div>
-                            <div className="flex items-center gap-1.5 text-xs text-stone-500 group-hover:text-amber-400 font-mono shrink-0">
-                              <span className="hidden sm:inline text-[11px]">View Dossier</span>
+                            <div className="flex items-center gap-1.5 text-xs text-stone-500 group-hover:text-amber-400 shrink-0">
+                              <span className="hidden sm:inline text-xs font-medium">View Dossier</span>
                               <ArrowRight className="w-3.5 h-3.5" />
                             </div>
                           </div>
@@ -567,12 +567,12 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
                   {(categoryFilter === 'all' || categoryFilter === 'liveries') &&
                     matchingLiveries.length > 0 && (
                       <div className="p-2 space-y-1">
-                        <div className="px-2 py-1 text-[10px] font-mono font-bold uppercase tracking-wider text-amber-400/90 flex items-center justify-between">
+                        <div className="px-2 py-1 text-[11px] font-semibold uppercase tracking-wider text-amber-400/90 flex items-center justify-between">
                           <span className="flex items-center gap-1.5">
                             <PaintBrush className="w-3.5 h-3.5 text-amber-400" />
                             <span>Liveries &amp; Aircraft Skins</span>
                           </span>
-                          <span className="text-stone-500">{matchingLiveries.length} match{matchingLiveries.length === 1 ? '' : 'es'}</span>
+                          <span className="text-stone-500 tabular-nums">{matchingLiveries.length} match{matchingLiveries.length === 1 ? '' : 'es'}</span>
                         </div>
                         {matchingLiveries.map((asset) => (
                           <div
@@ -597,7 +597,7 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
                                   <h4 className="text-sm font-semibold text-stone-100 truncate group-hover:text-amber-300 transition-colors">
                                     {asset.name}
                                   </h4>
-                                  <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-stone-900 border border-stone-800 text-stone-400">
+                                  <span className="px-1.5 py-0.5 rounded text-[11px] bg-stone-900 border border-stone-800 text-stone-400">
                                     {asset.aircraftOrModule || 'Livery'}
                                   </span>
                                 </div>
@@ -606,8 +606,8 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
                                 </p>
                               </div>
                             </div>
-                            <div className="flex items-center gap-1.5 text-xs text-stone-500 group-hover:text-amber-400 font-mono shrink-0">
-                              <span className="hidden sm:inline text-[11px]">Inspect</span>
+                            <div className="flex items-center gap-1.5 text-xs text-stone-500 group-hover:text-amber-400 shrink-0">
+                              <span className="hidden sm:inline text-xs font-medium">Inspect</span>
                               <ArrowRight className="w-3.5 h-3.5" />
                             </div>
                           </div>
@@ -619,12 +619,12 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
                   {(categoryFilter === 'all' || categoryFilter === 'mods') &&
                     matchingMods.length > 0 && (
                       <div className="p-2 space-y-1">
-                        <div className="px-2 py-1 text-[10px] font-mono font-bold uppercase tracking-wider text-amber-400/90 flex items-center justify-between">
+                        <div className="px-2 py-1 text-[11px] font-semibold uppercase tracking-wider text-amber-400/90 flex items-center justify-between">
                           <span className="flex items-center gap-1.5">
                             <Cpu className="w-3.5 h-3.5 text-amber-400" />
                             <span>Technical Mods &amp; Utilities</span>
                           </span>
-                          <span className="text-stone-500">{matchingMods.length} match{matchingMods.length === 1 ? '' : 'es'}</span>
+                          <span className="text-stone-500 tabular-nums">{matchingMods.length} match{matchingMods.length === 1 ? '' : 'es'}</span>
                         </div>
                         {matchingMods.map((mod) => (
                           <div
@@ -641,7 +641,7 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
                                   <h4 className="text-sm font-semibold text-stone-100 truncate group-hover:text-amber-300 transition-colors">
                                     {mod.name}
                                   </h4>
-                                  <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-stone-900 border border-stone-800 text-cyan-400">
+                                  <span className="px-1.5 py-0.5 rounded text-[11px] font-mono bg-stone-900 border border-stone-800 text-cyan-400">
                                     v{mod.version}
                                   </span>
                                 </div>
@@ -650,8 +650,8 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
                                 </p>
                               </div>
                             </div>
-                            <div className="flex items-center gap-1.5 text-xs text-stone-500 group-hover:text-amber-400 font-mono shrink-0">
-                              <span className="hidden sm:inline text-[11px]">Inspect</span>
+                            <div className="flex items-center gap-1.5 text-xs text-stone-500 group-hover:text-amber-400 shrink-0">
+                              <span className="hidden sm:inline text-xs font-medium">Inspect</span>
                               <ArrowRight className="w-3.5 h-3.5" />
                             </div>
                           </div>
@@ -663,12 +663,12 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
                   {(categoryFilter === 'all' || categoryFilter === 'awards') &&
                     matchingAwards.length > 0 && (
                       <div className="p-2 space-y-1">
-                        <div className="px-2 py-1 text-[10px] font-mono font-bold uppercase tracking-wider text-amber-400/90 flex items-center justify-between">
+                        <div className="px-2 py-1 text-[11px] font-semibold uppercase tracking-wider text-amber-400/90 flex items-center justify-between">
                           <span className="flex items-center gap-1.5">
                             <Medal className="w-3.5 h-3.5 text-amber-400" />
                             <span>Awards &amp; Decorations</span>
                           </span>
-                          <span className="text-stone-500">{matchingAwards.length} match{matchingAwards.length === 1 ? '' : 'es'}</span>
+                          <span className="text-stone-500 tabular-nums">{matchingAwards.length} match{matchingAwards.length === 1 ? '' : 'es'}</span>
                         </div>
                         {matchingAwards.map((award) => (
                           <div
@@ -685,7 +685,7 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
                                   <h4 className="text-sm font-semibold text-stone-100 truncate group-hover:text-amber-300 transition-colors">
                                     {award.name}
                                   </h4>
-                                  <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-stone-900 border border-stone-800 text-amber-400">
+                                  <span className="px-1.5 py-0.5 rounded text-[11px] tabular-nums bg-stone-900 border border-stone-800 text-amber-400">
                                     {award.issueCount}x Awarded
                                   </span>
                                 </div>
@@ -694,8 +694,8 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
                                 </p>
                               </div>
                             </div>
-                            <div className="flex items-center gap-1.5 text-xs text-stone-500 group-hover:text-amber-400 font-mono shrink-0">
-                              <span className="hidden sm:inline text-[11px]">View Awards</span>
+                            <div className="flex items-center gap-1.5 text-xs text-stone-500 group-hover:text-amber-400 shrink-0">
+                              <span className="hidden sm:inline text-xs font-medium">View Awards</span>
                               <ArrowRight className="w-3.5 h-3.5" />
                             </div>
                           </div>
@@ -706,12 +706,12 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
                   {/* Category: Airframes */}
                   {categoryFilter === 'all' && matchingAirframes.length > 0 && (
                     <div className="p-2 space-y-1">
-                      <div className="px-2 py-1 text-[10px] font-mono font-bold uppercase tracking-wider text-amber-400/90 flex items-center justify-between">
+                      <div className="px-2 py-1 text-[11px] font-semibold uppercase tracking-wider text-amber-400/90 flex items-center justify-between">
                         <span className="flex items-center gap-1.5">
                           <Airplane className="w-3.5 h-3.5 text-amber-400" />
                           <span>Qualified Airframes</span>
                         </span>
-                        <span className="text-stone-500">{matchingAirframes.length} match{matchingAirframes.length === 1 ? '' : 'es'}</span>
+                        <span className="text-stone-500 tabular-nums">{matchingAirframes.length} match{matchingAirframes.length === 1 ? '' : 'es'}</span>
                       </div>
                       {matchingAirframes.map((af) => (
                         <div
@@ -732,8 +732,8 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
                               </p>
                             </div>
                           </div>
-                          <div className="flex items-center gap-1.5 text-xs text-stone-500 group-hover:text-amber-400 font-mono shrink-0">
-                            <span className="hidden sm:inline text-[11px]">View Fleet</span>
+                          <div className="flex items-center gap-1.5 text-xs text-stone-500 group-hover:text-amber-400 shrink-0">
+                            <span className="hidden sm:inline text-xs font-medium">View Fleet</span>
                             <ArrowRight className="w-3.5 h-3.5" />
                           </div>
                         </div>
@@ -745,7 +745,7 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
             </div>
 
             {/* Dropdown Footer */}
-            <div className="p-2.5 bg-stone-900/95 border-t border-stone-800 text-[11px] font-mono text-stone-500 flex items-center justify-between">
+            <div className="p-2.5 bg-stone-900/95 border-t border-stone-800 text-xs text-stone-500 flex items-center justify-between">
               <span>Click any result to open its workbench or details</span>
               <span className="hidden sm:inline text-stone-600">Press ESC to dismiss</span>
             </div>
@@ -759,7 +759,7 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
         {appUpdate?.available && (
           <button
             onClick={() => setIsUpdateModalOpen(true)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-mono font-bold transition-all shadow-md shadow-amber-500/20"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-bold transition-all shadow-md shadow-amber-500/20"
           >
             <Sparkle className="w-3.5 h-3.5 text-stone-950" />
             <span>APP v{appUpdate.version} READY</span>
@@ -773,7 +773,7 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
               setActiveTab('library');
               updateAllOutdated();
             }}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/50 text-amber-300 text-xs font-mono font-semibold transition-all"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/50 text-amber-300 text-xs font-semibold transition-all"
           >
             <ArrowCircleUp className="w-4 h-4 text-amber-400 animate-bounce" />
             <span>{outdatedAssets.length} UPDATE(S) AVAILABLE</span>
@@ -783,7 +783,7 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
         {/* Flight Plans & ATC Navigation Button */}
         {/* <button
           onClick={() => setActiveTab('atc')}
-          className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-mono font-semibold transition-all ${
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all ${
             activeTab === 'atc'
               ? 'bg-amber-500/20 border-amber-500/60 text-amber-300 shadow-sm shadow-amber-500/10'
               : 'bg-stone-900/90 hover:bg-stone-800 border-stone-800 text-stone-300 hover:text-amber-400'
@@ -793,7 +793,7 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
           <Compass className="w-4 h-4 text-amber-400" />
           <span className="hidden sm:inline">ATC DISPATCH</span>
           {memberFlightPlans && memberFlightPlans.length > 0 && (
-            <span className="px-1.5 py-0.2 rounded-full bg-amber-500 text-stone-950 font-bold text-[10px]">
+            <span className="px-1.5 py-0.2 rounded-full bg-amber-500 text-stone-950 font-bold text-[11px]">
               {memberFlightPlans.length}
             </span>
           )}
@@ -823,7 +823,7 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
         >
           <ListChecks className="w-4 h-4" />
           {checklistSummary.pendingCount > 0 ? (
-            <span className="absolute -top-1 -right-1 flex h-4 min-w-4 px-1 items-center justify-center rounded-full bg-amber-500 text-[9px] font-mono font-bold text-stone-950 shadow-sm">
+            <span className="absolute -top-1 -right-1 flex h-[18px] min-w-[18px] px-1 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold tabular-nums text-stone-950 shadow-sm">
               {checklistSummary.pendingCount}
             </span>
           ) : (
@@ -852,7 +852,7 @@ export const TopBar: React.FC<TopBarProps> = ({ searchQuery, onSearchChange }) =
         >
           <CalendarBlank className="w-4 h-4" />
           {upcomingCalendarEvents.length > 0 && (
-            <span className="absolute -top-1 -right-1 flex h-4 min-w-4 px-1 items-center justify-center rounded-full bg-sky-500 text-[9px] font-mono font-bold text-stone-950 shadow-sm">
+            <span className="absolute -top-1 -right-1 flex h-[18px] min-w-[18px] px-1 items-center justify-center rounded-full bg-sky-500 text-[10px] font-bold tabular-nums text-stone-950 shadow-sm">
               {upcomingCalendarEvents.length > 99 ? '99+' : upcomingCalendarEvents.length}
             </span>
           )}

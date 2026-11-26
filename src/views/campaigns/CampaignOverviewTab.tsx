@@ -72,26 +72,26 @@ export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
               <div className="space-y-2 min-w-0 flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span
-                    className={`px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider rounded border flex items-center gap-1 ${getStatusBadgeClasses(
+                    className={`px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider rounded border flex items-center gap-1 ${getStatusBadgeClasses(
                       campaign.statusColor
                     )}`}
                   >
                     {campaign.statusLabel}
                   </span>
 
-                  <span className="px-2 py-0.5 text-[10px] font-black uppercase tracking-wider rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                  <span className="px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
                     <MapTrifold className="size-4 inline mr-1" />
                     {campaign.theatre || 'Active Theatre'}
                   </span>
 
                   {campaign.era && (
-                    <span className="px-2 py-0.5 text-[10px] font-bold uppercase rounded bg-stone-800 text-stone-300 border border-stone-700">
+                    <span className="px-2 py-0.5 text-[11px] font-semibold uppercase rounded bg-stone-800 text-stone-300 border border-stone-700">
                       {campaign.era} ERA
                     </span>
                   )}
                 </div>
 
-                <h2 className="font-display text-2xl font-black text-stone-100 tracking-wide">
+                <h2 className="font-display text-2xl font-bold text-stone-100">
                   {campaign.name}
                 </h2>
 
@@ -116,7 +116,7 @@ export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
                     ? 'Remove pinned campaign widget from Home dashboard'
                     : 'Pin this campaign to your Home dashboard'
                 }
-                className={`px-3 py-2 rounded-xl border text-xs font-mono font-bold flex items-center gap-1.5 transition-all ${
+                className={`px-3 py-2 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all ${
                   isPinned
                     ? 'bg-amber-500/20 hover:bg-red-500/20 border-amber-500/50 hover:border-red-500/50 text-amber-300 hover:text-red-300'
                     : 'bg-stone-950 hover:bg-stone-800 border-stone-700 hover:border-amber-500/40 text-stone-200 hover:text-amber-300'
@@ -138,7 +138,7 @@ export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
               <button
                 type="button"
                 onClick={() => onNavigateSubTab('map')}
-                className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-mono font-bold flex items-center gap-1.5 shadow-md shadow-amber-500/20 transition-colors"
+                className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-semibold flex items-center gap-1.5 shadow-md shadow-amber-500/20 transition-colors"
               >
                 <MapTrifold weight="duotone" className="w-4 h-4" />
                 <span>Campaign Map &amp; Planner</span>
@@ -172,7 +172,7 @@ export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
               <span>Campaign Operational Progress</span>
             </span>
 
-            <div className="flex items-center gap-3 font-mono text-[11px] text-stone-400">
+            <div className="flex items-center gap-3 text-xs tabular-nums text-stone-400">
               {campaign.targetMissions > 0 && (
                 <span>
                   <strong className="text-stone-200">{campaign.earnedMissionPoints}</strong> /{' '}
@@ -198,7 +198,7 @@ export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
               aria-valuemax={100}
             />
             <div
-              className={`absolute inset-0 flex items-center justify-center text-xs font-black font-mono tracking-wider select-none ${
+              className={`absolute inset-0 flex items-center justify-center text-xs font-mono font-bold tracking-wider select-none ${
                 campaign.progressPercentage >= 48 ? 'text-stone-950' : 'text-stone-100'
               }`}
             >
@@ -222,7 +222,7 @@ export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
                 <div className="text-xs font-bold text-stone-100 group-hover:text-amber-300 truncate">
                   Campaign Lore
                 </div>
-                <div className="text-[10px] font-mono text-stone-400">
+                <div className="text-xs tabular-nums text-stone-400">
                   {campaign.loresCount} chapter{campaign.loresCount === 1 ? '' : 's'}
                 </div>
               </div>
@@ -243,7 +243,7 @@ export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
                 <div className="text-xs font-bold text-stone-100 group-hover:text-sky-300 truncate">
                   Missions
                 </div>
-                <div className="text-[10px] font-mono text-stone-400">
+                <div className="text-xs tabular-nums text-stone-400">
                   {campaign.missions.length} total ({campaign.activeMissionsCount} active)
                 </div>
               </div>
@@ -264,7 +264,7 @@ export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
                 <div className="text-xs font-bold text-stone-100 group-hover:text-emerald-300 truncate">
                   Intel Reports
                 </div>
-                <div className="text-[10px] font-mono text-stone-400">
+                <div className="text-xs tabular-nums text-stone-400">
                   {(() => {
                     const totalIntelCount = getCampaignTotalIntelCount(campaign);
                     const aarCount = getCampaignAarCount(campaign);
@@ -294,7 +294,7 @@ export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
                 <div className="text-xs font-bold text-stone-100 group-hover:text-purple-300 truncate">
                   Airframes
                 </div>
-                <div className="text-[10px] font-mono text-stone-400">
+                <div className="text-xs tabular-nums text-stone-400">
                   {campaign.airframeSquadronGroups.length} squadron
                   {campaign.airframeSquadronGroups.length === 1 ? '' : 's'}
                 </div>
@@ -325,13 +325,13 @@ export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
               </div>
 
               <div className="mt-3">
-                <div className={`text-2xl font-black font-mono tracking-tight ${style.text}`}>
+                <div className={`text-2xl font-bold font-display tabular-nums ${style.text}`}>
                   {pool.balance.toLocaleString()}{' '}
                   <span className={`text-xs font-bold font-mono ${style.accent}`}>
                     {pool.shortLabel}
                   </span>
                 </div>
-                <p className="text-[11px] text-stone-400 mt-1 line-clamp-2 leading-snug">
+                <p className="text-xs text-stone-400 mt-1 line-clamp-2 leading-snug">
                   {pool.description}
                 </p>
               </div>
@@ -351,7 +351,7 @@ export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
                 <h3 className="text-sm font-bold text-stone-100 uppercase tracking-wider">
                   Active Missions
                 </h3>
-                <span className="px-2 py-0.5 text-[10px] font-black rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/30 font-mono">
+                <span className="px-2 py-0.5 text-[11px] font-bold tabular-nums rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/30">
                   {campaign.activeMissions.length}
                 </span>
               </div>
@@ -377,13 +377,13 @@ export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
                       <div className="space-y-1.5 min-w-0 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span
-                            className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${getMissionStatusBadgeClasses(
+                            className={`px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider border ${getMissionStatusBadgeClasses(
                               mission.status
                             )}`}
                           >
                             {mission.statusLabel}
                           </span>
-                          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-500/15 text-amber-300 border border-amber-500/25">
+                          <span className="px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider bg-amber-500/15 text-amber-300 border border-amber-500/25">
                             {mission.taskingName}
                           </span>
 
@@ -397,7 +397,7 @@ export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
                                     className="text-[11px] font-mono text-stone-300 flex items-center gap-1 bg-stone-900/90 px-1.5 py-0.5 rounded border border-stone-800"
                                   >
                                     <Clock weight="duotone" className="w-3 h-3 text-amber-500/80" />
-                                    <span className="text-[10px] text-stone-400 font-bold">
+                                    <span className="font-sans text-[11px] text-stone-400 font-semibold">
                                       {sortie.name}:
                                     </span>{' '}
                                     {formatZuluShort(sortie.scheduledAt)}
@@ -414,7 +414,7 @@ export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
                           {mission.rewardBadges.map((badge) => (
                             <span
                               key={badge.type}
-                              className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1 font-mono"
+                              className="px-2 py-0.5 rounded text-[11px] font-mono font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1"
                             >
                               {renderResourceIcon(badge.type, 'w-3 h-3 text-amber-400')}
                               {badge.amount.toLocaleString()} {badge.shortLabel}
@@ -443,7 +443,7 @@ export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
                         <button
                           type="button"
                           onClick={() => onInspectMission(mission, 'overview')}
-                          className="px-2.5 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/35 text-xs font-mono font-bold text-amber-300 transition-colors"
+                          className="px-2.5 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/35 text-xs font-semibold text-amber-300 transition-colors"
                         >
                           Inspect Mission
                         </button>
@@ -468,7 +468,7 @@ export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
                         {mission.objectives.slice(0, 6).map((obj, oIdx) => (
                           <span
                             key={`${mission.id}-obj-${oIdx}`}
-                            className={`px-2 py-0.5 rounded-lg border text-[10px] font-mono inline-flex items-center gap-1.5 max-w-full ${
+                            className={`px-2 py-0.5 rounded-lg border text-[11px] inline-flex items-center gap-1.5 max-w-full ${
                               obj.isCompleted
                                 ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300'
                                 : 'bg-stone-900 border-stone-800 text-stone-200'
@@ -489,14 +489,14 @@ export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
                               {obj.objective || obj.name}
                             </span>
                             {obj.points !== undefined && obj.points > 0 && (
-                              <span className="text-amber-300 font-bold shrink-0">
+                              <span className="font-mono text-amber-300 font-bold shrink-0">
                                 +{obj.points} {obj.resourceShortLabel || 'CR'}
                               </span>
                             )}
                           </span>
                         ))}
                         {mission.objectives.length > 6 && (
-                          <span className="px-2 py-0.5 rounded-lg bg-stone-900 border border-stone-800 text-[10px] font-mono text-stone-400">
+                          <span className="px-2 py-0.5 rounded-lg bg-stone-900 border border-stone-800 text-[11px] tabular-nums text-stone-400">
                             +{mission.objectives.length - 6} more
                           </span>
                         )}
@@ -504,13 +504,13 @@ export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
                     )}
 
                     <div className="pt-2.5 border-t border-stone-800/80 flex items-center justify-between gap-2 flex-wrap text-xs text-stone-400">
-                      <div className="flex items-center gap-4 flex-wrap">
-                        <span className="flex items-center gap-1 font-mono text-stone-300">
+                      <div className="flex items-center gap-4 flex-wrap tabular-nums">
+                        <span className="flex items-center gap-1 text-stone-300">
                           <AirplaneTilt weight="duotone" className="w-3.5 h-3.5 text-sky-400" />
                           <strong>{mission.flightsCount}</strong> Flight(s)
                         </span>
                         {mission.objectivesCount > 0 && (
-                          <span className="flex items-center gap-1 font-mono text-stone-300">
+                          <span className="flex items-center gap-1 text-stone-300">
                             <Target weight="duotone" className="w-3.5 h-3.5 text-amber-400" />
                             <strong>
                               {mission.completedObjectivesCount}/{mission.objectivesCount}
@@ -519,7 +519,7 @@ export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
                           </span>
                         )}
                         {mission.totalRewardsSummary && mission.totalRewardsSummary !== 'None' && (
-                          <span className="flex items-center gap-1 font-mono text-amber-400 text-[11px]">
+                          <span className="flex items-center gap-1 font-mono text-amber-400 text-xs">
                             <Coins weight="duotone" className="w-3.5 h-3.5 text-amber-400" />
                             <strong>{mission.earnedRewardsSummary}</strong> /{' '}
                             {mission.totalRewardsSummary}
@@ -558,7 +558,7 @@ export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
                   Pending Supply Shipments
                 </h3>
                 {campaign.pendingSupplyOrders.length > 0 && (
-                  <span className="px-2 py-0.5 text-[10px] font-black rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono">
+                  <span className="px-2 py-0.5 text-[11px] font-bold tabular-nums rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
                     {campaign.pendingSupplyOrders.length}
                   </span>
                 )}
@@ -596,13 +596,13 @@ export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
                           <span className="font-mono font-bold text-xs text-sky-400 tracking-wider">
                             #{order.identifier}
                           </span>
-                          <span className="text-[11px] font-mono text-stone-400 truncate">
+                          <span className="text-xs text-stone-400 truncate">
                             {order.flightCallsign} &bull; {order.airframeShortName}
                           </span>
                         </div>
 
                         <span
-                          className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border flex items-center gap-1 shrink-0 ${getStatusBadgeClasses(
+                          className={`px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider border flex items-center gap-1 shrink-0 ${getStatusBadgeClasses(
                             order.statusColor
                           )}`}
                         >
@@ -625,7 +625,7 @@ export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
                             {order.destinationName}
                           </span>
                           {order.distanceNm > 0 && (
-                            <span className="text-[10px] font-mono text-stone-500 shrink-0">
+                            <span className="text-[11px] font-mono text-stone-500 shrink-0">
                               ({order.distanceNm.toLocaleString()} NM)
                             </span>
                           )}
@@ -637,13 +637,13 @@ export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
                       </div>
 
                       <div className="space-y-1.5 bg-stone-900/80 p-2.5 rounded-xl border border-stone-800/80">
-                        <div className="flex items-center justify-between text-[11px]">
-                          <span className="text-stone-400 font-mono">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-stone-400">
                             Payload:{' '}
-                            <strong className="text-stone-200">
+                            <strong className="font-mono text-stone-200">
                               {order.totalWeightLbs.toLocaleString()}
                             </strong>{' '}
-                            / {order.maxPayloadLbs.toLocaleString()} lbs
+                            <span className="font-mono">/ {order.maxPayloadLbs.toLocaleString()} lbs</span>
                           </span>
                           <span
                             className={`font-mono font-bold ${
@@ -665,16 +665,16 @@ export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
                           />
                         </div>
 
-                        <div className="flex items-center justify-between text-[10px] text-stone-500 font-mono">
+                        <div className="flex items-center justify-between text-[11px] text-stone-500 tabular-nums">
                           <span>{order.totalItemsCount} munitions units</span>
-                          <span>{order.remainingPayloadLbs.toLocaleString()} lbs free</span>
+                          <span className="font-mono">{order.remainingPayloadLbs.toLocaleString()} lbs free</span>
                         </div>
                       </div>
 
                       <div className="space-y-1.5">
-                        <div className="text-[10px] font-bold text-stone-400 uppercase tracking-wider flex items-center justify-between">
+                        <div className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider flex items-center justify-between">
                           <span>Cargo Manifest</span>
-                          <span className="font-mono text-stone-500">
+                          <span className="tabular-nums text-stone-500 font-normal normal-case">
                             {order.items.length} item type(s)
                           </span>
                         </div>
@@ -691,12 +691,12 @@ export const CampaignOverviewTab: React.FC<CampaignOverviewTabProps> = ({
                                     <span className="font-semibold text-stone-200 truncate">
                                       {item.name}
                                     </span>
-                                    <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-bold bg-sky-500/15 text-sky-300 border border-sky-500/25">
+                                    <span className="px-1.5 py-0.2 rounded text-[11px] font-mono font-bold bg-sky-500/15 text-sky-300 border border-sky-500/25">
                                       &times;{item.quantity}
                                     </span>
                                   </div>
-                                  <div className="text-[10px] text-stone-400 font-mono flex items-center gap-2 flex-wrap">
-                                    <span>{item.totalWeightLbs.toLocaleString()} lbs</span>
+                                  <div className="text-[11px] text-stone-400 flex items-center gap-2 flex-wrap">
+                                    <span className="font-mono">{item.totalWeightLbs.toLocaleString()} lbs</span>
                                     {item.requestedBy && (
                                       <span className="text-stone-500">by {item.requestedBy}</span>
                                     )}

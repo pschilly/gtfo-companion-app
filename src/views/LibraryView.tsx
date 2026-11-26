@@ -72,7 +72,7 @@ export const LibraryView: React.FC = () => {
         <div className="flex flex-wrap items-center gap-2.5">
           <button
             onClick={rescanLocalAssets}
-            className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-200 font-mono text-xs flex items-center gap-2 transition-colors"
+            className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-200 text-xs font-medium flex items-center gap-2 transition-colors"
           >
             <ArrowsClockwise className="w-3.5 h-3.5 text-amber-400" />
             Rescan DCS Folder
@@ -82,7 +82,7 @@ export const LibraryView: React.FC = () => {
             <button
               onClick={handleVerifyAll}
               disabled={isVerifyingAll || Boolean(verifyingAssetId)}
-              className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-200 font-mono text-xs flex items-center gap-2 transition-colors disabled:opacity-60"
+              className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-200 text-xs font-medium flex items-center gap-2 transition-colors disabled:opacity-60"
               title="Verify local file integrity for all installed packages"
             >
               {isVerifyingAll ? (
@@ -97,7 +97,7 @@ export const LibraryView: React.FC = () => {
           {outdatedAssets.length > 0 && (
             <button
               onClick={updateAllOutdated}
-              className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono font-bold text-xs flex items-center gap-2 shadow"
+              className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs flex items-center gap-2 shadow"
             >
               <ArrowCircleUp className="w-4 h-4" />
               Update All ({outdatedAssets.length})
@@ -107,7 +107,7 @@ export const LibraryView: React.FC = () => {
       </div>
 
       {verifyAllFeedback && (
-        <div className="p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 font-mono text-xs flex items-center gap-2 animate-fadeIn">
+        <div className="p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-xs flex items-center gap-2 animate-fadeIn">
           <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
           <span>{verifyAllFeedback}</span>
         </div>
@@ -167,50 +167,50 @@ export const LibraryView: React.FC = () => {
                     <div className="flex flex-wrap items-center gap-2">
                       {record.aircraftOrModule &&
                         !record.aircraftOrModule.toLowerCase().includes('agnostic') && (
-                          <span className="px-2 py-0.5 rounded bg-stone-950 border border-stone-800 text-[11px] font-mono text-amber-300">
+                          <span className="px-2 py-0.5 rounded bg-stone-950 border border-stone-800 text-[11px] font-semibold text-amber-300">
                             {record.aircraftOrModule}
                           </span>
                         )}
                       <h3
                         onClick={() => remoteItem && setSelectedAsset(remoteItem)}
-                        className="font-display font-semibold text-sm text-stone-100 hover:text-amber-400 cursor-pointer"
+                        className="font-display font-semibold text-base text-stone-100 hover:text-amber-400 cursor-pointer"
                       >
                         {record.name}
                       </h3>
                       {hasUpdate ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500 text-stone-950 font-mono font-bold text-[10px]">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500 text-stone-950 font-bold text-[11px]">
                           <ArrowCircleUp className="w-3 h-3" />
                           UPDATE AVAILABLE: v{remoteItem.version}
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 font-mono text-[10px]">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-[11px]">
                           <CheckCircle className="w-3 h-3" />
-                          v{record.installedVersion} (CURRENT)
+                          <span className="font-mono">v{record.installedVersion}</span> (CURRENT)
                         </span>
                       )}
 
                       {verifyRes && verifyRes.valid && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 font-mono font-bold text-[10px]">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 font-bold text-[11px]">
                           <ShieldCheck className="w-3 h-3" />
                           VERIFIED ({verifyRes.checkedCount || record.extractedFiles.length} FILES)
                         </span>
                       )}
 
                       {verifyRes && !verifyRes.valid && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/50 text-amber-300 font-mono font-bold text-[10px]">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/50 text-amber-300 font-bold text-[11px]">
                           <Warning className="w-3 h-3 text-amber-400" />
                           INTEGRITY ISSUE ({issueCount} FILE{issueCount === 1 ? '' : 'S'})
                         </span>
                       )}
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-4 text-xs font-mono text-stone-400">
-                      <span className="flex items-center gap-1.5 truncate">
+                    <div className="flex flex-wrap items-center gap-4 text-xs text-stone-400">
+                      <span className="flex items-center gap-1.5 font-mono truncate">
                         <FolderOpen className="w-3.5 h-3.5 text-stone-500 shrink-0" />
                         {record.installedPath}
                       </span>
                       <span>• Installed {formatShortDate(record.installedAt)}</span>
-                      <span>• {record.extractedFiles.length} tracked files</span>
+                      <span className="tabular-nums">• {record.extractedFiles.length} tracked files</span>
                     </div>
                   </div>
 
@@ -218,7 +218,7 @@ export const LibraryView: React.FC = () => {
                     {hasUpdate && remoteItem && (
                       <button
                         onClick={() => installAsset(remoteItem)}
-                        className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono font-bold text-xs flex items-center gap-1.5"
+                        className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs flex items-center gap-1.5"
                       >
                         <ArrowCircleUp className="w-3.5 h-3.5" />
                         Update to v{remoteItem.version}
@@ -229,7 +229,7 @@ export const LibraryView: React.FC = () => {
                       onClick={() => verifyAsset(record.assetId)}
                       disabled={isVerifying || Boolean(progress)}
                       title="Verify all package files and checksums on disk"
-                      className="px-3 py-2 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-800 text-stone-300 font-mono text-xs flex items-center gap-1.5 disabled:opacity-60"
+                      className="px-3 py-2 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-800 text-stone-300 text-xs font-medium flex items-center gap-1.5 disabled:opacity-60"
                     >
                       {isVerifying ? (
                         <CircleNotch className="w-3.5 h-3.5 text-amber-400 animate-spin" />
@@ -244,7 +244,7 @@ export const LibraryView: React.FC = () => {
                         onClick={() => installAsset(remoteItem)}
                         disabled={Boolean(progress)}
                         title="Reinstall / Repair asset files"
-                        className={`px-3 py-2 rounded-xl font-mono text-xs flex items-center gap-1.5 disabled:opacity-60 ${
+                        className={`px-3 py-2 rounded-xl text-xs font-medium flex items-center gap-1.5 disabled:opacity-60 ${
                           verifyRes && !verifyRes.valid
                             ? 'bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold shadow'
                             : 'bg-stone-950 hover:bg-stone-800 border border-stone-800 text-stone-300'
@@ -258,7 +258,7 @@ export const LibraryView: React.FC = () => {
                     <button
                       onClick={() => uninstallAsset(record.assetId)}
                       disabled={Boolean(progress)}
-                      className="px-3 py-2 rounded-xl bg-red-500/15 hover:bg-red-500/25 border border-red-500/40 text-red-300 font-mono text-xs flex items-center gap-1.5 disabled:opacity-60"
+                      className="px-3 py-2 rounded-xl bg-red-500/15 hover:bg-red-500/25 border border-red-500/40 text-red-300 text-xs font-medium flex items-center gap-1.5 disabled:opacity-60"
                     >
                       <Trash className="w-3.5 h-3.5" />
                       Uninstall
@@ -268,12 +268,12 @@ export const LibraryView: React.FC = () => {
 
                 {progress && (
                   <div className="pt-2 border-t border-stone-800/80 space-y-1.5">
-                    <div className="flex items-center justify-between text-xs font-mono">
+                    <div className="flex items-center justify-between text-xs">
                       <span className="text-amber-300 flex items-center gap-1.5 truncate">
                         <CircleNotch className="w-3.5 h-3.5 animate-spin shrink-0" />
                         {progress.message}
                       </span>
-                      <span className="text-stone-300 shrink-0">{progress.percent}%</span>
+                      <span className="text-stone-300 font-mono shrink-0">{progress.percent}%</span>
                     </div>
                     <div className="w-full h-2 rounded-full bg-stone-950 overflow-hidden border border-stone-800">
                       <div

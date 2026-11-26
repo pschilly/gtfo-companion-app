@@ -210,7 +210,7 @@ export const ThreatEditorDrawer: React.FC<ThreatEditorDrawerProps> = ({
     >
       <div className="p-3.5 space-y-3 overflow-y-auto text-xs">
         {!mapData.permissions.canManageThreats && (
-          <div className="p-2.5 rounded-lg bg-amber-950/40 border border-amber-800/50 text-amber-300 text-[11px]">
+          <div className="p-2.5 rounded-lg bg-amber-950/40 border border-amber-800/50 text-amber-300 text-xs">
             Read-only: You need Threat Manager permission on the portal to commit changes.
           </div>
         )}
@@ -247,19 +247,19 @@ export const ThreatEditorDrawer: React.FC<ThreatEditorDrawerProps> = ({
         {selectedThreat && (
           <div className="bg-stone-900/80 border border-red-900/50 rounded-lg p-3 space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold text-red-300 uppercase">
+              <span className="text-xs font-bold text-red-300 uppercase">
                 Editing #{selectedIndex! + 1}
               </span>
               <button
                 onClick={() => setSelectedIndex(null)}
-                className="text-[11px] text-stone-400 hover:text-stone-200 cursor-pointer"
+                className="text-xs text-stone-400 hover:text-stone-200 cursor-pointer"
               >
                 Done
               </button>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="block text-[10px] text-stone-400 uppercase mb-0.5">Title</label>
+                <label className="block text-xs text-stone-400 uppercase mb-0.5">Title</label>
                 <input
                   type="text"
                   value={selectedThreat.title || ''}
@@ -272,7 +272,7 @@ export const ThreatEditorDrawer: React.FC<ThreatEditorDrawerProps> = ({
                 />
               </div>
               <div>
-                <label className="block text-[10px] text-stone-400 uppercase mb-0.5">Type</label>
+                <label className="block text-xs text-stone-400 uppercase mb-0.5">Type</label>
                 <select
                   value={selectedThreat.type}
                   onChange={(e) =>
@@ -292,7 +292,7 @@ export const ThreatEditorDrawer: React.FC<ThreatEditorDrawerProps> = ({
             </div>
             <div className="grid grid-cols-3 gap-2">
               <div className="col-span-2">
-                <label className="block text-[10px] text-stone-400 uppercase mb-0.5">
+                <label className="block text-xs text-stone-400 uppercase mb-0.5">
                   SAM System Template
                 </label>
                 <select
@@ -326,7 +326,7 @@ export const ThreatEditorDrawer: React.FC<ThreatEditorDrawerProps> = ({
                 </select>
               </div>
               <div>
-                <label className="block text-[10px] text-stone-400 uppercase mb-0.5">
+                <label className="block text-xs text-stone-400 uppercase mb-0.5">
                   HDG (°)
                 </label>
                 <input
@@ -352,7 +352,7 @@ export const ThreatEditorDrawer: React.FC<ThreatEditorDrawerProps> = ({
               </div>
             </div>
             <div>
-              <label className="block text-[10px] text-stone-400 uppercase mb-0.5">
+              <label className="block text-xs text-stone-400 uppercase mb-0.5">
                 Intel Notes
               </label>
               <textarea
@@ -386,7 +386,7 @@ export const ThreatEditorDrawer: React.FC<ThreatEditorDrawerProps> = ({
                 <div className="font-semibold text-stone-100 truncate">
                   {t.title || t.sam_name || String(t.type || '').toUpperCase()}
                 </div>
-                <div className="text-[10px] font-mono text-stone-400 truncate">
+                <div className="text-[11px] font-mono text-stone-400 truncate">
                   {t.sam_name ? `${t.sam_name} (${t.range} NM)` : String(t.type || '').toUpperCase()} ·{' '}
                   {formatCoordinateDdm(t.lat, t.lng)}
                 </div>
@@ -580,12 +580,12 @@ export const SupportAssetsDrawer: React.FC<SupportAssetsDrawerProps> = ({
         {selectedAsset && (
           <div className="bg-stone-900/80 border border-sky-900/50 rounded-lg p-3 space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold text-sky-300 uppercase">
+              <span className="text-xs font-bold text-sky-300 uppercase">
                 Editing {selectedAsset.title || `Asset #${selectedIndex! + 1}`}
               </span>
               <button
                 onClick={() => setSelectedIndex(null)}
-                className="text-[11px] text-stone-400 hover:text-stone-200 cursor-pointer"
+                className="text-xs text-stone-400 hover:text-stone-200 cursor-pointer"
               >
                 Done
               </button>
@@ -622,7 +622,7 @@ export const SupportAssetsDrawer: React.FC<SupportAssetsDrawerProps> = ({
 
             <div className="grid grid-cols-3 gap-1.5">
               <div>
-                <label className="text-[9px] text-stone-500 block">HDG (°T)</label>
+                <label className="text-[11px] text-stone-500 block">HDG (°T)</label>
                 <input
                   type="number"
                   value={selectedAsset.heading ?? 0}
@@ -637,7 +637,7 @@ export const SupportAssetsDrawer: React.FC<SupportAssetsDrawerProps> = ({
                 />
               </div>
               <div>
-                <label className="text-[9px] text-stone-500 block">Leg (NM)</label>
+                <label className="text-[11px] text-stone-500 block">Leg (NM)</label>
                 <input
                   type="number"
                   value={selectedAsset.leg_length ?? 20}
@@ -652,7 +652,7 @@ export const SupportAssetsDrawer: React.FC<SupportAssetsDrawerProps> = ({
                 />
               </div>
               <div>
-                <label className="text-[9px] text-stone-500 block">Alt (ft)</label>
+                <label className="text-[11px] text-stone-500 block">Alt (ft)</label>
                 <input
                   type="number"
                   value={selectedAsset.altitude ?? 22000}
@@ -714,7 +714,7 @@ export const SupportAssetsDrawer: React.FC<SupportAssetsDrawerProps> = ({
                 <div className="font-semibold text-stone-100 truncate">
                   {a.title || String(a.type || '').toUpperCase()}
                 </div>
-                <div className="text-[10px] font-mono text-stone-400 truncate">
+                <div className="text-[11px] font-mono text-stone-400 truncate">
                   {String(a.type || '').toUpperCase()} · {a.tacan_channel || 'No TCN'} ·{' '}
                   {a.radio_freq || 'No Freq'}
                 </div>
@@ -934,7 +934,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
 
         <div className="grid grid-cols-2 gap-2">
           <div>
-            <label className="block text-[10px] uppercase text-stone-400 font-semibold mb-1">
+            <label className="block text-xs uppercase text-stone-400 font-semibold mb-1">
               Label / Text
             </label>
             <input
@@ -946,7 +946,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
             />
           </div>
           <div>
-            <label className="block text-[10px] uppercase text-stone-400 font-semibold mb-1">
+            <label className="block text-xs uppercase text-stone-400 font-semibold mb-1">
               Visibility Scope
             </label>
             <select
@@ -985,7 +985,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
 
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2">
-            <span className="text-[10px] uppercase text-stone-400 font-semibold">Color</span>
+            <span className="text-xs uppercase text-stone-400 font-semibold">Color</span>
             <input
               type="color"
               value={color}
@@ -995,7 +995,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
           </div>
           {shape === 'circle' && (
             <div className="flex items-center gap-1.5 flex-1">
-              <span className="text-[10px] uppercase text-stone-400 font-semibold">Radius (NM)</span>
+              <span className="text-xs uppercase text-stone-400 font-semibold">Radius (NM)</span>
               <input
                 type="number"
                 min={0.5}
@@ -1010,7 +1010,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
             <select
               value={selectedIconKey}
               onChange={(e) => setSelectedIconKey(e.target.value)}
-              className="flex-1 min-w-0 px-2 py-1 rounded bg-stone-950 border border-stone-800 text-[11px] text-stone-100"
+              className="flex-1 min-w-0 px-2 py-1 rounded bg-stone-950 border border-stone-800 text-xs text-stone-100"
             >
               <option value="">Standard Pin</option>
               {tacticalIconList.map((ic, idx) => {
@@ -1067,7 +1067,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
                   <div className="font-semibold text-stone-100 truncate">
                     {m.properties?.label || m.marking_type}
                   </div>
-                  <div className="text-[10px] text-stone-400 truncate">
+                  <div className="text-[11px] text-stone-400 truncate">
                     {String(m.visibility).toUpperCase()} · {m.creator_name || 'Member'}
                   </div>
                 </div>
@@ -1295,7 +1295,7 @@ export const IsrToolDrawer: React.FC<IsrToolDrawerProps> = ({
         {mapData.permissions.canRequestIsr ? (
           <div className="bg-stone-900/70 border border-cyan-900/50 rounded-lg p-3 space-y-2.5">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold uppercase text-cyan-300">
+              <span className="text-xs font-bold uppercase text-cyan-300">
                 Queue New Recon Pass (16:9 Live Preview)
               </span>
               <button
@@ -1317,7 +1317,7 @@ export const IsrToolDrawer: React.FC<IsrToolDrawerProps> = ({
             </div>
 
             <div>
-              <label className="block text-[10px] text-stone-400 uppercase mb-1">
+              <label className="block text-xs text-stone-400 uppercase mb-1">
                 FOV Widths (Multi-Box Preview)
               </label>
               <div className="grid grid-cols-4 gap-1">
@@ -1340,7 +1340,7 @@ export const IsrToolDrawer: React.FC<IsrToolDrawerProps> = ({
 
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="block text-[10px] text-stone-400 uppercase mb-0.5">
+                <label className="block text-xs text-stone-400 uppercase mb-0.5">
                   Sensor Mode
                 </label>
                 <select
@@ -1354,7 +1354,7 @@ export const IsrToolDrawer: React.FC<IsrToolDrawerProps> = ({
                 </select>
               </div>
               <div>
-                <label className="block text-[10px] text-stone-400 uppercase mb-0.5">
+                <label className="block text-xs text-stone-400 uppercase mb-0.5">
                   Mission Tag
                 </label>
                 <select
@@ -1381,7 +1381,7 @@ export const IsrToolDrawer: React.FC<IsrToolDrawerProps> = ({
             </button>
           </div>
         ) : (
-          <div className="p-2.5 rounded-lg bg-stone-900 border border-stone-800 text-stone-400 text-[11px]">
+          <div className="p-2.5 rounded-lg bg-stone-900 border border-stone-800 text-stone-400 text-xs">
             Viewing campaign ISR intelligence feed (Request permission required to queue scans).
           </div>
         )}
@@ -1400,18 +1400,18 @@ export const IsrToolDrawer: React.FC<IsrToolDrawerProps> = ({
                   <div className="font-semibold text-stone-100 truncate">
                     {req.sensor_label || String(req.sensor || '').toUpperCase()} · {req.km_size}km Box
                   </div>
-                  <span className="px-1.5 py-0.5 rounded bg-stone-950 border border-stone-700 text-[10px] font-bold uppercase text-cyan-300">
+                  <span className="px-1.5 py-0.5 rounded bg-stone-950 border border-stone-700 text-[11px] font-bold uppercase text-cyan-300">
                     {req.status_label || req.status}
                   </span>
                 </div>
-                <div className="text-[10px] font-mono text-stone-400 flex justify-between">
+                <div className="text-[11px] font-mono text-stone-400 flex justify-between">
                   <span>{formatCoordinateDdm(req.lat, req.lon)}</span>
                   <span className="text-amber-300">{req.targets.length} Targets</span>
                 </div>
 
                 {(mapData.permissions.canManageIsr || mapData.permissions.canRequestIsr) && (
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] text-stone-500 uppercase font-semibold shrink-0">
+                    <span className="text-xs text-stone-500 uppercase font-semibold shrink-0">
                       Mission
                     </span>
                     <select
@@ -1423,7 +1423,7 @@ export const IsrToolDrawer: React.FC<IsrToolDrawerProps> = ({
                           e.target.value ? Number(e.target.value) : null
                         )
                       }
-                      className="flex-1 min-w-0 px-2 py-0.5 rounded bg-stone-950 border border-stone-800 text-[11px] text-stone-200"
+                      className="flex-1 min-w-0 px-2 py-0.5 rounded bg-stone-950 border border-stone-800 text-xs text-stone-200"
                     >
                       <option value="">-- Unassigned --</option>
                       {mapData.missions.map((m) => (
@@ -1501,7 +1501,7 @@ export const IsrToolDrawer: React.FC<IsrToolDrawerProps> = ({
                   )}
                 </div>
                 {ov && (
-                  <div className="pt-2 border-t border-stone-800 flex items-center gap-2 text-[10px] font-mono">
+                  <div className="pt-2 border-t border-stone-800 flex items-center gap-2 text-[11px]">
                     <span className="text-stone-400">Opacity</span>
                     <input
                       type="range"
@@ -1835,10 +1835,10 @@ export const IsrReconLightboxModal: React.FC<IsrReconLightboxModalProps> = ({
           <div className="flex flex-wrap items-center justify-between px-4 py-3 bg-stone-900/90 border-b border-stone-800 gap-2">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee]" />
-              <span className="text-xs font-bold text-white uppercase tracking-wider font-mono truncate">
+              <span className="text-xs font-bold text-white uppercase tracking-wider truncate">
                 ISR Image Capture ({isrRequest.km_size} km)
               </span>
-              <span className="px-2 py-0.5 rounded bg-amber-950/80 text-amber-300 border border-amber-800/80 text-[10px] font-mono font-bold">
+              <span className="px-2 py-0.5 rounded bg-amber-950/80 text-amber-300 border border-amber-800/80 text-[11px] tabular-nums font-bold">
                 {isrRequest.targets.length} Targets
               </span>
             </div>
@@ -1849,7 +1849,7 @@ export const IsrReconLightboxModal: React.FC<IsrReconLightboxModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setMarkupMode((m) => !m)}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-mono border flex items-center gap-1 cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-lg text-xs border flex items-center gap-1 cursor-pointer ${
                       markupMode
                         ? 'bg-amber-950 text-amber-300 border-amber-600 font-bold'
                         : 'bg-stone-900 text-stone-300 border-stone-700'
@@ -1874,7 +1874,7 @@ export const IsrReconLightboxModal: React.FC<IsrReconLightboxModalProps> = ({
                           key={idx}
                           type="button"
                           onClick={() => setActiveVariantIdx(idx)}
-                          className={`px-2 py-0.5 rounded text-[10px] font-mono border cursor-pointer ${
+                          className={`px-2 py-0.5 rounded text-[11px] border cursor-pointer ${
                             activeVariantIdx === idx
                               ? 'bg-cyan-950 text-cyan-300 border-cyan-700 font-bold'
                               : 'bg-stone-900 text-stone-400 border-stone-800'
@@ -1901,7 +1901,7 @@ export const IsrReconLightboxModal: React.FC<IsrReconLightboxModalProps> = ({
                         key={id}
                         type="button"
                         onClick={() => setActiveFilter(id)}
-                        className={`px-2 py-0.5 rounded text-[10px] font-mono border cursor-pointer ${
+                        className={`px-2 py-0.5 rounded text-[11px] border cursor-pointer ${
                           activeFilter === id
                             ? 'bg-cyan-950 text-cyan-300 border-cyan-700 font-bold'
                             : 'bg-stone-900 text-stone-400 border-stone-800'
@@ -1919,7 +1919,7 @@ export const IsrReconLightboxModal: React.FC<IsrReconLightboxModalProps> = ({
                       setNightBoost(next);
                       if (next && activeFilter === 'none') setActiveFilter('nvg');
                     }}
-                    className={`px-2.5 py-1 rounded-lg text-[10px] font-mono border flex items-center gap-1 cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-lg text-[11px] border flex items-center gap-1 cursor-pointer ${
                       nightBoost
                         ? 'bg-emerald-950 text-emerald-300 border-emerald-500 font-bold'
                         : 'bg-stone-950 text-stone-400 border-stone-800'
@@ -1932,7 +1932,7 @@ export const IsrReconLightboxModal: React.FC<IsrReconLightboxModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setShowControls((s) => !s)}
-                    className={`px-2.5 py-1 rounded-lg text-[10px] font-mono border flex items-center gap-1 cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-lg text-[11px] border flex items-center gap-1 cursor-pointer ${
                       showControls
                         ? 'bg-cyan-950 text-cyan-300 border-cyan-600 font-bold'
                         : 'bg-stone-950 text-stone-400 border-stone-800'
@@ -1950,7 +1950,7 @@ export const IsrReconLightboxModal: React.FC<IsrReconLightboxModalProps> = ({
                     >
                       -
                     </button>
-                    <span className="text-[10px] font-mono text-cyan-400 px-1">
+                    <span className="text-[11px] font-mono tabular-nums text-cyan-400 px-1">
                       {Math.round(zoom * 100)}%
                     </span>
                     <button
@@ -1963,7 +1963,7 @@ export const IsrReconLightboxModal: React.FC<IsrReconLightboxModalProps> = ({
                     <button
                       type="button"
                       onClick={() => setZoom(1)}
-                      className="px-1.5 py-0.5 text-[10px] font-mono text-stone-400 hover:text-white cursor-pointer"
+                      className="px-1.5 py-0.5 text-[11px] font-mono text-stone-400 hover:text-white cursor-pointer"
                     >
                       1:1
                     </button>
@@ -1982,11 +1982,11 @@ export const IsrReconLightboxModal: React.FC<IsrReconLightboxModalProps> = ({
 
           {/* Secondary Gain / Contrast Slider Bar */}
           {showControls && !isVideo && (
-            <div className="px-4 py-2.5 bg-stone-900/95 border-b border-stone-800 flex flex-wrap items-center justify-between gap-4 text-xs font-mono">
+            <div className="px-4 py-2.5 bg-stone-900/95 border-b border-stone-800 flex flex-wrap items-center justify-between gap-4 text-xs">
               <div className="flex flex-wrap items-center gap-4">
                 <div className="flex items-center gap-2">
                   <SunDim className="w-3.5 h-3.5 text-amber-400" />
-                  <span className="text-[11px] text-stone-400">Gain:</span>
+                  <span className="text-xs text-stone-400">Gain:</span>
                   <input
                     type="range"
                     min={20}
@@ -1996,11 +1996,11 @@ export const IsrReconLightboxModal: React.FC<IsrReconLightboxModalProps> = ({
                     onChange={(e) => setBrightness(Number(e.target.value))}
                     className="w-24 accent-cyan-400 cursor-pointer"
                   />
-                  <span className="text-[11px] text-cyan-300 w-10 text-right">{brightness}%</span>
+                  <span className="text-xs font-mono tabular-nums text-cyan-300 w-10 text-right">{brightness}%</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CircleHalf className="w-3.5 h-3.5 text-cyan-400" />
-                  <span className="text-[11px] text-stone-400">Contrast:</span>
+                  <span className="text-xs text-stone-400">Contrast:</span>
                   <input
                     type="range"
                     min={50}
@@ -2010,7 +2010,7 @@ export const IsrReconLightboxModal: React.FC<IsrReconLightboxModalProps> = ({
                     onChange={(e) => setContrast(Number(e.target.value))}
                     className="w-24 accent-cyan-400 cursor-pointer"
                   />
-                  <span className="text-[11px] text-cyan-300 w-10 text-right">{contrast}%</span>
+                  <span className="text-xs font-mono tabular-nums text-cyan-300 w-10 text-right">{contrast}%</span>
                 </div>
                 <div className="flex items-center gap-1 pl-2 border-l border-stone-800">
                   <button
@@ -2020,7 +2020,7 @@ export const IsrReconLightboxModal: React.FC<IsrReconLightboxModalProps> = ({
                       setContrast(100);
                       setNightBoost(false);
                     }}
-                    className="px-2 py-0.5 rounded text-[10px] bg-stone-950 border border-stone-800 text-stone-300 cursor-pointer"
+                    className="px-2 py-0.5 rounded text-[11px] bg-stone-950 border border-stone-800 text-stone-300 cursor-pointer"
                   >
                     Day
                   </button>
@@ -2032,7 +2032,7 @@ export const IsrReconLightboxModal: React.FC<IsrReconLightboxModalProps> = ({
                       setNightBoost(true);
                       setActiveFilter('nvg');
                     }}
-                    className="px-2 py-0.5 rounded text-[10px] bg-emerald-950/70 border border-emerald-800 text-emerald-300 cursor-pointer"
+                    className="px-2 py-0.5 rounded text-[11px] bg-emerald-950/70 border border-emerald-800 text-emerald-300 cursor-pointer"
                   >
                     Night NVG
                   </button>
@@ -2044,7 +2044,7 @@ export const IsrReconLightboxModal: React.FC<IsrReconLightboxModalProps> = ({
                       setNightBoost(true);
                       setActiveFilter('whot');
                     }}
-                    className="px-2 py-0.5 rounded text-[10px] bg-cyan-950/70 border border-cyan-800 text-cyan-300 cursor-pointer"
+                    className="px-2 py-0.5 rounded text-[11px] bg-cyan-950/70 border border-cyan-800 text-cyan-300 cursor-pointer"
                   >
                     Night WHOT
                   </button>
@@ -2058,7 +2058,7 @@ export const IsrReconLightboxModal: React.FC<IsrReconLightboxModalProps> = ({
                   setNightBoost(false);
                   setActiveFilter('none');
                 }}
-                className="px-2 py-1 rounded text-[10px] text-stone-400 hover:text-rose-300 border border-stone-800 flex items-center gap-1 cursor-pointer"
+                className="px-2 py-1 rounded text-[11px] text-stone-400 hover:text-rose-300 border border-stone-800 flex items-center gap-1 cursor-pointer"
               >
                 <ArrowCounterClockwise className="w-3 h-3" /> Reset
               </button>
@@ -2185,7 +2185,7 @@ export const IsrReconLightboxModal: React.FC<IsrReconLightboxModalProps> = ({
             >
               <div
                 onClick={(e) => e.stopPropagation()}
-                className="bg-stone-900 border border-stone-700 rounded-xl shadow-2xl p-4 w-full max-w-sm space-y-3 font-mono text-stone-200"
+                className="bg-stone-900 border border-stone-700 rounded-xl shadow-2xl p-4 w-full max-w-sm space-y-3 text-stone-200"
               >
                 <div className="flex items-center justify-between border-b border-stone-800 pb-2">
                   <span className="text-xs font-bold text-cyan-400 uppercase flex items-center gap-1.5">
@@ -2205,12 +2205,12 @@ export const IsrReconLightboxModal: React.FC<IsrReconLightboxModalProps> = ({
                 </div>
 
                 <div>
-                  <div className="flex items-center justify-between px-2.5 py-1 bg-stone-950 rounded-t-lg border border-stone-800 text-[10px]">
+                  <div className="flex items-center justify-between px-2.5 py-1 bg-stone-950 rounded-t-lg border border-stone-800 text-[11px]">
                     <span className="text-amber-400 font-bold flex items-center gap-1">
                       <MagnifyingGlassPlus className="w-3.5 h-3.5" weight="duotone" /> Target
                       Optical Zoom
                     </span>
-                    <span className="text-cyan-400 font-bold">
+                    <span className="text-cyan-400 font-mono font-bold">
                       {getMagText(selectedTarget.bbox)}
                     </span>
                   </div>
@@ -2225,7 +2225,7 @@ export const IsrReconLightboxModal: React.FC<IsrReconLightboxModalProps> = ({
                   </div>
                 </div>
 
-                <div className="bg-stone-950 p-2.5 rounded-lg border border-stone-800 space-y-1 text-xs">
+                <div className="bg-stone-950 p-2.5 rounded-lg border border-stone-800 space-y-1 text-xs font-mono">
                   {(
                     [
                       ['MGRS', toMgrs(selectedTarget.lat, selectedTarget.lon, 5)],
@@ -2238,7 +2238,7 @@ export const IsrReconLightboxModal: React.FC<IsrReconLightboxModalProps> = ({
                       key={fmt}
                       className="flex items-center justify-between bg-stone-900/90 px-2 py-1 rounded border border-stone-800"
                     >
-                      <span className="text-[10px] text-stone-500 font-bold w-12">{fmt}</span>
+                      <span className="text-[11px] font-sans text-stone-500 font-bold w-12">{fmt}</span>
                       <span className="text-cyan-300 font-bold truncate flex-1 text-right mr-2 select-all">
                         {val}
                       </span>
@@ -2260,7 +2260,7 @@ export const IsrReconLightboxModal: React.FC<IsrReconLightboxModalProps> = ({
                 {canMarkup ? (
                   <div className="space-y-2 pt-1 font-sans">
                     <div>
-                      <label className="block text-[10px] uppercase text-stone-400 font-bold mb-1">
+                      <label className="block text-xs uppercase text-stone-400 font-bold mb-1">
                         Target Classification
                       </label>
                       <select
@@ -2280,7 +2280,7 @@ export const IsrReconLightboxModal: React.FC<IsrReconLightboxModalProps> = ({
                       </select>
                     </div>
                     <div>
-                      <label className="block text-[10px] uppercase text-stone-400 font-bold mb-1">
+                      <label className="block text-xs uppercase text-stone-400 font-bold mb-1">
                         BDA / Target Notes
                       </label>
                       <textarea
@@ -2372,7 +2372,7 @@ export const IsrReconLightboxModal: React.FC<IsrReconLightboxModalProps> = ({
         )}
 
         {hoveredTarget && hoveredBbox && (
-          <div className="hidden xl:block absolute top-0 left-[calc(100%+1rem)] w-72 bg-stone-950/95 border border-stone-800 rounded-2xl shadow-2xl overflow-hidden pointer-events-none z-50 font-mono">
+          <div className="hidden xl:block absolute top-0 left-[calc(100%+1rem)] w-72 bg-stone-950/95 border border-stone-800 rounded-2xl shadow-2xl overflow-hidden pointer-events-none z-50">
             <div className="flex items-center justify-between px-3.5 py-2.5 bg-stone-900/90 border-b border-stone-800">
               <div className="flex items-center gap-2 min-w-0">
                 <div
@@ -2383,7 +2383,7 @@ export const IsrReconLightboxModal: React.FC<IsrReconLightboxModalProps> = ({
                   {hoveredTarget.label_text || hoveredTarget.label}
                 </span>
               </div>
-              <span className="px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 text-[10px] font-bold">
+              <span className="px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 text-[11px] font-mono font-bold">
                 {getMagText(hoveredBbox)}
               </span>
             </div>
@@ -2397,9 +2397,9 @@ export const IsrReconLightboxModal: React.FC<IsrReconLightboxModalProps> = ({
                   <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
                 </div>
               </div>
-              <div className="text-[11px] space-y-1">
+              <div className="text-[11px] font-mono space-y-1">
                 <div className="flex justify-between bg-stone-900 px-2 py-1 rounded border border-stone-800">
-                  <span className="text-stone-500">MGRS</span>
+                  <span className="text-stone-500 font-sans">MGRS</span>
                   <span className="text-amber-300 font-bold">
                     {toMgrs(hoveredTarget.lat, hoveredTarget.lon, 5)}
                   </span>

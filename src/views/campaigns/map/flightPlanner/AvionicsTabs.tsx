@@ -136,7 +136,7 @@ export const F18SaTab: React.FC<SharedAvionicsProps> = ({
           >
             <LineSegments className="size-3.5" weight="duotone" />
             <span>FLOT</span>
-            <span className="px-1.5 py-0.2 rounded-full text-[9px] font-mono bg-stone-900/80 text-emerald-300">
+            <span className="px-1.5 py-0.2 rounded-full text-[11px] tabular-nums bg-stone-900/80 text-emerald-300">
               {1 + (sa.flot?.length || 0)}
             </span>
           </button>
@@ -149,7 +149,7 @@ export const F18SaTab: React.FC<SharedAvionicsProps> = ({
           >
             <Polygon className="size-3.5" weight="duotone" />
             <span>FAOR</span>
-            <span className="px-1.5 py-0.2 rounded-full text-[9px] font-mono bg-stone-900/80 text-emerald-300">
+            <span className="px-1.5 py-0.2 rounded-full text-[11px] tabular-nums bg-stone-900/80 text-emerald-300">
               {sa.faor?.length || 0}
             </span>
           </button>
@@ -162,7 +162,7 @@ export const F18SaTab: React.FC<SharedAvionicsProps> = ({
           >
             <ArrowsClockwise className="size-3.5" weight="duotone" />
             <span>CAP</span>
-            <span className="px-1.5 py-0.2 rounded-full text-[9px] font-mono bg-stone-900/80 text-emerald-300">
+            <span className="px-1.5 py-0.2 rounded-full text-[11px] tabular-nums bg-stone-900/80 text-emerald-300">
               {sa.cap_points?.length || 0}
             </span>
           </button>
@@ -177,7 +177,7 @@ export const F18SaTab: React.FC<SharedAvionicsProps> = ({
           >
             <Path className="size-3.5" weight="duotone" />
             <span>CORRIDORS</span>
-            <span className="px-1.5 py-0.2 rounded-full text-[9px] font-mono bg-stone-900/80 text-emerald-300">
+            <span className="px-1.5 py-0.2 rounded-full text-[11px] tabular-nums bg-stone-900/80 text-emerald-300">
               {sa.corridors?.length || 0}
             </span>
           </button>
@@ -189,7 +189,7 @@ export const F18SaTab: React.FC<SharedAvionicsProps> = ({
         <div className="space-y-3">
           <div className="flex items-center justify-between bg-stone-900 border border-stone-800 p-2.5 rounded-lg gap-3">
             <div className="flex items-center gap-2">
-              <label className="text-[10px] font-bold text-stone-400 uppercase tracking-wider">
+              <label className="text-xs font-bold text-stone-400 uppercase tracking-wider">
                 Default FLOT:
               </label>
               <select
@@ -198,7 +198,7 @@ export const F18SaTab: React.FC<SharedAvionicsProps> = ({
                 onChange={(e) =>
                   updateSa((s) => ({ ...s, default_flot: Number(e.target.value) || 1 }))
                 }
-                className="bg-stone-950 border border-stone-700 text-stone-200 text-xs rounded px-2 py-1 font-mono focus:border-emerald-500 focus:outline-none"
+                className="bg-stone-950 border border-stone-700 text-stone-200 text-xs rounded px-2 py-1 focus:border-emerald-500 focus:outline-none"
               >
                 <option value={1}>FLOT 1 (Campaign Front Line)</option>
                 {(sa.flot || []).map((f: any, idx: number) => (
@@ -238,14 +238,14 @@ export const F18SaTab: React.FC<SharedAvionicsProps> = ({
                 <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">
                   FLOT 1: Campaign Front Line
                 </span>
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                   Campaign Master
                 </span>
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-stone-800 text-stone-300">
+                <span className="px-2 py-0.5 rounded text-[11px] bg-stone-800 text-stone-300">
                   Solid Green Line
                 </span>
               </div>
-              <span className="text-[10px] font-mono text-stone-400">
+              <span className="text-[11px] font-mono tabular-nums text-stone-400">
                 {frontLinePts.length} points (Max 7 exported to DTC)
               </span>
             </div>
@@ -254,7 +254,7 @@ export const F18SaTab: React.FC<SharedAvionicsProps> = ({
                 frontLinePts.map((pt, pIdx) => (
                   <span
                     key={pIdx}
-                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-stone-950 border border-stone-800 font-mono text-[10px] text-stone-300"
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-stone-950 border border-stone-800 font-mono text-[11px] text-stone-300"
                   >
                     <span className="text-emerald-400 font-bold">PT{pIdx + 1}</span>
                     <span>
@@ -263,7 +263,7 @@ export const F18SaTab: React.FC<SharedAvionicsProps> = ({
                   </span>
                 ))
               ) : (
-                <span className="text-[11px] text-amber-400/90 italic">
+                <span className="text-xs text-amber-400/90 italic">
                   No Front Line defined on campaign map yet.
                 </span>
               )}
@@ -300,7 +300,7 @@ export const F18SaTab: React.FC<SharedAvionicsProps> = ({
                         placeholder="Line Note / Phase Line (max 15)"
                         className="bg-stone-950 border border-stone-700 text-stone-200 text-xs rounded px-2 py-1 flex-1 max-w-[240px]"
                       />
-                      <span className="text-[10px] font-mono text-stone-400">
+                      <span className="text-[11px] font-mono tabular-nums text-stone-400">
                         {pts.length} / 7 pts
                       </span>
                     </div>
@@ -352,14 +352,14 @@ export const F18SaTab: React.FC<SharedAvionicsProps> = ({
 
                   <div className="flex flex-wrap gap-1.5 pt-1">
                     {pts.length === 0 ? (
-                      <span className="text-[11px] text-stone-500 italic">
+                      <span className="text-xs text-stone-500 italic">
                         No vertices set. Click &ldquo;Draw on Map&rdquo; and select positions (max 7).
                       </span>
                     ) : (
                       pts.map((pt, pIdx) => (
                         <span
                           key={pIdx}
-                          className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-stone-950 border border-stone-800 font-mono text-[10px] text-stone-300"
+                          className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-stone-950 border border-stone-800 font-mono text-[11px] text-stone-300"
                         >
                           <span className="text-emerald-400 font-bold">PT{pIdx + 1}</span>
                           <span>
@@ -395,7 +395,7 @@ export const F18SaTab: React.FC<SharedAvionicsProps> = ({
         <div className="space-y-3">
           <div className="flex items-center justify-between bg-stone-900 border border-stone-800 p-2.5 rounded-lg gap-3">
             <div className="flex items-center gap-2">
-              <label className="text-[10px] font-bold text-stone-400 uppercase tracking-wider">
+              <label className="text-xs font-bold text-stone-400 uppercase tracking-wider">
                 Default FAOR:
               </label>
               <select
@@ -404,7 +404,7 @@ export const F18SaTab: React.FC<SharedAvionicsProps> = ({
                 onChange={(e) =>
                   updateSa((s) => ({ ...s, default_faor: Number(e.target.value) || 1 }))
                 }
-                className="bg-stone-950 border border-stone-700 text-stone-200 text-xs rounded px-2 py-1 font-mono"
+                className="bg-stone-950 border border-stone-700 text-stone-200 text-xs rounded px-2 py-1"
               >
                 {(sa.faor || []).map((f: any, idx: number) => (
                   <option key={idx} value={idx + 1}>
@@ -527,14 +527,14 @@ export const F18SaTab: React.FC<SharedAvionicsProps> = ({
 
                     <div className="flex items-center justify-between gap-2 bg-stone-950/50 px-2.5 py-1.5 rounded border border-stone-800/60">
                       <div className="flex items-center gap-2">
-                        <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-stone-800 text-stone-300">
+                        <span className="px-1.5 py-0.5 rounded text-[11px] bg-stone-800 text-stone-300">
                           Dashed Line
                         </span>
-                        <span className="text-[10px] font-mono text-stone-400">
+                        <span className="text-[11px] font-mono tabular-nums text-stone-400">
                           {pts.length} / 7 pts
                         </span>
                         {closed && (
-                          <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-emerald-950 border border-emerald-500/50 text-emerald-300 font-bold">
+                          <span className="px-1.5 py-0.5 rounded text-[11px] bg-emerald-950 border border-emerald-500/50 text-emerald-300 font-bold">
                             Closed Box
                           </span>
                         )}
@@ -628,7 +628,7 @@ export const F18SaTab: React.FC<SharedAvionicsProps> = ({
                       {pts.map((pt, pIdx) => (
                         <span
                           key={pIdx}
-                          className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-stone-950 border border-stone-800 font-mono text-[10px] text-stone-300"
+                          className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-stone-950 border border-stone-800 font-mono text-[11px] text-stone-300"
                         >
                           <span className="text-emerald-400 font-bold">
                             {pIdx === pts.length - 1 && closed ? 'CLOSE (PT1)' : `PT${pIdx + 1}`}
@@ -666,7 +666,7 @@ export const F18SaTab: React.FC<SharedAvionicsProps> = ({
         <div className="space-y-3">
           <div className="flex items-center justify-between bg-stone-900 border border-stone-800 p-2.5 rounded-lg gap-3">
             <div className="flex items-center gap-2">
-              <label className="text-[10px] font-bold text-stone-400 uppercase tracking-wider">
+              <label className="text-xs font-bold text-stone-400 uppercase tracking-wider">
                 Default CAP Point:
               </label>
               <select
@@ -675,7 +675,7 @@ export const F18SaTab: React.FC<SharedAvionicsProps> = ({
                 onChange={(e) =>
                   updateSa((s) => ({ ...s, default_cap: Number(e.target.value) || 1 }))
                 }
-                className="bg-stone-950 border border-stone-700 text-stone-200 text-xs rounded px-2 py-1 font-mono"
+                className="bg-stone-950 border border-stone-700 text-stone-200 text-xs rounded px-2 py-1"
               >
                 {(sa.cap_points || []).map((cp: any, idx: number) => (
                   <option key={idx} value={idx + 1}>
@@ -716,7 +716,7 @@ export const F18SaTab: React.FC<SharedAvionicsProps> = ({
             )}
           </div>
 
-          <p className="text-[11px] text-stone-400">
+          <p className="text-xs text-stone-400">
             F/A-18 Combat Air Patrol station: 5 NM wide racetrack pathway. Anchor is top-right
             corner.
           </p>
@@ -789,7 +789,7 @@ export const F18SaTab: React.FC<SharedAvionicsProps> = ({
 
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                       <div className="space-y-1">
-                        <label className="block text-[10px] font-bold text-stone-400 uppercase">
+                        <label className="block text-xs font-bold text-stone-400 uppercase">
                           Top-Right Anchor
                         </label>
                         <div className="flex items-center gap-1.5">
@@ -799,7 +799,7 @@ export const F18SaTab: React.FC<SharedAvionicsProps> = ({
                                 {Number(cp.lat).toFixed(4)}, {Number(cp.lng).toFixed(4)}
                               </span>
                             ) : (
-                              <span className="text-stone-500 italic">Not set</span>
+                              <span className="text-stone-500 font-sans italic">Not set</span>
                             )}
                           </div>
                           {canEdit && (
@@ -820,7 +820,7 @@ export const F18SaTab: React.FC<SharedAvionicsProps> = ({
                       </div>
 
                       <div className="space-y-1">
-                        <label className="block text-[10px] font-bold text-stone-400 uppercase">
+                        <label className="block text-xs font-bold text-stone-400 uppercase">
                           Course (0 - 359°)
                         </label>
                         <input
@@ -840,7 +840,7 @@ export const F18SaTab: React.FC<SharedAvionicsProps> = ({
                       </div>
 
                       <div className="space-y-1">
-                        <label className="block text-[10px] font-bold text-stone-400 uppercase">
+                        <label className="block text-xs font-bold text-stone-400 uppercase">
                           Length (NM)
                         </label>
                         <input
@@ -862,7 +862,7 @@ export const F18SaTab: React.FC<SharedAvionicsProps> = ({
                       </div>
 
                       <div className="space-y-1">
-                        <label className="block text-[10px] font-bold text-stone-400 uppercase">
+                        <label className="block text-xs font-bold text-stone-400 uppercase">
                           Turn Direction
                         </label>
                         <select
@@ -874,7 +874,7 @@ export const F18SaTab: React.FC<SharedAvionicsProps> = ({
                               return s;
                             })
                           }
-                          className="w-full bg-stone-950 border border-stone-700 text-stone-200 text-xs rounded px-2 py-1 font-mono"
+                          className="w-full bg-stone-950 border border-stone-700 text-stone-200 text-xs rounded px-2 py-1"
                         >
                           <option value="Right">Right Turn</option>
                           <option value="Left">Left Turn</option>
@@ -894,7 +894,7 @@ export const F18SaTab: React.FC<SharedAvionicsProps> = ({
         <div className="space-y-3">
           <div className="flex items-center justify-between bg-stone-900 border border-stone-800 p-2.5 rounded-lg gap-3">
             <div className="flex items-center gap-2">
-              <label className="text-[10px] font-bold text-stone-400 uppercase tracking-wider">
+              <label className="text-xs font-bold text-stone-400 uppercase tracking-wider">
                 Default Corridor:
               </label>
               <select
@@ -903,7 +903,7 @@ export const F18SaTab: React.FC<SharedAvionicsProps> = ({
                 onChange={(e) =>
                   updateSa((s) => ({ ...s, default_corridor: Number(e.target.value) || 1 }))
                 }
-                className="bg-stone-950 border border-stone-700 text-stone-200 text-xs rounded px-2 py-1 font-mono"
+                className="bg-stone-950 border border-stone-700 text-stone-200 text-xs rounded px-2 py-1"
               >
                 {(sa.corridors || []).map((c: any, idx: number) => (
                   <option key={idx} value={idx + 1}>
@@ -935,7 +935,7 @@ export const F18SaTab: React.FC<SharedAvionicsProps> = ({
             )}
           </div>
 
-          <p className="text-[11px] text-stone-400">
+          <p className="text-xs text-stone-400">
             Flight Corridors: Up to 7 corridors (max 14 pts each), rendered with ±5 NM dashed rails
             (10 NM total width).
           </p>
@@ -989,10 +989,10 @@ export const F18SaTab: React.FC<SharedAvionicsProps> = ({
                           placeholder="Note (INGRESS)"
                           className="bg-stone-950 border border-stone-700 text-stone-200 text-xs rounded px-2 py-1 flex-1 max-w-[130px]"
                         />
-                        <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-stone-800 text-stone-300">
+                        <span className="px-1.5 py-0.5 rounded text-[11px] font-mono bg-stone-800 text-stone-300">
                           10 NM Width
                         </span>
-                        <span className="text-[10px] font-mono text-stone-400">
+                        <span className="text-[11px] font-mono tabular-nums text-stone-400">
                           {pts.length} / 14 pts
                         </span>
                       </div>
@@ -1044,7 +1044,7 @@ export const F18SaTab: React.FC<SharedAvionicsProps> = ({
                       {pts.map((pt, pIdx) => (
                         <span
                           key={pIdx}
-                          className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-stone-950 border border-stone-800 font-mono text-[10px] text-stone-300"
+                          className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-stone-950 border border-stone-800 font-mono text-[11px] text-stone-300"
                         >
                           <span className="text-emerald-400 font-bold">PT{pIdx + 1}</span>
                           <span>
@@ -1157,7 +1157,7 @@ export const F16GeoLinesTab: React.FC<SharedAvionicsProps> = ({
             </div>
             <div>
               <h3 className="text-xs font-bold text-stone-200">F-16 Geo Lines (STPT 31–55)</h3>
-              <p className="text-[10px] text-stone-400">
+              <p className="text-xs text-stone-400">
                 Tactical boundary lines for DTC upload (up to 4 lines, 25 points maximum combined)
               </p>
             </div>
@@ -1173,7 +1173,7 @@ export const F16GeoLinesTab: React.FC<SharedAvionicsProps> = ({
           </span>
         </div>
 
-        <div className="p-2.5 rounded bg-stone-950/70 border border-stone-800 text-[11px] text-stone-300 flex items-start gap-2">
+        <div className="p-2.5 rounded bg-stone-950/70 border border-stone-800 text-xs text-stone-300 flex items-start gap-2">
           <Info className="size-4 text-amber-400 shrink-0 mt-0.5" weight="duotone" />
           <div>
             <strong className="text-stone-200">
@@ -1217,9 +1217,9 @@ export const F16GeoLinesTab: React.FC<SharedAvionicsProps> = ({
                   <span className="text-xs font-bold text-stone-200">
                     {lNum === 1 ? 'Line 1 (Front Line / FLOT)' : `Line ${lNum}`}
                   </span>
-                  <span className="text-[10px] font-mono text-stone-400">({pts.length} pts)</span>
+                  <span className="text-[11px] font-mono tabular-nums text-stone-400">({pts.length} pts)</span>
                   {closed && (
-                    <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-teal-950 border border-teal-500/50 text-teal-300 font-bold">
+                    <span className="px-1.5 py-0.5 rounded text-[11px] bg-teal-950 border border-teal-500/50 text-teal-300 font-bold">
                       Closed Loop
                     </span>
                   )}
@@ -1332,14 +1332,14 @@ export const F16GeoLinesTab: React.FC<SharedAvionicsProps> = ({
 
               <div className="flex flex-wrap gap-1.5 pt-1">
                 {pts.length === 0 ? (
-                  <span className="text-[11px] text-stone-500 italic">
+                  <span className="text-xs text-stone-500 italic">
                     No points in this line. Click &ldquo;Draw on Map&rdquo; or load a preset above.
                   </span>
                 ) : (
                   pts.map((pt, pIdx) => (
                     <div
                       key={pIdx}
-                      className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-stone-950 border border-stone-800 font-mono text-[10px] text-stone-300"
+                      className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-stone-950 border border-stone-800 font-mono text-[11px] text-stone-300"
                     >
                       <span className={`font-bold ${st.text}`}>
                         STPT {pt.stpt || 31 + pIdx}
@@ -1368,7 +1368,7 @@ export const F16GeoLinesTab: React.FC<SharedAvionicsProps> = ({
                                     next[targetLine] = [...next[targetLine], moved];
                                     commitGeoLines(next);
                                   }}
-                                  className="px-1 py-0.2 rounded text-[8px] font-bold text-stone-500 hover:text-stone-100 hover:bg-stone-800 cursor-pointer"
+                                  className="px-1 py-0.2 rounded text-[11px] font-bold text-stone-500 hover:text-stone-100 hover:bg-stone-800 cursor-pointer"
                                   title={`Move to Line ${targetLine}`}
                                 >
                                   L{targetLine}
@@ -1494,7 +1494,7 @@ export const F16DestPtsTab: React.FC<SharedAvionicsProps> = ({
               <h3 className="text-xs font-bold text-stone-200">
                 F-16 Destination Points (STPT 81–99)
               </h3>
-              <p className="text-[10px] text-stone-400">
+              <p className="text-xs text-stone-400">
                 Destination &amp; divert airfields for DTC upload (up to 19 steerpoints)
               </p>
             </div>
@@ -1558,7 +1558,7 @@ export const F16DestPtsTab: React.FC<SharedAvionicsProps> = ({
               key={idx}
               className="flex items-center justify-between p-2 rounded-lg bg-stone-900/90 border border-stone-800 text-xs gap-2.5 hover:border-stone-700"
             >
-              <span className="w-6 h-6 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono font-bold text-[10px] flex items-center justify-center shrink-0">
+              <span className="w-6 h-6 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono font-bold text-[11px] flex items-center justify-center shrink-0">
                 {pt.stpt || 81 + idx}
               </span>
 
@@ -1601,10 +1601,10 @@ export const F16DestPtsTab: React.FC<SharedAvionicsProps> = ({
                   }}
                   className="w-full bg-stone-950 border border-stone-800 rounded px-1.5 py-1 text-xs font-mono text-stone-200 text-right"
                 />
-                <span className="text-[10px] text-stone-500 font-mono">ft</span>
+                <span className="text-[11px] text-stone-500 font-mono">ft</span>
               </div>
 
-              <span className="hidden sm:block text-[10px] font-mono text-stone-400 shrink-0">
+              <span className="hidden sm:block text-[11px] font-mono text-stone-400 shrink-0">
                 {Number(pt.lat).toFixed(3)}, {Number(pt.lng).toFixed(3)}
               </span>
 
@@ -1713,11 +1713,11 @@ export const F14PlotLinesTab: React.FC<SharedAvionicsProps> = ({
             <div>
               <h4 className="text-xs font-bold text-stone-100 flex items-center gap-2">
                 <span>F-14 TID Plot Lines</span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-teal-500/20 text-teal-300 border border-teal-500/30">
+                <span className="text-[11px] font-mono px-1.5 py-0.5 rounded bg-teal-500/20 text-teal-300 border border-teal-500/30">
                   Max 4 Lines &bull; 9 Pts/Line
                 </span>
               </h4>
-              <p className="text-[11px] text-stone-400 mt-0.5">
+              <p className="text-xs text-stone-400 mt-0.5">
                 Lines rendered on F-14 TID avionics display (max 4 lines, 9 points each).
               </p>
             </div>
@@ -1768,14 +1768,14 @@ export const F14PlotLinesTab: React.FC<SharedAvionicsProps> = ({
                 <div className="flex items-center gap-2">
                   <span className={`w-3 h-3 rounded-full shrink-0 ${st.dot}`} />
                   <span className="text-xs font-bold text-stone-200">Line {lNum}</span>
-                  <span className="text-[10px] font-mono text-stone-400">
+                  <span className="text-[11px] font-mono tabular-nums text-stone-400">
                     ({lineObj.points.length} / 9 pts)
                   </span>
                 </div>
 
                 {canEdit && (
                   <div className="flex items-center gap-1.5 shrink-0 flex-wrap">
-                    <label className="flex items-center gap-1.5 text-[11px] text-stone-300 font-mono bg-stone-950 px-2 py-1 rounded border border-stone-800 cursor-pointer select-none">
+                    <label className="flex items-center gap-1.5 text-xs text-stone-300 bg-stone-950 px-2 py-1 rounded border border-stone-800 cursor-pointer select-none">
                       <input
                         type="checkbox"
                         checked={lineObj.closed}
@@ -1844,7 +1844,7 @@ export const F14PlotLinesTab: React.FC<SharedAvionicsProps> = ({
 
               <div className="flex flex-wrap gap-1.5 pt-1">
                 {lineObj.points.length === 0 ? (
-                  <span className="text-[11px] text-stone-500 italic">
+                  <span className="text-xs text-stone-500 italic">
                     No points in this plot line. Click &ldquo;Draw on Map&rdquo; or load a preset
                     above.
                   </span>
@@ -1852,7 +1852,7 @@ export const F14PlotLinesTab: React.FC<SharedAvionicsProps> = ({
                   lineObj.points.map((pt, pIdx) => (
                     <div
                       key={pIdx}
-                      className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-stone-950 border border-stone-800 font-mono text-[10px] text-stone-300"
+                      className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-stone-950 border border-stone-800 font-mono text-[11px] text-stone-300"
                     >
                       <span className={`font-bold ${st.text}`}>
                         {pt.name || `L${lNum} P${pIdx + 1}`}
@@ -1870,9 +1870,9 @@ export const F14PlotLinesTab: React.FC<SharedAvionicsProps> = ({
                             nextPts[pIdx] = { ...pt, elev: Number(e.target.value) || 0 };
                             commitF14Plot({ ...plotLines, [lNum]: { ...lineObj, points: nextPts } });
                           }}
-                          className="w-12 bg-stone-900 border border-stone-700 rounded px-1 py-0 text-[10px] font-mono text-stone-200 text-right"
+                          className="w-12 bg-stone-900 border border-stone-700 rounded px-1 py-0 text-[11px] font-mono text-stone-200 text-right"
                         />
-                        <span className="text-[9px] text-stone-500">ft</span>
+                        <span className="text-[11px] text-stone-500">ft</span>
                       </div>
                       {canEdit && (
                         <button
@@ -1943,11 +1943,11 @@ export const F14AdditionalPtsTab: React.FC<F14AdditionalPtsTabProps> = ({
             <div>
               <h4 className="text-xs font-bold text-stone-100 flex items-center gap-2">
                 <span>F-14 Additional Points</span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                <span className="text-[11px] font-mono px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">
                   {additionalPts.length} / 40 Pts &bull; Max 40 / Plan
                 </span>
               </h4>
-              <p className="text-[11px] text-stone-400 mt-0.5">
+              <p className="text-xs text-stone-400 mt-0.5">
                 Additional Waypoints &amp; Designation Points for F-14 avionics.
               </p>
             </div>
@@ -1967,46 +1967,46 @@ export const F14AdditionalPtsTab: React.FC<F14AdditionalPtsTabProps> = ({
         </div>
 
         <div className="p-2.5 rounded bg-stone-950/80 border border-stone-800 space-y-2 text-xs">
-          <div className="flex items-center gap-1.5 text-purple-400 font-bold uppercase tracking-wider text-[10px]">
+          <div className="flex items-center gap-1.5 text-purple-400 font-bold uppercase tracking-wider text-xs">
             <Info className="size-3.5 shrink-0" weight="duotone" />
             <span>Point Name Suffix Conventions</span>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px] font-mono">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs font-mono">
             <div className="p-2 rounded bg-stone-900/70 border border-stone-800/60 space-y-1">
               <div className="flex items-center justify-between">
                 <span className="text-amber-300 font-bold">X##</span>
-                <span className="text-stone-400 font-sans text-[10px]">Special Points</span>
+                <span className="text-stone-400 font-sans text-[11px]">Special Points</span>
               </div>
-              <div className="text-stone-400 text-[10px]">FP, IP, HB, DP, HA, ST</div>
-              <div className="text-stone-500 text-[10px] italic">
+              <div className="text-stone-400 text-[11px]">FP, IP, HB, DP, HA, ST</div>
+              <div className="text-stone-500 text-[11px] italic">
                 Example: DHAFRAXHB = DHAFRA as Home Base
               </div>
             </div>
             <div className="p-2 rounded bg-stone-900/70 border border-stone-800/60 space-y-1">
               <div className="flex items-center justify-between">
                 <span className="text-cyan-300 font-bold">XB / X##B</span>
-                <span className="text-stone-400 font-sans text-[10px]">Bullseye Ref</span>
+                <span className="text-stone-400 font-sans text-[11px]">Bullseye Ref</span>
               </div>
               <div className="flex items-center justify-between pt-0.5">
                 <span className="text-cyan-300 font-bold">XD / X##D</span>
-                <span className="text-stone-400 font-sans text-[10px]">Destination</span>
+                <span className="text-stone-400 font-sans text-[11px]">Destination</span>
               </div>
             </div>
             <div className="p-2 rounded bg-stone-900/70 border border-stone-800/60 space-y-1">
               <div className="flex items-center justify-between">
                 <span className="text-purple-300 font-bold">XL / X##L</span>
-                <span className="text-stone-400 font-sans text-[10px]">LANTIRN (max 20)</span>
+                <span className="text-stone-400 font-sans text-[11px]">LANTIRN (max 20)</span>
               </div>
-              <div className="text-stone-400 text-[10px]">Targeting pod designation targets</div>
+              <div className="text-stone-400 font-sans text-[11px]">Targeting pod designation targets</div>
             </div>
             <div className="p-2 rounded bg-stone-900/70 border border-stone-800/60 space-y-1">
               <div className="flex items-center justify-between">
                 <span className="text-emerald-300 font-bold">X#1 - X#3</span>
-                <span className="text-stone-400 font-sans text-[10px]">Priority 1 - 3</span>
+                <span className="text-stone-400 font-sans text-[11px]">Priority 1 - 3</span>
               </div>
               <div className="flex items-center justify-between pt-0.5">
                 <span className="text-emerald-300 font-bold">X#4 - X#7</span>
-                <span className="text-stone-400 font-sans text-[10px]">Generic</span>
+                <span className="text-stone-400 font-sans text-[11px]">Generic</span>
               </div>
             </div>
           </div>
@@ -2017,7 +2017,7 @@ export const F14AdditionalPtsTab: React.FC<F14AdditionalPtsTabProps> = ({
         {additionalPts.length === 0 ? (
           <div className="text-center p-6 text-stone-500 italic text-xs bg-stone-900/50 rounded-lg border border-stone-800 space-y-1">
             <div>No additional points defined.</div>
-            <div className="text-[11px] text-stone-400">
+            <div className="text-xs text-stone-400">
               Click &ldquo;Add Additional Point&rdquo; above or right-click anywhere on the map
               and choose &ldquo;Add Additional Point&rdquo;.
             </div>
@@ -2029,12 +2029,12 @@ export const F14AdditionalPtsTab: React.FC<F14AdditionalPtsTabProps> = ({
               className="p-2.5 rounded-lg bg-stone-900/80 border border-stone-800 hover:border-purple-500/30 transition-all flex items-center justify-between gap-3 flex-wrap"
             >
               <div className="flex items-center gap-2.5 flex-wrap">
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-stone-950 border border-stone-800 text-purple-300 font-mono">
+                <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-stone-950 border border-stone-800 text-purple-300 font-mono">
                   Plan {wp.sequence || 1}
                 </span>
 
                 <div className="flex items-center gap-1">
-                  <label className="text-[10px] text-stone-500 font-bold uppercase">Name:</label>
+                  <label className="text-xs text-stone-500 font-bold uppercase">Name:</label>
                   <input
                     type="text"
                     maxLength={10}
@@ -2051,7 +2051,7 @@ export const F14AdditionalPtsTab: React.FC<F14AdditionalPtsTabProps> = ({
                 </div>
 
                 <div className="flex items-center gap-1">
-                  <label className="text-[10px] text-stone-500 font-bold uppercase">Elev:</label>
+                  <label className="text-xs text-stone-500 font-bold uppercase">Elev:</label>
                   <input
                     type="number"
                     disabled={!canEdit}
@@ -2062,10 +2062,10 @@ export const F14AdditionalPtsTab: React.FC<F14AdditionalPtsTabProps> = ({
                     }}
                     className="w-20 bg-stone-950 border border-stone-800 rounded px-2 py-1 text-xs font-mono text-stone-200 text-right"
                   />
-                  <span className="text-[10px] text-stone-500 font-mono">ft</span>
+                  <span className="text-[11px] text-stone-500 font-mono">ft</span>
                 </div>
 
-                <div className="hidden sm:block text-[10px] font-mono text-stone-400">
+                <div className="hidden sm:block text-[11px] font-mono text-stone-400">
                   {Number(wp.lat).toFixed(4)}, {Number(wp.lng).toFixed(4)}
                 </div>
               </div>
@@ -2185,7 +2185,7 @@ export const Jf17AirspaceTab: React.FC<Jf17AirspaceTabProps> = ({
               <h3 className="text-xs font-bold text-stone-200">
                 JF-17 Custom Airspace (BKYA–BKYD)
               </h3>
-              <p className="text-[10px] text-stone-400">
+              <p className="text-xs text-stone-400">
                 Boundary &amp; operational airspace lines for JF-17 avionics (4 lines total)
               </p>
             </div>
@@ -2195,7 +2195,7 @@ export const Jf17AirspaceTab: React.FC<Jf17AirspaceTabProps> = ({
           </span>
         </div>
 
-        <div className="p-2.5 rounded bg-stone-950/70 border border-stone-800 text-[11px] text-stone-300 flex items-start gap-2">
+        <div className="p-2.5 rounded bg-stone-950/70 border border-stone-800 text-xs text-stone-300 flex items-start gap-2">
           <Info className="size-4 text-cyan-400 shrink-0 mt-0.5" weight="duotone" />
           <div>
             <strong className="text-stone-200">
@@ -2265,11 +2265,11 @@ export const Jf17AirspaceTab: React.FC<Jf17AirspaceTabProps> = ({
                           ? 'Line 3 (BKYC)'
                           : 'Line 4 (BKYD)'}
                   </span>
-                  <span className="text-[10px] font-mono text-stone-400">
+                  <span className="text-[11px] font-mono tabular-nums text-stone-400">
                     ({cfg.points.length} pts)
                   </span>
                   {closed && (
-                    <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-cyan-950 border border-cyan-500/50 text-cyan-300 font-bold">
+                    <span className="px-1.5 py-0.5 rounded text-[11px] bg-cyan-950 border border-cyan-500/50 text-cyan-300 font-bold">
                       Closed Loop
                     </span>
                   )}
@@ -2292,7 +2292,7 @@ export const Jf17AirspaceTab: React.FC<Jf17AirspaceTabProps> = ({
                         }
                         className="w-4 h-4 rounded cursor-pointer bg-transparent border-0 p-0"
                       />
-                      <span className="text-[9px] font-mono text-stone-400 uppercase">
+                      <span className="text-[11px] font-mono text-stone-400 uppercase">
                         {cfg.color}
                       </span>
                     </div>
@@ -2383,14 +2383,14 @@ export const Jf17AirspaceTab: React.FC<Jf17AirspaceTabProps> = ({
 
               <div className="flex flex-wrap gap-1.5 pt-1">
                 {cfg.points.length === 0 ? (
-                  <span className="text-[11px] text-stone-500 italic">
+                  <span className="text-xs text-stone-500 italic">
                     No points in this line. Click &ldquo;Draw on Map&rdquo; or load a preset above.
                   </span>
                 ) : (
                   cfg.points.map((pt, pIdx) => (
                     <div
                       key={pIdx}
-                      className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-stone-950 border border-stone-800 font-mono text-[10px] text-stone-300"
+                      className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-stone-950 border border-stone-800 font-mono text-[11px] text-stone-300"
                     >
                       <span className="font-bold text-cyan-400">P{pIdx + 1}</span>
                       <span className="text-stone-400 truncate max-w-[85px]">
@@ -2421,7 +2421,7 @@ export const Jf17AirspaceTab: React.FC<Jf17AirspaceTabProps> = ({
                                       },
                                     });
                                   }}
-                                  className="px-1 py-0.2 rounded text-[8px] font-bold text-stone-500 hover:text-stone-100 hover:bg-stone-800 uppercase cursor-pointer"
+                                  className="px-1 py-0.2 rounded text-[11px] font-bold text-stone-500 hover:text-stone-100 hover:bg-stone-800 uppercase cursor-pointer"
                                 >
                                   {targetKey.slice(-1)}
                                 </button>

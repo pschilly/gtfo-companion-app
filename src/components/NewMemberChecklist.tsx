@@ -176,16 +176,16 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
 
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="font-display font-bold text-stone-100 text-base tracking-tight">
+              <h2 className="font-display font-bold text-stone-100 text-lg">
                 Member Readiness
               </h2>
               {allComplete ? (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-mono text-[10px] font-bold uppercase tracking-wider">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[11px] font-bold uppercase tracking-wide">
                   <Check className="w-3 h-3 text-emerald-400" />
                   All Systems Go
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 font-mono text-[10px] font-bold uppercase tracking-wider">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] font-bold uppercase tracking-wide">
                   Onboarding
                 </span>
               )}
@@ -200,7 +200,7 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
         <div className="flex items-center gap-3 ml-auto">
           <div className="flex items-center gap-2">
             <div className="text-right">
-              <div className="font-mono text-xs font-bold text-stone-200">
+              <div className="text-xs font-bold tabular-nums text-stone-200">
                 {completedSteps} / {totalSteps} Complete
               </div>
               <div className="w-24 h-1.5 rounded-full bg-stone-800 overflow-hidden mt-1">
@@ -271,21 +271,21 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
               <div className="space-y-3">
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-stone-800 border border-stone-700 text-stone-300 font-mono text-[10px] font-bold flex items-center justify-center">
+                    <span className="w-5 h-5 rounded-full bg-stone-800 border border-stone-700 text-stone-300 text-[11px] font-bold tabular-nums flex items-center justify-center">
                       1
                     </span>
-                    <h3 className="font-display font-semibold text-stone-100 text-sm">
+                    <h3 className="font-display font-semibold text-stone-100 text-base">
                       Required Mods
                     </h3>
                   </div>
 
                   {isModsComplete ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-[10px] font-bold uppercase">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-bold uppercase">
                       <Check className="w-3 h-3" />
                       Ready
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-300 font-mono text-[10px] font-bold uppercase">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] font-bold uppercase">
                       Action Required
                     </span>
                   )}
@@ -295,15 +295,15 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
                   Mandatory modifications required to access GTFO servers.
                 </p>
 
-                <div className="p-2.5 rounded-lg bg-stone-900/90 border border-stone-800/80 text-[11px] font-mono space-y-1">
+                <div className="p-2.5 rounded-lg bg-stone-900/90 border border-stone-800/80 text-xs space-y-1">
                   <div className="flex items-center justify-between text-stone-400">
                     <span>Mandatory Mods:</span>
-                    <span className="text-stone-200 font-semibold">{requiredMods.length}</span>
+                    <span className="text-stone-200 font-semibold tabular-nums">{requiredMods.length}</span>
                   </div>
                   <div className="flex items-center justify-between text-stone-400">
                     <span>Installed Locally:</span>
                     <span
-                      className={`font-semibold ${
+                      className={`font-semibold tabular-nums ${
                         isModsComplete ? 'text-emerald-400' : 'text-amber-400'
                       }`}
                     >
@@ -320,7 +320,7 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
                   <button
                     onClick={handleInstallMods}
                     disabled={isInstallingMods}
-                    className="w-full py-2 px-3 rounded-lg bg-amber-500 hover:bg-amber-400 disabled:bg-stone-800 text-stone-950 font-mono font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md shadow-amber-500/10"
+                    className="w-full py-2 px-3 rounded-lg bg-amber-500 hover:bg-amber-400 disabled:bg-stone-800 text-stone-950 font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md shadow-amber-500/10"
                   >
                     {isInstallingMods ? (
                       <>
@@ -337,7 +337,7 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
                 )}
                 <button
                   onClick={() => setActiveTab('mods')}
-                  className="w-full py-2 px-3 rounded-lg bg-stone-800/80 hover:bg-stone-700 text-stone-300 hover:text-stone-100 font-mono text-xs flex items-center justify-center gap-1.5 transition-colors"
+                  className="w-full py-2 px-3 rounded-lg bg-stone-800/80 hover:bg-stone-700 text-stone-300 hover:text-stone-100 font-medium text-xs flex items-center justify-center gap-1.5 transition-colors"
                 >
                   <Package className="w-3.5 h-3.5 text-stone-400" />
                   <span>Browse All Mods</span>
@@ -356,21 +356,21 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
               <div className="space-y-3">
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-stone-800 border border-stone-700 text-stone-300 font-mono text-[10px] font-bold flex items-center justify-center">
+                    <span className="w-5 h-5 rounded-full bg-stone-800 border border-stone-700 text-stone-300 text-[11px] font-bold tabular-nums flex items-center justify-center">
                       2
                     </span>
-                    <h3 className="font-display font-semibold text-stone-100 text-sm">
+                    <h3 className="font-display font-semibold text-stone-100 text-base">
                       Airframe Liveries
                     </h3>
                   </div>
 
                   {isLiveriesComplete ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-[10px] font-bold uppercase">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-bold uppercase">
                       <Check className="w-3 h-3" />
                       Ready
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-300 font-mono text-[10px] font-bold uppercase">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] font-bold uppercase">
                       Action Required
                     </span>
                   )}
@@ -380,12 +380,12 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
                   Official squadron aircraft liveries and community paint schemes.
                 </p>
 
-                <div className="p-2.5 rounded-lg bg-stone-900/90 border border-stone-800/80 text-[11px] font-mono space-y-1">
+                <div className="p-2.5 rounded-lg bg-stone-900/90 border border-stone-800/80 text-xs space-y-1">
                   
                   <div className="flex items-center justify-between text-stone-400">
                     <span>Installed Liveries:</span>
                     <span
-                      className={`font-semibold ${
+                      className={`font-semibold tabular-nums ${
                         isLiveriesComplete ? 'text-emerald-400' : 'text-amber-400'
                       }`}
                     >
@@ -402,7 +402,7 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
                   <button
                     onClick={handleInstallLiveries}
                     disabled={isInstallingLiveries}
-                    className="w-full py-2 px-3 rounded-lg bg-amber-500 hover:bg-amber-400 disabled:bg-stone-800 text-stone-950 font-mono font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md shadow-amber-500/10"
+                    className="w-full py-2 px-3 rounded-lg bg-amber-500 hover:bg-amber-400 disabled:bg-stone-800 text-stone-950 font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md shadow-amber-500/10"
                   >
                     {isInstallingLiveries ? (
                       <>
@@ -419,7 +419,7 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
                 )}
                 <button
                   onClick={() => setActiveTab('liveries')}
-                  className="w-full py-2 px-3 rounded-lg bg-stone-800/80 hover:bg-stone-700 text-stone-300 hover:text-stone-100 font-mono text-xs flex items-center justify-center gap-1.5 transition-colors"
+                  className="w-full py-2 px-3 rounded-lg bg-stone-800/80 hover:bg-stone-700 text-stone-300 hover:text-stone-100 font-medium text-xs flex items-center justify-center gap-1.5 transition-colors"
                 >
                   <PaintBrush className="w-3.5 h-3.5 text-stone-400" />
                   <span>Browse All Liveries</span>
@@ -438,21 +438,21 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
               <div className="space-y-3">
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-stone-800 border border-stone-700 text-stone-300 font-mono text-[10px] font-bold flex items-center justify-center">
+                    <span className="w-5 h-5 rounded-full bg-stone-800 border border-stone-700 text-stone-300 text-[11px] font-bold tabular-nums flex items-center justify-center">
                       3
                     </span>
-                    <h3 className="font-display font-semibold text-stone-100 text-sm">
+                    <h3 className="font-display font-semibold text-stone-100 text-base">
                       Callsign &amp; Tag
                     </h3>
                   </div>
 
                   {isNickComplete ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-[10px] font-bold uppercase">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-bold uppercase">
                       <Check className="w-3 h-3" />
                       Verified
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-300 font-mono text-[10px] font-bold uppercase">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] font-bold uppercase">
                       Action Required
                     </span>
                   )}
@@ -463,10 +463,10 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
                 </p>
 
                 {/* Nickname Comparison Card */}
-                <div className="p-2.5 rounded-lg bg-stone-900/90 border border-stone-800/80 text-[11px] font-mono space-y-1.5">
+                <div className="p-2.5 rounded-lg bg-stone-900/90 border border-stone-800/80 text-xs space-y-1.5">
                   <div className="flex items-center justify-between gap-1">
                     <span className="text-stone-400">Required DCS Tag:</span>
-                    <span className="text-amber-300 font-bold truncate max-w-[120px]" title={expectedDcsNickname}>
+                    <span className="text-amber-300 font-mono font-bold truncate max-w-[120px]" title={expectedDcsNickname}>
                       {expectedDcsNickname}
                     </span>
                   </div>
@@ -474,7 +474,7 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
                   <div className="pt-1 border-t border-stone-800/70 flex items-center justify-between gap-1">
                     <span className="text-stone-400">Active:</span>
                     <span
-                      className={`font-bold truncate max-w-[120px] ${
+                      className={`font-mono font-bold truncate max-w-[120px] ${
                         isNickComplete ? 'text-emerald-400' : 'text-amber-400'
                       }`}
                       title={dcsNicknameInfo?.currentNickname || 'None'}
@@ -487,7 +487,7 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
 
               <div className="pt-4 mt-2 border-t border-stone-800/80 space-y-2">
                 {nickSuccessMsg && (
-                  <p className="text-[11px] font-mono text-emerald-400 bg-emerald-950/40 border border-emerald-500/30 p-1.5 rounded text-center">
+                  <p className="text-xs text-emerald-400 bg-emerald-950/40 border border-emerald-500/30 p-1.5 rounded text-center">
                     {nickSuccessMsg}
                   </p>
                 )}
@@ -496,7 +496,7 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
                   <button
                     onClick={handleApplyExpectedNickname}
                     disabled={isUpdatingNick}
-                    className="w-full py-2 px-3 rounded-lg bg-amber-500 hover:bg-amber-400 disabled:bg-stone-800 text-stone-950 font-mono font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md shadow-amber-500/10"
+                    className="w-full py-2 px-3 rounded-lg bg-amber-500 hover:bg-amber-400 disabled:bg-stone-800 text-stone-950 font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md shadow-amber-500/10"
                   >
                     {isUpdatingNick ? (
                       <>
@@ -512,14 +512,14 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
                   </button>
                 ) : (
                   <>
-                    <div className="w-full py-2 px-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-xs flex items-center justify-center gap-1.5">
+                    <div className="w-full py-2 px-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-semibold text-xs flex items-center justify-center gap-1.5">
                       <Check className="w-3.5 h-3.5" />
                       <span>Active in DCS</span>
                     </div>
                     <button
                       onClick={handleApplyExpectedNickname}
                       disabled={isUpdatingNick}
-                      className="w-full py-2 px-3 rounded-lg bg-stone-800/80 hover:bg-stone-700 text-stone-300 hover:text-stone-100 font-mono text-xs flex items-center justify-center gap-1.5 transition-colors"
+                      className="w-full py-2 px-3 rounded-lg bg-stone-800/80 hover:bg-stone-700 text-stone-300 hover:text-stone-100 font-medium text-xs flex items-center justify-center gap-1.5 transition-colors"
                     >
                       <Tag className="w-3.5 h-3.5 text-stone-400" />
                       <span>{isUpdatingNick ? 'Updating Lua...' : 'Re-sync DCS Nickname'}</span>
@@ -540,21 +540,21 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
               <div className="space-y-3">
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-stone-800 border border-stone-700 text-stone-300 font-mono text-[10px] font-bold flex items-center justify-center">
+                    <span className="w-5 h-5 rounded-full bg-stone-800 border border-stone-700 text-stone-300 text-[11px] font-bold tabular-nums flex items-center justify-center">
                       4
                     </span>
-                    <h3 className="font-display font-semibold text-stone-100 text-sm">
+                    <h3 className="font-display font-semibold text-stone-100 text-base">
                       DCS Server Bot
                     </h3>
                   </div>
 
                   {isDcsBotLinked ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-[10px] font-bold uppercase">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-bold uppercase">
                       <Check className="w-3 h-3" />
                       Linked
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-300 font-mono text-[10px] font-bold uppercase">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] font-bold uppercase">
                       Action Required
                     </span>
                   )}
@@ -564,7 +564,7 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
                   Connects your DCS World account (UCID) to track server flight time and sortie logs.
                 </p>
 
-                <div className="p-2.5 rounded-lg bg-stone-900/90 border border-stone-800/80 text-[11px] font-mono space-y-1">
+                <div className="p-2.5 rounded-lg bg-stone-900/90 border border-stone-800/80 text-xs space-y-1">
                   <div className="flex items-center justify-between text-stone-400">
                     <span>Link Status:</span>
                     <span
@@ -578,7 +578,7 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
                   <div className="flex items-center justify-between text-stone-400">
                     <span>DCS UCID:</span>
                     <span
-                      className="text-stone-300 font-semibold truncate max-w-[120px]"
+                      className="text-stone-300 font-mono font-semibold truncate max-w-[120px]"
                       title={memberProfile?.dcsUcid || 'Not Linked'}
                     >
                       {memberProfile?.dcsUcid
@@ -592,13 +592,13 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
               <div className="pt-4 mt-2 border-t border-stone-800/80 space-y-2">
                 {isDcsBotLinked ? (
                   <>
-                    <div className="w-full py-2 px-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-xs flex items-center justify-center gap-1.5">
+                    <div className="w-full py-2 px-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-semibold text-xs flex items-center justify-center gap-1.5">
                       <Check className="w-3.5 h-3.5" />
                       <span>Bot Account Linked</span>
                     </div>
                     <button
                       onClick={() => setShowLinkModal(true)}
-                      className="w-full py-2 px-3 rounded-lg bg-stone-800/80 hover:bg-stone-700 text-stone-300 hover:text-stone-100 font-mono text-xs flex items-center justify-center gap-1.5 transition-colors"
+                      className="w-full py-2 px-3 rounded-lg bg-stone-800/80 hover:bg-stone-700 text-stone-300 hover:text-stone-100 font-medium text-xs flex items-center justify-center gap-1.5 transition-colors"
                     >
                       <Link className="w-3.5 h-3.5 text-stone-400" />
                       <span>Link Instructions (/linkme)</span>
@@ -607,7 +607,7 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
                 ) : (
                   <button
                     onClick={() => setShowLinkModal(true)}
-                    className="w-full py-2 px-3 rounded-lg bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md shadow-amber-500/10"
+                    className="w-full py-2 px-3 rounded-lg bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md shadow-amber-500/10"
                   >
                     <Link className="w-3.5 h-3.5" />
                     <span>How to Link (/linkme)</span>
@@ -681,7 +681,7 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
                   </div>
                   <button
                     onClick={handleCopyLinkme}
-                    className="px-3 py-2 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 font-mono text-xs flex items-center gap-1.5 transition-colors shrink-0"
+                    className="px-3 py-2 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 font-medium text-xs flex items-center gap-1.5 transition-colors shrink-0"
                   >
                     {copiedLinkme ? (
                       <>
@@ -733,7 +733,7 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
                     `https://discord.com/channels/${STATIC_CONFIG.discordGuildId}`
                   )
                 }
-                className="px-3.5 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 font-mono text-xs flex items-center gap-2 transition-colors"
+                className="px-3.5 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 font-medium text-xs flex items-center gap-2 transition-colors"
               >
                 <span>Open Discord</span>
                 <ArrowSquareOut className="w-3.5 h-3.5" />
@@ -743,7 +743,7 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
                 <button
                   onClick={handleModalSync}
                   disabled={isSyncingPortalInModal}
-                  className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:bg-stone-800 text-stone-950 font-mono font-bold text-xs flex items-center gap-2 transition-colors"
+                  className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:bg-stone-800 text-stone-950 font-bold text-xs flex items-center gap-2 transition-colors"
                 >
                   <ArrowsClockwise
                     className={`w-3.5 h-3.5 ${
@@ -757,7 +757,7 @@ export const NewMemberChecklist: React.FC<NewMemberChecklistProps> = ({
 
                 <button
                   onClick={() => setShowLinkModal(false)}
-                  className="px-3.5 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 font-mono text-xs transition-colors"
+                  className="px-3.5 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 font-medium text-xs transition-colors"
                 >
                   Close
                 </button>

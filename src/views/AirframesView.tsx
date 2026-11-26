@@ -114,10 +114,10 @@ export const AirframesView: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-800/80">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="font-display text-2xl font-bold bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent">
+            <h1 className="font-display text-2xl sm:text-3xl font-bold bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent">
               Qualified Airframes
             </h1>
-            <span className="px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 font-mono text-[11px] font-bold">
+            <span className="px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[11px] font-bold tabular-nums">
               {airframes.length} TYPE RATING{airframes.length === 1 ? '' : 'S'}
             </span>
           </div>
@@ -131,7 +131,7 @@ export const AirframesView: React.FC = () => {
           href={STATIC_CONFIG.kbUrl}
           target="_blank"
           rel="noreferrer"
-          className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-amber-400 font-mono text-xs flex items-center gap-1.5 transition-colors shrink-0"
+          className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-amber-400 text-xs font-medium flex items-center gap-1.5 transition-colors shrink-0"
         >
           <span>Aviation SOP &amp; Syllabus</span>
           <ArrowSquareOut className="w-3.5 h-3.5" />
@@ -142,11 +142,11 @@ export const AirframesView: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="p-4 rounded-xl bg-stone-900/90 border border-stone-800 flex items-center justify-between shadow-md">
           <div>
-            <p className="text-[11px] font-mono uppercase text-stone-400">Primary Airframe</p>
-            <p className="text-lg font-bold font-display text-amber-300 mt-1 truncate">
+            <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">Primary Airframe</p>
+            <p className="text-xl font-bold font-display text-amber-300 mt-1 truncate">
               {primaryAirframe?.name || 'Unassigned'}
             </p>
-            <p className="text-[11px] font-mono text-stone-500 mt-0.5">
+            <p className="text-xs text-stone-400 mt-0.5">
               {primaryAirframe?.squadron || 'General Community'}
             </p>
           </div>
@@ -157,11 +157,11 @@ export const AirframesView: React.FC = () => {
 
         <div className="p-4 rounded-xl bg-stone-900/90 border border-stone-800 flex items-center justify-between shadow-md">
           <div>
-            <p className="text-[11px] font-mono uppercase text-stone-400">Total Certifications</p>
-            <p className="text-2xl font-bold font-display text-emerald-400 mt-1">
+            <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">Total Certifications</p>
+            <p className="text-2xl font-bold font-display text-emerald-400 mt-1 tabular-nums">
               {airframes.length}
             </p>
-            <p className="text-[11px] font-mono text-stone-500 mt-0.5">
+            <p className="text-xs text-stone-400 mt-0.5">
               Campaign Authorized Airframes
             </p>
           </div>
@@ -172,11 +172,11 @@ export const AirframesView: React.FC = () => {
 
         <div className="p-4 rounded-xl bg-stone-900/90 border border-stone-800 flex items-center justify-between shadow-md">
           <div>
-            <p className="text-[11px] font-mono uppercase text-stone-400">Instructor Status</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">Instructor Status</p>
             <p className="text-2xl font-bold font-display text-purple-300 mt-1">
               {instructorCount > 0 ? `${instructorCount} Endorsement${instructorCount === 1 ? '' : 's'}` : 'Standard Pilot'}
             </p>
-            <p className="text-[11px] font-mono text-stone-500 mt-0.5">
+            <p className="text-xs text-stone-400 mt-0.5">
               Flight Training Endorsement
             </p>
           </div>
@@ -266,7 +266,7 @@ export const AirframesView: React.FC = () => {
                       </div>
 
                       {airframe.isPrimary && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500 text-stone-950 text-[10px] font-mono font-extrabold uppercase tracking-wider shrink-0 shadow-md">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500 text-stone-950 text-[11px] font-extrabold uppercase tracking-wider shrink-0 shadow-md">
                           <Sparkle className="w-3 h-3 text-stone-950" />
                           PRIMARY
                         </span>
@@ -278,34 +278,34 @@ export const AirframesView: React.FC = () => {
                   <div className="space-y-3 pt-3 border-t border-stone-800/80">
                     <div className="flex flex-wrap items-center gap-1.5">
                       {airframe.isPilot && (
-                        <span className="px-2.5 py-1 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-mono text-xs font-semibold backdrop-blur-sm">
+                        <span className="px-2.5 py-1 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-semibold backdrop-blur-sm">
                           {airframe.roleLabel || 'Pilot'}
                         </span>
                       )}
                       {airframe.isInstructor && (
-                        <span className="px-2.5 py-1 rounded-lg bg-purple-500/20 border border-purple-500/40 text-purple-300 font-mono text-xs font-semibold backdrop-blur-sm">
+                        <span className="px-2.5 py-1 rounded-lg bg-purple-500/20 border border-purple-500/40 text-purple-300 text-xs font-semibold backdrop-blur-sm">
                           Instructor
                         </span>
                       )}
                       {airframe.isCrew && (
-                        <span className="px-2.5 py-1 rounded-lg bg-blue-500/20 border border-blue-500/40 text-blue-300 font-mono text-xs font-semibold backdrop-blur-sm">
+                        <span className="px-2.5 py-1 rounded-lg bg-blue-500/20 border border-blue-500/40 text-blue-300 text-xs font-semibold backdrop-blur-sm">
                           Crew
                         </span>
                       )}
-                      <span className="px-2.5 py-1 rounded-lg bg-stone-950/80 border border-stone-700 text-amber-400 font-mono text-xs uppercase ml-auto font-bold backdrop-blur-sm">
+                      <span className="px-2.5 py-1 rounded-lg bg-stone-950/80 border border-stone-700 text-amber-400 text-xs uppercase ml-auto font-bold backdrop-blur-sm">
                         {airframe.status}
                       </span>
                     </div>
 
                     {matchingLivery && (
-                      <div className="flex items-center justify-between text-xs font-mono text-stone-400 pt-1">
-                        <span className="truncate max-w-[200px] text-stone-300/90 flex items-center gap-1.5 text-[11px]">
+                      <div className="flex items-center justify-between text-xs text-stone-400 pt-1">
+                        <span className="truncate max-w-[200px] text-stone-300/90 flex items-center gap-1.5 text-xs">
                           <PaintBrush className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                           <span className="truncate">{matchingLivery.name}</span>
                         </span>
                         <button
                           onClick={() => setActiveTab('liveries')}
-                          className="text-amber-400 hover:text-amber-300 hover:underline flex items-center gap-1 text-[11px] shrink-0 font-semibold"
+                          className="text-amber-400 hover:text-amber-300 hover:underline flex items-center gap-1 text-xs shrink-0 font-semibold"
                         >
                           <span>Hangar</span>
                           <ArrowSquareOut className="w-3 h-3" />

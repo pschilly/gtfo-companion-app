@@ -244,7 +244,7 @@ export const NotificationCenterDropdown: React.FC<NotificationCenterDropdownProp
       >
         <Bell className="w-4 h-4" />
         {unreadNotificationsCount > 0 && (
-          <span className="absolute -top-1 -right-1 flex h-4 min-w-4 px-1 items-center justify-center rounded-full bg-amber-500 text-[9px] font-mono font-bold text-stone-950 shadow-sm animate-pulse">
+          <span className="absolute -top-1 -right-1 flex h-[18px] min-w-[18px] px-1 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold tabular-nums text-stone-950 shadow-sm animate-pulse">
             {unreadNotificationsCount > 99 ? '99+' : unreadNotificationsCount}
           </span>
         )}
@@ -256,11 +256,11 @@ export const NotificationCenterDropdown: React.FC<NotificationCenterDropdownProp
           {/* Header */}
           <div className="p-3.5 border-b border-stone-800 flex items-center justify-between gap-2 bg-stone-900">
             <div className="flex items-center gap-2">
-              <span className="font-mono text-xs font-bold tracking-wider text-stone-200 uppercase">
+              <span className="font-display text-sm font-bold tracking-wider text-stone-200 uppercase">
                 Notifications
               </span>
               {unreadNotificationsCount > 0 && (
-                <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[10px] font-mono font-semibold">
+                <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[11px] font-semibold tabular-nums">
                   {unreadNotificationsCount} new
                 </span>
               )}
@@ -270,7 +270,7 @@ export const NotificationCenterDropdown: React.FC<NotificationCenterDropdownProp
               {unreadNotificationsCount > 0 && (
                 <button
                   onClick={markAllNotificationsAsRead}
-                  className="px-2.5 py-1 rounded-lg text-[10px] font-mono text-stone-300 hover:text-stone-100 bg-stone-800/80 hover:bg-stone-750 border border-stone-700 transition-colors flex items-center gap-1.5"
+                  className="px-2.5 py-1 rounded-lg text-[11px] font-medium text-stone-300 hover:text-stone-100 bg-stone-800/80 hover:bg-stone-750 border border-stone-700 transition-colors flex items-center gap-1.5"
                   title="Mark all as read"
                 >
                   <Checks className="w-3.5 h-3.5 text-amber-400" />
@@ -290,7 +290,7 @@ export const NotificationCenterDropdown: React.FC<NotificationCenterDropdownProp
           </div>
 
           {/* Filter Pills */}
-          <div className="px-3 py-2 border-b border-stone-800 bg-stone-900/95 flex items-center gap-1.5 overflow-x-auto scrollbar-none text-[11px] font-mono">
+          <div className="px-3 py-2 border-b border-stone-800 bg-stone-900/95 flex items-center gap-1.5 overflow-x-auto scrollbar-none text-xs">
             <button
               onClick={() => setCategoryFilter('all')}
               className={`px-2.5 py-1 rounded-lg transition-all shrink-0 whitespace-nowrap flex items-center gap-1.5 ${
@@ -300,7 +300,7 @@ export const NotificationCenterDropdown: React.FC<NotificationCenterDropdownProp
               }`}
             >
               <span>All</span>
-              <span className="text-[10px] opacity-80">({counts.all})</span>
+              <span className="text-[11px] tabular-nums opacity-80">({counts.all})</span>
             </button>
             <button
               onClick={() => setCategoryFilter('calendar')}
@@ -312,7 +312,7 @@ export const NotificationCenterDropdown: React.FC<NotificationCenterDropdownProp
             >
               <CalendarBlank className="w-3 h-3" />
               <span>Sorties</span>
-              <span className="text-[10px] opacity-80">({counts.calendar})</span>
+              <span className="text-[11px] tabular-nums opacity-80">({counts.calendar})</span>
             </button>
             <button
               onClick={() => setCategoryFilter('flight_plan')}
@@ -324,7 +324,7 @@ export const NotificationCenterDropdown: React.FC<NotificationCenterDropdownProp
             >
               <AirplaneTilt className="w-3 h-3" />
               <span>Flight Plans</span>
-              <span className="text-[10px] opacity-80">({counts.flightPlan})</span>
+              <span className="text-[11px] tabular-nums opacity-80">({counts.flightPlan})</span>
             </button>
             <button
               onClick={() => setCategoryFilter('livery')}
@@ -336,7 +336,7 @@ export const NotificationCenterDropdown: React.FC<NotificationCenterDropdownProp
             >
               <Package className="w-3 h-3" />
               <span>Liveries &amp; Mods</span>
-              <span className="text-[10px] opacity-80">({counts.assets})</span>
+              <span className="text-[11px] tabular-nums opacity-80">({counts.assets})</span>
             </button>
             <button
               onClick={() => setCategoryFilter('app')}
@@ -348,7 +348,7 @@ export const NotificationCenterDropdown: React.FC<NotificationCenterDropdownProp
             >
               <Sparkle className="w-3 h-3" />
               <span>App</span>
-              <span className="text-[10px] opacity-80">({counts.app})</span>
+              <span className="text-[11px] tabular-nums opacity-80">({counts.app})</span>
             </button>
           </div>
 
@@ -359,10 +359,10 @@ export const NotificationCenterDropdown: React.FC<NotificationCenterDropdownProp
                 <div className="w-10 h-10 mx-auto mb-3 rounded-full bg-stone-900 border border-stone-800 flex items-center justify-center text-stone-500">
                   <Bell className="w-5 h-5 text-stone-600" />
                 </div>
-                <div className="text-xs font-mono font-medium text-stone-400">
+                <div className="text-sm font-medium text-stone-400">
                   No notifications
                 </div>
-                <div className="text-[11px] text-stone-600 mt-0.5">
+                <div className="text-xs text-stone-500 mt-0.5">
                   All systems operating at standard readiness
                 </div>
               </div>
@@ -390,24 +390,24 @@ export const NotificationCenterDropdown: React.FC<NotificationCenterDropdownProp
                           <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
                         )}
                         <h4
-                          className={`text-xs font-semibold leading-snug truncate ${
+                          className={`text-sm font-semibold leading-snug truncate ${
                             item.read ? 'text-stone-300' : 'text-stone-100 font-bold'
                           }`}
                         >
                           {item.title}
                         </h4>
                       </div>
-                      <span className="text-[10px] font-mono text-stone-500 shrink-0">
+                      <span className="text-[11px] font-mono text-stone-500 shrink-0">
                         {formatRelativeTime(item.timestamp)}
                       </span>
                     </div>
 
-                    <p className="text-[11px] text-stone-400 mt-1 line-clamp-2 leading-relaxed">
+                    <p className="text-xs text-stone-400 mt-1 line-clamp-2 leading-relaxed">
                       {item.message}
                     </p>
 
                     <div className="flex items-center justify-between gap-2 mt-2 pt-1 border-t border-stone-800/80">
-                      <span className="px-1.5 py-0.5 rounded bg-stone-900 border border-stone-800 text-[9px] font-mono uppercase text-stone-400">
+                      <span className="px-1.5 py-0.5 rounded bg-stone-900 border border-stone-800 text-[11px] font-medium uppercase text-stone-400">
                         {item.category === 'flight_plan'
                           ? 'Flight Plan'
                           : item.category === 'app'
@@ -420,7 +420,7 @@ export const NotificationCenterDropdown: React.FC<NotificationCenterDropdownProp
                       </span>
 
                       {(item.actionTab || item.category === 'app') && (
-                        <span className="text-[10px] font-mono text-amber-400 hover:text-amber-300 flex items-center gap-1 font-semibold">
+                        <span className="text-xs text-amber-400 hover:text-amber-300 flex items-center gap-1 font-semibold">
                           <span>{item.category === 'flight_plan' ? 'View in ATC' : 'Open'}</span>
                           <ArrowSquareOut className="w-3 h-3" />
                         </span>
@@ -445,9 +445,9 @@ export const NotificationCenterDropdown: React.FC<NotificationCenterDropdownProp
           </div>
 
           {/* Footer note */}
-          <div className="px-3.5 py-2 bg-stone-900 border-t border-stone-800 text-[10px] font-mono text-stone-500 flex items-center justify-between">
+          <div className="px-3.5 py-2 bg-stone-900 border-t border-stone-800 text-xs text-stone-500 flex items-center justify-between">
             <span>GTFO Tactical Comm Link</span>
-            <span className="text-stone-600">v{manifest.manifestVersion}</span>
+            <span className="text-stone-500 font-mono">v{manifest.manifestVersion}</span>
           </div>
         </div>
       )}

@@ -39,25 +39,25 @@ export const ChecklistView: React.FC = () => {
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 font-mono text-[11px] font-bold uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] font-bold uppercase tracking-wider">
                 <ListChecks className="w-3.5 h-3.5 text-amber-400" />
                 <span>Flight Line Onboarding</span>
               </span>
 
               {checklistSummary.allComplete ? (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-mono text-[11px] font-bold uppercase tracking-wider">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[11px] font-bold uppercase tracking-wider">
                   <CheckCircle className="w-3 h-3 text-emerald-400" />
                   Combat Ready (4/4)
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 font-mono text-[11px] font-bold uppercase tracking-wider animate-pulse">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[11px] font-bold uppercase tracking-wider animate-pulse">
                   <ShieldWarning className="w-3 h-3 text-amber-400" />
                   {checklistSummary.pendingCount} Action Item{checklistSummary.pendingCount === 1 ? '' : 's'} Pending
                 </span>
               )}
             </div>
 
-            <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-stone-100 tracking-tight">
+            <h1 className="font-display text-2xl sm:text-3xl font-bold text-stone-100">
               Member Readiness
             </h1>
 
@@ -70,7 +70,7 @@ export const ChecklistView: React.FC = () => {
             <button
               onClick={handleRefreshAll}
               disabled={isRefreshing}
-              className="px-4 py-2.5 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-700 text-stone-200 font-mono text-xs font-semibold flex items-center justify-center gap-2 transition-colors"
+              className="px-4 py-2.5 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-700 text-stone-200 text-xs font-semibold flex items-center justify-center gap-2 transition-colors"
             >
               <ArrowsClockwise
                 className={`w-3.5 h-3.5 text-amber-400 ${
@@ -84,7 +84,7 @@ export const ChecklistView: React.FC = () => {
               href={STATIC_CONFIG.kbUrl}
               target="_blank"
               rel="noreferrer"
-              className="px-4 py-2.5 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-700 text-amber-400 font-mono text-xs font-semibold flex items-center justify-center gap-2 transition-colors"
+              className="px-4 py-2.5 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-700 text-amber-400 text-xs font-semibold flex items-center justify-center gap-2 transition-colors"
             >
               <span>Onboarding SOP</span>
               <ArrowSquareOut className="w-3.5 h-3.5" />

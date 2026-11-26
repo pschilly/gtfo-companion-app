@@ -124,39 +124,39 @@ export const AssetDetailsModal: React.FC = () => {
               <div className="flex flex-wrap items-center gap-2">
                 {selectedAsset.aircraftOrModule &&
                   !selectedAsset.aircraftOrModule.toLowerCase().includes('agnostic') && (
-                    <span className="px-2.5 py-0.5 rounded bg-stone-950/90 border border-stone-700 text-xs font-mono font-semibold text-amber-300">
+                    <span className="px-2.5 py-0.5 rounded bg-stone-950/90 border border-stone-700 text-xs font-semibold text-amber-300">
                       {selectedAsset.aircraftOrModule}
                     </span>
                   )}
 
                 {selectedAsset.requirementLevel === 'required_all' ? (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded bg-red-600 text-white font-mono font-bold text-xs uppercase">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded bg-red-600 text-white font-bold text-xs uppercase">
                     <Warning className="w-3.5 h-3.5" />
                     REQUIRED FOR ALL
                   </span>
                 ) : selectedAsset.requirementLevel === 'required_core' ? (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded bg-amber-500 text-stone-950 font-mono font-bold text-xs uppercase">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded bg-amber-500 text-stone-950 font-bold text-xs uppercase">
                     <Sparkle className="w-3.5 h-3.5" />
                     REQUIRED FOR CORE
                   </span>
                 ) : (
-                  <span className="px-2.5 py-0.5 rounded bg-stone-800 border border-stone-700 text-stone-300 font-mono text-xs uppercase">
+                  <span className="px-2.5 py-0.5 rounded bg-stone-800 border border-stone-700 text-stone-300 font-medium text-xs uppercase">
                     OPTIONAL
                   </span>
                 )}
 
                 {isCore ? (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded bg-amber-950/90 border border-amber-500/50 text-amber-300 font-mono font-bold text-xs uppercase">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded bg-amber-950/90 border border-amber-500/50 text-amber-300 font-bold text-xs uppercase">
                     CORE ROSTER TIER
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded bg-stone-950/90 border border-stone-700 text-stone-300 font-mono font-semibold text-xs uppercase">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded bg-stone-950/90 border border-stone-700 text-stone-300 font-semibold text-xs uppercase">
                     <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
                     COMMUNITY TIER
                   </span>
                 )}
               </div>
-              <h2 className="font-display text-xl font-bold text-stone-100">
+              <h2 className="font-display text-2xl font-bold text-stone-100">
                 {selectedAsset.name}
               </h2>
             </div>
@@ -177,7 +177,7 @@ export const AssetDetailsModal: React.FC = () => {
         <div className="p-6 overflow-y-auto space-y-5 flex-1">
           {selectedAsset.previewGallery && selectedAsset.previewGallery.length > 0 && (
             <div className="space-y-2">
-              <div className="text-[10px] font-mono uppercase tracking-wider text-stone-400">
+              <div className="text-xs font-semibold uppercase tracking-wider text-stone-400">
                 Preview Gallery (Click to inspect fixture)
               </div>
               <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
@@ -215,7 +215,7 @@ export const AssetDetailsModal: React.FC = () => {
           {/* Metadata Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div className="p-3 rounded-xl bg-stone-950/80 border border-stone-800 space-y-1">
-              <div className="text-[10px] font-mono uppercase text-stone-400 flex items-center gap-1.5">
+              <div className="text-xs font-semibold uppercase text-stone-400 flex items-center gap-1.5">
                 <FolderOpen className="w-3.5 h-3.5 text-amber-400" />
                 {selectedAsset.detectionPath
                   ? 'Detection Hook / Script Path'
@@ -225,7 +225,7 @@ export const AssetDetailsModal: React.FC = () => {
             </div>
 
             <div className="p-3 rounded-xl bg-stone-950/80 border border-stone-800 space-y-1">
-              <div className="text-[10px] font-mono uppercase text-stone-400 flex items-center gap-1.5">
+              <div className="text-xs font-semibold uppercase text-stone-400 flex items-center gap-1.5">
                 {selectedAsset.githubRepo ? (
                   <>
                     <GitBranch className="w-3.5 h-3.5 text-amber-400" />
@@ -249,7 +249,7 @@ export const AssetDetailsModal: React.FC = () => {
                     {selectedAsset.githubRepo} ({selectedAsset.githubBranch || 'main'})
                     <ArrowSquareOut className="w-3 h-3" />
                   </a>
-                  <p className="text-[11px] font-mono text-stone-400 break-all">
+                  <p className="text-xs font-mono text-stone-400 break-all">
                     Tree SHA: {selectedAsset.sha256}
                   </p>
                 </div>
@@ -259,13 +259,13 @@ export const AssetDetailsModal: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-stone-400 pt-1">
+          <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-stone-400 pt-1">
             <span className="flex items-center gap-1.5">
               <User className="w-3.5 h-3.5 text-stone-500" />
               Author: <strong className="text-stone-200">{selectedAsset.author}</strong>
             </span>
             <span>Last Checked: {formatShortDate(selectedAsset.updatedAt)}</span>
-            <span>Asset ID: {selectedAsset.id}</span>
+            <span className="font-mono">Asset ID: {selectedAsset.id}</span>
           </div>
 
           {/* Tags */}
@@ -274,7 +274,7 @@ export const AssetDetailsModal: React.FC = () => {
               {selectedAsset.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="px-2.5 py-1 rounded-lg bg-stone-950 border border-stone-800 text-xs font-mono text-stone-300"
+                  className="px-2.5 py-1 rounded-lg bg-stone-950 border border-stone-800 text-xs text-stone-300"
                 >
                   #{tag}
                 </span>
@@ -285,10 +285,10 @@ export const AssetDetailsModal: React.FC = () => {
           {/* Changelog */}
           {selectedAsset.changelog && selectedAsset.changelog.length > 0 && (
             <div className="space-y-2">
-              <h4 className="text-xs font-mono uppercase tracking-wider text-stone-400">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-stone-400">
                 Deployment Specification &amp; Sync Notes
               </h4>
-              <ul className="space-y-1.5 p-3.5 rounded-xl bg-stone-950/80 border border-stone-800/90 text-xs font-mono text-stone-300">
+              <ul className="space-y-1.5 p-3.5 rounded-xl bg-stone-950/80 border border-stone-800/90 text-xs text-stone-300">
                 {selectedAsset.changelog.map((line, idx) => (
                   <li key={idx} className="flex items-start gap-2">
                     <span className="text-amber-400">•</span>
@@ -303,27 +303,27 @@ export const AssetDetailsModal: React.FC = () => {
           {installed && (
             <div className="p-3.5 rounded-xl bg-emerald-950/20 border border-emerald-500/30 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-semibold text-emerald-300 flex items-center gap-1.5">
+                <span className="text-xs font-semibold text-emerald-300 flex items-center gap-1.5">
                   <CheckCircle className="w-4 h-4 text-emerald-400" />
-                  INSTALLED ON DISK (Rev {installed.installedVersion})
+                  INSTALLED ON DISK (<span className="font-mono">Rev {installed.installedVersion}</span>)
                 </span>
                 <button
                   onClick={handleVerify}
                   disabled={verifying}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-stone-950 hover:bg-stone-800 border border-stone-700 text-[11px] font-mono text-stone-200"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-stone-950 hover:bg-stone-800 border border-stone-700 text-xs font-medium text-stone-200"
                 >
                   <ArrowsClockwise className={`w-3 h-3 ${verifying ? 'animate-spin' : ''}`} />
                   Verify Local Files
                 </button>
               </div>
               {verifyStatus === 'ok' && (
-                <p className="text-xs font-mono text-emerald-400 flex items-center gap-1.5">
+                <p className="text-xs text-emerald-400 flex items-center gap-1.5">
                   <Certificate className="w-3.5 h-3.5" /> All {installed.extractedFiles.length}{' '}
                   tracked file(s) verified intact in DCS Saved Games.
                 </p>
               )}
               {verifyStatus === 'fail' && (
-                <p className="text-xs font-mono text-amber-400">
+                <p className="text-xs text-amber-400">
                   One or more files were modified or removed. Click Verify &amp; Repair below.
                 </p>
               )}
@@ -335,9 +335,9 @@ export const AssetDetailsModal: React.FC = () => {
         <div className="p-4 bg-stone-950 border-t border-stone-800 flex items-center justify-between gap-4 shrink-0">
           {progress ? (
             <div className="w-full space-y-1.5">
-              <div className="flex justify-between text-xs font-mono">
+              <div className="flex justify-between text-xs">
                 <span className="text-amber-300 truncate">{progress.message}</span>
-                <span className="text-stone-300 shrink-0">{progress.percent}%</span>
+                <span className="text-stone-300 font-mono shrink-0">{progress.percent}%</span>
               </div>
               <div className="w-full h-2 rounded-full bg-stone-900 overflow-hidden">
                 <div
@@ -353,7 +353,7 @@ export const AssetDetailsModal: React.FC = () => {
                   setActiveImage(null);
                   setSelectedAsset(null);
                 }}
-                className="px-4 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-xs font-mono text-stone-300"
+                className="px-4 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-xs font-medium text-stone-300"
               >
                 Close
               </button>
@@ -365,7 +365,7 @@ export const AssetDetailsModal: React.FC = () => {
                       setSelectedAsset(null);
                       setLoginModalOpen(true);
                     }}
-                    className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono font-bold text-xs flex items-center gap-2"
+                    className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs flex items-center gap-2"
                   >
                     <Lock className="w-4 h-4" />
                     Sign in with Discord
@@ -376,13 +376,13 @@ export const AssetDetailsModal: React.FC = () => {
                       {selectedAsset.externalUrl && (
                         <button
                           onClick={() => openExternalUrl(selectedAsset.externalUrl!)}
-                          className="px-4 py-2.5 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-700 text-stone-300 hover:text-white font-mono font-semibold text-xs flex items-center gap-1.5 transition-colors"
+                          className="px-4 py-2.5 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-700 text-stone-300 hover:text-white font-semibold text-xs flex items-center gap-1.5 transition-colors"
                         >
                           <ArrowSquareOut className="w-4 h-4" />
                           Releases &amp; Documentation
                         </button>
                       )}
-                      <div className="px-5 py-2.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-mono font-semibold text-xs flex items-center gap-2">
+                      <div className="px-5 py-2.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-semibold text-xs flex items-center gap-2">
                         <CheckCircle className="w-4 h-4" />
                         External Tool Active &amp; Verified
                       </div>
@@ -394,7 +394,7 @@ export const AssetDetailsModal: React.FC = () => {
                           openExternalUrl(selectedAsset.externalUrl);
                         }
                       }}
-                      className="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono font-bold text-xs flex items-center gap-2 shadow-lg shadow-amber-500/10 transition-all"
+                      className="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs flex items-center gap-2 shadow-lg shadow-amber-500/10 transition-all"
                     >
                       <ArrowSquareOut className="w-4 h-4" />
                       Open External Installer ({selectedAsset.name})
@@ -404,14 +404,14 @@ export const AssetDetailsModal: React.FC = () => {
                   <>
                     <button
                       onClick={() => uninstallAsset(selectedAsset.id)}
-                      className="px-4 py-2.5 rounded-xl bg-red-500/15 hover:bg-red-500/25 border border-red-500/40 text-red-300 font-mono font-semibold text-xs flex items-center gap-1.5"
+                      className="px-4 py-2.5 rounded-xl bg-red-500/15 hover:bg-red-500/25 border border-red-500/40 text-red-300 font-semibold text-xs flex items-center gap-1.5"
                     >
                       <Trash className="w-4 h-4" />
                       Uninstall Asset
                     </button>
                     <button
                       onClick={() => installAsset(selectedAsset)}
-                      className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono font-bold text-xs flex items-center gap-1.5"
+                      className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs flex items-center gap-1.5"
                     >
                       {needsUpdate ? (
                         <>
@@ -429,7 +429,7 @@ export const AssetDetailsModal: React.FC = () => {
                 ) : (
                   <button
                     onClick={() => installAsset(selectedAsset)}
-                    className="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono font-bold text-xs flex items-center gap-2 shadow-lg shadow-amber-500/10"
+                    className="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs flex items-center gap-2 shadow-lg shadow-amber-500/10"
                   >
                     <DownloadSimple className="w-4 h-4" />
                     Deploy to DCS Saved Games

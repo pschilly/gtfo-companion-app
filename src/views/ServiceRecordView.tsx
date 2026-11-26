@@ -253,10 +253,10 @@ export const ServiceRecordView: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-800/80">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="font-display text-2xl font-bold bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent">
+            <h1 className="font-display text-2xl sm:text-3xl font-bold bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent">
               My Service Record
             </h1>
-            <span className="px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 font-mono text-[11px] font-bold">
+            <span className="px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[11px] font-bold tabular-nums">
               {records.length} {records.length === 1 ? 'ENTRY' : 'ENTRIES'}
             </span>
           </div>
@@ -270,7 +270,7 @@ export const ServiceRecordView: React.FC = () => {
           <button
             onClick={handleRefresh}
             disabled={isSyncing}
-            className="px-3 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-300 hover:text-amber-300 font-mono text-xs flex items-center gap-1.5 transition-colors disabled:opacity-50"
+            className="px-3 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-300 hover:text-amber-300 text-xs font-medium flex items-center gap-1.5 transition-colors disabled:opacity-50"
             title="Sync latest service record entries from Member Portal"
           >
             <ArrowsClockwise className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin text-amber-400' : ''}`} />
@@ -283,13 +283,13 @@ export const ServiceRecordView: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="p-4 rounded-2xl bg-stone-900/90 border border-stone-800 shadow-lg flex items-start justify-between">
           <div>
-            <div className="text-[11px] font-mono uppercase tracking-wider text-stone-400">
+            <div className="text-xs font-semibold uppercase tracking-wide text-stone-400">
               Sorties Attended
             </div>
-            <div className="text-2xl font-display font-bold text-stone-100 mt-1">
+            <div className="text-2xl font-display font-bold tabular-nums text-stone-100 mt-1">
               {stats.attended}
             </div>
-            <div className="text-xs font-mono text-emerald-400 mt-1">
+            <div className="text-xs text-emerald-400 mt-1 tabular-nums">
               {stats.attended} Show-ups
             </div>
           </div>
@@ -300,13 +300,13 @@ export const ServiceRecordView: React.FC = () => {
 
         <div className="p-4 rounded-2xl bg-stone-900/90 border border-stone-800 shadow-lg flex items-start justify-between">
           <div>
-            <div className="text-[11px] font-mono uppercase tracking-wider text-stone-400">
+            <div className="text-xs font-semibold uppercase tracking-wide text-stone-400">
               No-Shows / Absent
             </div>
-            <div className="text-2xl font-display font-bold text-stone-100 mt-1">
+            <div className="text-2xl font-display font-bold tabular-nums text-stone-100 mt-1">
               {stats.absent}
             </div>
-            <div className="text-xs font-mono text-rose-400 mt-1">
+            <div className="text-xs text-rose-400 mt-1 tabular-nums">
               {stats.absent} Missed Sorties
             </div>
           </div>
@@ -317,13 +317,13 @@ export const ServiceRecordView: React.FC = () => {
 
         <div className="p-4 rounded-2xl bg-stone-900/90 border border-stone-800 shadow-lg flex items-start justify-between">
           <div>
-            <div className="text-[11px] font-mono uppercase tracking-wider text-stone-400">
+            <div className="text-xs font-semibold uppercase tracking-wide text-stone-400">
               Total Sortie RSVPs
             </div>
-            <div className="text-2xl font-display font-bold text-stone-100 mt-1">
+            <div className="text-2xl font-display font-bold tabular-nums text-stone-100 mt-1">
               {stats.totalRsvps}
             </div>
-            <div className="text-xs font-mono text-sky-400 mt-1">
+            <div className="text-xs text-sky-400 mt-1 tabular-nums">
               {stats.totalRsvps} Total Registered
               {stats.pending > 0 ? ` (${stats.pending} Pending AAR)` : ''}
             </div>
@@ -335,13 +335,13 @@ export const ServiceRecordView: React.FC = () => {
 
         <div className="p-4 rounded-2xl bg-stone-900/90 border border-stone-800 shadow-lg flex items-start justify-between">
           <div>
-            <div className="text-[11px] font-mono uppercase tracking-wider text-stone-400">
+            <div className="text-xs font-semibold uppercase tracking-wide text-stone-400">
               Attendance Rate
             </div>
-            <div className="text-2xl font-display font-bold text-amber-300 mt-1">
+            <div className="text-2xl font-display font-bold tabular-nums text-amber-300 mt-1">
               {stats.rateFormatted}
             </div>
-            <div className="text-xs font-mono text-stone-400 mt-1">
+            <div className="text-xs text-stone-400 mt-1 tabular-nums">
               {stats.attended}/{stats.totalRsvps} Flown
             </div>
           </div>
@@ -360,7 +360,7 @@ export const ServiceRecordView: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setSelectedGroup(tab.id)}
-                className={`px-3 py-1.5 rounded-xl font-mono text-xs flex items-center gap-1.5 transition-all ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-medium flex items-center gap-1.5 transition-all ${
                   active
                     ? 'bg-amber-500 text-stone-950 font-bold shadow-sm'
                     : 'bg-stone-950/60 text-stone-400 hover:text-stone-200 border border-stone-800'
@@ -368,7 +368,7 @@ export const ServiceRecordView: React.FC = () => {
               >
                 <span>{tab.label}</span>
                 <span
-                  className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+                  className={`px-1.5 py-0.5 rounded-full text-[11px] font-bold tabular-nums ${
                     active ? 'bg-stone-950 text-amber-300' : 'bg-stone-800 text-stone-400'
                   }`}
                 >
@@ -386,7 +386,7 @@ export const ServiceRecordView: React.FC = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search service record entries..."
-            className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-stone-950 border border-stone-800 focus:border-amber-500/60 focus:outline-none text-xs font-mono text-stone-200 placeholder:text-stone-500"
+            className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-stone-950 border border-stone-800 focus:border-amber-500/60 focus:outline-none text-xs text-stone-200 placeholder:text-stone-500"
           />
         </div>
       </div>
@@ -400,7 +400,7 @@ export const ServiceRecordView: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="text-xs font-mono text-stone-400">
+            <span className="text-xs text-stone-400 tabular-nums">
               {filteredRecords.length === 0
                 ? '0 entries'
                 : `Showing ${startIndex + 1}–${endIndex} of ${filteredRecords.length} entries`}
@@ -416,7 +416,7 @@ export const ServiceRecordView: React.FC = () => {
                 >
                   <CaretLeft className="w-3.5 h-3.5" />
                 </button>
-                <span className="px-2 font-mono text-[11px] text-stone-300">
+                <span className="px-2 font-mono text-xs text-stone-300">
                   {safeCurrentPage} / {totalPages}
                 </span>
                 <button
@@ -481,12 +481,12 @@ export const ServiceRecordView: React.FC = () => {
                       <div className="min-w-0 space-y-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <span
-                            className={`px-2 py-0.5 rounded-md border font-mono text-[10px] font-bold uppercase tracking-wider ${visuals.badgeClass}`}
+                            className={`px-2 py-0.5 rounded-md border text-[11px] font-bold uppercase tracking-wider ${visuals.badgeClass}`}
                           >
                             {item.typeLabel}
                           </span>
                           {relTime && (
-                            <span className="text-[11px] font-mono text-stone-500">
+                            <span className="text-xs text-stone-500">
                               {relTime}
                             </span>
                           )}
@@ -498,7 +498,7 @@ export const ServiceRecordView: React.FC = () => {
                     </div>
 
                     <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center shrink-0 pl-12 sm:pl-0">
-                      <span className="text-[10px] font-mono uppercase tracking-wider text-stone-500">
+                      <span className="text-[11px] uppercase tracking-wider text-stone-500">
                         Recorded
                       </span>
                       <span className="text-xs font-mono font-semibold text-stone-300">
@@ -512,7 +512,7 @@ export const ServiceRecordView: React.FC = () => {
 
             {/* Pagination Footer */}
             <div className="px-5 py-3.5 border-t border-stone-800/80 bg-stone-950/60 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <div className="flex items-center gap-2 text-xs font-mono text-stone-400">
+              <div className="flex items-center gap-2 text-xs text-stone-400">
                 <span>Rows per page:</span>
                 <select
                   value={pageSize}
@@ -525,7 +525,7 @@ export const ServiceRecordView: React.FC = () => {
                     </option>
                   ))}
                 </select>
-                <span className="hidden md:inline text-stone-500 pl-2">
+                <span className="hidden md:inline text-stone-500 pl-2 tabular-nums">
                   Showing {startIndex + 1}–{endIndex} of {filteredRecords.length}
                 </span>
               </div>

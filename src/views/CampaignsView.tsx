@@ -235,7 +235,7 @@ export const CampaignsView: React.FC = () => {
         {/* Updating Campaign Breadcrumb */}
         <nav
           aria-label="Campaign breadcrumb"
-          className={`flex flex-wrap items-center gap-1.5 text-xs font-mono text-stone-400 border-b border-stone-800/70 ${
+          className={`flex flex-wrap items-center gap-1.5 text-xs font-medium text-stone-400 border-b border-stone-800/70 ${
             isMapSubTab ? 'pb-2' : 'pb-3'
           }`}
         >
@@ -274,7 +274,7 @@ export const CampaignsView: React.FC = () => {
             {currentMeta.icon}
             <span>{currentMeta.label}</span>
             {typeof currentMeta.badge === 'number' && (
-              <span className="px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-200 text-[10px]">
+              <span className="px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-200 text-[11px] tabular-nums">
                 {currentMeta.badge}
               </span>
             )}
@@ -285,18 +285,18 @@ export const CampaignsView: React.FC = () => {
           <div className="space-y-1.5">
             {!isMapSubTab && (
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 font-mono text-[10px] font-bold uppercase tracking-wider">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 font-mono text-[11px] font-bold uppercase tracking-wider">
                   <Crosshair className="w-3 h-3" />
                   {currentMeta.code}
                 </span>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-mono text-[10px] font-bold">
+                <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[11px] font-semibold tabular-nums">
                   {activeCampaigns.length} Active
                 </span>
               </div>
             )}
 
             <h1
-              className={`font-display font-extrabold text-stone-100 tracking-tight ${
+              className={`font-display font-bold text-stone-100 ${
                 isMapSubTab ? 'text-lg sm:text-xl' : 'text-2xl sm:text-3xl'
               }`}
             >
@@ -330,13 +330,13 @@ export const CampaignsView: React.FC = () => {
                         className="w-7 h-7 rounded-lg object-contain bg-stone-900 border border-stone-800 p-0.5 shrink-0"
                       />
                     ) : (
-                      <div className="w-7 h-7 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center font-mono font-black text-[10px] text-amber-300 shrink-0">
+                      <div className="w-7 h-7 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center font-mono font-bold text-[11px] text-amber-300 shrink-0">
                         {selectedCampaign.abbreviation}
                       </div>
                     )}
 
                     <div className="text-left min-w-0 max-w-[200px]">
-                      <div className="flex items-center gap-1 text-[9px] font-mono uppercase tracking-wider text-stone-500 leading-none">
+                      <div className="flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-stone-500 leading-none">
                         <span>Active Campaign</span>
                         {pinnedCampaignId === selectedCampaign.id && (
                           <PushPin
@@ -345,7 +345,7 @@ export const CampaignsView: React.FC = () => {
                           />
                         )}
                         {activeCampaigns.length > 1 && (
-                          <span className="px-1 rounded bg-stone-900 border border-stone-800 text-amber-300/90 font-semibold">
+                          <span className="px-1 rounded bg-stone-900 border border-stone-800 text-amber-300/90 tabular-nums font-semibold">
                             {activeCampaigns.length}
                           </span>
                         )}
@@ -368,7 +368,7 @@ export const CampaignsView: React.FC = () => {
                       aria-label="Active Campaigns"
                       className="absolute right-0 top-full mt-2 w-[350px] max-w-[90vw] rounded-2xl border border-stone-700/90 bg-stone-950/95 backdrop-blur-xl shadow-2xl overflow-hidden z-50"
                     >
-                      <div className="px-3 py-2 border-b border-stone-800/80 bg-stone-900/70 flex items-center justify-between gap-2 text-[10px] font-mono">
+                      <div className="px-3 py-2 border-b border-stone-800/80 bg-stone-900/70 flex items-center justify-between gap-2 text-[11px] font-medium">
                         <span className="uppercase tracking-wider font-bold text-stone-400">
                           Active Campaigns ({activeCampaigns.length})
                         </span>
@@ -449,9 +449,9 @@ export const CampaignsView: React.FC = () => {
                                       />
                                     )}
                                   </div>
-                                  <div className="flex items-center gap-1.5 text-[10px] font-mono text-stone-400 mt-0.5 flex-wrap">
+                                  <div className="flex items-center gap-1.5 text-[11px] text-stone-400 mt-0.5 flex-wrap">
                                     <span
-                                      className={`px-1.5 py-0.2 rounded border uppercase font-bold ${getStatusBadgeClasses(
+                                      className={`px-1.5 py-0.2 rounded border uppercase font-semibold ${getStatusBadgeClasses(
                                         camp.statusColor
                                       )}`}
                                     >
@@ -461,7 +461,7 @@ export const CampaignsView: React.FC = () => {
                                       {camp.theatre || 'Active Theatre'}
                                     </span>
                                     <span>•</span>
-                                    <span className="text-amber-300 font-semibold">
+                                    <span className="text-amber-300 font-mono font-semibold">
                                       {camp.progressPercentage}%
                                     </span>
                                   </div>
@@ -508,7 +508,7 @@ export const CampaignsView: React.FC = () => {
                         })}
                       </div>
 
-                      <div className="px-3 py-2 border-t border-stone-800/80 bg-stone-900/70 flex items-center justify-between gap-2 text-[11px] font-mono">
+                      <div className="px-3 py-2 border-t border-stone-800/80 bg-stone-900/70 flex items-center justify-between gap-2 text-xs">
                         <span className="text-stone-500 truncate">
                           {selectedCampaign.theatre || 'Active Theatre'}
                         </span>
@@ -533,7 +533,7 @@ export const CampaignsView: React.FC = () => {
               type="button"
               onClick={() => refreshCampaigns()}
               disabled={isLoadingCampaigns}
-              className="h-10 px-3 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-800 hover:border-amber-500/40 text-stone-300 hover:text-amber-300 text-xs font-mono flex items-center gap-1.5 transition-all disabled:opacity-60 cursor-pointer"
+              className="h-10 px-3 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-800 hover:border-amber-500/40 text-stone-300 hover:text-amber-300 text-xs font-medium flex items-center gap-1.5 transition-all disabled:opacity-60 cursor-pointer"
             >
               <ArrowsClockwise
                 className={`w-3.5 h-3.5 text-amber-400 ${isLoadingCampaigns ? 'animate-spin' : ''}`}
@@ -564,7 +564,7 @@ export const CampaignsView: React.FC = () => {
             <button
               type="button"
               onClick={() => refreshCampaigns()}
-              className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono font-bold text-xs inline-flex items-center gap-1.5"
+              className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-semibold text-xs inline-flex items-center gap-1.5"
             >
               <ArrowsClockwise className="w-3.5 h-3.5" />
               <span>Retry Portal Sync</span>
@@ -601,7 +601,7 @@ export const CampaignsView: React.FC = () => {
                       )}
                       <div className="min-w-0 space-y-1">
                         <span
-                          className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider border ${getStatusBadgeClasses(
+                          className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider border ${getStatusBadgeClasses(
                             camp.statusColor
                           )}`}
                         >
@@ -621,7 +621,7 @@ export const CampaignsView: React.FC = () => {
                           ? 'Unpin campaign and remove widget from Home dashboard'
                           : 'Pin this campaign to Home widget'
                       }
-                      className={`px-2.5 py-1 rounded-xl border text-[11px] font-mono font-semibold flex items-center gap-1 transition-colors shrink-0 ${
+                      className={`px-2.5 py-1 rounded-xl border text-xs font-medium flex items-center gap-1 transition-colors shrink-0 ${
                         isPinned
                           ? 'bg-amber-500/20 hover:bg-red-500/20 border-amber-500/50 hover:border-red-500/50 text-amber-300 hover:text-red-300'
                           : 'bg-stone-950 border-stone-800 text-stone-400 hover:text-amber-300 hover:border-amber-500/40'
@@ -641,18 +641,18 @@ export const CampaignsView: React.FC = () => {
                     </button>
                   </div>
 
-                  <div className="flex items-center gap-1.5 flex-wrap text-[10px] font-mono">
-                    <span className="px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 font-bold uppercase">
+                  <div className="flex items-center gap-1.5 flex-wrap text-[11px] font-medium">
+                    <span className="px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 font-semibold uppercase tracking-wider">
                       {camp.theatre || 'Active Theatre'}
                     </span>
                     {camp.dcsServer && (
-                      <span className="px-2 py-0.5 rounded bg-sky-500/15 text-sky-300 border border-sky-500/30 font-bold flex items-center gap-1">
+                      <span className="px-2 py-0.5 rounded bg-sky-500/15 text-sky-300 border border-sky-500/30 font-semibold flex items-center gap-1">
                         <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
                         {camp.dcsServer}
                       </span>
                     )}
                     {camp.era && (
-                      <span className="px-2 py-0.5 rounded bg-stone-800 text-stone-300 border border-stone-700 font-bold">
+                      <span className="px-2 py-0.5 rounded bg-stone-800 text-stone-300 border border-stone-700 font-semibold">
                         {camp.era}
                       </span>
                     )}
@@ -669,9 +669,9 @@ export const CampaignsView: React.FC = () => {
                   )}
 
                   <div className="space-y-1.5">
-                    <div className="flex items-center justify-between text-[11px] font-mono">
+                    <div className="flex items-center justify-between text-xs">
                       <span className="text-stone-400">Operational Progress</span>
-                      <span className="text-amber-300 font-bold">{camp.progressPercentage}%</span>
+                      <span className="text-amber-300 font-mono font-bold">{camp.progressPercentage}%</span>
                     </div>
                     <div className="h-2 rounded-full bg-stone-950 border border-stone-800 overflow-hidden">
                       <div
@@ -687,10 +687,10 @@ export const CampaignsView: React.FC = () => {
                         key={pool.key}
                         className="p-2 rounded-xl bg-stone-950/80 border border-stone-800 text-center"
                       >
-                        <div className="text-xs font-mono font-black text-stone-100">
+                        <div className="text-xs font-mono font-bold text-stone-100">
                           {pool.balance.toLocaleString()}
                         </div>
-                        <div className="text-[10px] font-mono text-stone-400">
+                        <div className="text-[11px] text-stone-400">
                           {pool.shortLabel}
                         </div>
                       </div>
@@ -699,7 +699,7 @@ export const CampaignsView: React.FC = () => {
                 </div>
 
                 <div className="pt-3 border-t border-stone-800 flex items-center justify-between gap-2">
-                  <span className="text-[11px] font-mono text-stone-400">
+                  <span className="text-xs tabular-nums text-stone-400">
                     {camp.activeMissionsCount} active mission
                     {camp.activeMissionsCount === 1 ? '' : 's'} &bull; {camp.pendingSupplyOrdersCount}{' '}
                     supply
@@ -707,7 +707,7 @@ export const CampaignsView: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => handleSelectCampaign(camp, 'overview')}
-                    className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono font-bold text-xs flex items-center gap-1.5 transition-colors"
+                    className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-semibold text-xs flex items-center gap-1.5 transition-colors"
                   >
                     <span>View Overview</span>
                     <ArrowRight className="w-3.5 h-3.5" />

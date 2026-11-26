@@ -420,7 +420,7 @@ export class SupportAssetsMapController {
       callsign ? '' : 'display:none;'
     }" class="pointer-events-none select-none mt-0.5 px-1.5 py-0.5 rounded bg-stone-950/90 border ${
       data._isPending ? 'border-amber-500/70 text-amber-200' : 'border-sky-500/50 text-sky-200'
-    } text-[9px] font-mono font-bold whitespace-nowrap shadow-md leading-none">${escapeHtml(
+    } text-[11px] font-mono font-bold whitespace-nowrap shadow-md leading-none">${escapeHtml(
       callsign
     )}</div>`;
 
@@ -835,19 +835,19 @@ export class SupportAssetsMapController {
             titleText
           )}</h3>
           <div class="flex items-center gap-1.5 flex-wrap mt-1.5">
-            <span class="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded bg-sky-950/90 text-sky-400 border border-sky-800/60 whitespace-nowrap">${escapeHtml(
+            <span class="text-[11px] font-bold tracking-wider uppercase px-2 py-0.5 rounded bg-sky-950/90 text-sky-400 border border-sky-800/60 whitespace-nowrap">${escapeHtml(
               typeUpper
             )}</span>
             ${
               aircraftType
-                ? `<span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-amber-950/90 text-amber-300 border border-amber-800/60 whitespace-nowrap">${escapeHtml(
+                ? `<span class="text-[11px] font-semibold px-2 py-0.5 rounded bg-amber-950/90 text-amber-300 border border-amber-800/60 whitespace-nowrap">${escapeHtml(
                     aircraftType
                   )}</span>`
                 : ''
             }
             ${
               data.is_dcs_tracked
-                ? `<span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-950/90 text-emerald-300 border border-emerald-700/60 whitespace-nowrap">LIVE DCS</span>`
+                ? `<span class="text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-950/90 text-emerald-300 border border-emerald-700/60 whitespace-nowrap">LIVE DCS</span>`
                 : ''
             }
           </div>
@@ -953,7 +953,7 @@ export class SupportAssetsMapController {
     const inputClasses =
       'w-full bg-zinc-800/90 border border-zinc-700 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 text-zinc-100 font-semibold rounded-md px-2.5 py-1 text-xs transition-colors placeholder:text-zinc-500';
     const labelClasses =
-      'block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1';
+      'block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1';
     const titleText = data.title || 'Support Asset';
     const isOrbit = data.type === 'tanker' || data.type === 'awacs';
     const hasDcsGroup = Boolean(data.dcs_group_name && String(data.dcs_group_name).trim() !== '');
@@ -961,7 +961,7 @@ export class SupportAssetsMapController {
     container.innerHTML = `
       <div class="flex items-center justify-between border-b border-zinc-800 pb-2">
         <div class="flex items-center gap-2 min-w-0">
-          <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold tracking-wider uppercase bg-sky-500/20 text-sky-400 border border-sky-500/30 shrink-0">
+          <span class="px-2 py-0.5 rounded text-[11px] font-bold tracking-wider uppercase bg-sky-500/20 text-sky-400 border border-sky-500/30 shrink-0">
             SUPPORT
           </span>
           <h3 class="sa-header-title text-sm font-bold text-zinc-100 truncate max-w-[165px]" title="${escapeHtml(
@@ -1028,11 +1028,11 @@ export class SupportAssetsMapController {
             <input type="number" step="1" min="0" max="359" class="sa-sam-heading-input ${inputClasses} font-mono" value="${
               data.heading ?? 0
             }" placeholder="e.g. 60">
-            <p class="text-[9px] text-zinc-400 mt-0.5">Directional systems like Patriot orient their engagement cone along this heading.</p>
+            <p class="text-[11px] text-zinc-400 mt-0.5">Directional systems like Patriot orient their engagement cone along this heading.</p>
           </div>
         </div>
 
-        <div class="sa-dcs-track-info text-[10px] text-amber-400 italic py-1 font-mono" style="${
+        <div class="sa-dcs-track-info text-[11px] text-amber-400 italic py-1" style="${
           isOrbit && hasDcsGroup ? '' : 'display:none;'
         }">
           ⚡ Heading &amp; leg length are derived from WP1 → WP2 of the DCS group.

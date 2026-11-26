@@ -76,11 +76,11 @@ export const RepairPromptModal: React.FC = () => {
               <ShieldWarning className="w-5 h-5 text-amber-400" />
             </div>
             <div>
-              <h3 className="font-display text-base font-bold text-stone-100">
+              <h3 className="font-display text-lg font-bold text-stone-100">
                 Issues Detected — DownloadSimple &amp; Fix?
               </h3>
-              <p className="text-xs font-mono text-amber-400">
-                {record.name} (v{record.installedVersion})
+              <p className="text-xs text-amber-400 font-medium">
+                {record.name} (<span className="font-mono">v{record.installedVersion}</span>)
               </p>
             </div>
           </div>
@@ -120,11 +120,11 @@ export const RepairPromptModal: React.FC = () => {
 
           {missingFiles.length > 0 && (
             <div className="space-y-1.5">
-              <div className="text-[11px] font-mono uppercase tracking-wider text-red-400 flex items-center gap-1.5">
+              <div className="text-xs font-semibold uppercase tracking-wide text-red-400 flex items-center gap-1.5">
                 <FileX className="w-3.5 h-3.5" />
                 Missing Files ({missingFiles.length})
               </div>
-              <div className="max-h-36 overflow-y-auto rounded-xl bg-stone-950 border border-stone-800 p-3 space-y-1 font-mono text-[11px] text-stone-300">
+              <div className="max-h-36 overflow-y-auto rounded-xl bg-stone-950 border border-stone-800 p-3 space-y-1 font-mono text-xs text-stone-300">
                 {missingFiles.map((f, idx) => (
                   <div key={idx} className="truncate text-red-300/90" title={f}>
                     • {f}
@@ -136,11 +136,11 @@ export const RepairPromptModal: React.FC = () => {
 
           {modifiedFiles.length > 0 && (
             <div className="space-y-1.5">
-              <div className="text-[11px] font-mono uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+              <div className="text-xs font-semibold uppercase tracking-wide text-amber-400 flex items-center gap-1.5">
                 <FileX className="w-3.5 h-3.5" />
                 Modified / Corrupted Files ({modifiedFiles.length})
               </div>
-              <div className="max-h-36 overflow-y-auto rounded-xl bg-stone-950 border border-stone-800 p-3 space-y-1 font-mono text-[11px] text-stone-300">
+              <div className="max-h-36 overflow-y-auto rounded-xl bg-stone-950 border border-stone-800 p-3 space-y-1 font-mono text-xs text-stone-300">
                 {modifiedFiles.map((f, idx) => (
                   <div key={idx} className="truncate text-amber-300/90" title={f}>
                     • {f}
@@ -155,14 +155,14 @@ export const RepairPromptModal: React.FC = () => {
         <div className="px-6 py-4 bg-stone-950 border-t border-stone-800 flex items-center justify-between gap-3">
           <button
             onClick={() => setRepairPrompt(null)}
-            className="px-4 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-xs font-mono text-stone-300 transition-colors"
+            className="px-4 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-xs font-medium text-stone-300 transition-colors"
           >
             Cancel
           </button>
 
           <button
             onClick={handleConfirmRepair}
-            className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono font-bold text-xs flex items-center gap-2 shadow-lg shadow-amber-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+            className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs flex items-center gap-2 shadow-lg shadow-amber-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
             <DownloadSimple className="w-4 h-4" />
             DownloadSimple &amp; Fix Now ({totalIssues} issue{totalIssues === 1 ? '' : 's'})

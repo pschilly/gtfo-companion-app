@@ -709,8 +709,19 @@ export const EventCalendarView: React.FC = () => {
   }, [selectedEvent, availableAirframesForSelectedEvent, rsvpAirframeId, rsvpSide]);
 
   // Support role options allocated for this campaign sortie
+  // Holders of SUP-ATC or SUP-GCI may fill either ATC or GCI slots.
+  const hasAtcGciQualification = useMemo(() => {
+    return (memberProfile.certificates || []).some(
+      (c) => c.isIssued && ['SUP-ATC', 'SUP-GCI'].includes((c.code || '').toUpperCase())
+    );
+  }, [memberProfile.certificates]);
+
   const supportRoleOptions = useMemo(() => {
     if (!selectedEvent || selectedEvent.type !== 'campaign') return [];
+    const atcGciEligible =
+      hasAtcGciQualification ||
+      Boolean(selectedEvent.can_rsvp_atc) ||
+      Boolean(selectedEvent.can_rsvp_gci);
 
     const options = [];
     if ((selectedEvent.game_master_slots ?? 0) > 0) {
@@ -745,7 +756,7 @@ export const EventCalendarView: React.FC = () => {
         totalSlots: selectedEvent.atc_slots ?? 0,
         occupiedSlots: selectedEvent.atc_count ?? 0,
         available: Boolean(selectedEvent.has_available_atc_slots),
-        eligible: Boolean(selectedEvent.can_rsvp_atc),
+        eligible: atcGciEligible,
         active: selectedEvent.my_rsvp?.role === 'atc',
       });
     }
@@ -757,12 +768,12 @@ export const EventCalendarView: React.FC = () => {
         totalSlots: selectedEvent.gci_slots ?? 0,
         occupiedSlots: selectedEvent.gci_count ?? 0,
         available: Boolean(selectedEvent.has_available_gci_slots),
-        eligible: Boolean(selectedEvent.can_rsvp_gci),
+        eligible: atcGciEligible,
         active: selectedEvent.my_rsvp?.role === 'gci',
       });
     }
     return options;
-  }, [selectedEvent]);
+  }, [selectedEvent, hasAtcGciQualification]);
 
   const isSupportRole = useMemo(() => {
     return ['game_master', 'gm', 'jtac', 'atc', 'gci'].includes((rsvpRole || '').toLowerCase());
@@ -1265,19 +1276,19 @@ export const EventCalendarView: React.FC = () => {
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
           <div className="space-y-2 max-w-2xl">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 font-mono text-[10px] font-bold uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] font-semibold uppercase tracking-wider">
                 <CalendarBlank className="w-3.5 h-3.5 text-amber-400" />
                 <span>Operations &amp; Training</span>
               </span>
               {stats.attendingCount > 0 && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-mono text-[10px] font-bold uppercase tracking-wider">
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[11px] font-semibold uppercase tracking-wider tabular-nums">
                   <CheckCircle weight="fill" className="w-3 h-3 text-emerald-400" />
                   <span>{stats.attendingCount} Active RSVP{stats.attendingCount === 1 ? '' : 's'}</span>
                 </span>
               )}
             </div>
 
-            <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-stone-100 tracking-tight">
+            <h1 className="font-display text-2xl sm:text-3xl font-bold text-stone-100">
               Taskforce Event Calendar
             </h1>
             <p className="text-xs sm:text-sm text-stone-400 leading-relaxed">
@@ -1288,20 +1299,20 @@ export const EventCalendarView: React.FC = () => {
           {/* Summary Stat Pills */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 shrink-0">
             <div className="px-3.5 py-2.5 rounded-2xl bg-stone-950/80 border border-stone-800/90 text-center">
-              <p className="text-[10px] font-mono uppercase text-stone-400">Total Window</p>
-              <p className="text-lg font-display font-bold text-stone-100 mt-0.5">{stats.total}</p>
+              <p className="text-[11px] font-semibold tracking-wider uppercase text-stone-400">Total Window</p>
+              <p className="text-lg font-display font-bold tabular-nums text-stone-100 mt-0.5">{stats.total}</p>
             </div>
             <div className="px-3.5 py-2.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-center">
-              <p className="text-[10px] font-mono uppercase text-amber-300/90">Operation</p>
-              <p className="text-lg font-display font-bold text-amber-400 mt-0.5">{stats.campaignCount}</p>
+              <p className="text-[11px] font-semibold tracking-wider uppercase text-amber-300/90">Operation</p>
+              <p className="text-lg font-display font-bold tabular-nums text-amber-400 mt-0.5">{stats.campaignCount}</p>
             </div>
             <div className="px-3.5 py-2.5 rounded-2xl bg-sky-500/10 border border-sky-500/30 text-center">
-              <p className="text-[10px] font-mono uppercase text-sky-300/90">Training</p>
-              <p className="text-lg font-display font-bold text-sky-400 mt-0.5">{stats.trainingCount}</p>
+              <p className="text-[11px] font-semibold tracking-wider uppercase text-sky-300/90">Training</p>
+              <p className="text-lg font-display font-bold tabular-nums text-sky-400 mt-0.5">{stats.trainingCount}</p>
             </div>
             <div className="px-3.5 py-2.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-center">
-              <p className="text-[10px] font-mono uppercase text-emerald-300/90">My RSVPs</p>
-              <p className="text-lg font-display font-bold text-emerald-400 mt-0.5">{stats.attendingCount}</p>
+              <p className="text-[11px] font-semibold tracking-wider uppercase text-emerald-300/90">My RSVPs</p>
+              <p className="text-lg font-display font-bold tabular-nums text-emerald-400 mt-0.5">{stats.attendingCount}</p>
             </div>
           </div>
         </div>
@@ -1311,26 +1322,26 @@ export const EventCalendarView: React.FC = () => {
       <div className="p-4 rounded-2xl bg-stone-900/90 border border-stone-800 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-lg">
         {/* Left: Category Filters */}
         <div className="flex flex-wrap items-center gap-1.5">
-          <span className="text-xs font-mono text-stone-400 mr-1 flex items-center gap-1">
+          <span className="text-xs font-medium text-stone-400 mr-1 flex items-center gap-1">
             <Funnel className="w-3.5 h-3.5 text-amber-400" />
             <span>Filter:</span>
           </span>
 
           <button
             onClick={() => setFilterType('all')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-mono transition-all flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all flex items-center gap-1.5 tabular-nums ${
               filterType === 'all'
                 ? 'bg-amber-500 text-stone-950 font-bold shadow-sm'
                 : 'bg-stone-950 text-stone-400 hover:text-stone-200 border border-stone-800'
             }`}
           >
             <span>All Events</span>
-            <span className="text-[10px] opacity-80">({stats.total})</span>
+            <span className="text-[11px] opacity-80">({stats.total})</span>
           </button>
 
           <button
             onClick={() => setFilterType('campaign')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-mono transition-all flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all flex items-center gap-1.5 tabular-nums ${
               filterType === 'campaign'
                 ? 'bg-amber-500 text-stone-950 font-bold shadow-sm'
                 : 'bg-stone-950 text-amber-300/90 hover:bg-amber-500/10 border border-amber-500/30'
@@ -1338,12 +1349,12 @@ export const EventCalendarView: React.FC = () => {
           >
             <Crosshair className="w-3.5 h-3.5" />
             <span>Operation</span>
-            <span className="text-[10px] opacity-80">({stats.campaignCount})</span>
+            <span className="text-[11px] opacity-80">({stats.campaignCount})</span>
           </button>
 
           <button
             onClick={() => setFilterType('training')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-mono transition-all flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all flex items-center gap-1.5 tabular-nums ${
               filterType === 'training'
                 ? 'bg-sky-500 text-stone-950 font-bold shadow-sm'
                 : 'bg-stone-950 text-sky-300/90 hover:bg-sky-500/10 border border-sky-500/30'
@@ -1351,12 +1362,12 @@ export const EventCalendarView: React.FC = () => {
           >
             <GraduationCap className="w-3.5 h-3.5" />
             <span>Training</span>
-            <span className="text-[10px] opacity-80">({stats.trainingCount})</span>
+            <span className="text-[11px] opacity-80">({stats.trainingCount})</span>
           </button>
 
           <button
             onClick={() => setFilterType('attending')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-mono transition-all flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all flex items-center gap-1.5 tabular-nums ${
               filterType === 'attending'
                 ? 'bg-emerald-500 text-stone-950 font-bold shadow-sm'
                 : 'bg-stone-950 text-emerald-300/90 hover:bg-emerald-500/10 border border-emerald-500/30'
@@ -1364,7 +1375,7 @@ export const EventCalendarView: React.FC = () => {
           >
             <CheckCircle className="w-3.5 h-3.5" />
             <span>Attending</span>
-            <span className="text-[10px] opacity-80">({stats.attendingCount})</span>
+            <span className="text-[11px] opacity-80">({stats.attendingCount})</span>
           </button>
         </div>
 
@@ -1382,7 +1393,7 @@ export const EventCalendarView: React.FC = () => {
 
             <button
               onClick={handleToday}
-              className="px-2.5 py-1 rounded-lg text-xs font-mono text-stone-300 hover:text-amber-300 hover:bg-stone-900 transition-colors"
+              className="px-2.5 py-1 rounded-lg text-xs font-medium text-stone-300 hover:text-amber-300 hover:bg-stone-900 transition-colors"
               title="Jump to Current Month"
             >
               Today
@@ -1405,7 +1416,7 @@ export const EventCalendarView: React.FC = () => {
           <div className="flex items-center bg-stone-950 p-1 rounded-xl border border-stone-800">
             <button
               onClick={() => setLayoutMode('grid')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-mono flex items-center gap-1.5 transition-all ${
+              className={`px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all ${
                 layoutMode === 'grid'
                   ? 'bg-stone-800 text-amber-300 font-semibold'
                   : 'text-stone-400 hover:text-stone-200'
@@ -1417,7 +1428,7 @@ export const EventCalendarView: React.FC = () => {
             </button>
             <button
               onClick={() => setLayoutMode('agenda')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-mono flex items-center gap-1.5 transition-all ${
+              className={`px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all ${
                 layoutMode === 'agenda'
                   ? 'bg-stone-800 text-amber-300 font-semibold'
                   : 'text-stone-400 hover:text-stone-200'
@@ -1450,7 +1461,7 @@ export const EventCalendarView: React.FC = () => {
           </div>
           <button
             onClick={() => loadCalendar(currentYear, currentMonth)}
-            className="px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-200 font-mono font-bold shrink-0"
+            className="px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-200 font-semibold shrink-0"
           >
             Retry
           </button>
@@ -1465,7 +1476,7 @@ export const EventCalendarView: React.FC = () => {
             {WEEKDAYS.map((dayName) => (
               <div
                 key={dayName}
-                className="py-2.5 px-2 text-center text-[11px] font-mono font-bold uppercase tracking-wider text-stone-400 border-r last:border-r-0 border-stone-800/60"
+                className="py-2.5 px-2 text-center text-[11px] font-semibold uppercase tracking-wider text-stone-400 border-r last:border-r-0 border-stone-800/60"
               >
                 {dayName}
               </div>
@@ -1502,7 +1513,7 @@ export const EventCalendarView: React.FC = () => {
                       </span>
 
                       {day.events.length > 0 && (
-                        <span className="text-[9px] font-mono text-stone-500">
+                        <span className="text-[11px] font-mono text-stone-500">
                           {day.events.length}
                         </span>
                       )}
@@ -1546,7 +1557,7 @@ export const EventCalendarView: React.FC = () => {
                           >
                             <div className="flex items-center gap-1.5 min-w-0 flex-1">
                               <span
-                                className={`px-1 py-0.2 rounded text-[9px] font-mono font-bold uppercase leading-tight shrink-0 ${
+                                className={`px-1 py-0.2 rounded text-[11px] font-bold uppercase leading-tight shrink-0 ${
                                   isCampaign
                                     ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
                                     : 'bg-sky-500/20 text-sky-300 border border-sky-500/30'
@@ -1554,12 +1565,12 @@ export const EventCalendarView: React.FC = () => {
                               >
                                 {isCampaign ? 'OP' : 'TRG'}
                               </span>
-                              <span className="font-display font-semibold text-[11px] text-stone-100 truncate group-hover:text-amber-300 transition-colors">
+                              <span className="font-display font-semibold text-xs text-stone-100 truncate group-hover:text-amber-300 transition-colors">
                                 {displayLabel}
                               </span>
                             </div>
 
-                            <div className="flex items-center gap-1 shrink-0 font-mono text-[10px]">
+                            <div className="flex items-center gap-1 shrink-0 font-mono text-[11px]">
                               {ev.is_attending && (
                                 <span
                                   className="text-emerald-400 font-bold"
@@ -1583,7 +1594,7 @@ export const EventCalendarView: React.FC = () => {
           </div>
 
           {/* Calendar Legend Footer */}
-          <div className="px-4 py-3 bg-stone-950/90 border-t border-stone-800 flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-stone-400">
+          <div className="px-4 py-3 bg-stone-950/90 border-t border-stone-800 flex flex-wrap items-center justify-between gap-3 text-xs text-stone-400">
             <div className="flex flex-wrap items-center gap-4">
               <span className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
@@ -1598,7 +1609,7 @@ export const EventCalendarView: React.FC = () => {
                 <span>Attending (Your RSVP)</span>
               </span>
             </div>
-            <span className="text-[11px] text-stone-500">
+            <span className="text-xs text-stone-500">
               Times shown in your local timezone (with Zulu/UTC inside event details)
             </span>
           </div>
@@ -1631,7 +1642,7 @@ export const EventCalendarView: React.FC = () => {
                 >
                   <div className="flex items-start gap-4 min-w-0">
                     <div
-                      className={`w-12 h-12 rounded-2xl border flex flex-col items-center justify-center shrink-0 font-mono ${
+                      className={`w-12 h-12 rounded-2xl border flex flex-col items-center justify-center shrink-0 ${
                         isCampaign
                           ? 'bg-amber-500/10 border-amber-500/30 text-amber-300'
                           : 'bg-sky-500/10 border-sky-500/30 text-sky-300'
@@ -1642,7 +1653,7 @@ export const EventCalendarView: React.FC = () => {
                       ) : (
                         <GraduationCap className="w-5 h-5" />
                       )}
-                      <span className="text-[9px] font-bold uppercase mt-0.5">
+                      <span className="text-[11px] font-bold uppercase leading-none mt-0.5">
                         {isCampaign ? 'OP' : 'TRG'}
                       </span>
                     </div>
@@ -1653,14 +1664,14 @@ export const EventCalendarView: React.FC = () => {
                           {ev.title}
                         </h3>
                         {ev.is_attending && (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                          <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
                             ✓ Attending • {ev.my_rsvp?.airframe_name} ({ev.my_rsvp?.role_label})
                           </span>
                         )}
                       </div>
                       <p className="text-xs text-stone-400">{ev.subtitle}</p>
-                      <div className="flex flex-wrap items-center gap-3 text-xs font-mono text-stone-400 pt-1">
-                        <span className="flex items-center gap-1 text-stone-300">
+                      <div className="flex flex-wrap items-center gap-3 text-xs text-stone-400 pt-1">
+                        <span className="flex items-center gap-1 font-mono text-stone-300">
                           <Clock className="w-3.5 h-3.5 text-amber-400" />
                           <span>
                             {formatFullDateTime(ev.scheduled_at)} ({formatZuluTime(ev.scheduled_at)})
@@ -1672,7 +1683,7 @@ export const EventCalendarView: React.FC = () => {
                             <span>{ev.theatre}</span>
                           </span>
                         )}
-                        <span className="flex items-center gap-1">
+                        <span className="flex items-center gap-1 tabular-nums">
                           <Users className="w-3.5 h-3.5 text-stone-500" />
                           <span>{ev.attendee_count} Attending</span>
                         </span>
@@ -1681,7 +1692,7 @@ export const EventCalendarView: React.FC = () => {
                   </div>
 
                   <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-                    <span className="px-3 py-1.5 rounded-xl bg-stone-950 border border-stone-800 text-xs font-mono text-amber-300 group-hover:border-amber-500/40">
+                    <span className="px-3 py-1.5 rounded-xl bg-stone-950 border border-stone-800 text-xs font-medium text-amber-300 group-hover:border-amber-500/40">
                       Inspect &amp; RSVP &rarr;
                     </span>
                   </div>
@@ -1700,7 +1711,7 @@ export const EventCalendarView: React.FC = () => {
               <Clock className="w-4 h-4 text-amber-400" />
               <span>Upcoming Active Sorties</span>
             </h2>
-            <span className="text-xs font-mono text-stone-400">
+            <span className="text-xs text-stone-400">
               Click any card to RSVP or inspect roster
             </span>
           </div>
@@ -1720,7 +1731,7 @@ export const EventCalendarView: React.FC = () => {
                 >
                   <div className="flex items-center justify-between gap-2">
                     <span
-                      className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
+                      className={`px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider ${
                         isCampaign
                           ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
                           : 'bg-sky-500/20 text-sky-300 border border-sky-500/30'
@@ -1728,7 +1739,7 @@ export const EventCalendarView: React.FC = () => {
                     >
                       {isCampaign ? 'Operation' : 'Training'}
                     </span>
-                    <span className="text-xs font-mono text-stone-400">
+                    <span className="text-xs tabular-nums text-stone-400">
                       {ev.attendee_count} Pilot{ev.attendee_count === 1 ? '' : 's'}
                     </span>
                   </div>
@@ -1740,14 +1751,14 @@ export const EventCalendarView: React.FC = () => {
                     <p className="text-xs text-stone-400 truncate mt-0.5">{ev.subtitle}</p>
                   </div>
 
-                  <div className="pt-2 border-t border-stone-800/80 flex items-center justify-between text-[11px] font-mono">
-                    <span className="text-stone-300">
+                  <div className="pt-2 border-t border-stone-800/80 flex items-center justify-between text-xs">
+                    <span className="font-mono text-stone-300">
                       {formatFullDateTime(ev.scheduled_at)}
                     </span>
                     {ev.is_attending ? (
-                      <span className="text-emerald-400 font-bold">✓ Attending</span>
+                      <span className="text-emerald-400 font-semibold">✓ Attending</span>
                     ) : (
-                      <span className="text-amber-400">Details &rarr;</span>
+                      <span className="text-amber-400 font-medium">Details &rarr;</span>
                     )}
                   </div>
                 </div>
@@ -1772,7 +1783,7 @@ export const EventCalendarView: React.FC = () => {
               <div className="space-y-1.5 min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <span
-                    className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider border ${
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider border ${
                       selectedEvent.type === 'campaign'
                         ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
                         : 'bg-sky-500/20 text-sky-300 border-sky-500/40'
@@ -1792,35 +1803,35 @@ export const EventCalendarView: React.FC = () => {
                   </span>
 
                   {selectedEvent.has_aar ? (
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/40">
                       AAR Filed
                     </span>
                   ) : selectedEvent.is_concluded ? (
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-stone-800 text-stone-400 border border-stone-700">
+                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider bg-stone-800 text-stone-400 border border-stone-700">
                       Concluded
                     </span>
                   ) : selectedEvent.is_signup_open ? (
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
                       Sign-up Open
                     </span>
                   ) : (
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-red-500/20 text-red-300 border border-red-500/40">
+                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider bg-red-500/20 text-red-300 border border-red-500/40">
                       Sign-up Cut-off Passed
                     </span>
                   )}
 
                   {selectedEvent.is_attending && (
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-emerald-500 text-stone-950">
+                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-emerald-500 text-stone-950">
                       ✓ You Are Attending
                     </span>
                   )}
                 </div>
 
-                <h2 className="font-display text-xl sm:text-2xl font-extrabold text-stone-100 leading-tight">
+                <h2 className="font-display text-xl sm:text-2xl font-bold text-stone-100 leading-tight">
                   {selectedEvent.title}
                 </h2>
                 {selectedEvent.subtitle && (
-                  <p className="text-xs sm:text-sm text-stone-400 font-mono">
+                  <p className="text-xs sm:text-sm text-stone-400">
                     {selectedEvent.subtitle}
                   </p>
                 )}
@@ -1836,7 +1847,7 @@ export const EventCalendarView: React.FC = () => {
                       setSelectedEventUid(null);
                       openCampaignMissionModal(campaignId, missionId);
                     }}
-                    className="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-mono font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                    className="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
                     title="Jump to full Campaign Mission Briefing, Objectives & AAR"
                   >
                     <Target weight="duotone" className="w-4 h-4" />
@@ -1859,20 +1870,20 @@ export const EventCalendarView: React.FC = () => {
               {/* Key Metadata Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 <div className="p-3.5 rounded-2xl bg-stone-950/90 border border-stone-800/90">
-                  <div className="text-[10px] font-mono uppercase text-stone-400 flex items-center gap-1.5">
+                  <div className="text-[11px] font-semibold tracking-wider uppercase text-stone-400 flex items-center gap-1.5">
                     <Clock className="w-3.5 h-3.5 text-amber-400" />
                     <span>Scheduled Time</span>
                   </div>
                   <div className="text-xs font-semibold text-stone-100 mt-1">
                     {formatFullDateTime(selectedEvent.scheduled_at)}
                   </div>
-                  <div className="text-[11px] font-mono text-amber-400/90 mt-0.5">
+                  <div className="text-xs font-mono text-amber-400/90 mt-0.5">
                     Zulu: {formatZuluTime(selectedEvent.scheduled_at)}
                   </div>
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-stone-950/90 border border-stone-800/90">
-                  <div className="text-[10px] font-mono uppercase text-stone-400 flex items-center gap-1.5">
+                  <div className="text-[11px] font-semibold tracking-wider uppercase text-stone-400 flex items-center gap-1.5">
                     <Lock className="w-3.5 h-3.5 text-stone-400" />
                     <span>Sign-up Cut-off</span>
                   </div>
@@ -1881,30 +1892,30 @@ export const EventCalendarView: React.FC = () => {
                       ? formatFullDateTime(selectedEvent.signup_cutoff_at)
                       : 'No Cut-off (Open)'}
                   </div>
-                  <div className="text-[11px] font-mono text-stone-400 mt-0.5">
+                  <div className="text-xs text-stone-400 mt-0.5">
                     {selectedEvent.is_signup_open ? 'Registrations Active' : 'Locked'}
                   </div>
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-stone-950/90 border border-stone-800/90">
-                  <div className="text-[10px] font-mono uppercase text-stone-400 flex items-center gap-1.5">
+                  <div className="text-[11px] font-semibold tracking-wider uppercase text-stone-400 flex items-center gap-1.5">
                     <GlobeHemisphereWest className="w-3.5 h-3.5 text-sky-400" />
                     <span>Theatre &amp; Server</span>
                   </div>
                   <div className="text-xs font-semibold text-stone-100 mt-1 truncate">
                     {selectedEvent.theatre || 'Standard Theatre'}
                   </div>
-                  <div className="text-[11px] font-mono text-stone-400 mt-0.5 truncate">
+                  <div className="text-xs text-stone-400 mt-0.5 truncate">
                     {selectedEvent.server || 'GTFO Dedicated Server'}
                   </div>
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-stone-950/90 border border-stone-800/90">
-                  <div className="text-[10px] font-mono uppercase text-stone-400 flex items-center gap-1.5">
+                  <div className="text-[11px] font-semibold tracking-wider uppercase text-stone-400 flex items-center gap-1.5">
                     <Users className="w-3.5 h-3.5 text-emerald-400" />
                     <span>{selectedEvent.has_aar ? 'Sortie Attendance' : 'Confirmed Roster'}</span>
                   </div>
-                  <div className="text-base font-display font-bold text-emerald-400 mt-1">
+                  <div className="text-base font-display font-bold tabular-nums text-emerald-400 mt-1">
                     {selectedEvent.has_aar
                       ? `${selectedEvent.attendees.filter((a) => a.is_present === true).length} Attended / ${
                           selectedEvent.attendees.filter((a) => a.is_present === false).length
@@ -1912,7 +1923,7 @@ export const EventCalendarView: React.FC = () => {
                       : `${selectedEvent.attendee_count} Attending`}
                   </div>
                   {selectedEvent.type === 'campaign' && selectedEvent.allow_opfor && (
-                    <div className="text-[10px] font-mono text-red-400 mt-0.5">
+                    <div className="text-xs font-mono text-red-400 mt-0.5">
                       OPFOR Enabled ({selectedEvent.opfor_count || 0}/{selectedEvent.opfor_slots || '∞'})
                     </div>
                   )}
@@ -1922,7 +1933,7 @@ export const EventCalendarView: React.FC = () => {
               {/* Briefing / Notes Section */}
               {selectedEvent.notes && (
                 <div className="p-4 rounded-2xl bg-stone-950/80 border border-stone-800 space-y-1.5">
-                  <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+                  <div className="text-[11px] font-semibold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
                     <Note className="w-4 h-4" />
                     <span>Sortie Briefing &amp; Syllabus Notes</span>
                   </div>
@@ -1936,21 +1947,21 @@ export const EventCalendarView: React.FC = () => {
               {selectedEvent.has_aar && (
                 <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono font-bold uppercase text-amber-300 flex items-center gap-1.5">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
                       <Sword className="w-4 h-4 text-amber-400" />
                       <span>{selectedEvent.type === 'training' ? 'Training Debrief & Attendance Record' : 'After Action Report (AAR)'}</span>
                     </span>
                     {selectedEvent.type === 'campaign' ? (
-                      <div className="flex items-center gap-3 text-xs font-mono">
+                      <div className="flex items-center gap-3 text-xs tabular-nums">
                         <span className="text-red-300">
-                          Friendly Losses: <strong>{selectedEvent.our_losses ?? 0}</strong>
+                          Friendly Losses: <strong className="font-mono">{selectedEvent.our_losses ?? 0}</strong>
                         </span>
                         <span className="text-emerald-300">
-                          Enemy Losses: <strong>{selectedEvent.enemy_losses ?? 0}</strong>
+                          Enemy Losses: <strong className="font-mono">{selectedEvent.enemy_losses ?? 0}</strong>
                         </span>
                       </div>
                     ) : (
-                      <div className="text-xs font-mono text-emerald-400">
+                      <div className="text-xs tabular-nums text-emerald-400">
                         {selectedEvent.attendees.filter((a) => a.is_present === true).length} Pilots Attended (+100 XP)
                       </div>
                     )}
@@ -1981,7 +1992,7 @@ export const EventCalendarView: React.FC = () => {
                       </p>
                     </div>
                     {selectedEvent.is_concluded && (
-                      <span className="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-mono font-bold uppercase shrink-0">
+                      <span className="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] font-semibold uppercase tracking-wider shrink-0">
                         ✓ Sortie Concluded
                       </span>
                     )}
@@ -1990,7 +2001,7 @@ export const EventCalendarView: React.FC = () => {
                   {/* Feedback message */}
                   {completeFeedback && (
                     <div
-                      className={`p-3 rounded-xl text-xs font-mono flex items-center gap-2 ${
+                      className={`p-3 rounded-xl text-xs flex items-center gap-2 ${
                         completeFeedback.type === 'success'
                           ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
                           : 'bg-red-500/15 text-red-300 border border-red-500/30'
@@ -2007,9 +2018,9 @@ export const EventCalendarView: React.FC = () => {
 
                   {/* Debrief Notes */}
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-mono font-bold uppercase tracking-wider text-stone-300 flex items-center justify-between">
+                    <label className="text-[11px] font-semibold uppercase tracking-wider text-stone-300 flex items-center justify-between">
                       <span>Debrief Notes / AAR Remarks</span>
-                      <span className="text-[10px] text-stone-500 lowercase font-normal">optional</span>
+                      <span className="text-[11px] text-stone-500 lowercase font-normal">optional</span>
                     </label>
                     <textarea
                       value={completeNotes}
@@ -2023,7 +2034,7 @@ export const EventCalendarView: React.FC = () => {
                   {/* Attendance Checklist */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <label className="text-[11px] font-mono font-bold uppercase tracking-wider text-stone-300 flex items-center gap-1.5">
+                      <label className="text-[11px] font-semibold uppercase tracking-wider text-stone-300 flex items-center gap-1.5">
                         <Users className="w-3.5 h-3.5 text-amber-400" />
                         <span>Pilot &amp; Crew Attendance</span>
                       </label>
@@ -2037,7 +2048,7 @@ export const EventCalendarView: React.FC = () => {
                             });
                             setCompleteAttendance(allTrue);
                           }}
-                          className="text-[10px] font-mono text-emerald-400 hover:underline cursor-pointer"
+                          className="text-xs font-medium text-emerald-400 hover:underline cursor-pointer"
                         >
                           Mark All Present
                         </button>
@@ -2051,7 +2062,7 @@ export const EventCalendarView: React.FC = () => {
                             });
                             setCompleteAttendance(allFalse);
                           }}
-                          className="text-[10px] font-mono text-stone-400 hover:underline cursor-pointer"
+                          className="text-xs font-medium text-stone-400 hover:underline cursor-pointer"
                         >
                           Mark All Absent
                         </button>
@@ -2059,7 +2070,7 @@ export const EventCalendarView: React.FC = () => {
                     </div>
 
                     {(!selectedEvent.attendees || selectedEvent.attendees.length === 0) ? (
-                      <p className="text-xs text-stone-500 font-mono italic">
+                      <p className="text-xs text-stone-500 italic">
                         No pilots registered for this sortie yet.
                       </p>
                     ) : (
@@ -2075,11 +2086,11 @@ export const EventCalendarView: React.FC = () => {
                                 <span className="font-display font-semibold text-stone-100">
                                   {att.callsign}
                                 </span>
-                                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-stone-800 text-stone-300 border border-stone-700">
+                                <span className="px-1.5 py-0.5 rounded text-[11px] font-semibold bg-stone-800 text-stone-300 border border-stone-700">
                                   {att.role_label}
                                 </span>
                                 {att.airframe_name && (
-                                  <span className="text-[11px] font-mono text-stone-400 truncate">
+                                  <span className="text-xs text-stone-400 truncate">
                                     {att.airframe_name}
                                   </span>
                                 )}
@@ -2093,7 +2104,7 @@ export const EventCalendarView: React.FC = () => {
                                     [att.id]: !isPresent,
                                   }))
                                 }
-                                className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold uppercase flex items-center gap-1.5 border transition-all cursor-pointer ${
+                                className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold uppercase flex items-center gap-1.5 border transition-all cursor-pointer ${
                                   isPresent
                                     ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 hover:bg-emerald-500/30'
                                     : 'bg-rose-500/20 text-rose-300 border-rose-500/40 hover:bg-rose-500/30'
@@ -2124,7 +2135,7 @@ export const EventCalendarView: React.FC = () => {
                       type="button"
                       disabled={isSubmittingComplete}
                       onClick={handleCompleteSortie}
-                      className="w-full sm:w-auto px-5 py-2.5 rounded-xl font-mono text-xs font-bold uppercase tracking-wider bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-stone-950 shadow-lg shadow-amber-500/20 disabled:opacity-50 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                      className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-stone-950 shadow-lg shadow-amber-500/20 disabled:opacity-50 transition-all flex items-center justify-center gap-2 cursor-pointer"
                     >
                       {isSubmittingComplete ? (
                         <>
@@ -2167,9 +2178,9 @@ export const EventCalendarView: React.FC = () => {
                     </div>
 
                     {selectedEvent.is_attending && selectedEvent.my_rsvp && (
-                      <div className="px-3 py-1.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-mono">
+                      <div className="px-3 py-1.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs">
                         Current:{' '}
-                        <strong>
+                        <strong className="font-mono">
                           {selectedEvent.my_rsvp.flight_callsign ||
                             selectedEvent.my_rsvp.callsign ||
                             rsvpCallsign ||
@@ -2193,7 +2204,7 @@ export const EventCalendarView: React.FC = () => {
                   {/* Feedback Alert */}
                   {rsvpFeedback && (
                     <div
-                      className={`p-3 rounded-xl border text-xs font-mono flex items-center gap-2 ${
+                      className={`p-3 rounded-xl border text-xs flex items-center gap-2 ${
                         rsvpFeedback.type === 'success'
                           ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300'
                           : 'bg-red-500/15 border-red-500/40 text-red-300'
@@ -2226,7 +2237,7 @@ export const EventCalendarView: React.FC = () => {
                     <div className="space-y-4">
                       {/* Slot Category Selector: Flight Slot vs Support Slot */}
                       {supportRoleOptions.length > 0 && selectedEvent.is_signup_open && (
-                        <div className="flex items-center gap-2 p-1 rounded-xl bg-stone-900 border border-stone-800 text-xs font-mono">
+                        <div className="flex items-center gap-2 p-1 rounded-xl bg-stone-900 border border-stone-800 text-xs font-medium">
                           <button
                             type="button"
                             onClick={() => {
@@ -2273,7 +2284,7 @@ export const EventCalendarView: React.FC = () => {
                       {rsvpCategory === 'support' && selectedEvent.is_signup_open ? (
                         <div className="space-y-4">
                           <div className="space-y-2">
-                            <label className="block text-[11px] font-mono uppercase text-stone-400 font-semibold">
+                            <label className="block text-[11px] font-semibold tracking-wider uppercase text-stone-400">
                               Select Support Role Slot
                             </label>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -2301,14 +2312,14 @@ export const EventCalendarView: React.FC = () => {
                                     }`}
                                   >
                                     <div className="flex items-center justify-between gap-1 mb-1">
-                                      <span className="font-bold font-mono text-xs text-stone-100">{opt.label}</span>
-                                      <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${
+                                      <span className="font-semibold text-xs text-stone-100">{opt.label}</span>
+                                      <span className={`text-[11px] font-mono px-1.5 py-0.5 rounded border ${
                                         isSelected ? 'bg-amber-500/20 border-amber-500/40 text-amber-300' : 'bg-stone-800 border-stone-700 text-stone-400'
                                       }`}>
                                         {opt.occupiedSlots} / {opt.totalSlots} Slots
                                       </span>
                                     </div>
-                                    <div className="text-[11px] font-mono">
+                                    <div className="text-xs">
                                       {isLocked ? (
                                         <span className="text-rose-400/80 flex items-center gap-1">
                                           <Lock className="w-3 h-3" /> Locked &bull; Requires {opt.short_label} role
@@ -2326,7 +2337,7 @@ export const EventCalendarView: React.FC = () => {
                           </div>
 
                           <div className="p-3.5 rounded-xl bg-stone-900/70 border border-stone-800 space-y-2">
-                            <label className="block text-[11px] font-mono uppercase text-amber-300 font-semibold">
+                            <label className="block text-[11px] uppercase tracking-wider text-amber-300 font-semibold">
                               Tactical Callsign / Callsign Identifier
                             </label>
                             <input
@@ -2336,7 +2347,7 @@ export const EventCalendarView: React.FC = () => {
                               placeholder="e.g. Game Master, Overlord, Magic, etc."
                               className="w-full px-3.5 py-2.5 rounded-xl bg-stone-900 border border-stone-800 text-xs sm:text-sm text-stone-100 font-mono focus:outline-none focus:border-amber-500"
                             />
-                            <p className="text-[11px] font-mono text-stone-400">
+                            <p className="text-xs text-stone-400">
                               Support slots do not require a qualified airframe. You will receive full attendance credit and service record entry upon sortie debrief.
                             </p>
                           </div>
@@ -2347,7 +2358,7 @@ export const EventCalendarView: React.FC = () => {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           {/* Aircraft Selector */}
                           <div className="space-y-1.5">
-                            <label className="block text-[11px] font-mono uppercase text-stone-400">
+                            <label className="block text-[11px] font-semibold tracking-wider uppercase text-stone-400">
                               Select Aircraft
                             </label>
                             <select
@@ -2374,7 +2385,7 @@ export const EventCalendarView: React.FC = () => {
 
                           {/* Role Selector */}
                           <div className="space-y-1.5">
-                            <label className="block text-[11px] font-mono uppercase text-stone-400">
+                            <label className="block text-[11px] font-semibold tracking-wider uppercase text-stone-400">
                               Flight Position / Role
                             </label>
                             <select
@@ -2396,10 +2407,10 @@ export const EventCalendarView: React.FC = () => {
                       {selectedEvent.is_signup_open && (
                         <div className="p-3.5 rounded-xl bg-stone-900/70 border border-stone-800 space-y-3">
                           <div className="flex flex-wrap items-center justify-between gap-2">
-                            <label className="block text-[11px] font-mono uppercase text-amber-300 font-semibold">
+                            <label className="block text-[11px] uppercase tracking-wider text-amber-300 font-semibold">
                               Flight Callsign &amp; Element Number
                             </label>
-                            <span className="text-[11px] font-mono text-stone-400">
+                            <span className="text-xs text-stone-400">
                               Auto-assigned next open slot (1-1 &rarr; 1-4, then 2-1...) &bull; Editable
                             </span>
                           </div>
@@ -2407,7 +2418,7 @@ export const EventCalendarView: React.FC = () => {
                           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             {/* Authorized Squadron Callsign */}
                             <div className="space-y-1">
-                              <label className="block text-[10px] font-mono uppercase text-stone-400">
+                              <label className="block text-[11px] font-medium uppercase tracking-wider text-stone-400">
                                 Authorized Callsign
                               </label>
                               <select
@@ -2445,7 +2456,7 @@ export const EventCalendarView: React.FC = () => {
 
                             {/* Flight & Element Slot (1-1..1-4, 2-1..2-4, etc.) */}
                             <div className="space-y-1">
-                              <label className="block text-[10px] font-mono uppercase text-stone-400">
+                              <label className="block text-[11px] font-medium uppercase tracking-wider text-stone-400">
                                 Flight &amp; Position
                               </label>
                               <select
@@ -2496,7 +2507,7 @@ export const EventCalendarView: React.FC = () => {
 
                             {/* Direct Custom / Override Callsign Input */}
                             <div className="space-y-1">
-                              <label className="block text-[10px] font-mono uppercase text-stone-400">
+                              <label className="block text-[11px] font-medium uppercase tracking-wider text-stone-400">
                                 Assigned Callsign (Editable)
                               </label>
                               <input
@@ -2519,14 +2530,14 @@ export const EventCalendarView: React.FC = () => {
                         selectedEvent.type === 'campaign' &&
                         selectedEvent.is_opfor_eligible && (
                           <div className="space-y-1.5">
-                            <label className="block text-[11px] font-mono uppercase text-stone-400">
+                            <label className="block text-[11px] font-semibold tracking-wider uppercase text-stone-400">
                               Force Assignment (OPFOR Certified)
                             </label>
                             <div className="grid grid-cols-2 gap-3">
                               <button
                                 type="button"
                                 onClick={() => handleSideChange('blufor')}
-                                className={`py-2 px-3 rounded-xl border text-xs font-mono font-bold transition-all ${
+                                className={`py-2 px-3 rounded-xl border text-xs font-semibold transition-all ${
                                   rsvpSide === 'blufor'
                                     ? 'bg-sky-500/20 border-sky-500 text-sky-300'
                                     : 'bg-stone-900 border-stone-800 text-stone-400 hover:text-stone-200'
@@ -2537,7 +2548,7 @@ export const EventCalendarView: React.FC = () => {
                               <button
                                 type="button"
                                 onClick={() => handleSideChange('opfor')}
-                                className={`py-2 px-3 rounded-xl border text-xs font-mono font-bold transition-all ${
+                                className={`py-2 px-3 rounded-xl border text-xs font-semibold transition-all ${
                                   rsvpSide === 'opfor'
                                     ? 'bg-red-500/20 border-red-500 text-red-300'
                                     : 'bg-stone-900 border-stone-800 text-stone-400 hover:text-stone-200'
@@ -2553,7 +2564,7 @@ export const EventCalendarView: React.FC = () => {
                       {selectedEvent.is_signup_open &&
                         selectedEvent.type === 'training' && (
                           <div className="space-y-1.5">
-                            <label className="block text-[11px] font-mono uppercase text-stone-400">
+                            <label className="block text-[11px] font-semibold tracking-wider uppercase text-stone-400">
                               Training Objectives / Remarks (Optional)
                             </label>
                             <input
@@ -2576,7 +2587,7 @@ export const EventCalendarView: React.FC = () => {
                             type="button"
                             disabled={isSubmittingRsvp}
                             onClick={() => handleSubmitRsvp('cancel')}
-                            className="px-4 py-2 rounded-xl bg-red-500/15 hover:bg-red-500/25 border border-red-500/40 text-red-300 font-mono font-bold text-xs flex items-center gap-1.5 transition-all disabled:opacity-50"
+                            className="px-4 py-2 rounded-xl bg-red-500/15 hover:bg-red-500/25 border border-red-500/40 text-red-300 font-semibold text-xs flex items-center gap-1.5 transition-all disabled:opacity-50"
                           >
                             <Trash className="w-3.5 h-3.5" />
                             <span>Cancel RSVP</span>
@@ -2588,7 +2599,7 @@ export const EventCalendarView: React.FC = () => {
                             type="button"
                             disabled={isSubmittingRsvp || (!isSupportRole && !rsvpAirframeId)}
                             onClick={() => handleSubmitRsvp('attend')}
-                            className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono font-bold text-xs flex items-center gap-2 transition-all shadow-md shadow-amber-500/20 disabled:opacity-50"
+                            className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-semibold text-xs flex items-center gap-2 transition-all shadow-md shadow-amber-500/20 disabled:opacity-50"
                           >
                             <CheckCircle weight="bold" className="w-4 h-4" />
                             <span>
@@ -2632,11 +2643,11 @@ export const EventCalendarView: React.FC = () => {
                           key={squadronName}
                           className="rounded-2xl bg-stone-950/80 border border-stone-800 overflow-hidden"
                         >
-                          <div className="px-4 py-2 bg-stone-900/90 border-b border-stone-800 flex items-center justify-between text-xs font-mono">
-                            <span className="font-bold text-amber-300">
+                          <div className="px-4 py-2 bg-stone-900/90 border-b border-stone-800 flex items-center justify-between text-xs">
+                            <span className="font-semibold text-amber-300">
                               {squadronName}
                             </span>
-                            <span className="text-stone-400">
+                            <span className="tabular-nums text-stone-400">
                               {selectedEvent.has_aar
                                 ? `${list.filter((a) => a.is_present === true).length} Attended / ${list.filter((a) => a.is_present === false).length} Absent`
                                 : `${list.length} Member${list.length === 1 ? '' : 's'}`}
@@ -2678,7 +2689,7 @@ export const EventCalendarView: React.FC = () => {
                                       {att.callsign}
                                     </span>
                                     <span
-                                      className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${getRoleBadgeStyle(
+                                      className={`px-2 py-0.5 rounded text-[11px] font-semibold border ${getRoleBadgeStyle(
                                         att.role
                                       )} ${isAbsent ? 'opacity-60' : ''}`}
                                     >
@@ -2686,27 +2697,27 @@ export const EventCalendarView: React.FC = () => {
                                     </span>
                                     {selectedEvent.has_aar && (
                                       att.is_present === false ? (
-                                        <span className="px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[9px] font-bold uppercase font-mono">
+                                        <span className="px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[11px] font-semibold uppercase">
                                           Not Present
                                         </span>
                                       ) : att.xp_awarded ? (
-                                        <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[9px] font-bold font-mono">
+                                        <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] font-bold font-mono">
                                           {selectedEvent.type === 'training' ? '+100 XP' : '+500 XP'}
                                         </span>
                                       ) : (
-                                        <span className="px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[9px] font-bold uppercase font-mono">
+                                        <span className="px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[11px] font-semibold uppercase">
                                           Attended
                                         </span>
                                       )
                                     )}
                                   </div>
-                                  <div className="flex items-center gap-3 font-mono text-stone-300">
+                                  <div className="flex items-center gap-3 text-stone-300">
                                     {att.notes && (
-                                      <span className="text-[11px] text-stone-400 italic truncate max-w-xs">
+                                      <span className="text-xs text-stone-400 italic truncate max-w-xs">
                                         &ldquo;{att.notes}&rdquo;
                                       </span>
                                     )}
-                                    <span className={`px-2 py-0.5 rounded border text-[11px] ${
+                                    <span className={`px-2 py-0.5 rounded border text-[11px] font-medium ${
                                       isAbsent
                                         ? 'bg-stone-900/60 border-stone-800/60 text-stone-500 line-through'
                                         : 'bg-stone-900 border-stone-800 text-amber-300'
@@ -2727,11 +2738,11 @@ export const EventCalendarView: React.FC = () => {
                     {/* OPFOR Roster (if any visible) */}
                     {groupedAttendees.opfor.length > 0 && (
                       <div className="rounded-2xl bg-red-950/20 border border-red-500/30 overflow-hidden">
-                        <div className="px-4 py-2 bg-red-500/10 border-b border-red-500/30 flex items-center justify-between text-xs font-mono">
-                          <span className="font-bold text-red-300">
+                        <div className="px-4 py-2 bg-red-500/10 border-b border-red-500/30 flex items-center justify-between text-xs">
+                          <span className="font-semibold text-red-300">
                             OPFOR Aggressor Element
                           </span>
-                          <span className="text-red-300/80">
+                          <span className="tabular-nums text-red-300/80">
                             {selectedEvent.has_aar
                               ? `${groupedAttendees.opfor.filter((a) => a.is_present === true).length} Attended / ${groupedAttendees.opfor.filter((a) => a.is_present === false).length} Absent`
                               : `${groupedAttendees.opfor.length} Pilot${groupedAttendees.opfor.length === 1 ? '' : 's'}`}
@@ -2769,21 +2780,21 @@ export const EventCalendarView: React.FC = () => {
                                   </span>
                                   {selectedEvent.has_aar && (
                                     att.is_present === false ? (
-                                      <span className="px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[9px] font-bold uppercase font-mono">
+                                      <span className="px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[11px] font-semibold uppercase">
                                         Not Present
                                       </span>
                                     ) : att.xp_awarded ? (
-                                      <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[9px] font-bold font-mono">
+                                      <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] font-bold font-mono">
                                         {selectedEvent.type === 'training' ? '+100 XP' : '+500 XP'}
                                       </span>
                                     ) : (
-                                      <span className="px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[9px] font-bold uppercase font-mono">
+                                      <span className="px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[11px] font-semibold uppercase">
                                         Attended
                                       </span>
                                     )
                                   )}
                                 </div>
-                                <span className={`px-2 py-0.5 rounded border font-mono text-[11px] ${
+                                <span className={`px-2 py-0.5 rounded border text-[11px] font-medium ${
                                   isAbsent
                                     ? 'bg-stone-950/60 border-stone-800 text-stone-500 line-through'
                                     : 'bg-stone-950 border-red-500/30 text-red-300'
@@ -2813,7 +2824,7 @@ export const EventCalendarView: React.FC = () => {
                       selectedEvent.discord_event_url &&
                       openExternalUrl(selectedEvent.discord_event_url)
                     }
-                    className="px-3 py-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-300 text-xs font-mono flex items-center gap-1.5 transition-colors cursor-pointer"
+                    className="px-3 py-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-300 text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
                   >
                     <DiscordLogo className="w-4 h-4" />
                     <span>Discord Event</span>
@@ -2828,7 +2839,7 @@ export const EventCalendarView: React.FC = () => {
                       selectedEvent.discord_thread_url &&
                       openExternalUrl(selectedEvent.discord_thread_url)
                     }
-                    className="px-3 py-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-300 text-xs font-mono flex items-center gap-1.5 transition-colors cursor-pointer"
+                    className="px-3 py-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-300 text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
                   >
                     <DiscordLogo className="w-4 h-4" />
                     <span>Briefing Thread</span>
@@ -2843,7 +2854,7 @@ export const EventCalendarView: React.FC = () => {
                       selectedEvent.aar_discord_url &&
                       openExternalUrl(selectedEvent.aar_discord_url)
                     }
-                    className="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 text-xs font-mono flex items-center gap-1.5 transition-colors cursor-pointer"
+                    className="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
                   >
                     <DiscordLogo className="w-4 h-4" />
                     <span>Discord AAR</span>
@@ -2860,7 +2871,7 @@ export const EventCalendarView: React.FC = () => {
                       setSelectedEventUid(null);
                       openCampaignMissionModal(campaignId, missionId);
                     }}
-                    className="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-mono font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                    className="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
                   >
                     <Target weight="duotone" className="w-4 h-4" />
                     <span>View Mission Briefing &amp; Objectives</span>
@@ -2873,7 +2884,7 @@ export const EventCalendarView: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleStayOnCalendar}
-                    className="px-3 py-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-300 hover:text-stone-100 text-xs font-mono transition-colors cursor-pointer"
+                    className="px-3 py-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-300 hover:text-stone-100 text-xs font-medium transition-colors cursor-pointer"
                   >
                     Stay on Calendar
                   </button>
@@ -2882,7 +2893,7 @@ export const EventCalendarView: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleCloseEventModal}
-                  className="px-4 py-1.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-mono font-semibold transition-colors cursor-pointer"
+                  className="px-4 py-1.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-semibold transition-colors cursor-pointer"
                 >
                   {calendarReturnContext
                     ? calendarReturnContext.missionId !== null

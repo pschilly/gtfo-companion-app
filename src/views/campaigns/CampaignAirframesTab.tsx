@@ -58,7 +58,7 @@ export const CampaignAirframesTab: React.FC<CampaignAirframesTabProps> = ({
                     <div className="flex items-center gap-2 mt-1 text-xs text-stone-400 font-medium flex-wrap">
                       {group.nickname && <span>&ldquo;{group.nickname}&rdquo;</span>}
                       {group.abbreviation && (
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-stone-800 border border-stone-700 text-stone-300">
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-mono font-bold uppercase tracking-wider bg-stone-800 border border-stone-700 text-stone-300">
                           {group.abbreviation}
                         </span>
                       )}
@@ -67,10 +67,10 @@ export const CampaignAirframesTab: React.FC<CampaignAirframesTabProps> = ({
                 </div>
 
                 <div className="text-right shrink-0">
-                  <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-stone-400">
+                  <div className="text-[11px] font-semibold uppercase tracking-wider text-stone-400">
                     Squadron Total
                   </div>
-                  <div className="text-2xl font-black font-mono text-amber-400">
+                  <div className="text-2xl font-bold font-display tabular-nums text-amber-400">
                     {group.totalCount.toLocaleString()}
                   </div>
                 </div>
@@ -80,7 +80,7 @@ export const CampaignAirframesTab: React.FC<CampaignAirframesTabProps> = ({
               <div className="overflow-x-auto flex-1">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr className="border-b border-stone-800 bg-stone-950/40 text-[10px] font-mono font-bold text-stone-400 uppercase tracking-wider">
+                    <tr className="border-b border-stone-800 bg-stone-950/40 text-[11px] font-semibold text-stone-400 uppercase tracking-wider">
                       <th className="py-2.5 px-4">Airframe</th>
                       <th className="py-2.5 px-4 text-center">Available</th>
                       <th className="py-2.5 px-4">Airbase Stations</th>
@@ -99,7 +99,7 @@ export const CampaignAirframesTab: React.FC<CampaignAirframesTabProps> = ({
                               {item.name}
                             </div>
                             {item.dcsEntity && item.dcsEntity !== item.name && (
-                              <div className="text-[10px] font-mono text-stone-500 mt-0.5">
+                              <div className="text-[11px] font-mono text-stone-500 mt-0.5">
                                 {item.dcsEntity}
                               </div>
                             )}
@@ -107,7 +107,7 @@ export const CampaignAirframesTab: React.FC<CampaignAirframesTabProps> = ({
 
                           <td className="py-3 px-4 align-top text-center whitespace-nowrap">
                             <span
-                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold font-mono ${
+                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold tabular-nums ${
                                 item.totalCount > 0
                                   ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
                                   : 'bg-stone-800 text-stone-400 border border-stone-700'
@@ -119,13 +119,13 @@ export const CampaignAirframesTab: React.FC<CampaignAirframesTabProps> = ({
 
                           <td className="py-3 px-4 align-top">
                             {bases.length === 0 ? (
-                              <span className="text-[11px] text-stone-500 italic" />
+                              <span className="text-xs text-stone-500 italic" />
                             ) : (
                               <div className="flex flex-wrap gap-1.5">
                                 {bases.map(([baseName, baseQty]) => (
                                   <span
                                     key={baseName}
-                                    className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-[11px] font-medium bg-stone-950 border border-stone-800 text-stone-300"
+                                    className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-xs font-medium bg-stone-950 border border-stone-800 text-stone-300"
                                   >
                                     <span>{baseName}</span>
                                     <span className="font-bold text-amber-300 font-mono">

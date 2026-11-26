@@ -334,7 +334,7 @@ export const LoadoutTab: React.FC<LoadoutTabProps> = ({
           >
             <Lightning className="size-3.5 text-amber-400" weight="duotone" />
             <span>Load Preset...</span>
-            <span className="text-[10px] text-stone-400 font-mono">
+            <span className="text-[11px] text-stone-400 font-mono tabular-nums">
               ({systemPresets.length + userPresets.length})
             </span>
           </button>
@@ -429,7 +429,7 @@ export const LoadoutTab: React.FC<LoadoutTabProps> = ({
                 }`}
               >
                 <span
-                  className={`text-[9px] font-mono font-bold px-1 rounded ${
+                  className={`text-[11px] font-mono font-bold px-1 rounded ${
                     active
                       ? 'bg-amber-400 text-stone-950'
                       : 'bg-stone-950 text-stone-400 group-hover:text-stone-200'
@@ -440,10 +440,10 @@ export const LoadoutTab: React.FC<LoadoutTabProps> = ({
 
                 <div className="py-0.5 w-full truncate">
                   {isClean ? (
-                    <span className="text-[9px] text-stone-600 font-mono italic">Empty</span>
+                    <span className="text-[11px] text-stone-600 italic">Empty</span>
                   ) : (
                     <span
-                      className={`text-[9px] font-bold font-mono truncate block ${
+                      className={`text-[11px] font-bold truncate block ${
                         !stock.available && !stock.is_unlimited
                           ? 'text-amber-400'
                           : 'text-stone-200'
@@ -486,7 +486,7 @@ export const LoadoutTab: React.FC<LoadoutTabProps> = ({
                 />
                 <span className="text-stone-400">Departure Base:</span>
                 <span className="font-bold text-white font-mono">{plan.departure_airfield}</span>
-                <span className="text-[10px] text-stone-500 font-mono">
+                <span className="text-[11px] text-stone-500">
                   {warehouse?.is_unlimited ? '(Unlimited Stock)' : '(Warehouse Monitored)'}
                 </span>
               </div>
@@ -501,7 +501,7 @@ export const LoadoutTab: React.FC<LoadoutTabProps> = ({
             <button
               type="button"
               onClick={onRefreshWarehouse}
-              className="text-[10px] text-amber-400 hover:text-amber-300 underline flex items-center gap-0.5 cursor-pointer"
+              className="text-xs text-amber-400 hover:text-amber-300 underline flex items-center gap-0.5 cursor-pointer"
             >
               <ArrowsClockwise
                 className={`size-3 ${loadingWarehouse ? 'animate-spin' : ''}`}
@@ -520,7 +520,7 @@ export const LoadoutTab: React.FC<LoadoutTabProps> = ({
                 Advisory: Depleted Ordnance at Departure Airfield ({plan.departure_airfield})
               </span>
             </div>
-            <p className="text-[11px] text-amber-300/90 leading-tight">
+            <p className="text-xs text-amber-300/90 leading-tight">
               The following selected munitions are currently out of stock at your indicated
               departure airbase.
             </p>
@@ -528,7 +528,7 @@ export const LoadoutTab: React.FC<LoadoutTabProps> = ({
               {outOfStockWarnings.map((w) => (
                 <span
                   key={`${w.station}-${w.weapon}`}
-                  className="px-2 py-0.5 rounded bg-amber-900/60 border border-amber-600/50 text-[10px] font-mono text-amber-200"
+                  className="px-2 py-0.5 rounded bg-amber-900/60 border border-amber-600/50 text-[11px] font-mono text-amber-200"
                 >
                   {w.station}: {w.weapon}
                 </span>
@@ -578,12 +578,12 @@ export const LoadoutTab: React.FC<LoadoutTabProps> = ({
             >
               <div className="col-span-4 flex flex-col min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <span className="px-1.5 py-0.5 rounded bg-stone-950 font-mono font-bold text-amber-400 text-[10px] border border-stone-800">
+                  <span className="px-1.5 py-0.5 rounded bg-stone-950 font-mono font-bold text-amber-400 text-[11px] border border-stone-800">
                     STA {staNum}
                   </span>
                   <span className="font-bold text-stone-200 text-xs truncate">{sta.name}</span>
                 </div>
-                <div className="text-[10px] text-stone-500 capitalize pl-0.5 mt-0.5">
+                <div className="text-[11px] text-stone-500 capitalize pl-0.5 mt-0.5">
                   {sta.type} ({sta.side})
                 </div>
               </div>
@@ -709,21 +709,21 @@ export const LoadoutTab: React.FC<LoadoutTabProps> = ({
                 </div>
 
                 {/* Live Stock Pill */}
-                <div className="flex items-center justify-between px-1 text-[10px]">
+                <div className="flex items-center justify-between px-1 text-[11px]">
                   {!isClean ? (
                     stock.is_unlimited ? (
-                      <span className="text-stone-400 font-mono">Stock: Unlimited</span>
+                      <span className="text-stone-400">Stock: Unlimited</span>
                     ) : stock.available ? (
-                      <span className="text-emerald-400 font-mono font-semibold">
+                      <span className="text-emerald-400 tabular-nums font-semibold">
                         ✓ {stock.quantity} in stock at {plan.departure_airfield}
                       </span>
                     ) : (
-                      <span className="text-amber-400 font-mono font-bold">
+                      <span className="text-amber-400 tabular-nums font-bold">
                         ⚠️ 0 in stock at {plan.departure_airfield} (Depleted)
                       </span>
                     )
                   ) : (
-                    <span className="text-stone-500 font-mono">Station Clean</span>
+                    <span className="text-stone-500">Station Clean</span>
                   )}
                 </div>
               </div>
@@ -736,7 +736,7 @@ export const LoadoutTab: React.FC<LoadoutTabProps> = ({
           <div className="grid grid-cols-2 gap-2 pt-2 border-t border-stone-800">
             {loadoutCfg?.gun && (
               <div className="p-2 rounded bg-stone-900/60 border border-stone-800 space-y-1">
-                <label className="text-[10px] font-bold text-stone-400 uppercase block truncate">
+                <label className="text-xs font-bold text-stone-400 uppercase block truncate">
                   {loadoutCfg.gun.name || 'Internal Gun'}
                 </label>
                 {gunOptions.length > 0 ? (
@@ -771,7 +771,7 @@ export const LoadoutTab: React.FC<LoadoutTabProps> = ({
 
             {loadoutCfg?.countermeasures && (
               <div className="p-2 rounded bg-stone-900/60 border border-stone-800 space-y-1">
-                <label className="text-[10px] font-bold text-stone-400 uppercase block truncate">
+                <label className="text-xs font-bold text-stone-400 uppercase block truncate">
                   {loadoutCfg.countermeasures.name || 'Countermeasures'}
                 </label>
                 <select
@@ -807,7 +807,7 @@ export const LoadoutTab: React.FC<LoadoutTabProps> = ({
             <button
               type="button"
               onClick={() => applyStationsAndCompile(stationsMap)}
-              className="text-[10px] text-amber-400 hover:text-amber-300 underline cursor-pointer"
+              className="text-xs text-amber-400 hover:text-amber-300 underline cursor-pointer"
             >
               Recompile from Stations
             </button>
@@ -912,7 +912,7 @@ export const LoadoutTab: React.FC<LoadoutTabProps> = ({
                   <h3 className="text-xs font-bold text-stone-100 uppercase tracking-wide">
                     Load Aircraft Preset
                   </h3>
-                  <p className="text-[10px] text-stone-400">
+                  <p className="text-xs text-stone-400">
                     {loadoutCfg?.name || 'Standard Configurations'}
                   </p>
                 </div>
@@ -957,7 +957,7 @@ export const LoadoutTab: React.FC<LoadoutTabProps> = ({
                             {preset.name}
                           </span>
                           {preset.description && (
-                            <p className="text-[11px] text-stone-400 truncate mt-0.5">
+                            <p className="text-xs text-stone-400 truncate mt-0.5">
                               {preset.description}
                             </p>
                           )}
@@ -1005,7 +1005,7 @@ export const LoadoutTab: React.FC<LoadoutTabProps> = ({
                             {preset.name}
                           </span>
                           {preset.description && (
-                            <p className="text-[11px] text-stone-400 leading-tight mt-0.5">
+                            <p className="text-xs text-stone-400 leading-tight mt-0.5">
                               {preset.description}
                             </p>
                           )}

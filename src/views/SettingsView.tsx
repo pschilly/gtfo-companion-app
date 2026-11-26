@@ -125,7 +125,7 @@ export const SettingsView: React.FC = () => {
       label: 'Notifications',
       icon: <Bell className="w-4 h-4" />,
       badge: unreadNotificationsCount > 0 ? (
-        <span className="px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[9px] font-mono font-bold">
+        <span className="px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[11px] font-bold tabular-nums">
           {unreadNotificationsCount}
         </span>
       ) : undefined,
@@ -159,7 +159,7 @@ export const SettingsView: React.FC = () => {
         </div>
 
         {savedBanner && (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-mono self-start sm:self-auto">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-medium self-start sm:self-auto">
             <CheckCircle className="w-4 h-4" />
             Settings Saved
           </span>
@@ -174,7 +174,7 @@ export const SettingsView: React.FC = () => {
             <button
               key={tab.id}
               onClick={() => setActiveSubTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-mono transition-all ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all ${
                 isActive
                   ? 'bg-amber-500 text-stone-950 font-bold shadow-md shadow-amber-500/20'
                   : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800/80'
@@ -236,11 +236,11 @@ export const SettingsView: React.FC = () => {
                       <span className="font-display font-bold text-xs text-amber-300">
                         CORE Members Only
                       </span>
-                      <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 text-[10px] font-mono font-bold">
+                      <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 text-[11px] font-semibold tracking-wider">
                         DEFAULT
                       </span>
                     </div>
-                    <p className="text-[11px] text-stone-400 leading-normal">
+                    <p className="text-xs text-stone-400 leading-normal">
                       Shows only primary operational flight personnel (CORE) by default. Reduces visual noise and focuses on active task force aviators.
                     </p>
                   </div>
@@ -264,7 +264,7 @@ export const SettingsView: React.FC = () => {
                     <span className="font-display font-bold text-xs text-stone-100">
                       Full Task Force Roster
                     </span>
-                    <p className="text-[11px] text-stone-400 leading-normal">
+                    <p className="text-xs text-stone-400 leading-normal">
                       Shows all members of the organization by default, including both verified CORE and community roster members.
                     </p>
                   </div>
@@ -285,7 +285,7 @@ export const SettingsView: React.FC = () => {
               </p>
 
               <div className="p-3.5 rounded-xl bg-stone-950/80 border border-stone-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="text-xs font-mono">
+                <div className="text-xs tabular-nums">
                   <span className="text-stone-300 font-semibold">Currently Tracked: </span>
                   <span className="text-amber-400 font-bold">
                     {(settings.trackedQualificationIds || []).length} Qualifications
@@ -304,7 +304,7 @@ export const SettingsView: React.FC = () => {
                         completedQualificationCheckpoints: {},
                       });
                     }}
-                    className="px-3 py-1.5 rounded-lg bg-stone-900 hover:bg-rose-950/40 border border-stone-700 hover:border-rose-500/50 text-stone-400 hover:text-rose-300 font-mono text-xs transition-colors self-start sm:self-auto"
+                    className="px-3 py-1.5 rounded-lg bg-stone-900 hover:bg-rose-950/40 border border-stone-700 hover:border-rose-500/50 text-stone-400 hover:text-rose-300 text-xs font-medium transition-colors self-start sm:self-auto"
                   >
                     Clear Tracked Queue
                   </button>
@@ -349,14 +349,14 @@ export const SettingsView: React.FC = () => {
                   <span className="text-xs font-semibold text-stone-200">
                     Periodic Background Polling Interval
                   </span>
-                  <p className="text-[11px] text-stone-400">
+                  <p className="text-xs text-stone-400">
                     How frequently the app checks for new flight plans, manifest updates, and portal changes.
                   </p>
                 </div>
                 <select
                   value={settings.pollingIntervalMinutes}
                   onChange={(e) => updateSettings({ pollingIntervalMinutes: Number(e.target.value) })}
-                  className="px-3 py-1.5 rounded-xl bg-stone-900 border border-stone-700 text-xs font-mono text-stone-200 focus:outline-none focus:border-amber-500/60 shrink-0"
+                  className="px-3 py-1.5 rounded-xl bg-stone-900 border border-stone-700 text-xs text-stone-200 focus:outline-none focus:border-amber-500/60 shrink-0"
                 >
                   <option value={10}>Every 10 Minutes</option>
                   <option value={15}>Every 15 Minutes</option>
@@ -374,8 +374,11 @@ export const SettingsView: React.FC = () => {
                   <h3 className="font-display font-semibold text-stone-200 text-sm">
                     GTFO Portal Uplink Status
                   </h3>
-                  <p className="text-[11px] text-stone-400 font-mono mt-0.5">
-                    Connected: {settings.memberPortalApiUrl || STATIC_CONFIG.portalBaseUrl}
+                  <p className="text-xs text-stone-400 mt-0.5">
+                    Connected:{' '}
+                    <span className="font-mono text-stone-300">
+                      {settings.memberPortalApiUrl || STATIC_CONFIG.portalBaseUrl}
+                    </span>
                   </p>
                 </div>
 
@@ -383,7 +386,7 @@ export const SettingsView: React.FC = () => {
                   type="button"
                   onClick={() => syncManifest()}
                   disabled={isSyncingManifest}
-                  className="px-3.5 py-1.5 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-700 text-xs font-mono text-stone-300 hover:text-amber-300 flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                  className="px-3.5 py-1.5 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-700 text-xs font-medium text-stone-300 hover:text-amber-300 flex items-center gap-1.5 transition-colors disabled:opacity-50"
                 >
                   <ArrowsClockwise className={`w-3.5 h-3.5 text-amber-400 ${isSyncingManifest ? 'animate-spin' : ''}`} />
                   <span>{isSyncingManifest ? 'Syncing...' : 'Sync Manifest Now'}</span>
@@ -391,8 +394,9 @@ export const SettingsView: React.FC = () => {
               </div>
 
               {lastSyncedAt && (
-                <p className="text-[10px] font-mono text-stone-500">
-                  Last successful manifest sync: {new Date(lastSyncedAt).toLocaleString()}
+                <p className="text-xs text-stone-500">
+                  Last successful manifest sync:{' '}
+                  <span className="font-mono">{new Date(lastSyncedAt).toLocaleString()}</span>
                 </p>
               )}
             </div>
@@ -423,7 +427,7 @@ export const SettingsView: React.FC = () => {
             <button
               type="button"
               onClick={() => refreshDcsEnv()}
-              className="px-3 py-1.5 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-700 text-xs font-mono text-stone-300 flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
+              className="px-3 py-1.5 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-700 text-xs font-medium text-stone-300 flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
             >
               <FolderSimplePlus className="w-3.5 h-3.5 text-amber-400" />
               Auto-Detect Windows Paths
@@ -431,7 +435,7 @@ export const SettingsView: React.FC = () => {
           </div>
 
           <div className="space-y-2">
-            <label className="block text-xs font-mono uppercase text-stone-400">
+            <label className="block text-[11px] font-semibold tracking-wider uppercase text-stone-400">
               Active Target DCS Saved Games Path
             </label>
             <input
@@ -441,7 +445,7 @@ export const SettingsView: React.FC = () => {
               placeholder="C:\Users\<Username>\Saved Games\DCS"
               className="w-full px-3.5 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-xs font-mono text-stone-100 focus:outline-none focus:border-amber-500"
             />
-            <p className="text-[11px] text-stone-400 leading-relaxed">
+            <p className="text-xs text-stone-400 leading-relaxed">
               Liveries are deployed into{' '}
               <code className="font-mono text-stone-300">&lt;Path&gt;\Liveries\&lt;Aircraft&gt;</code>{' '}
               and mods/tech packages into{' '}
@@ -452,7 +456,7 @@ export const SettingsView: React.FC = () => {
           {/* Detected Windows Candidates */}
           {dcsEnv && dcsEnv.detectedCandidates.length > 0 && (
             <div className="space-y-2">
-              <span className="text-[11px] font-mono uppercase text-stone-400">
+              <span className="text-[11px] font-semibold tracking-wider uppercase text-stone-400">
                 Detected Local DCS Profiles:
               </span>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
@@ -476,7 +480,7 @@ export const SettingsView: React.FC = () => {
                         </div>
                       </div>
                       <span
-                        className={`text-[10px] font-mono px-2 py-0.5 rounded shrink-0 ${
+                        className={`text-[11px] font-semibold px-2 py-0.5 rounded shrink-0 ${
                           cand.exists
                             ? 'bg-emerald-500/20 text-emerald-300'
                             : 'bg-stone-800 text-stone-400'
@@ -506,7 +510,7 @@ export const SettingsView: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="block text-xs font-mono uppercase text-stone-400">
+              <label className="block text-[11px] font-semibold tracking-wider uppercase text-stone-400">
                 Active Target DCS World Root Directory (Game Install Folder)
               </label>
               <input
@@ -516,7 +520,7 @@ export const SettingsView: React.FC = () => {
                 placeholder="C:\Program Files\Eagle Dynamics\DCS World"
                 className="w-full px-3.5 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-xs font-mono text-stone-100 focus:outline-none focus:border-amber-500"
               />
-              <p className="text-[11px] text-stone-400 leading-relaxed">
+              <p className="text-xs text-stone-400 leading-relaxed">
                 Aircraft core customizations and navigation databases (such as{' '}
                 <strong className="text-stone-300">JF-17 Custom Airspaces</strong>) are deployed into{' '}
                 <code className="font-mono text-stone-300">&lt;DCS World&gt;\Mods\aircraft\JF-17\Customization\airspace</code>.
@@ -526,7 +530,7 @@ export const SettingsView: React.FC = () => {
             {/* Detected DCS World Candidates */}
             {dcsEnv && dcsEnv.detectedWorldCandidates && dcsEnv.detectedWorldCandidates.length > 0 && (
               <div className="space-y-2">
-                <span className="text-[11px] font-mono uppercase text-stone-400">
+                <span className="text-[11px] font-semibold tracking-wider uppercase text-stone-400">
                   Detected DCS World Core Installations:
                 </span>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
@@ -550,7 +554,7 @@ export const SettingsView: React.FC = () => {
                           </div>
                         </div>
                         <span
-                          className={`text-[10px] font-mono px-2 py-0.5 rounded shrink-0 ${
+                          className={`text-[11px] font-semibold px-2 py-0.5 rounded shrink-0 ${
                             cand.exists
                               ? 'bg-emerald-500/20 text-emerald-300'
                               : 'bg-stone-800 text-stone-400'
@@ -574,7 +578,7 @@ export const SettingsView: React.FC = () => {
                   setPathInput(dcsEnv?.activeSavedGamesPath || '');
                   setWorldPathInput(dcsEnv?.activeWorldRootPath || '');
                 }}
-                className="text-xs font-mono text-stone-400 hover:text-stone-200 flex items-center gap-1.5 cursor-pointer"
+                className="text-xs font-medium text-stone-400 hover:text-stone-200 flex items-center gap-1.5 cursor-pointer"
               >
                 <ArrowCounterClockwise className="w-3.5 h-3.5" />
                 Reset Paths to Detected
@@ -582,7 +586,7 @@ export const SettingsView: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setPathOnboardingOpen(true)}
-                className="text-xs font-mono text-stone-400 hover:text-amber-300 flex items-center gap-1.5 transition-colors cursor-pointer"
+                className="text-xs font-medium text-stone-400 hover:text-amber-300 flex items-center gap-1.5 transition-colors cursor-pointer"
               >
                 <FolderSimplePlus className="w-3.5 h-3.5 text-amber-400" />
                 Review Onboarding Prompt
@@ -623,7 +627,7 @@ export const SettingsView: React.FC = () => {
                   <label htmlFor="startMinimizedToggle" className="text-xs font-semibold text-stone-200 cursor-pointer">
                     Start Minimized
                   </label>
-                  <p className="text-[11px] text-stone-400 leading-relaxed">
+                  <p className="text-xs text-stone-400 leading-relaxed">
                     Automatically launch the companion app minimized to the background/system tray on startup, ready for mission checks without covering your desktop or DCS screens.
                   </p>
                 </div>
@@ -642,7 +646,7 @@ export const SettingsView: React.FC = () => {
                   <label htmlFor="minimizeToTrayToggle" className="text-xs font-semibold text-stone-200 cursor-pointer">
                     Minimize to System Tray
                   </label>
-                  <p className="text-[11px] text-stone-400 leading-relaxed">
+                  <p className="text-xs text-stone-400 leading-relaxed">
                     Clicking the minimize button hides the window into the Windows notification tray area rather than cluttering your Windows taskbar.
                   </p>
                 </div>
@@ -661,7 +665,7 @@ export const SettingsView: React.FC = () => {
                   <label htmlFor="closeToTrayToggle" className="text-xs font-semibold text-stone-200 cursor-pointer">
                     Close to System Tray
                   </label>
-                  <p className="text-[11px] text-stone-400 leading-relaxed">
+                  <p className="text-xs text-stone-400 leading-relaxed">
                     Clicking the window close (X) button keeps the app running quietly in the tray so background updates and flight plans continue monitoring. Use the tray menu &apos;Quit&apos; option to exit completely.
                   </p>
                 </div>
@@ -677,7 +681,7 @@ export const SettingsView: React.FC = () => {
 
             {/* System Tray Note */}
             <div className="pt-4 border-t border-stone-800/80">
-              <span className="text-[11px] font-mono text-stone-500">
+              <span className="text-xs text-stone-500">
                 Left-click the GTFO icon in your Windows system tray to toggle window visibility at any time.
               </span>
             </div>
@@ -705,7 +709,7 @@ export const SettingsView: React.FC = () => {
               <button
                 type="button"
                 onClick={handleTestNotification}
-                className="px-3.5 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 font-mono text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer shrink-0"
+                className="px-3.5 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer shrink-0"
               >
                 <PaperPlaneTilt className="w-3.5 h-3.5 text-amber-400" />
                 <span>Send Test Notification</span>
@@ -713,7 +717,7 @@ export const SettingsView: React.FC = () => {
             </div>
 
             {testNotificationFeedback && (
-              <div className="p-3 rounded-xl bg-stone-950 border border-amber-500/30 text-xs font-mono text-amber-300 flex items-center gap-2">
+              <div className="p-3 rounded-xl bg-stone-950 border border-amber-500/30 text-xs text-amber-300 flex items-center gap-2">
                 <Info className="w-4 h-4 text-amber-400 shrink-0" />
                 <span>{testNotificationFeedback}</span>
               </div>
@@ -726,7 +730,7 @@ export const SettingsView: React.FC = () => {
                   <label htmlFor="desktopNotifToggle" className="text-xs font-semibold text-stone-200 cursor-pointer">
                     Windows Desktop Toast Notifications
                   </label>
-                  <p className="text-[11px] text-stone-400 leading-relaxed">
+                  <p className="text-xs text-stone-400 leading-relaxed">
                     Trigger native Windows notifications in the Windows Action Center when important updates are detected, even while the app is minimized to the system tray.
                   </p>
                 </div>
@@ -745,7 +749,7 @@ export const SettingsView: React.FC = () => {
                   <label htmlFor="notifyAppUpdatesToggle" className="text-xs font-semibold text-stone-200 cursor-pointer">
                     Companion App Versions
                   </label>
-                  <p className="text-[11px] text-stone-400 leading-relaxed">
+                  <p className="text-xs text-stone-400 leading-relaxed">
                     Receive notifications whenever a new version of the GTFO Companion App is published and ready for auto-updating.
                   </p>
                 </div>
@@ -764,7 +768,7 @@ export const SettingsView: React.FC = () => {
                   <label htmlFor="notifyAssetUpdatesToggle" className="text-xs font-semibold text-stone-200 cursor-pointer">
                     Liveries &amp; Mods Updates
                   </label>
-                  <p className="text-[11px] text-stone-400 leading-relaxed">
+                  <p className="text-xs text-stone-400 leading-relaxed">
                     Receive notifications when new versions of your installed aircraft liveries or DCS technical mods become available in the manifest.
                   </p>
                 </div>
@@ -783,7 +787,7 @@ export const SettingsView: React.FC = () => {
                   <label htmlFor="notifyFlightPlansToggle" className="text-xs font-semibold text-stone-200 cursor-pointer">
                     Tactical Flight Plans &amp; DTC Cartridges
                   </label>
-                  <p className="text-[11px] text-stone-400 leading-relaxed">
+                  <p className="text-xs text-stone-400 leading-relaxed">
                     Receive alerts when new squadron flight packages, ATC route presets, or Data Cartridge files are uploaded to the GTFO portal.
                   </p>
                 </div>
@@ -803,7 +807,7 @@ export const SettingsView: React.FC = () => {
                     <label htmlFor="notifyCalendarEventsToggle" className="text-xs font-semibold text-stone-200 cursor-pointer">
                       Operations &amp; Training Sortie Calendar Alerts
                     </label>
-                    <p className="text-[11px] text-stone-400 leading-relaxed">
+                    <p className="text-xs text-stone-400 leading-relaxed">
                       Receive an alert once when a new Campaign Operation (OP) or Training Sortie (TRG) is posted on the Event Calendar, plus pre-flight reminders before launch.
                     </p>
                   </div>
@@ -820,10 +824,10 @@ export const SettingsView: React.FC = () => {
                   <div className="p-3.5 rounded-xl bg-stone-950/80 border border-stone-800/80 space-y-3">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <div>
-                        <span className="text-[11px] font-mono font-bold uppercase text-amber-300">
+                        <span className="text-[11px] font-semibold tracking-wider uppercase text-amber-300">
                           Pre-Sortie Launch Reminder Schedule
                         </span>
-                        <p className="text-[11px] text-stone-400 mt-0.5">
+                        <p className="text-xs text-stone-400 mt-0.5">
                           Select which countdown intervals trigger a reminder before a sortie starts:
                         </p>
                       </div>
@@ -850,7 +854,7 @@ export const SettingsView: React.FC = () => {
                                 : [...currentList, opt.minutes].sort((a, b) => b - a);
                               updateSettings({ calendarReminderMinutes: nextList });
                             }}
-                            className={`px-3 py-1.5 rounded-xl border text-xs font-mono transition-all cursor-pointer ${
+                            className={`px-3 py-1.5 rounded-xl border text-xs font-medium transition-all cursor-pointer ${
                               isSelected
                                 ? 'bg-amber-500/20 border-amber-500/60 text-amber-300 font-bold'
                                 : 'bg-stone-900 border-stone-800 text-stone-400 hover:text-stone-200'
@@ -864,7 +868,7 @@ export const SettingsView: React.FC = () => {
                     </div>
 
                     <div className="pt-2 border-t border-stone-800/60 flex items-center justify-between gap-3">
-                      <label htmlFor="remindOnlyAttendingToggle" className="text-[11px] text-stone-300 cursor-pointer">
+                      <label htmlFor="remindOnlyAttendingToggle" className="text-xs text-stone-300 cursor-pointer">
                         Only send launch countdown reminders for sorties I have RSVP&apos;d to
                       </label>
                       <input
@@ -885,7 +889,7 @@ export const SettingsView: React.FC = () => {
                   <label htmlFor="pollingIntervalSelect" className="text-xs font-semibold text-stone-200">
                     Background Polling Frequency
                   </label>
-                  <p className="text-[11px] text-stone-400 leading-relaxed">
+                  <p className="text-xs text-stone-400 leading-relaxed">
                     How frequently the background companion process polls the member portal, calendar, and manifest for new updates.
                   </p>
                 </div>
@@ -896,7 +900,7 @@ export const SettingsView: React.FC = () => {
                     id="pollingIntervalSelect"
                     value={settings.pollingIntervalMinutes}
                     onChange={(e) => updateSettings({ pollingIntervalMinutes: Number(e.target.value) })}
-                    className="px-3 py-1.5 rounded-xl bg-stone-950 border border-stone-800 text-xs font-mono text-stone-200 focus:outline-none focus:border-amber-500 cursor-pointer"
+                    className="px-3 py-1.5 rounded-xl bg-stone-950 border border-stone-800 text-xs text-stone-200 focus:outline-none focus:border-amber-500 cursor-pointer"
                   >
                     <option value={0}>Disabled (Manual Only)</option>
                     <option value={5}>Every 5 minutes</option>
@@ -943,7 +947,7 @@ export const SettingsView: React.FC = () => {
                       {appUpdate?.available ? 'Update Available' : 'Application Up to Date'}
                     </h2>
                     <span
-                      className={`px-2 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wider border ${
+                      className={`px-2 py-0.5 rounded-full font-mono text-[11px] font-bold uppercase tracking-wider border ${
                         appUpdate?.available
                           ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
                           : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
@@ -965,7 +969,7 @@ export const SettingsView: React.FC = () => {
                   type="button"
                   onClick={handleManualCheck}
                   disabled={isCheckingAppUpdate}
-                  className="px-4 py-2 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-700 text-stone-200 font-mono text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer disabled:opacity-50"
+                  className="px-4 py-2 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-700 text-stone-200 text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer disabled:opacity-50"
                 >
                   <ArrowsClockwise
                     className={`w-3.5 h-3.5 text-amber-400 ${isCheckingAppUpdate ? 'animate-spin' : ''}`}
@@ -987,7 +991,7 @@ export const SettingsView: React.FC = () => {
             </div>
 
             {manualCheckFeedback && (
-              <div className="p-3 rounded-xl bg-stone-950 border border-stone-800 text-xs font-mono text-stone-300 flex items-center gap-2">
+              <div className="p-3 rounded-xl bg-stone-950 border border-stone-800 text-xs text-stone-300 flex items-center gap-2">
                 <Info className="w-4 h-4 text-amber-400 shrink-0" />
                 <span>{manualCheckFeedback}</span>
               </div>
@@ -996,7 +1000,7 @@ export const SettingsView: React.FC = () => {
             {/* Release notes preview if available */}
             {appUpdate?.available && appUpdate.body && (
               <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-2">
-                <span className="text-[11px] font-mono uppercase text-stone-400 tracking-wider">
+                <span className="text-[11px] font-semibold uppercase text-stone-400 tracking-wider">
                   Release Notes (v{appUpdate.version})
                 </span>
                 <p className="text-xs text-stone-300 leading-relaxed whitespace-pre-wrap font-mono">
@@ -1014,7 +1018,7 @@ export const SettingsView: React.FC = () => {
                   <h3 className="font-display text-base font-bold text-stone-100">
                     Portal Asset Manifest
                   </h3>
-                  <span className="px-2 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wider bg-stone-950 text-amber-300 border border-stone-800">
+                  <span className="px-2 py-0.5 rounded-full font-mono text-[11px] font-bold uppercase tracking-wider bg-stone-950 text-amber-300 border border-stone-800">
                     MANIFEST v{manifest.manifestVersion}
                   </span>
                 </div>
@@ -1030,7 +1034,7 @@ export const SettingsView: React.FC = () => {
                 onClick={syncManifest}
                 disabled={isSyncingManifest}
                 title="Sync remote manifest from Member Portal / CDN"
-                className="px-4 py-2 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-700 text-stone-200 font-mono text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer disabled:opacity-50 self-end sm:self-auto shrink-0"
+                className="px-4 py-2 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-700 text-stone-200 text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer disabled:opacity-50 self-end sm:self-auto shrink-0"
               >
                 <ArrowsClockwise
                   className={`w-3.5 h-3.5 text-amber-400 ${
@@ -1048,20 +1052,20 @@ export const SettingsView: React.FC = () => {
               Deployment &amp; Security Specifications
             </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-mono">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
               <div className="p-3 rounded-xl bg-stone-950 border border-stone-800 space-y-1">
-                <span className="text-stone-500 text-[10px] uppercase">Installed Version</span>
-                <p className="text-stone-200 font-bold">v{currentAppVersion}</p>
+                <span className="text-stone-500 text-[11px] font-medium uppercase tracking-wider">Installed Version</span>
+                <p className="text-stone-200 font-mono font-bold">v{currentAppVersion}</p>
               </div>
 
               <div className="p-3 rounded-xl bg-stone-950 border border-stone-800 space-y-1">
-                <span className="text-stone-500 text-[10px] uppercase">Release Channel</span>
-                <p className="text-amber-300">Official Releases</p>
+                <span className="text-stone-500 text-[11px] font-medium uppercase tracking-wider">Release Channel</span>
+                <p className="text-amber-300 font-medium">Official Releases</p>
               </div>
 
               <div className="p-3 rounded-xl bg-stone-950 border border-stone-800 space-y-1">
-                <span className="text-stone-500 text-[10px] uppercase">Auto-Check On Launch</span>
-                <p className="text-stone-300">Active (Background Service)</p>
+                <span className="text-stone-500 text-[11px] font-medium uppercase tracking-wider">Auto-Check On Launch</span>
+                <p className="text-stone-300 font-medium">Active (Background Service)</p>
               </div>
             </div>
           </div>
@@ -1137,7 +1141,7 @@ export const SettingsView: React.FC = () => {
                   <div className="text-xs font-display font-semibold text-stone-200 group-hover:text-amber-300">
                     Official Discord
                   </div>
-                  <div className="text-[11px] font-mono text-stone-500">
+                  <div className="text-xs text-stone-500">
                     Global Task Force Overlord
                   </div>
                 </div>
@@ -1154,7 +1158,7 @@ export const SettingsView: React.FC = () => {
                   <div className="text-xs font-display font-semibold text-stone-200 group-hover:text-amber-300">
                     GitHub Repository
                   </div>
-                  <div className="text-[11px] font-mono text-stone-500">
+                  <div className="text-xs font-mono text-stone-500">
                     pschilly/gtfo-companion-app
                   </div>
                 </div>
@@ -1162,7 +1166,7 @@ export const SettingsView: React.FC = () => {
               </a>
             </div>
 
-            <p className="text-[11px] font-mono text-stone-500 pt-2 border-t border-stone-800/80">
+            <p className="text-xs text-stone-400 pt-2 border-t border-stone-800/80 leading-relaxed">
               DCS World is a registered trademark of Eagle Dynamics SA. This software is built for members of the Global Task Force Overlord multiplayer DCS squadron and is not affiliated with Eagle Dynamics in any way.
             </p>
           </div>

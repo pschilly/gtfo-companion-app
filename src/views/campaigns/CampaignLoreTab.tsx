@@ -121,11 +121,11 @@ export const CampaignLoreTab: React.FC<CampaignLoreTabProps> = ({
                       : 'bg-stone-950/50 border-stone-800 hover:border-stone-700 hover:bg-stone-950'
                   }`}
                 >
-                  <div className="flex items-center justify-between gap-2 text-[10px] font-mono">
-                    <span className="text-amber-400 font-bold uppercase">
+                  <div className="flex items-center justify-between gap-2 text-[11px] font-semibold">
+                    <span className="text-amber-400 uppercase tracking-wider">
                       Chapter {chapter.order || idx + 1}
                     </span>
-                    <span className="text-stone-500">
+                    <span className="text-stone-500 tabular-nums font-normal">
                       {chapter.pages.length || 1} page{chapter.pages.length === 1 ? '' : 's'}
                     </span>
                   </div>
@@ -137,7 +137,7 @@ export const CampaignLoreTab: React.FC<CampaignLoreTabProps> = ({
                     {chapter.title}
                   </div>
                   {chapter.author && (
-                    <div className="text-[11px] font-mono text-stone-400 truncate">
+                    <div className="text-xs text-stone-400 truncate">
                       By {chapter.author}
                     </div>
                   )}
@@ -154,12 +154,12 @@ export const CampaignLoreTab: React.FC<CampaignLoreTabProps> = ({
           {/* Chapter Header */}
           <div className="border-b border-stone-800/80 pb-4 space-y-3">
             <div className="flex items-center justify-between gap-2 flex-wrap">
-              <span className="px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 font-mono text-[10px] font-bold uppercase tracking-wider">
+              <span className="px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] font-semibold uppercase tracking-wider tabular-nums">
                 Chapter {currentChapter.order || activeChapterIdx + 1} &bull; Page{' '}
                 {safePageIdx + 1} of {Math.max(1, pages.length)}
               </span>
               {currentChapter.author && (
-                <span className="text-xs font-mono text-stone-400">
+                <span className="text-xs text-stone-400">
                   Byline: <strong className="text-stone-200">{currentChapter.author}</strong>
                 </span>
               )}
@@ -207,7 +207,7 @@ export const CampaignLoreTab: React.FC<CampaignLoreTabProps> = ({
 
               {currentPage.audioUrl && (
                 <div className="p-3.5 rounded-2xl bg-stone-950/80 border border-stone-800 space-y-2">
-                  <div className="flex items-center gap-2 text-xs font-mono text-amber-300 font-bold">
+                  <div className="flex items-center gap-2 text-xs text-amber-300 font-semibold">
                     <Radio weight="duotone" className="w-4 h-4" />
                     <span>{currentPage.audioTitle || 'Comms Intercept Audio'}</span>
                   </div>
@@ -220,7 +220,7 @@ export const CampaignLoreTab: React.FC<CampaignLoreTabProps> = ({
               {(currentPage.videoEmbedUrl || currentPage.videoUrl) && (
                 <div className="p-3.5 rounded-2xl bg-stone-950/80 border border-stone-800 space-y-2">
                   <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 text-xs font-mono text-sky-300 font-bold">
+                    <div className="flex items-center gap-2 text-xs text-sky-300 font-semibold">
                       <VideoCamera weight="duotone" className="w-4 h-4" />
                       <span>{currentPage.videoTitle || 'HUD / Tactical Video Footage'}</span>
                     </div>
@@ -228,7 +228,7 @@ export const CampaignLoreTab: React.FC<CampaignLoreTabProps> = ({
                       <button
                         type="button"
                         onClick={() => onOpenExternal(currentPage.videoUrl)}
-                        className="text-[11px] font-mono text-sky-400 hover:text-sky-300 flex items-center gap-1"
+                        className="text-xs font-medium text-sky-400 hover:text-sky-300 flex items-center gap-1"
                       >
                         <span>Open Video</span>
                         <ArrowSquareOut className="w-3 h-3" />
@@ -276,7 +276,7 @@ export const CampaignLoreTab: React.FC<CampaignLoreTabProps> = ({
               type="button"
               onClick={handlePrev}
               disabled={!canGoPrev}
-              className="px-3.5 py-2 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-800 text-xs font-mono font-semibold text-stone-200 flex items-center gap-1.5 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+              className="px-3.5 py-2 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-800 text-xs font-semibold text-stone-200 flex items-center gap-1.5 disabled:opacity-40 disabled:pointer-events-none transition-colors"
             >
               <CaretLeft className="w-3.5 h-3.5" />
               <span>Previous Page</span>
@@ -305,7 +305,7 @@ export const CampaignLoreTab: React.FC<CampaignLoreTabProps> = ({
               type="button"
               onClick={handleNext}
               disabled={!canGoNext}
-              className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-mono font-bold flex items-center gap-1.5 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+              className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-bold flex items-center gap-1.5 disabled:opacity-40 disabled:pointer-events-none transition-colors"
             >
               <span>Next Page</span>
               <CaretRight className="w-3.5 h-3.5" />

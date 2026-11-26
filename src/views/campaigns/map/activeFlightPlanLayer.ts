@@ -174,7 +174,7 @@ export class ActiveFlightPlanMapController {
 
     if (target) {
       parts.push(
-        `<span class="text-[9px] font-bold text-red-300 bg-red-950/90 px-1.5 py-0.5 rounded border border-red-600">TARGET</span>`
+        `<span class="text-[11px] font-bold text-red-300 bg-red-950/90 px-1.5 py-0.5 rounded border border-red-600">TARGET</span>`
       );
       if (pt.name) {
         parts.push(`<span class="text-red-400 font-bold uppercase tracking-wider">${escapeHtml(pt.name)}</span>`);
@@ -196,15 +196,15 @@ export class ActiveFlightPlanMapController {
       }
     } else if (additional) {
       parts.unshift(
-        `<span class="text-[9px] font-bold text-purple-300 bg-purple-950/90 px-1.5 py-0.5 rounded border border-purple-600">ADDITIONAL PT (PLAN ${seqNum})</span>`
+        `<span class="text-[11px] font-bold text-purple-300 bg-purple-950/90 px-1.5 py-0.5 rounded border border-purple-600">ADDITIONAL PT (PLAN ${seqNum})</span>`
       );
     } else if (divert) {
       parts.unshift(
-        `<span class="text-[9px] font-bold text-amber-300 bg-amber-950/90 px-1.5 py-0.5 rounded border border-amber-600">DIVERT</span>`
+        `<span class="text-[11px] font-bold text-amber-300 bg-amber-950/90 px-1.5 py-0.5 rounded border border-amber-600">DIVERT</span>`
       );
     } else if (seqNum > 1) {
       parts.unshift(
-        `<span class="text-[9px] font-bold text-sky-300 bg-sky-950/90 px-1.5 py-0.5 rounded border border-sky-600">${params.isF14 ? 'PLAN' : 'SEQ'} ${seqNum}</span>`
+        `<span class="text-[11px] font-bold text-sky-300 bg-sky-950/90 px-1.5 py-0.5 rounded border border-sky-600">${params.isF14 ? 'PLAN' : 'SEQ'} ${seqNum}</span>`
       );
     }
 
@@ -219,15 +219,15 @@ export class ActiveFlightPlanMapController {
       if (altVal !== null && Number.isFinite(altVal) && altVal !== 0) {
         stats.push(
           isKm
-            ? `${Math.round(altVal * 0.3048)}<span class="text-[9px] text-stone-400 ml-0.5">m</span>`
-            : `${Math.round(altVal)}<span class="text-[9px] text-stone-400 ml-0.5">ft</span>`
+            ? `${Math.round(altVal * 0.3048)}<span class="text-[11px] text-stone-400 ml-0.5">m</span>`
+            : `${Math.round(altVal)}<span class="text-[11px] text-stone-400 ml-0.5">ft</span>`
         );
       }
       if (speedVal !== null && Number.isFinite(speedVal) && speedVal !== 0) {
         stats.push(
           isKm
-            ? `${Math.round(speedVal * 1.852)}<span class="text-[9px] text-stone-400 ml-0.5">kph</span>`
-            : `${Math.round(speedVal)}<span class="text-[9px] text-stone-400 ml-0.5">kts</span>`
+            ? `${Math.round(speedVal * 1.852)}<span class="text-[11px] text-stone-400 ml-0.5">kph</span>`
+            : `${Math.round(speedVal)}<span class="text-[11px] text-stone-400 ml-0.5">kts</span>`
         );
       }
       if (stats.length > 0) {
@@ -294,45 +294,45 @@ export class ActiveFlightPlanMapController {
       container.innerHTML = `
         <div class="flex items-center justify-between border-b border-zinc-800 pb-2">
           <div class="flex items-center gap-2">
-            <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold tracking-wider uppercase bg-red-500/20 text-red-400 border border-red-500/30">TARGET</span>
+            <span class="px-2 py-0.5 rounded text-[11px] font-bold tracking-wider uppercase bg-red-500/20 text-red-400 border border-red-500/30">TARGET</span>
             <h3 class="text-sm font-bold text-zinc-100 truncate max-w-[150px]">${escapeHtml(pt.name || 'TARGET')}</h3>
           </div>
-          ${mgrsStr ? `<span class="text-[10px] font-mono text-zinc-400">${escapeHtml(mgrsStr)}</span>` : ''}
+          ${mgrsStr ? `<span class="text-[11px] font-mono text-zinc-400">${escapeHtml(mgrsStr)}</span>` : ''}
         </div>
         <div class="space-y-2.5">
           <div>
-            <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Target Name</label>
+            <label class="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1">Target Name</label>
             <input type="text" class="target-name-input w-full bg-zinc-800/90 border border-zinc-700 focus:border-red-500 focus:ring-1 focus:ring-red-500 text-zinc-100 font-semibold rounded-md px-2.5 py-1 text-xs" value="${escapeHtml(pt.name || '')}" placeholder="e.g. STORAGEB, WAREHOUSE" />
           </div>
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Target Elev (ft)</label>
+              <label class="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1">Target Elev (ft)</label>
               <input type="number" class="target-elev-input w-full bg-zinc-800/90 border border-zinc-700 focus:border-red-500 text-zinc-100 font-semibold font-mono rounded-md px-2.5 py-1 text-xs" value="${escapeHtml(elevVal)}" placeholder="Ground elev" />
             </div>
             <div>
-              <label class="block text-[10px] font-bold text-red-400 uppercase tracking-wider mb-1">Drop Alt (ft)</label>
+              <label class="block text-xs font-bold text-red-400 uppercase tracking-wider mb-1">Drop Alt (ft)</label>
               <input type="number" class="target-drop-alt-input w-full bg-zinc-800/90 border border-zinc-700 focus:border-red-500 text-zinc-100 font-semibold font-mono rounded-md px-2.5 py-1 text-xs" value="${escapeHtml(dropAltVal)}" placeholder="30000" />
             </div>
           </div>
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="block text-[10px] font-bold text-amber-400 uppercase tracking-wider mb-1">Attack Hdg (°)</label>
+              <label class="block text-xs font-bold text-amber-400 uppercase tracking-wider mb-1">Attack Hdg (°)</label>
               <input type="number" step="0.1" class="target-hdg-input w-full bg-zinc-800/90 border border-zinc-700 focus:border-red-500 text-zinc-100 font-semibold font-mono rounded-md px-2.5 py-1 text-xs" value="${escapeHtml(atkHdgVal)}" placeholder="198.1" />
             </div>
             <div>
-              <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Drop Spd (kts)</label>
+              <label class="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1">Drop Spd (kts)</label>
               <input type="number" class="target-speed-input w-full bg-zinc-800/90 border border-zinc-700 focus:border-red-500 text-zinc-100 font-semibold font-mono rounded-md px-2.5 py-1 text-xs" value="${escapeHtml(dropSpdVal)}" placeholder="450" />
             </div>
           </div>
           <div class="grid ${isF14 ? 'grid-cols-2' : 'grid-cols-1'} gap-2">
             <div>
-              <label class="block text-[10px] font-bold text-sky-400 uppercase tracking-wider mb-1">Weapon</label>
+              <label class="block text-xs font-bold text-sky-400 uppercase tracking-wider mb-1">Weapon</label>
               <input type="text" class="target-weapon-input w-full bg-zinc-800/90 border border-zinc-700 focus:border-red-500 text-zinc-100 font-semibold rounded-md px-2.5 py-1 text-xs" value="${escapeHtml(pt.weapon || 'GBU-38')}" placeholder="GBU-38" />
             </div>
             ${
               isF14
                 ? `<div>
-                    <label class="block text-[10px] font-bold text-purple-400 uppercase tracking-wider mb-1">Station #</label>
+                    <label class="block text-xs font-bold text-purple-400 uppercase tracking-wider mb-1">Station #</label>
                     <select class="target-station-select w-full bg-zinc-800/90 border border-zinc-700 text-zinc-100 font-semibold rounded-md px-2 py-1 text-xs">
                       <option value="all" ${!pt.station || pt.station === 'all' ? 'selected' : ''}>All (3-6)</option>
                       <option value="3" ${String(pt.station) === '3' ? 'selected' : ''}>STA 3 (Fwd R)</option>
@@ -437,7 +437,7 @@ export class ActiveFlightPlanMapController {
     container.innerHTML = `
       <div class="flex items-center justify-between border-b border-zinc-800 pb-2">
         <div class="flex items-center gap-2">
-          <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold tracking-wider uppercase ${
+          <span class="px-2 py-0.5 rounded text-[11px] font-bold tracking-wider uppercase ${
             divert
               ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
               : isSpawnPoint
@@ -450,36 +450,36 @@ export class ActiveFlightPlanMapController {
       <div class="space-y-2.5">
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block text-[10px] font-bold text-amber-400 uppercase tracking-wider mb-1">${isF14 ? 'Plan' : 'Sequence'}</label>
+            <label class="block text-xs font-bold text-amber-400 uppercase tracking-wider mb-1">${isF14 ? 'Plan' : 'Sequence'}</label>
             <select class="wp-sequence-select w-full bg-zinc-800/90 border border-zinc-700 text-amber-300 font-bold rounded-md px-2 py-1 text-xs">
               ${seqOptionsHtml}
             </select>
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Waypoint Name</label>
+            <label class="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1">Waypoint Name</label>
             <input type="text" class="wp-name-input w-full bg-zinc-800/90 border border-zinc-700 text-zinc-100 font-semibold rounded-md px-2.5 py-1 text-xs" value="${escapeHtml(pt.name || '')}" placeholder="${isSpawnPoint ? 'Departure Airfield' : 'Turning Point'}" />
           </div>
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">${isKm ? 'Alt (m)' : 'Alt (ft)'}</label>
+            <label class="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1">${isKm ? 'Alt (m)' : 'Alt (ft)'}</label>
             <input type="text" class="wp-alt-input w-full bg-zinc-800/90 border border-zinc-700 text-zinc-100 font-semibold font-mono rounded-md px-2.5 py-1 text-xs" value="${escapeHtml(altDisplay)}" placeholder="${isKm ? '6000' : '20000'}" />
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">${isKm ? 'Speed (kph CAS)' : 'Speed (kts CAS)'}</label>
+            <label class="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1">${isKm ? 'Speed (kph CAS)' : 'Speed (kts CAS)'}</label>
             <input type="text" class="wp-speed-input w-full bg-zinc-800/90 border border-zinc-700 text-zinc-100 font-semibold font-mono rounded-md px-2.5 py-1 text-xs" value="${escapeHtml(speedDisplay)}" placeholder="${isKm ? '648' : '350'}" />
           </div>
         </div>
         <div class="bg-zinc-800/40 border border-zinc-800 rounded-md p-2 space-y-1">
           <div class="flex items-center justify-between">
-            <label class="block text-[10px] font-bold ${isSpawnPoint ? 'text-amber-400' : 'text-zinc-300'} uppercase tracking-wider">Time on Target (M+)</label>
-            <span class="text-[9px] font-mono text-zinc-500">HH:MM:SS</span>
+            <label class="block text-xs font-bold ${isSpawnPoint ? 'text-amber-400' : 'text-zinc-300'} uppercase tracking-wider">Time on Target (M+)</label>
+            <span class="text-[11px] font-mono text-zinc-500">HH:MM:SS</span>
           </div>
           <input type="text" class="wp-tot-input w-full bg-zinc-800/90 border border-zinc-700 text-amber-400 font-bold font-mono rounded-md px-2.5 py-1 text-xs" value="${escapeHtml(pt.tot || '')}" placeholder="HH:MM:SS" />
-          <p class="text-[9px] text-zinc-500 font-medium mt-0.5">Format: HH:MM:SS (from Mission Start)</p>
+          <p class="text-[11px] text-zinc-500 font-medium mt-0.5">Format: HH:MM:SS (from Mission Start)</p>
         </div>
         <div>
-          <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Remarks</label>
+          <label class="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1">Remarks</label>
           <input type="text" class="wp-remarks-input w-full bg-zinc-800/90 border border-zinc-700 text-zinc-100 font-medium rounded-md px-2.5 py-1 text-xs" value="${escapeHtml(pt.remarks || '')}" placeholder="Notes for flight report..." />
         </div>
       </div>
@@ -734,7 +734,7 @@ export class ActiveFlightPlanMapController {
 
           const seqBadge =
             seq > 1
-              ? `<span class="text-[9px] font-mono px-1 rounded bg-indigo-950 text-indigo-300 border border-indigo-700 mr-1.5">S${seq}</span>`
+              ? `<span class="text-[11px] font-mono px-1 rounded bg-indigo-950 text-indigo-300 border border-indigo-700 mr-1.5">S${seq}</span>`
               : '';
 
           L.marker([midLat, midLng], {
@@ -751,7 +751,7 @@ export class ActiveFlightPlanMapController {
                     <span class="text-amber-400">${Math.round(distVal)} ${unitLabel}</span>
                     ${speedHtml}
                   </div>
-                  <span class="text-stone-300 font-mono text-[10px] mt-0.5">
+                  <span class="text-stone-300 font-mono text-[11px] mt-0.5">
                     ${String(Math.round(bearing)).padStart(3, '0')}°T / ${String(Math.round(magBrg)).padStart(3, '0')}°M
                   </span>
                   ${tipHtml}
@@ -1467,7 +1467,7 @@ export class ActiveFlightPlanMapController {
               canEdit ? 'cursor-move' : 'cursor-default'
             }" style="color:${color};">
               <span class="w-3 h-3 rounded-full border-2 bg-stone-900/90 shrink-0 inline-block" style="border-color:${color};box-shadow:0 0 6px ${color};"></span>
-              <span class="leading-none bg-stone-950/80 px-1 py-0.5 rounded border border-stone-800 text-[10px]">${escapeHtml(
+              <span class="leading-none bg-stone-950/80 px-1 py-0.5 rounded border border-stone-800 text-[11px]">${escapeHtml(
                 stptLabel
               )}</span>
             </div>`,
@@ -1543,7 +1543,7 @@ export class ActiveFlightPlanMapController {
             canEdit ? 'cursor-move' : 'cursor-default'
           }">
             <span class="w-3.5 h-3.5 rotate-45 border-2 border-amber-400 bg-stone-950/90 shrink-0 inline-block"></span>
-            <span class="flex items-center gap-1 bg-stone-950/90 px-1.5 py-0.5 rounded border border-amber-500/50 text-[10px] leading-tight">
+            <span class="flex items-center gap-1 bg-stone-950/90 px-1.5 py-0.5 rounded border border-amber-500/50 text-[11px] leading-tight">
               <span class="text-amber-300 font-bold">${escapeHtml(labelText)}</span>
               ${noteText ? `<span class="text-stone-300 font-normal truncate max-w-[80px]">${escapeHtml(noteText)}</span>` : ''}
             </span>
@@ -1619,7 +1619,7 @@ export class ActiveFlightPlanMapController {
               canEdit ? 'cursor-move' : 'cursor-default'
             }" style="color:${color};">
               <span class="w-3 h-3 rounded-full border-2 bg-stone-900/90 shrink-0 inline-block" style="border-color:${color};box-shadow:0 0 6px ${color};"></span>
-              <span class="leading-none bg-stone-950/80 px-1 py-0.5 rounded border border-stone-800 text-[10px]">${escapeHtml(
+              <span class="leading-none bg-stone-950/80 px-1 py-0.5 rounded border border-stone-800 text-[11px]">${escapeHtml(
                 ptLabel
               )}</span>
             </div>`,
@@ -1723,7 +1723,7 @@ export class ActiveFlightPlanMapController {
               canEdit ? 'cursor-move' : 'cursor-default'
             }" style="color:${color};">
               <span class="w-3 h-3 rounded-full border-2 bg-stone-900/90 shrink-0 inline-block" style="border-color:${color};box-shadow:0 0 6px ${color};"></span>
-              <span class="leading-none bg-stone-950/80 px-1 py-0.5 rounded border border-stone-800 text-[10px]">${escapeHtml(
+              <span class="leading-none bg-stone-950/80 px-1 py-0.5 rounded border border-stone-800 text-[11px]">${escapeHtml(
                 ptLabel
               )}</span>
             </div>`,

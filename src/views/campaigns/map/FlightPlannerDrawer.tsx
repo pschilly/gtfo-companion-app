@@ -1027,7 +1027,7 @@ export const FlightPlannerDrawer: React.FC<FlightPlannerDrawerProps> = ({
         {activePlan.callsign || activePlan.name || 'Draft Plan'}
       </span>
       <span
-        className={`text-[9px] font-bold px-1.5 py-0.5 rounded font-mono uppercase shrink-0 border ${
+        className={`text-[11px] font-bold px-1.5 py-0.5 rounded uppercase shrink-0 border ${
           activePlan.is_opfor
             ? 'bg-red-950/80 text-red-400 border-red-700/60'
             : 'bg-sky-950/80 text-sky-400 border-sky-700/60'
@@ -1044,25 +1044,25 @@ export const FlightPlannerDrawer: React.FC<FlightPlannerDrawerProps> = ({
       {canEdit && (
         <div className="flex items-center">
           {autoSaveStatus === 'saving' && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-[10px] text-amber-400 font-mono animate-pulse">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-[11px] text-amber-400 animate-pulse">
               <span className="size-1.5 rounded-full bg-amber-400 animate-ping" />
               Auto-saving...
             </span>
           )}
           {autoSaveStatus === 'saved' && !isPlanDirty && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[10px] text-emerald-400 font-mono">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[11px] text-emerald-400">
               <Check className="size-2.5" weight="bold" />
               Auto-saved
             </span>
           )}
           {(autoSaveStatus === 'pending' || (isPlanDirty && autoSaveStatus !== 'saving')) && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-stone-800 text-[10px] text-stone-400 font-mono">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-stone-800 text-[11px] text-stone-400">
               <span className="size-1.5 rounded-full bg-amber-400" />
               Unsaved
             </span>
           )}
           {autoSaveStatus === 'error' && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/15 border border-red-500/40 text-[10px] text-red-400 font-mono">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/15 border border-red-500/40 text-[11px] text-red-400">
               Save failed
             </span>
           )}
@@ -1445,9 +1445,9 @@ export const FlightPlannerDrawer: React.FC<FlightPlannerDrawerProps> = ({
             {/* Search Results View */}
             {searchQuery.trim().length > 0 ? (
               <div>
-                <h4 className="text-[10px] font-bold text-stone-400 uppercase mb-2 flex items-center justify-between">
+                <h4 className="text-[11px] font-bold text-stone-400 uppercase mb-2 flex items-center justify-between">
                   <span>Search Results</span>
-                  <span className="text-stone-500 font-normal">{searchResults.length} found</span>
+                  <span className="text-stone-500 font-normal tabular-nums">{searchResults.length} found</span>
                 </h4>
 
                 {searchResults.length === 0 ? (
@@ -1474,7 +1474,7 @@ export const FlightPlannerDrawer: React.FC<FlightPlannerDrawerProps> = ({
                                 {f.identifier}
                               </span>
                               {f.is_opfor && (
-                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-red-950/80 text-red-400 font-mono border border-red-700/60 uppercase">
+                                <span className="text-[11px] font-bold px-1.5 py-0.5 rounded bg-red-950/80 text-red-400 border border-red-700/60 uppercase">
                                   OPFOR
                                 </span>
                               )}
@@ -1494,7 +1494,7 @@ export const FlightPlannerDrawer: React.FC<FlightPlannerDrawerProps> = ({
                           </div>
                           {hasPlan && (
                             <div className="flex items-center gap-1 text-green-400 shrink-0 ml-2">
-                              <span className="text-[10px] font-mono font-semibold text-stone-400 bg-stone-950 px-1.5 py-0.5 rounded border border-stone-700">
+                              <span className="text-[11px] font-mono font-semibold text-stone-400 bg-stone-950 px-1.5 py-0.5 rounded border border-stone-700">
                                 {ptsCount} WP
                               </span>
                               <CheckCircle className="size-4 text-emerald-400" weight="duotone" />
@@ -1509,7 +1509,7 @@ export const FlightPlannerDrawer: React.FC<FlightPlannerDrawerProps> = ({
             ) : (
               /* My Flight Plans View */
               <div>
-                <h4 className="text-[10px] font-bold text-stone-400 uppercase mb-2">
+                <h4 className="text-[11px] font-bold text-stone-400 uppercase mb-2">
                   My Flight Plans
                 </h4>
                 {myPlans.length === 0 ? (
@@ -1536,7 +1536,7 @@ export const FlightPlannerDrawer: React.FC<FlightPlannerDrawerProps> = ({
                                 {f.identifier}
                               </span>
                               {f.is_opfor && (
-                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-red-950/80 text-red-400 font-mono border border-red-700/60 uppercase">
+                                <span className="text-[11px] font-bold px-1.5 py-0.5 rounded bg-red-950/80 text-red-400 border border-red-700/60 uppercase">
                                   OPFOR
                                 </span>
                               )}
@@ -1552,7 +1552,7 @@ export const FlightPlannerDrawer: React.FC<FlightPlannerDrawerProps> = ({
                           </div>
                           {hasPlan && (
                             <div className="flex items-center gap-1 text-green-400 shrink-0 ml-2">
-                              <span className="text-[10px] font-mono font-semibold text-stone-400 bg-stone-950 px-1.5 py-0.5 rounded border border-stone-700">
+                              <span className="text-[11px] font-mono font-semibold text-stone-400 bg-stone-950 px-1.5 py-0.5 rounded border border-stone-700">
                                 {ptsCount} WP
                               </span>
                               <CheckCircle className="size-4 text-emerald-400" weight="duotone" />
@@ -1625,7 +1625,7 @@ export const FlightPlannerDrawer: React.FC<FlightPlannerDrawerProps> = ({
                   <Target className="size-3.5 text-red-400" weight="duotone" />
                   <span>Targets</span>
                   {targetPointsCount > 0 && (
-                    <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-red-500/20 text-red-300 border border-red-500/30">
+                    <span className="px-1.5 py-0.2 rounded-full text-[11px] tabular-nums font-bold bg-red-500/20 text-red-300 border border-red-500/30">
                       {targetPointsCount}
                     </span>
                   )}
@@ -1674,7 +1674,7 @@ export const FlightPlannerDrawer: React.FC<FlightPlannerDrawerProps> = ({
                   >
                     <Broadcast className="size-3.5" weight="duotone" />
                     <span>MIDS</span>
-                    <span className="text-[9px] px-1 py-0.2 rounded bg-cyan-500/20 text-cyan-300 font-mono">
+                    <span className="text-[11px] px-1 py-0.2 rounded bg-cyan-500/20 text-cyan-300">
                       L16
                     </span>
                   </button>
@@ -1692,7 +1692,7 @@ export const FlightPlannerDrawer: React.FC<FlightPlannerDrawerProps> = ({
                   >
                     <Compass className="size-3.5 text-emerald-400" weight="duotone" />
                     <span>SA</span>
-                    <span className="text-[9px] px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-mono">
+                    <span className="text-[11px] px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-300">
                       DTC
                     </span>
                   </button>
@@ -1710,7 +1710,7 @@ export const FlightPlannerDrawer: React.FC<FlightPlannerDrawerProps> = ({
                   >
                     <Polygon className="size-3.5 text-teal-400" weight="duotone" />
                     <span>GEO LINES</span>
-                    <span className="text-[9px] px-1 py-0.2 rounded bg-teal-500/20 text-teal-300 font-mono">
+                    <span className="text-[11px] px-1 py-0.2 rounded bg-teal-500/20 text-teal-300">
                       DTC
                     </span>
                   </button>
@@ -1728,7 +1728,7 @@ export const FlightPlannerDrawer: React.FC<FlightPlannerDrawerProps> = ({
                   >
                     <ShieldCheck className="size-3.5 text-indigo-400" weight="duotone" />
                     <span>DEST PTS</span>
-                    <span className="text-[9px] px-1 py-0.2 rounded bg-indigo-500/20 text-indigo-300 font-mono">
+                    <span className="text-[11px] px-1 py-0.2 rounded bg-indigo-500/20 text-indigo-300">
                       DTC
                     </span>
                   </button>
@@ -1746,7 +1746,7 @@ export const FlightPlannerDrawer: React.FC<FlightPlannerDrawerProps> = ({
                   >
                     <Polygon className="size-3.5 text-teal-400" weight="duotone" />
                     <span>PLOT LINES</span>
-                    <span className="text-[9px] px-1 py-0.2 rounded bg-teal-500/20 text-teal-300 font-mono">
+                    <span className="text-[11px] px-1 py-0.2 rounded bg-teal-500/20 text-teal-300">
                       DTC
                     </span>
                   </button>
@@ -1764,7 +1764,7 @@ export const FlightPlannerDrawer: React.FC<FlightPlannerDrawerProps> = ({
                   >
                     <Crosshair className="size-3.5 text-purple-400" weight="duotone" />
                     <span>ADDITIONAL PTS</span>
-                    <span className="text-[9px] px-1 py-0.2 rounded bg-purple-500/20 text-purple-300 font-mono">
+                    <span className="text-[11px] px-1 py-0.2 rounded bg-purple-500/20 text-purple-300 font-mono tabular-nums">
                       {additionalPointsCount} / 40
                     </span>
                   </button>
@@ -1782,7 +1782,7 @@ export const FlightPlannerDrawer: React.FC<FlightPlannerDrawerProps> = ({
                   >
                     <Polygon className="size-3.5 text-cyan-400" weight="duotone" />
                     <span>AIRSPACE</span>
-                    <span className="text-[9px] px-1 py-0.2 rounded bg-cyan-500/20 text-cyan-300 font-mono">
+                    <span className="text-[11px] px-1 py-0.2 rounded bg-cyan-500/20 text-cyan-300">
                       JF-17
                     </span>
                   </button>
@@ -1800,7 +1800,7 @@ export const FlightPlannerDrawer: React.FC<FlightPlannerDrawerProps> = ({
                   >
                     <ShieldCheck className="size-3.5" weight="duotone" />
                     <span>CMDS</span>
-                    <span className="text-[9px] px-1 py-0.2 rounded bg-rose-500/20 text-rose-300 font-mono">
+                    <span className="text-[11px] px-1 py-0.2 rounded bg-rose-500/20 text-rose-300">
                       EW
                     </span>
                   </button>
@@ -1828,7 +1828,7 @@ export const FlightPlannerDrawer: React.FC<FlightPlannerDrawerProps> = ({
                   title="More tabs available — click or scroll right"
                 >
                   <div className="flex items-center gap-0.5 animate-pulse">
-                    <span className="text-[9px] font-bold text-amber-400/90 uppercase tracking-tighter hidden sm:inline">
+                    <span className="text-[11px] font-bold text-amber-400/90 uppercase tracking-tight hidden sm:inline">
                       More
                     </span>
                     <CaretRight className="size-3.5 drop-shadow" weight="bold" />
@@ -2028,7 +2028,7 @@ export const FlightPlannerDrawer: React.FC<FlightPlannerDrawerProps> = ({
               {activeTab === 'notes' && (
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-[10px] font-bold text-stone-400 uppercase mb-1">
+                    <label className="block text-xs font-bold text-stone-400 uppercase mb-1">
                       Remarks / Bingo / Joker
                     </label>
                     <textarea
@@ -2044,7 +2044,7 @@ export const FlightPlannerDrawer: React.FC<FlightPlannerDrawerProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold text-stone-400 uppercase mb-1">
+                    <label className="block text-xs font-bold text-stone-400 uppercase mb-1">
                       Flight Plan Description &amp; Briefing Notes
                     </label>
                     <textarea

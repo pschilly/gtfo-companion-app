@@ -507,7 +507,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
   };
 
   const scopeBadge = isDrawingActive ? (
-    <span className="px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 text-[10px] font-bold animate-pulse flex items-center gap-1">
+    <span className="px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 text-[11px] font-bold animate-pulse flex items-center gap-1">
       <span className="size-1.5 rounded-full bg-emerald-400" />
       <span>Drawing: {activeDrawingType}</span>
     </span>
@@ -519,7 +519,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
         <button
           type="button"
           onClick={onFinishDraw}
-          className="px-2 py-0.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold transition-colors border border-emerald-400/50 shadow-sm flex items-center gap-1 cursor-pointer"
+          className="px-2 py-0.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold transition-colors border border-emerald-400/50 shadow-sm flex items-center gap-1 cursor-pointer"
           title="Finish and close shape"
         >
           <Check className="w-3 h-3" weight="bold" />
@@ -529,7 +529,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
       <button
         type="button"
         onClick={onCancelDraw}
-        className="px-2 py-0.5 rounded bg-stone-800 hover:bg-stone-700 text-stone-300 hover:text-white text-[10px] font-semibold transition-colors border border-stone-700/60 cursor-pointer"
+        className="px-2 py-0.5 rounded bg-stone-800 hover:bg-stone-700 text-stone-300 hover:text-white text-[11px] font-semibold transition-colors border border-stone-700/60 cursor-pointer"
       >
         Cancel Draw
       </button>
@@ -644,7 +644,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
               }`}
             >
               {visibilityScope === 'mission' && (
-                <div className="flex items-center gap-2 p-2 rounded-lg bg-sky-500/10 border border-sky-500/30 text-[10px] text-sky-300 mb-1.5">
+                <div className="flex items-center gap-2 p-2 rounded-lg bg-sky-500/10 border border-sky-500/30 text-[11px] text-sky-300 mb-1.5">
                   <Info className="w-3.5 h-3.5 text-sky-400 shrink-0" weight="duotone" />
                   <span>
                     Drawing on <strong>Mission layer</strong>. Click any drawn shape and select{' '}
@@ -654,7 +654,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
                 </div>
               )}
 
-              <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider">
+              <label className="block text-[11px] font-bold text-stone-400 uppercase tracking-wider">
                 Select Shape to Draw
               </label>
 
@@ -686,7 +686,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
                       }`}
                     >
                       {item.icon}
-                      <span className="text-[10px] font-semibold">{item.label}</span>
+                      <span className="text-[11px] font-semibold">{item.label}</span>
                     </button>
                   );
                 })}
@@ -696,7 +696,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
             {/* Shape Label vs Text Box Content */}
             {activeShape !== 'text' ? (
               <div className="bg-stone-950/80 p-2.5 rounded-lg border border-stone-800 space-y-1">
-                <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider">
+                <label className="block text-[11px] font-bold text-stone-400 uppercase tracking-wider">
                   Shape Label (Permanent on Map)
                 </label>
                 <input
@@ -712,7 +712,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
               </div>
             ) : (
               <div className="bg-stone-950/80 p-2.5 rounded-lg border border-stone-800 space-y-2">
-                <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider">
+                <label className="block text-[11px] font-bold text-stone-400 uppercase tracking-wider">
                   Text Box Content
                 </label>
                 <input
@@ -723,11 +723,11 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
                     if (isDrawingActive) onUpdateDrawOptions({ text: e.target.value });
                   }}
                   placeholder="Enter map annotation text..."
-                  className="w-full bg-stone-900 border border-stone-700 rounded-md px-2.5 py-1.5 text-xs text-stone-100 placeholder:text-stone-500 focus:outline-none focus:border-amber-400 font-mono"
+                  className="w-full bg-stone-900 border border-stone-700 rounded-md px-2.5 py-1.5 text-xs text-stone-100 placeholder:text-stone-500 focus:outline-none focus:border-amber-400 font-sans"
                 />
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-1.5">
-                    <label className="text-[10px] text-stone-400">Size:</label>
+                    <label className="text-xs text-stone-400">Size:</label>
                     <select
                       value={textFontSize}
                       onChange={(e) => {
@@ -743,7 +743,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
                       <option value={16}>Header (16px)</option>
                     </select>
                   </div>
-                  <label className="flex items-center gap-1.5 text-[10px] text-stone-300 cursor-pointer">
+                  <label className="flex items-center gap-1.5 text-xs text-stone-300 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={textBoxBg}
@@ -761,7 +761,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
 
             {/* Line Style */}
             <div className="bg-stone-950/80 p-2.5 rounded-lg border border-stone-800 space-y-1.5">
-              <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider">
+              <label className="block text-[11px] font-bold text-stone-400 uppercase tracking-wider">
                 Line Style
               </label>
               <div className="grid grid-cols-4 gap-1">
@@ -777,7 +777,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
                     key={k}
                     type="button"
                     onClick={() => handleSelectLineStyle(k)}
-                    className={`py-1 px-1.5 rounded border text-[10px] font-semibold text-center transition-all cursor-pointer ${
+                    className={`py-1 px-1.5 rounded border text-[11px] font-semibold text-center transition-all cursor-pointer ${
                       lineStyle === k
                         ? 'bg-amber-500/20 text-amber-300 border-amber-500'
                         : 'bg-stone-900 text-stone-400 hover:text-stone-200 border-stone-800'
@@ -792,7 +792,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
             {/* Thickness & Fill Opacity */}
             <div className="grid grid-cols-2 gap-2">
               <div className="bg-stone-950/80 p-2.5 rounded-lg border border-stone-800 space-y-1">
-                <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider">
+                <label className="block text-[11px] font-bold text-stone-400 uppercase tracking-wider">
                   Thickness
                 </label>
                 <select
@@ -815,10 +815,10 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
               </div>
               <div className="bg-stone-950/80 p-2.5 rounded-lg border border-stone-800 space-y-1">
                 <div className="flex items-center justify-between">
-                  <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider">
+                  <label className="block text-[11px] font-bold text-stone-400 uppercase tracking-wider">
                     Fill Opacity
                   </label>
-                  <span className="text-[10px] font-mono text-amber-400 font-bold">
+                  <span className="text-[11px] font-mono tabular-nums text-amber-400 font-bold">
                     {Math.round(fillOpacity * 100)}%
                   </span>
                 </div>
@@ -851,7 +851,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
             )}
 
             {/* Category Tabs */}
-            <div className="flex items-center gap-1 bg-stone-950/80 p-1 rounded-lg border border-stone-800 text-[10px] overflow-x-auto">
+            <div className="flex items-center gap-1 bg-stone-950/80 p-1 rounded-lg border border-stone-800 text-[11px] overflow-x-auto">
               {iconCatalog.categories.map((cat) => (
                 <button
                   key={cat}
@@ -870,7 +870,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
 
             {/* Icon Badge / Label */}
             <div className="space-y-1">
-              <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider">
+              <label className="block text-[11px] font-bold text-stone-400 uppercase tracking-wider">
                 Icon Badge / Label (Optional)
               </label>
               <input
@@ -884,7 +884,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
                 }}
                 disabled={!permissions.canCreateTacticalMarkings}
                 placeholder="e.g. 1st Tank Plt, CP Alpha, Depot 4..."
-                className="w-full bg-stone-950 border border-stone-700 rounded-md px-2.5 py-1.5 text-xs text-stone-100 placeholder:text-stone-500 focus:outline-none focus:border-amber-400 font-mono disabled:opacity-40"
+                className="w-full bg-stone-950 border border-stone-700 rounded-md px-2.5 py-1.5 text-xs text-stone-100 placeholder:text-stone-500 focus:outline-none focus:border-amber-400 disabled:opacity-40"
               />
             </div>
 
@@ -895,10 +895,10 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
               }`}
             >
               <div className="flex items-center justify-between">
-                <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider">
+                <label className="block text-[11px] font-bold text-stone-400 uppercase tracking-wider">
                   Click Icon to Place on Map
                 </label>
-                <span className="text-[10px] text-stone-500 font-mono">
+                <span className="text-[11px] text-stone-500 tabular-nums">
                   {categoryIcons.length} icons
                 </span>
               </div>
@@ -920,7 +920,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
                       style={{ color: activeColor || ic.defaultColor || '#f59e0b' }}
                       dangerouslySetInnerHTML={{ __html: ic.svg }}
                     />
-                    <span className="text-[10px] font-semibold text-stone-300 text-center leading-tight truncate max-w-full px-0.5">
+                    <span className="text-[11px] font-semibold text-stone-300 text-center leading-tight truncate max-w-full px-0.5">
                       {ic.label}
                     </span>
                   </button>
@@ -933,9 +933,9 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
         {/* TAB 3: PLACED MARKINGS LIST */}
         {activeTab === 'list' && (
           <div className="space-y-2">
-            <div className="flex items-center justify-between text-[10px] text-stone-400 font-semibold uppercase">
+            <div className="flex items-center justify-between text-[11px] text-stone-400 font-semibold uppercase">
               <span>Active Tactical Annotations</span>
-              <span>{markingsList.length} total</span>
+              <span className="tabular-nums">{markingsList.length} total</span>
             </div>
 
             <div className="space-y-1.5 max-h-[380px] overflow-y-auto pr-1">
@@ -969,11 +969,11 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
                               m.properties?.text ||
                               `${m.properties?.shape || 'Marking'} #${m.id}`}
                           </span>
-                          <span className="px-1.5 py-0.2 rounded text-[9px] font-bold uppercase tracking-wider bg-stone-800 text-stone-400 border border-stone-700 shrink-0">
+                          <span className="px-1.5 py-0.2 rounded text-[11px] font-bold uppercase tracking-wider bg-stone-800 text-stone-400 border border-stone-700 shrink-0">
                             {m.properties?.shape || 'Shape'}
                           </span>
                         </div>
-                        <div className="text-[10px] text-stone-400 mt-0.5 flex items-center gap-2 flex-wrap">
+                        <div className="text-[11px] text-stone-400 mt-0.5 flex items-center gap-2 flex-wrap">
                           <span>By: {m.creator_name || 'User'}</span>
                           <span>&bull;</span>
                           <span className={`capitalize ${visColorClass}`}>{m.visibility}</span>
@@ -1031,7 +1031,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
           <div className="space-y-3 bg-stone-950/90 border border-amber-500/40 rounded-xl p-3 shadow-lg">
             <div className="flex items-center justify-between border-b border-stone-800 pb-2">
               <div className="flex items-center gap-2">
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                <span className="px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30">
                   {editDraft.shape}
                 </span>
                 <span className="text-xs font-bold text-stone-200">Editing #{editDraft.id}</span>
@@ -1042,13 +1042,13 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
                   onSelectEditingMarking(null);
                   setActiveTab('list');
                 }}
-                className="text-[10px] text-stone-400 hover:text-stone-200 hover:underline cursor-pointer"
+                className="text-xs text-stone-400 hover:text-stone-200 hover:underline cursor-pointer"
               >
                 Back
               </button>
             </div>
 
-            <div className="flex items-center gap-2 p-2 rounded-lg bg-amber-500/10 border border-amber-500/30 text-[11px] text-amber-300">
+            <div className="flex items-center gap-2 p-2 rounded-lg bg-amber-500/10 border border-amber-500/30 text-xs text-amber-300">
               <ArrowsOutCardinal className="w-4 h-4 shrink-0 text-amber-400" weight="duotone" />
               <span>
                 Drag this icon or grab shape vertex handles directly on the map to reposition or
@@ -1058,7 +1058,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
 
             {/* Label */}
             <div className="space-y-1">
-              <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider">
+              <label className="block text-[11px] font-bold text-stone-400 uppercase tracking-wider">
                 Label / Annotation
               </label>
               <input
@@ -1079,7 +1079,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
             {/* Change Icon (when shape === 'icon') */}
             {(editDraft.shape === 'icon' || editDraft.icon) && (
               <div className="space-y-1">
-                <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider">
+                <label className="block text-[11px] font-bold text-stone-400 uppercase tracking-wider">
                   Change Icon
                 </label>
                 <div className="grid grid-cols-4 gap-1.5 max-h-36 overflow-y-auto p-1.5 bg-stone-900/80 border border-stone-800 rounded-lg">
@@ -1101,7 +1101,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
                         className="w-5 h-5 flex items-center justify-center text-amber-400 [&>svg]:w-full [&>svg]:h-full"
                         dangerouslySetInnerHTML={{ __html: ic.svg }}
                       />
-                      <span className="text-[8px] truncate w-full text-center text-stone-400 mt-0.5">
+                      <span className="text-[11px] truncate w-full text-center text-stone-400 mt-0.5">
                         {ic.label}
                       </span>
                     </button>
@@ -1112,7 +1112,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
 
             {/* Notes */}
             <div className="space-y-1">
-              <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider">
+              <label className="block text-[11px] font-bold text-stone-400 uppercase tracking-wider">
                 Intel / Tactical Notes
               </label>
               <textarea
@@ -1128,9 +1128,9 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
 
             {/* Visibility Scope Redefinition */}
             <div className="space-y-1.5 p-2 rounded-lg bg-stone-900/60 border border-stone-800">
-              <div className="flex items-center justify-between text-[10px] font-bold text-stone-400 uppercase tracking-wider">
+              <div className="flex items-center justify-between text-[11px] font-bold text-stone-400 uppercase tracking-wider">
                 <span>Marking Layer / Visibility</span>
-                <span className="text-[9px] text-amber-400 font-normal normal-case">
+                <span className="text-[11px] text-amber-400 font-normal normal-case">
                   Change layer
                 </span>
               </div>
@@ -1138,7 +1138,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
                 <button
                   type="button"
                   onClick={() => mutateEditDraft((prev) => ({ ...prev, visibility: 'personal' }))}
-                  className={`py-1 px-1 rounded border text-[10px] text-center transition-all cursor-pointer ${
+                  className={`py-1 px-1 rounded border text-[11px] text-center transition-all cursor-pointer ${
                     editDraft.visibility === 'personal'
                       ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500 font-bold'
                       : 'bg-stone-900 text-stone-400 border-stone-800'
@@ -1191,7 +1191,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
                         };
                       });
                     }}
-                    className={`py-1 px-1 rounded border text-[10px] text-center transition-all flex items-center justify-center gap-0.5 ${
+                    className={`py-1 px-1 rounded border text-[11px] text-center transition-all flex items-center justify-center gap-0.5 ${
                       editDraft.visibility === scopeKey
                         ? activeCls
                         : 'bg-stone-900 text-stone-400 border-stone-800'
@@ -1209,7 +1209,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
 
               {(editDraft.visibility === 'mission' || editDraft.visibility === 'sortie') && (
                 <div className="space-y-1 mt-1">
-                  <label className="block text-[9px] text-stone-400">Assigned Mission:</label>
+                  <label className="block text-[11px] text-stone-400">Assigned Mission:</label>
                   <select
                     value={editDraft.mission_id ?? ''}
                     onChange={(e) => {
@@ -1238,7 +1238,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
 
               {editDraft.visibility === 'sortie' && (
                 <div className="space-y-1 mt-1">
-                  <label className="block text-[9px] text-stone-400">Assigned Sortie:</label>
+                  <label className="block text-[11px] text-stone-400">Assigned Sortie:</label>
                   <select
                     value={editDraft.sortie_id ?? ''}
                     onChange={(e) =>
@@ -1269,7 +1269,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
             {editDraft.shape !== 'icon' && editDraft.shape !== 'text' && (
               <>
                 <div className="bg-stone-900/60 p-2.5 rounded-lg border border-stone-800 space-y-1.5">
-                  <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider">
+                  <label className="block text-[11px] font-bold text-stone-400 uppercase tracking-wider">
                     Line Style
                   </label>
                   <div className="grid grid-cols-4 gap-1">
@@ -1289,7 +1289,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
                             dashArray: getDashArrayFromStyle(k),
                           })
                         }
-                        className={`py-1 px-1.5 rounded border text-[10px] text-center transition-all cursor-pointer ${
+                        className={`py-1 px-1.5 rounded border text-[11px] text-center transition-all cursor-pointer ${
                           editDraft.lineStyle === k
                             ? 'bg-amber-500/20 text-amber-300 border-amber-500 font-bold'
                             : 'bg-stone-900 text-stone-400 hover:text-stone-200 border-stone-800'
@@ -1303,7 +1303,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
 
                 <div className="grid grid-cols-2 gap-2">
                   <div className="bg-stone-900/60 p-2.5 rounded-lg border border-stone-800 space-y-1">
-                    <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider">
+                    <label className="block text-[11px] font-bold text-stone-400 uppercase tracking-wider">
                       Thickness
                     </label>
                     <select
@@ -1330,10 +1330,10 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider">
+                      <label className="block text-[11px] font-bold text-stone-400 uppercase tracking-wider">
                         Fill Opacity
                       </label>
-                      <span className="text-[10px] font-mono text-amber-400 font-bold">
+                      <span className="text-[11px] font-mono tabular-nums text-amber-400 font-bold">
                         {editDraft.shape === 'line'
                           ? 'N/A'
                           : `${Math.round(editDraft.fillOpacity * 100)}%`}
@@ -1363,10 +1363,10 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
             <div className="space-y-2 bg-stone-900/60 p-2.5 rounded-lg border border-stone-800">
               <div className="space-y-1">
                 <div className="flex items-center justify-between">
-                  <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider">
+                  <label className="block text-[11px] font-bold text-stone-400 uppercase tracking-wider">
                     {editDraft.shape === 'icon' ? 'Icon Color' : 'Stroke / Line Color'}
                   </label>
-                  <span className="font-mono text-[10px] text-amber-400 font-bold">
+                  <span className="font-mono text-[11px] text-amber-400 font-bold">
                     {editDraft.color}
                   </span>
                 </div>
@@ -1400,10 +1400,10 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
                 editDraft.shape !== 'text' && (
                   <div className="space-y-1.5 pt-2 border-t border-stone-800">
                     <div className="flex items-center justify-between">
-                      <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider">
+                      <label className="block text-[11px] font-bold text-stone-400 uppercase tracking-wider">
                         Fill Color
                       </label>
-                      <label className="flex items-center gap-1.5 text-[10px] text-stone-300 cursor-pointer">
+                      <label className="flex items-center gap-1.5 text-xs text-stone-300 cursor-pointer">
                         <input
                           type="checkbox"
                           checked={editDraft.syncFillColor}
@@ -1455,16 +1455,16 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
               permissions.canEditMissionAor &&
               missions.length > 0 && (
                 <div className="p-2.5 rounded-lg bg-sky-950/50 border border-sky-500/40 space-y-2 shadow-sm">
-                  <div className="flex items-center justify-between text-[10px]">
+                  <div className="flex items-center justify-between text-[11px]">
                     <span className="font-bold text-sky-300 flex items-center gap-1.5">
                       <Target className="w-3.5 h-3.5 text-sky-400" weight="duotone" />
                       <span>Area of Responsibility (AOR)</span>
                     </span>
-                    <span className="text-stone-400 text-[9px]">Bind boundary</span>
+                    <span className="text-stone-400 text-[11px]">Bind boundary</span>
                   </div>
 
                   <div className="space-y-1">
-                    <label className="block text-[10px] text-stone-400 font-semibold">
+                    <label className="block text-[11px] text-stone-400 font-semibold">
                       Target Mission:
                     </label>
                     <select
@@ -1484,7 +1484,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
                   </div>
 
                   <div className="space-y-1">
-                    <label className="block text-[10px] text-stone-400 font-semibold">
+                    <label className="block text-[11px] text-stone-400 font-semibold">
                       Assign Boundary To:
                     </label>
                     <select
@@ -1550,10 +1550,10 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
             {/* Color Swatches */}
             <div className="bg-stone-950/80 p-2.5 rounded-lg border border-stone-800 space-y-1.5">
               <div className="flex items-center justify-between">
-                <span className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider">
+                <span className="block text-[11px] font-bold text-stone-400 uppercase tracking-wider">
                   Color Swatches
                 </span>
-                <span className="font-mono text-[10px] text-stone-300 font-bold">
+                <span className="font-mono text-[11px] text-stone-300 font-bold">
                   {activeColor}
                 </span>
               </div>
@@ -1589,7 +1589,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
 
             {/* Marking Visibility Scope */}
             <div className="bg-stone-950/80 p-2.5 rounded-lg border border-stone-800 space-y-2">
-              <label className="text-[10px] font-bold text-stone-400 uppercase tracking-wider flex items-center gap-1.5">
+              <label className="text-[11px] font-bold text-stone-400 uppercase tracking-wider flex items-center gap-1.5">
                 <Eye className="w-3.5 h-3.5 text-amber-400" weight="duotone" />
                 <span>Marking Visibility Scope</span>
               </label>
@@ -1601,7 +1601,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
                   onClick={() => {
                     if (permissions.canCreateTacticalMarkings) setVisibilityScope('personal');
                   }}
-                  className={`py-1 px-1 rounded border text-[10px] text-center transition-all ${
+                  className={`py-1 px-1 rounded border text-[11px] text-center transition-all ${
                     visibilityScope === 'personal'
                       ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500 font-bold'
                       : 'bg-stone-900 text-stone-400 hover:text-stone-200 border-stone-800'
@@ -1649,7 +1649,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
                     onClick={() => {
                       if (allowed) setVisibilityScope(scopeKey);
                     }}
-                    className={`py-1 px-1 rounded border text-[10px] text-center transition-all flex items-center justify-center gap-0.5 ${
+                    className={`py-1 px-1 rounded border text-[11px] text-center transition-all flex items-center justify-center gap-0.5 ${
                       visibilityScope === scopeKey
                         ? activeCls
                         : 'bg-stone-900 text-stone-400 hover:text-stone-200 border-stone-800'
@@ -1667,7 +1667,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
 
               {(visibilityScope === 'mission' || visibilityScope === 'sortie') && (
                 <div className="space-y-1">
-                  <label className="block text-[10px] text-stone-400">Target Mission:</label>
+                  <label className="block text-[11px] text-stone-400">Target Mission:</label>
                   <select
                     value={targetMissionId ?? ''}
                     onChange={(e) =>
@@ -1686,7 +1686,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
 
               {visibilityScope === 'sortie' && (
                 <div className="space-y-1">
-                  <label className="block text-[10px] text-stone-400">Target Sortie:</label>
+                  <label className="block text-[11px] text-stone-400">Target Sortie:</label>
                   <select
                     value={targetSortieId ?? ''}
                     onChange={(e) =>
@@ -1709,7 +1709,7 @@ export const TacticalMarkingsDrawer: React.FC<TacticalMarkingsDrawerProps> = ({
                 </div>
               )}
 
-              <p className="text-[9px] text-stone-500 italic">
+              <p className="text-[11px] text-stone-500 italic">
                 {visibilityScope === 'personal'
                   ? 'Visible only to you on this campaign map.'
                   : visibilityScope === 'campaign'

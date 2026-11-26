@@ -121,12 +121,12 @@ export const SummaryTab: React.FC<SummaryTabProps> = ({
         {/* Callsign / Name */}
         <div className="col-span-2">
           <div className="flex items-center justify-between mb-1">
-            <label className="block text-[10px] font-bold text-stone-400 uppercase">
+            <label className="block text-xs font-bold text-stone-400 uppercase">
               Callsign / Flight Plan Name
             </label>
             {plan.identifier && (
               <span
-                className="text-[10px] font-mono font-bold text-amber-400 bg-stone-900 border border-stone-800 px-1.5 py-0.5 rounded"
+                className="text-[11px] font-mono font-bold text-amber-400 bg-stone-900 border border-stone-800 px-1.5 py-0.5 rounded"
                 title="FP ID is permanent and cannot be changed"
               >
                 <span className="text-stone-500">FP ID:</span> {plan.identifier}
@@ -157,14 +157,14 @@ export const SummaryTab: React.FC<SummaryTabProps> = ({
               className="w-full rounded-md border border-stone-700 bg-stone-900 text-stone-100 text-xs py-1.5 px-2.5 font-bold focus:border-amber-400 focus:outline-none disabled:opacity-60"
             />
           </div>
-          <p className="text-[10px] text-stone-400 mt-1">
+          <p className="text-xs text-stone-400 mt-1">
             FP ID is permanent. You can append or customize the flight plan callsign/name.
           </p>
         </div>
 
         {/* Airframe */}
         <div>
-          <label className="block text-[10px] font-bold text-stone-400 uppercase mb-1">
+          <label className="block text-xs font-bold text-stone-400 uppercase mb-1">
             Airframe
           </label>
           <select
@@ -212,7 +212,7 @@ export const SummaryTab: React.FC<SummaryTabProps> = ({
 
         {/* Faction / Side */}
         <div>
-          <label className="block text-[10px] font-bold text-stone-400 uppercase mb-1">
+          <label className="block text-xs font-bold text-stone-400 uppercase mb-1">
             Faction / Side
           </label>
           {mapData.permissions.canManageBothCoalitions ? (
@@ -248,14 +248,14 @@ export const SummaryTab: React.FC<SummaryTabProps> = ({
                   className={`size-2 rounded-full ${plan.is_opfor ? 'bg-red-500' : 'bg-sky-500'}`}
                 />
                 <span
-                  className={`font-bold font-mono text-xs ${
+                  className={`font-bold text-xs ${
                     plan.is_opfor ? 'text-red-400' : 'text-sky-400'
                   }`}
                 >
                   {plan.is_opfor ? 'OPFOR' : 'BLUFOR'}
                 </span>
               </div>
-              <span className="text-[10px] text-stone-500 italic">
+              <span className="text-[11px] text-stone-500 italic">
                 {plan.is_opfor ? 'Adversary' : 'Friendly'}
               </span>
             </div>
@@ -264,7 +264,7 @@ export const SummaryTab: React.FC<SummaryTabProps> = ({
 
         {/* Sortie (Searchable Mission-Grouped Dropdown) */}
         <div className="relative" ref={sortieRef}>
-          <label className="block text-[10px] font-bold text-stone-400 uppercase mb-1">
+          <label className="block text-xs font-bold text-stone-400 uppercase mb-1">
             Sortie
           </label>
           <button
@@ -365,7 +365,7 @@ export const SummaryTab: React.FC<SummaryTabProps> = ({
 
                 {Object.entries(filteredSortieGroups).map(([missionName, sorties]) => (
                   <div key={missionName} className="py-1">
-                    <div className="px-2.5 py-1 text-[10px] font-mono uppercase tracking-wider text-amber-500/90 font-bold bg-stone-900/40 flex items-center gap-1.5">
+                    <div className="px-2.5 py-1 text-[11px] uppercase tracking-wider text-amber-500/90 font-bold bg-stone-900/40 flex items-center gap-1.5">
                       <span className="size-1.5 rounded-full bg-amber-400" />
                       <span>{missionName}</span>
                     </div>
@@ -395,7 +395,7 @@ export const SummaryTab: React.FC<SummaryTabProps> = ({
 
         {/* Tasking */}
         <div>
-          <label className="block text-[10px] font-bold text-stone-400 uppercase mb-1">
+          <label className="block text-xs font-bold text-stone-400 uppercase mb-1">
             Tasking
           </label>
           <select
@@ -420,9 +420,9 @@ export const SummaryTab: React.FC<SummaryTabProps> = ({
 
         {/* Flight Rules (Automated) */}
         <div>
-          <label className="block text-[10px] font-bold text-stone-400 uppercase mb-1 flex items-center justify-between">
+          <label className="block text-xs font-bold text-stone-400 uppercase mb-1 flex items-center justify-between">
             <span>Flight Rules</span>
-            <span className="text-[9px] text-amber-400 font-mono font-semibold">AUTO</span>
+            <span className="text-[11px] text-amber-400 font-semibold">AUTO</span>
           </label>
           <div
             className="w-full rounded-md border border-stone-700 bg-stone-950 px-2.5 py-1.5 flex items-center justify-between text-xs cursor-help min-h-[34px]"
@@ -448,7 +448,7 @@ export const SummaryTab: React.FC<SummaryTabProps> = ({
                 {autoRules}
               </span>
             </div>
-            <span className="text-[10px] text-stone-400 truncate ml-1 font-sans">
+            <span className="text-[11px] text-stone-400 truncate ml-1 font-sans">
               {isIfrRules
                 ? 'Instrument Rules'
                 : autoRules === 'MVFR'
@@ -460,7 +460,7 @@ export const SummaryTab: React.FC<SummaryTabProps> = ({
 
         {/* Coordinate Format */}
         <div>
-          <label className="block text-[10px] font-bold text-stone-400 uppercase mb-1">
+          <label className="block text-xs font-bold text-stone-400 uppercase mb-1">
             Coordinate Format
           </label>
           <select
@@ -480,7 +480,7 @@ export const SummaryTab: React.FC<SummaryTabProps> = ({
 
         {/* Launch Time */}
         <div>
-          <label className="block text-[10px] font-bold text-stone-400 uppercase mb-1">
+          <label className="block text-xs font-bold text-stone-400 uppercase mb-1">
             Launch Time
           </label>
           <input
@@ -497,7 +497,7 @@ export const SummaryTab: React.FC<SummaryTabProps> = ({
 
         {/* Overlay Color */}
         <div>
-          <label className="block text-[10px] font-bold text-stone-400 uppercase mb-1">
+          <label className="block text-xs font-bold text-stone-400 uppercase mb-1">
             Overlay Color
           </label>
           <div className="flex items-center gap-2">
@@ -518,7 +518,7 @@ export const SummaryTab: React.FC<SummaryTabProps> = ({
 
         {/* Home Plate (Departure) */}
         <div>
-          <label className="block text-[10px] font-bold text-stone-400 uppercase mb-1">
+          <label className="block text-xs font-bold text-stone-400 uppercase mb-1">
             Home Plate (Launch Base)
           </label>
           <input
@@ -536,7 +536,7 @@ export const SummaryTab: React.FC<SummaryTabProps> = ({
 
         {/* Final Recovery (Destination) */}
         <div>
-          <label className="block text-[10px] font-bold text-stone-400 uppercase mb-1">
+          <label className="block text-xs font-bold text-stone-400 uppercase mb-1">
             Final Recovery (Destination)
           </label>
           <input
@@ -560,7 +560,7 @@ export const SummaryTab: React.FC<SummaryTabProps> = ({
 
         {/* Recovery Overhead Pattern Indicator */}
         {overhead && (
-          <div className="col-span-full flex items-center justify-between text-[11px] px-2.5 py-1.5 rounded-lg bg-purple-950/40 border border-purple-800/60 text-purple-200 shadow-sm">
+          <div className="col-span-full flex items-center justify-between text-xs px-2.5 py-1.5 rounded-lg bg-purple-950/40 border border-purple-800/60 text-purple-200 shadow-sm">
             <div className="flex items-center gap-2 min-w-0">
               <span className="p-1 rounded bg-purple-900/80 text-purple-300 shrink-0">
                 <AirplaneLanding className="size-3.5" weight="duotone" />
@@ -570,12 +570,12 @@ export const SummaryTab: React.FC<SummaryTabProps> = ({
                   <span className="text-stone-300">Recovery Pattern:</span>
                   <span className="text-purple-300 truncate">{overhead.name}</span>
                   {overhead.runway && (
-                    <span className="text-stone-400 font-mono text-[10px]">
+                    <span className="text-stone-400 font-mono text-[11px]">
                       (RWY {overhead.runway})
                     </span>
                   )}
                 </div>
-                <div className="text-[10px] text-stone-400">
+                <div className="text-[11px] text-stone-400">
                   <span>{overhead.altitude_ft ? `${overhead.altitude_ft} ft` : '1,500 ft'}</span>
                   <span> • </span>
                   <span>{overhead.speed_kts ? `${overhead.speed_kts} kts` : '300 kts'}</span>
@@ -587,7 +587,7 @@ export const SummaryTab: React.FC<SummaryTabProps> = ({
             <button
               type="button"
               onClick={() => onSwitchTab('routes')}
-              className="text-[10px] text-amber-400 hover:text-amber-300 font-bold shrink-0 ml-2 px-2 py-1 rounded bg-stone-900/80 hover:bg-stone-800 border border-stone-700 transition-colors cursor-pointer"
+              className="text-xs text-amber-400 hover:text-amber-300 font-bold shrink-0 ml-2 px-2 py-1 rounded bg-stone-900/80 hover:bg-stone-800 border border-stone-700 transition-colors cursor-pointer"
             >
               View in Routes &rarr;
             </button>
@@ -596,7 +596,7 @@ export const SummaryTab: React.FC<SummaryTabProps> = ({
 
         {/* Fuel Amount */}
         <div>
-          <label className="block text-[10px] font-bold text-stone-400 uppercase mb-1">
+          <label className="block text-xs font-bold text-stone-400 uppercase mb-1">
             Total Fuel (lbs / %)
           </label>
           <input
@@ -613,7 +613,7 @@ export const SummaryTab: React.FC<SummaryTabProps> = ({
 
         {/* Planned Loadout */}
         <div>
-          <label className="block text-[10px] font-bold text-stone-400 uppercase mb-1">
+          <label className="block text-xs font-bold text-stone-400 uppercase mb-1">
             Planned Loadout
           </label>
           <input
@@ -632,7 +632,7 @@ export const SummaryTab: React.FC<SummaryTabProps> = ({
       {/* Divert Airfields */}
       <div className="pt-2 border-t border-stone-800 space-y-2">
         <div className="flex items-center justify-between gap-2">
-          <label className="block text-[10px] font-bold text-amber-400 uppercase">
+          <label className="block text-xs font-bold text-amber-400 uppercase">
             Divert Airfields ({diverts.length})
           </label>
           {canEdit && (
@@ -666,7 +666,7 @@ export const SummaryTab: React.FC<SummaryTabProps> = ({
                   };
                 });
               }}
-              className="bg-stone-950 border border-stone-700 rounded px-2 py-0.5 text-[10px] text-stone-200 focus:border-amber-400 focus:outline-none"
+              className="bg-stone-950 border border-stone-700 rounded px-2 py-0.5 text-xs text-stone-200 focus:border-amber-400 focus:outline-none"
             >
               <option value="">+ Add Divert Airfield...</option>
               {(mapData.airbases || []).map((ab) => (
@@ -688,9 +688,9 @@ export const SummaryTab: React.FC<SummaryTabProps> = ({
                 className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-stone-900 border border-stone-700 text-xs"
               >
                 <span className="text-amber-400 font-bold">{label}</span>
-                {code && <span className="font-mono text-[10px] text-stone-400">({code})</span>}
+                {code && <span className="font-mono text-[11px] text-stone-400">({code})</span>}
                 {tacan && (
-                  <span className="font-mono text-[10px] text-emerald-400 font-semibold">
+                  <span className="font-mono text-[11px] text-emerald-400 font-semibold">
                     {tacan}
                   </span>
                 )}
@@ -715,7 +715,7 @@ export const SummaryTab: React.FC<SummaryTabProps> = ({
             );
           })}
           {diverts.length === 0 && (
-            <span className="text-stone-500 italic text-[11px]">
+            <span className="text-stone-500 italic text-xs">
               No divert airfields selected. Click airbases on the map to add them as diverts.
             </span>
           )}

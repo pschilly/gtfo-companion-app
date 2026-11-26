@@ -76,10 +76,10 @@ export const LoginModal: React.FC = () => {
               className="size-24 rounded-xl object-contain p-1"
             />
             <div>
-              <h2 className="font-display text-base font-bold text-stone-100">
+              <h2 className="font-display text-lg font-bold text-stone-100">
                 {STATIC_CONFIG.appTitle}
               </h2>
-              <p className="text-xs font-mono text-stone-400">
+              <p className="text-xs text-stone-400">
                 Discord OAuth2 &amp; Member Dossier Verification
               </p>
             </div>
@@ -116,16 +116,16 @@ export const LoginModal: React.FC = () => {
                     />
                   )}
                   <div>
-                    <span className="text-[10px] font-mono uppercase text-stone-400">
+                    <span className="text-[11px] font-medium uppercase text-stone-400">
                       Authenticated Pilot ({memberProfile.grade})
                     </span>
-                    <h4 className="font-display text-sm font-bold text-stone-100">
+                    <h4 className="font-display text-base font-bold text-stone-100">
                       {userSession.globalName} (@{userSession.username})
                     </h4>
                   </div>
                 </div>
                 <span
-                  className={`px-2.5 py-1 rounded text-xs font-mono font-bold uppercase ${
+                  className={`px-2.5 py-1 rounded text-xs font-bold uppercase ${
                     effectiveTier === 'core'
                       ? 'bg-amber-500 text-stone-950'
                       : effectiveTier === 'community'
@@ -143,7 +143,7 @@ export const LoginModal: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-2.5 pt-2 border-t border-stone-800">
                 <div
-                  className={`p-2.5 rounded-xl border text-xs font-mono flex items-center gap-2 ${
+                  className={`p-2.5 rounded-xl border text-xs flex items-center gap-2 ${
                     hasCommunityRole
                       ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-300'
                       : 'bg-stone-900 border-stone-800 text-stone-500'
@@ -152,12 +152,12 @@ export const LoginModal: React.FC = () => {
                   <ShieldCheck className="w-4 h-4 shrink-0" />
                   <div>
                     <div className="font-bold">Community Role</div>
-                    <div className="text-[10px]">{hasCommunityRole ? 'VERIFIED' : 'NOT PRESENT'}</div>
+                    <div className="text-[11px] font-semibold">{hasCommunityRole ? 'VERIFIED' : 'NOT PRESENT'}</div>
                   </div>
                 </div>
 
                 <div
-                  className={`p-2.5 rounded-xl border text-xs font-mono flex items-center gap-2 ${
+                  className={`p-2.5 rounded-xl border text-xs flex items-center gap-2 ${
                     hasCoreRole
                       ? 'bg-amber-500/15 border-amber-500/50 text-amber-300'
                       : 'bg-stone-900 border-stone-800 text-stone-500'
@@ -166,7 +166,7 @@ export const LoginModal: React.FC = () => {
                   <Sparkle className="w-4 h-4 shrink-0" />
                   <div>
                     <div className="font-bold">CORE Roster Role</div>
-                    <div className="text-[10px]">{hasCoreRole ? 'VERIFIED' : 'NOT PRESENT'}</div>
+                    <div className="text-[11px] font-semibold">{hasCoreRole ? 'VERIFIED' : 'NOT PRESENT'}</div>
                   </div>
                 </div>
               </div>
@@ -213,26 +213,26 @@ export const LoginModal: React.FC = () => {
               <button
                 onClick={handleOAuthClick}
                 disabled={isLoading}
-                className="text-xs font-mono text-amber-400 hover:underline flex items-center gap-1"
+                className="text-xs font-medium text-amber-400 hover:underline flex items-center gap-1"
               >
                 <CheckCircle className="w-3.5 h-3.5" />
                 Re-verify Roles
               </button>
               <button
                 onClick={() => setShowLogoutConfirm(true)}
-                className="text-xs font-mono text-red-400 hover:underline"
+                className="text-xs font-medium text-red-400 hover:underline"
               >
                 Sign Out
               </button>
             </div>
           ) : (
-            <span className="text-[11px] font-mono text-stone-500">
+            <span className="text-xs text-stone-500">
               {STATIC_CONFIG.appTitle} // Discord OAuth2
             </span>
           )}
           <button
             onClick={() => setLoginModalOpen(false)}
-            className="px-4 py-1.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-xs font-mono text-stone-200"
+            className="px-4 py-1.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-xs font-medium text-stone-200"
           >
             Close
           </button>

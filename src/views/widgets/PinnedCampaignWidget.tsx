@@ -53,10 +53,10 @@ export const PinnedCampaignWidget: React.FC<HomeWidgetProps> = ({ colSpan }) => 
                 <Crosshair className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-display font-bold text-stone-100 text-sm sm:text-base">
+                <h3 className="font-display font-bold text-stone-100 text-base">
                   Pinned Campaign Overview
                 </h3>
-                <p className="text-[11px] font-mono text-stone-400">
+                <p className="text-xs text-stone-400">
                   S2 - Operations theater summary
                 </p>
               </div>
@@ -65,26 +65,26 @@ export const PinnedCampaignWidget: React.FC<HomeWidgetProps> = ({ colSpan }) => 
             <button
               type="button"
               onClick={() => setActiveTab('campaigns')}
-              className="text-xs font-mono text-amber-400 hover:text-amber-300 flex items-center gap-1 transition"
+              className="text-xs font-medium text-amber-400 hover:text-amber-300 flex items-center gap-1 transition"
             >
               <span>Campaigns</span>
               <ArrowRight className="w-3 h-3" />
             </button>
           </div>
 
-          <div className="mt-4 py-8 text-center text-xs font-mono text-stone-500">
+          <div className="mt-4 py-8 text-center text-xs text-stone-500">
             {isLoadingCampaigns
               ? 'Loading ongoing campaign data from portal...'
               : 'No active operational campaigns found.'}
           </div>
         </div>
 
-        <div className="mt-4 pt-3 border-t border-stone-800 flex items-center justify-between text-xs font-mono text-stone-400">
+        <div className="mt-4 pt-3 border-t border-stone-800 flex items-center justify-between text-xs text-stone-400">
           <span>S2 - Operations</span>
           <button
             type="button"
             onClick={() => setActiveTab('campaigns')}
-            className="text-amber-400 hover:text-amber-300 font-bold"
+            className="text-amber-400 hover:text-amber-300 font-semibold"
           >
             Open Campaigns &rarr;
           </button>
@@ -115,12 +115,12 @@ export const PinnedCampaignWidget: React.FC<HomeWidgetProps> = ({ colSpan }) => 
 
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
-                <h3 className="font-display font-bold text-stone-100 text-sm sm:text-base truncate">
+                <h3 className="font-display font-bold text-stone-100 text-base truncate">
                   {campaign.name}
                 </h3>
                 {isExplicitlyPinned && (
                   <span
-                    className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[9px] font-mono uppercase font-bold shrink-0"
+                    className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] uppercase font-bold shrink-0"
                     title="Pinned campaign"
                   >
                     <PushPin weight="fill" className="w-2.5 h-2.5" />
@@ -129,7 +129,7 @@ export const PinnedCampaignWidget: React.FC<HomeWidgetProps> = ({ colSpan }) => 
                 )}
               </div>
 
-              <div className="flex items-center gap-1.5 text-[11px] font-mono text-stone-400 flex-wrap">
+              <div className="flex items-center gap-1.5 text-xs text-stone-400 flex-wrap">
                 <span className="text-amber-300">{campaign.theatre || 'Active Theatre'}</span>
                 {campaign.dcsServer && (
                   <>
@@ -154,7 +154,7 @@ export const PinnedCampaignWidget: React.FC<HomeWidgetProps> = ({ colSpan }) => 
                   }
                 }}
                 aria-label="Select pinned campaign"
-                className="px-2 py-1 rounded-lg bg-stone-950 border border-stone-800 text-[11px] font-mono text-stone-200 focus:outline-none focus:border-amber-500/50 max-w-[155px]"
+                className="px-2 py-1 rounded-lg bg-stone-950 border border-stone-800 text-xs text-stone-200 focus:outline-none focus:border-amber-500/50 max-w-[155px]"
               >
                 {activeCampaigns.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -169,7 +169,7 @@ export const PinnedCampaignWidget: React.FC<HomeWidgetProps> = ({ colSpan }) => 
               onClick={() => pinCampaignToHome(null)}
               title="Unpin campaign from Home dashboard"
               aria-label="Unpin campaign from Home dashboard"
-              className="px-2 py-1 rounded-lg bg-stone-950 hover:bg-red-500/20 border border-stone-800 hover:border-red-500/40 text-stone-400 hover:text-red-300 text-[11px] font-mono flex items-center gap-1 transition-colors"
+              className="px-2 py-1 rounded-lg bg-stone-950 hover:bg-red-500/20 border border-stone-800 hover:border-red-500/40 text-stone-400 hover:text-red-300 text-xs flex items-center gap-1 transition-colors"
             >
               <PushPinSlash className="w-3 h-3" />
               <span>Unpin</span>
@@ -178,7 +178,7 @@ export const PinnedCampaignWidget: React.FC<HomeWidgetProps> = ({ colSpan }) => 
             <button
               type="button"
               onClick={handleOpenCampaign}
-              className="text-xs font-mono text-amber-400 hover:text-amber-300 flex items-center gap-1 transition"
+              className="text-xs font-medium text-amber-400 hover:text-amber-300 flex items-center gap-1 transition"
             >
               <span>Overview</span>
               <ArrowRight className="w-3 h-3" />
@@ -188,12 +188,12 @@ export const PinnedCampaignWidget: React.FC<HomeWidgetProps> = ({ colSpan }) => 
 
         {/* Operational Progress */}
         <div className="space-y-1.5">
-          <div className="flex items-center justify-between text-[11px] font-mono">
+          <div className="flex items-center justify-between text-xs">
             <span className="text-stone-300 flex items-center gap-1 font-semibold">
               <Target weight="duotone" className="w-3.5 h-3.5 text-amber-400" />
               Operational Progress
             </span>
-            <span className="text-stone-400">
+            <span className="text-stone-400 tabular-nums">
               {campaign.totalObjectivesCount > 0 ? (
                 <>
                   <strong className="text-amber-300">{campaign.completedObjectivesCount}</strong>/
@@ -230,10 +230,10 @@ export const PinnedCampaignWidget: React.FC<HomeWidgetProps> = ({ colSpan }) => 
                 className={`p-2.5 rounded-xl bg-stone-950/70 border ${accentClass} flex flex-col justify-between`}
                 title={pool.label}
               >
-                <span className="text-[10px] font-mono text-stone-400 uppercase truncate">
+                <span className="text-[11px] font-medium text-stone-400 uppercase truncate">
                   {pool.shortLabel}
                 </span>
-                <span className="text-sm font-mono font-black mt-0.5">
+                <span className="text-sm font-mono font-bold mt-0.5">
                   {pool.balance.toLocaleString()}
                 </span>
               </div>
@@ -243,13 +243,13 @@ export const PinnedCampaignWidget: React.FC<HomeWidgetProps> = ({ colSpan }) => 
 
         {/* Active Missions Preview */}
         <div className="space-y-2">
-          <div className="flex items-center justify-between text-[11px] font-mono text-stone-400">
+          <div className="flex items-center justify-between text-xs text-stone-400">
             <span className="flex items-center gap-1.5 font-semibold text-stone-300">
               <AirplaneTakeoff weight="duotone" className="w-3.5 h-3.5 text-sky-400" />
               Active Missions ({campaign.activeMissions.length})
             </span>
             {campaign.pendingSupplyOrdersCount > 0 && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[10px] font-bold">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] font-bold tabular-nums">
                 <Package className="w-3 h-3" />
                 {campaign.pendingSupplyOrdersCount} supply
               </span>
@@ -266,10 +266,10 @@ export const PinnedCampaignWidget: React.FC<HomeWidgetProps> = ({ colSpan }) => 
                 >
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold uppercase bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                      <span className="px-1.5 py-0.5 rounded text-[11px] font-bold uppercase bg-sky-500/20 text-sky-300 border border-sky-500/30">
                         {mission.statusLabel}
                       </span>
-                      <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold uppercase bg-amber-500/15 text-amber-300 border border-amber-500/25">
+                      <span className="px-1.5 py-0.5 rounded text-[11px] font-bold uppercase bg-amber-500/15 text-amber-300 border border-amber-500/25">
                         {mission.taskingName}
                       </span>
                     </div>
@@ -278,21 +278,21 @@ export const PinnedCampaignWidget: React.FC<HomeWidgetProps> = ({ colSpan }) => 
                     </div>
                   </div>
 
-                  <span className="text-[10px] font-mono text-stone-400 shrink-0">
+                  <span className="text-xs text-stone-400 tabular-nums shrink-0">
                     {mission.flightsCount} flt
                   </span>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="py-3 text-center text-[11px] font-mono text-stone-500 rounded-xl border border-dashed border-stone-800">
+            <div className="py-3 text-center text-xs text-stone-500 rounded-xl border border-dashed border-stone-800">
               No active missions currently scheduled.
             </div>
           )}
         </div>
       </div>
 
-      <div className="mt-4 pt-3 border-t border-stone-800 flex items-center justify-between text-xs font-mono text-stone-400">
+      <div className="mt-4 pt-3 border-t border-stone-800 flex items-center justify-between text-xs text-stone-400">
         <span>
           {campaign.pendingSupplyOrdersCount} pending supply shipment
           {campaign.pendingSupplyOrdersCount === 1 ? '' : 's'}
@@ -300,7 +300,7 @@ export const PinnedCampaignWidget: React.FC<HomeWidgetProps> = ({ colSpan }) => 
         <button
           type="button"
           onClick={handleOpenCampaign}
-          className="text-amber-400 hover:text-amber-300 font-bold"
+          className="text-amber-400 hover:text-amber-300 font-semibold"
         >
           Open Campaign Overview &rarr;
         </button>

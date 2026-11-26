@@ -76,10 +76,10 @@ export const QualificationsView: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-800/80">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="font-display text-2xl font-bold bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent">
+            <h1 className="font-display text-2xl sm:text-3xl font-bold bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent">
               Certifications &amp; Credentials
             </h1>
-            <span className="px-2.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 font-mono text-[11px] font-bold">
+            <span className="px-2.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[11px] font-bold tabular-nums">
               {certificates.length} ISSUED
             </span>
           </div>
@@ -93,7 +93,7 @@ export const QualificationsView: React.FC = () => {
           {certificates.length > 0 && (
             <button
               onClick={isAllExpanded ? collapseAll : expandAll}
-              className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-800 text-stone-300 hover:text-amber-300 font-mono text-xs flex items-center gap-1.5 transition-colors shrink-0"
+              className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-800 text-stone-300 hover:text-amber-300 text-xs font-medium flex items-center gap-1.5 transition-colors shrink-0"
             >
               {isAllExpanded ? (
                 <>
@@ -113,7 +113,7 @@ export const QualificationsView: React.FC = () => {
             href={STATIC_CONFIG.kbUrl}
             target="_blank"
             rel="noreferrer"
-            className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-amber-400 font-mono text-xs flex items-center gap-1.5 transition-colors shrink-0"
+            className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-amber-400 text-xs font-medium flex items-center gap-1.5 transition-colors shrink-0"
           >
             <span>Training Syllabus</span>
             <ArrowSquareOut className="w-3.5 h-3.5" />
@@ -125,11 +125,11 @@ export const QualificationsView: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="p-4 rounded-xl bg-stone-900/90 border border-stone-800 flex items-center justify-between shadow-md">
           <div>
-            <p className="text-[11px] font-mono uppercase text-stone-400">Certificates Earned</p>
-            <p className="text-2xl font-bold font-display text-amber-400 mt-1">
+            <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">Certificates Earned</p>
+            <p className="text-2xl font-bold font-display text-amber-400 mt-1 tabular-nums">
               {certificates.length}
             </p>
-            <p className="text-[11px] font-mono text-stone-500 mt-0.5">
+            <p className="text-xs text-stone-400 mt-0.5">
               Active flight authorizations
             </p>
           </div>
@@ -140,11 +140,11 @@ export const QualificationsView: React.FC = () => {
 
         <div className="p-4 rounded-xl bg-stone-900/90 border border-stone-800 flex items-center justify-between shadow-md">
           <div>
-            <p className="text-[11px] font-mono uppercase text-stone-400">Total Certification XP</p>
-            <p className="text-2xl font-bold font-display text-emerald-400 mt-1">
+            <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">Total Certification XP</p>
+            <p className="text-2xl font-bold font-display text-emerald-400 mt-1 tabular-nums">
               +{totalCertXp.toLocaleString()} XP
             </p>
-            <p className="text-[11px] font-mono text-stone-500 mt-0.5">
+            <p className="text-xs text-stone-400 mt-0.5">
               Awarded towards grade promotion
             </p>
           </div>
@@ -155,11 +155,11 @@ export const QualificationsView: React.FC = () => {
 
         <div className="p-4 rounded-xl bg-stone-900/90 border border-stone-800 flex items-center justify-between shadow-md">
           <div>
-            <p className="text-[11px] font-mono uppercase text-stone-400">Certified Platforms</p>
-            <p className="text-2xl font-bold font-display text-stone-100 mt-1">
+            <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">Certified Platforms</p>
+            <p className="text-2xl font-bold font-display text-stone-100 mt-1 tabular-nums">
               {certifiedAirframes.length} {certifiedAirframes.length === 1 ? 'Airframe' : 'Airframes'}
             </p>
-            <p className="text-[11px] font-mono text-stone-400 truncate max-w-[180px] mt-0.5">
+            <p className="text-xs text-stone-400 truncate max-w-[180px] mt-0.5">
               {certifiedAirframes.join(', ') || 'None'}
             </p>
           </div>
@@ -230,7 +230,7 @@ export const QualificationsView: React.FC = () => {
                           {cert.name}
                         </h2>
                         {cert.isIssued && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 font-mono text-[10px] font-bold uppercase tracking-wider">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-[11px] font-bold uppercase tracking-wider">
                             <CheckCircle className="w-3 h-3 text-emerald-400" />
                             <span>ISSUED</span>
                           </span>
@@ -238,7 +238,7 @@ export const QualificationsView: React.FC = () => {
                       </div>
 
                       {/* Metadata badges: Airframe, Role, Issued Date, Issued By */}
-                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs font-mono text-stone-400">
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-stone-400">
                         {cert.airframe && (
                           <span className="inline-flex items-center gap-1.5 text-stone-300">
                             <AirplaneTilt className="w-3.5 h-3.5 text-amber-400" />
@@ -282,14 +282,14 @@ export const QualificationsView: React.FC = () => {
                           e.stopPropagation();
                           toggleCert(cert.id);
                         }}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-mono font-semibold transition-all shadow-sm ${
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all shadow-sm ${
                           isExpanded
                             ? 'bg-amber-500/20 border-amber-500/40 text-amber-300'
                             : 'bg-stone-950/80 hover:bg-stone-800 border-stone-800 text-stone-400 hover:text-stone-200'
                         }`}
                         title={isExpanded ? 'Collapse syllabus benchmarks' : 'Expand syllabus benchmarks'}
                       >
-                        <span className="text-[11px] hidden sm:inline">
+                        <span className="text-xs hidden sm:inline">
                           {isExpanded ? 'Hide Syllabus' : 'View Syllabus'}
                         </span>
                         {isExpanded ? (
@@ -305,7 +305,7 @@ export const QualificationsView: React.FC = () => {
                 {/* Subdued Syllabus / Benchmarks Details (Collapsible & secondary) */}
                 {isExpanded && hasRequirements && (
                   <div className="pt-3 border-t border-stone-800/80 space-y-3">
-                    <p className="text-[11px] font-mono uppercase tracking-wider text-stone-400 font-semibold">
+                    <p className="text-xs uppercase tracking-wider text-stone-400 font-semibold">
                       Recorded Benchmarks &amp; Skills:
                     </p>
                     <div className="grid grid-cols-1 gap-2.5">
@@ -314,7 +314,7 @@ export const QualificationsView: React.FC = () => {
                           key={rIdx}
                           className="p-3.5 rounded-xl bg-stone-950/80 border border-stone-800/80 space-y-2 text-xs"
                         >
-                          <div className="flex items-center gap-2 font-mono font-bold text-amber-300 text-xs">
+                          <div className="flex items-center gap-2 font-semibold text-amber-300 text-xs">
                             <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                             <span>{req.skill}</span>
                           </div>

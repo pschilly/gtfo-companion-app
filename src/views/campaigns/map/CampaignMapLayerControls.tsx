@@ -197,7 +197,7 @@ export const CampaignMapLayerControls: React.FC<CampaignMapLayerControlsProps> =
                   <span className="text-sky-300"> • </span>
                   <span>{activeSortie.name}</span>
                 </span>
-                <span className="px-1.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-sky-900/90 text-sky-300 border border-sky-700 shrink-0">
+                <span className="px-1.5 py-0.5 rounded-full text-[11px] tabular-nums font-bold bg-sky-900/90 text-sky-300 border border-sky-700 shrink-0">
                   {activeSortie.flight_plans_count} plans
                 </span>
               </button>
@@ -242,9 +242,9 @@ export const CampaignMapLayerControls: React.FC<CampaignMapLayerControlsProps> =
 
               <div className="grid grid-cols-12 h-[360px] max-h-[60vh]">
                 <div className="col-span-5 border-r border-stone-800 p-2 flex flex-col min-h-0 bg-stone-950/30">
-                  <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-wider text-stone-400 font-bold flex justify-between mb-1">
+                  <div className="px-2 py-1 text-[11px] uppercase tracking-wider text-stone-400 font-bold flex justify-between mb-1">
                     <span>Missions</span>
-                    <span>{filteredMissions.length}</span>
+                    <span className="tabular-nums">{filteredMissions.length}</span>
                   </div>
                   <div className="flex-1 overflow-y-auto space-y-1 pr-0.5">
                     {filteredMissions.length === 0 ? (
@@ -270,12 +270,12 @@ export const CampaignMapLayerControls: React.FC<CampaignMapLayerControlsProps> =
                             />
                             <div className="min-w-0">
                               <div className="text-xs font-semibold truncate">{m.name}</div>
-                              <div className="text-[10px] text-stone-400 truncate">
+                              <div className="text-[11px] text-stone-400 truncate">
                                 {m.tasking_label || 'Mission'}
                               </div>
                             </div>
                           </div>
-                          <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-stone-900 text-stone-400 shrink-0">
+                          <span className="px-1.5 py-0.5 rounded text-[11px] font-mono tabular-nums bg-stone-900 text-stone-400 shrink-0">
                             {(m.sorties || []).length}s
                           </span>
                         </div>
@@ -285,9 +285,9 @@ export const CampaignMapLayerControls: React.FC<CampaignMapLayerControlsProps> =
                 </div>
 
                 <div className="col-span-7 p-2.5 flex flex-col min-h-0">
-                  <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-wider text-stone-400 font-bold flex justify-between mb-1.5">
+                  <div className="px-2 py-1 text-[11px] uppercase tracking-wider text-stone-400 font-bold flex justify-between mb-1.5">
                     <span className="truncate">{focusedMission?.name || 'Sorties'}</span>
-                    <span>{(focusedMission?.sorties || []).length} sorties</span>
+                    <span className="tabular-nums">{(focusedMission?.sorties || []).length} sorties</span>
                   </div>
                   <div className="flex-1 overflow-y-auto space-y-1.5 pr-0.5">
                     {!focusedMission || (focusedMission.sorties || []).length === 0 ? (
@@ -313,12 +313,12 @@ export const CampaignMapLayerControls: React.FC<CampaignMapLayerControlsProps> =
                             <div className="flex items-center gap-2">
                               <span className="text-xs font-bold truncate">{s.name}</span>
                               {selectedSortieId === s.id && (
-                                <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-sky-500/20 text-sky-300 border border-sky-500/50 uppercase">
+                                <span className="px-1.5 py-0.2 rounded text-[11px] font-bold bg-sky-500/20 text-sky-300 border border-sky-500/50 uppercase">
                                   Active
                                 </span>
                               )}
                             </div>
-                            <div className="flex items-center gap-1.5 text-[10px] text-stone-400 font-mono">
+                            <div className="flex items-center gap-1.5 text-[11px] text-stone-400 font-mono">
                               <Clock className="w-3 h-3 shrink-0" />
                               <span className="truncate">
                                 {s.scheduled_at_human || s.scheduled_at || 'Unscheduled'}
@@ -327,7 +327,7 @@ export const CampaignMapLayerControls: React.FC<CampaignMapLayerControlsProps> =
                           </div>
                           <div className="flex items-center gap-2 shrink-0 ml-2">
                             <span
-                              className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold ${
+                              className={`px-2 py-0.5 rounded text-[11px] tabular-nums font-bold ${
                                 s.flight_plans_count > 0
                                   ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
                                   : 'bg-stone-800 text-stone-400'
@@ -341,7 +341,7 @@ export const CampaignMapLayerControls: React.FC<CampaignMapLayerControlsProps> =
                       ))
                     )}
                   </div>
-                  <div className="pt-2 mt-2 border-t border-stone-800 text-[10px] text-stone-400 font-mono">
+                  <div className="pt-2 mt-2 border-t border-stone-800 text-[11px] text-stone-400">
                     Click a sortie to show its flight plans on map
                   </div>
                 </div>
@@ -369,7 +369,7 @@ export const CampaignMapLayerControls: React.FC<CampaignMapLayerControlsProps> =
 
         {openMenu === 'tiles' && (
           <div className="w-56 bg-stone-900/95 border border-stone-700/80 rounded-xl shadow-2xl backdrop-blur-md p-2 space-y-1 z-[1200] absolute right-0 top-full mt-2">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-stone-400 px-2 py-1 border-b border-stone-800 flex items-center justify-between">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-stone-400 px-2 py-1 border-b border-stone-800 flex items-center justify-between">
               <span>Base Maps</span>
               <GlobeHemisphereWest className="w-3.5 h-3.5 text-stone-500" />
             </p>
@@ -620,7 +620,7 @@ export const CampaignMapLayerControls: React.FC<CampaignMapLayerControlsProps> =
                   <span className="flex items-center gap-1.5">
                     <Polygon className="w-4 h-4 text-amber-400" weight="duotone" />
                     <span>Areas of Operations</span>
-                    <span className="text-[10px] text-stone-400 font-normal">
+                    <span className="text-[11px] text-stone-400 font-normal tabular-nums">
                       ({polygonGroups.length})
                     </span>
                   </span>

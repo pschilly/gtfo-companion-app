@@ -23,7 +23,7 @@ export const ActivityConsole: React.FC = () => {
         className="h-9 px-4 flex items-center justify-between gap-4 cursor-pointer hover:bg-stone-900/60 transition-colors"
       >
         <div className="flex items-center gap-3 min-w-0">
-          <span className="inline-flex items-center gap-1.5 text-[11px] font-mono font-semibold text-amber-400 shrink-0">
+          <span className="inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-amber-400 shrink-0">
             <Terminal className="w-3.5 h-3.5" />
             TELEMETRY LOG
           </span>
@@ -44,7 +44,7 @@ export const ActivityConsole: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-3 shrink-0">
-          <span className="text-[10px] font-mono text-stone-500">{logs.length} EVENTS</span>
+          <span className="text-[11px] font-mono text-stone-500">{logs.length} EVENTS</span>
           {expanded ? (
             <CaretDown className="w-4 h-4 text-stone-400" />
           ) : (
@@ -56,7 +56,7 @@ export const ActivityConsole: React.FC = () => {
       {/* Expandable Log Drawer */}
       {expanded && (
         <div className="h-44 border-t border-stone-800/80 bg-stone-950 flex flex-col">
-          <div className="px-4 py-1.5 border-b border-stone-900 flex items-center justify-between text-[10px] font-mono text-stone-500">
+          <div className="px-4 py-1.5 border-b border-stone-900 flex items-center justify-between text-[11px] font-mono text-stone-500">
             <span>REAL-TIME DEPLOYMENT, PORTAL SYNC &amp; ATC DISPATCH CONSOLE</span>
             <button
               onClick={(e) => {

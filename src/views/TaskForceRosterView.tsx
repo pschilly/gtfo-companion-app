@@ -94,8 +94,8 @@ const RibbonRack: React.FC<RibbonRackProps> = ({ ribbons, rackUrl, size = 'sm' }
     size === 'lg'
       ? 'w-24 h-6 text-xs'
       : size === 'md'
-      ? 'w-18 h-4.5 text-[10px]'
-      : 'w-14 h-3.5 text-[9px]';
+      ? 'w-18 h-4.5 text-[11px] leading-none'
+      : 'w-14 h-3.5 text-[10px] leading-none';
 
   return (
     <div className="flex flex-col items-center justify-center gap-0 py-0.5">
@@ -325,7 +325,7 @@ export const TaskForceRosterView: React.FC = () => {
         <div className="flex items-center gap-2.5 self-start sm:self-auto">
           <button
             onClick={() => setActiveTab('settings')}
-            className="px-3 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-800 text-stone-400 hover:text-amber-300 font-mono text-xs flex items-center gap-1.5 transition-colors shadow-sm"
+            className="px-3 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-800 text-stone-400 hover:text-amber-300 text-xs font-medium flex items-center gap-1.5 transition-colors shadow-sm"
             title="Configure Roster Defaults in Settings"
           >
             <Gear className="w-3.5 h-3.5 text-stone-400" />
@@ -335,7 +335,7 @@ export const TaskForceRosterView: React.FC = () => {
           <button
             onClick={() => refreshTaskforceData()}
             disabled={isLoadingTaskforce}
-            className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-300 hover:text-amber-300 font-mono text-xs flex items-center gap-2 transition-colors shrink-0 shadow-sm disabled:opacity-50"
+            className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-300 hover:text-amber-300 text-xs font-medium flex items-center gap-2 transition-colors shrink-0 shadow-sm disabled:opacity-50"
           >
             <ArrowsClockwise className={`w-3.5 h-3.5 text-amber-400 ${isLoadingTaskforce ? 'animate-spin' : ''}`} />
             <span>{isLoadingTaskforce ? 'Refreshing...' : 'Refresh Roster'}</span>
@@ -347,11 +347,11 @@ export const TaskForceRosterView: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="p-4 rounded-xl bg-stone-900/90 border border-stone-800 flex items-center justify-between shadow-md">
           <div>
-            <p className="text-[11px] font-mono uppercase text-stone-400">CORE Roster</p>
-            <p className="text-2xl font-bold font-display text-amber-400 mt-0.5">
+            <p className="text-[11px] font-semibold tracking-wider uppercase text-stone-400">CORE Roster</p>
+            <p className="text-2xl font-bold font-display tabular-nums text-amber-400 mt-0.5">
               {coreCount}
             </p>
-            <p className="text-[11px] font-mono text-stone-500 mt-0.5">
+            <p className="text-xs text-stone-500 mt-0.5">
               Primary operational flight personnel
             </p>
           </div>
@@ -362,11 +362,11 @@ export const TaskForceRosterView: React.FC = () => {
 
         <div className="p-4 rounded-xl bg-stone-900/90 border border-stone-800 flex items-center justify-between shadow-md">
           <div>
-            <p className="text-[11px] font-mono uppercase text-stone-400">Community Roster</p>
-            <p className="text-2xl font-bold font-display text-sky-400 mt-0.5">
+            <p className="text-[11px] font-semibold tracking-wider uppercase text-stone-400">Community Roster</p>
+            <p className="text-2xl font-bold font-display tabular-nums text-sky-400 mt-0.5">
               {communityCount}
             </p>
-            <p className="text-[11px] font-mono text-stone-500 mt-0.5">
+            <p className="text-xs text-stone-500 mt-0.5">
               Community flight members
             </p>
           </div>
@@ -377,11 +377,11 @@ export const TaskForceRosterView: React.FC = () => {
 
         <div className="p-4 rounded-xl bg-stone-900/90 border border-stone-800 flex items-center justify-between shadow-md">
           <div>
-            <p className="text-[11px] font-mono uppercase text-stone-400">Total Task Force</p>
-            <p className="text-2xl font-bold font-display text-stone-100 mt-0.5">
+            <p className="text-[11px] font-semibold tracking-wider uppercase text-stone-400">Total Task Force</p>
+            <p className="text-2xl font-bold font-display tabular-nums text-stone-100 mt-0.5">
               {totalCount}
             </p>
-            <p className="text-[11px] font-mono text-stone-500 mt-0.5">
+            <p className="text-xs text-stone-500 mt-0.5">
               Combined active organization roster
             </p>
           </div>
@@ -394,7 +394,7 @@ export const TaskForceRosterView: React.FC = () => {
       {/* Control Bar: View Mode Switcher, Squadron Filter, Search */}
       <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 p-3 rounded-2xl bg-stone-900/80 border border-stone-800">
         {/* Tier Filter Toggle */}
-        <div className="flex items-center gap-1 bg-stone-950 p-1 rounded-xl border border-stone-800 text-xs font-mono self-start lg:self-auto">
+        <div className="flex items-center gap-1 bg-stone-950 p-1 rounded-xl border border-stone-800 text-xs font-medium self-start lg:self-auto">
           <button
             onClick={() => handleToggleTierFilter(false)}
             className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
@@ -406,7 +406,7 @@ export const TaskForceRosterView: React.FC = () => {
             <Star className="w-3.5 h-3.5" weight={!showAllMembers ? 'fill' : 'regular'} />
             <span>CORE</span>
             <span
-              className={`px-1.5 py-0.2 rounded text-[10px] ${
+              className={`px-1.5 py-0.2 rounded text-[11px] tabular-nums ${
                 !showAllMembers ? 'bg-stone-950/20 text-stone-950 font-bold' : 'bg-stone-800 text-stone-400'
               }`}
             >
@@ -425,7 +425,7 @@ export const TaskForceRosterView: React.FC = () => {
             <UsersFour className="w-3.5 h-3.5" />
             <span>All</span>
             <span
-              className={`px-1.5 py-0.2 rounded text-[10px] ${
+              className={`px-1.5 py-0.2 rounded text-[11px] tabular-nums ${
                 showAllMembers ? 'bg-stone-950/20 text-stone-950 font-bold' : 'bg-stone-800 text-stone-400'
               }`}
             >
@@ -446,7 +446,7 @@ export const TaskForceRosterView: React.FC = () => {
                   setRosterSquadronFilter(e.target.value === 'all' ? null : e.target.value);
                   setCurrentPage(1);
                 }}
-                className="px-3 py-1.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-200 text-xs font-mono focus:outline-none focus:border-amber-500/60 w-full sm:w-auto"
+                className="px-3 py-1.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-200 text-xs focus:outline-none focus:border-amber-500/60 w-full sm:w-auto"
               >
                 <option value="all">All Squadrons</option>
                 {availableSquadrons.map((sq) => (
@@ -464,7 +464,7 @@ export const TaskForceRosterView: React.FC = () => {
               <select
                 value={selectedAdminPosition}
                 onChange={(e) => setSelectedAdminPosition(e.target.value)}
-                className="px-3 py-1.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-200 text-xs font-mono focus:outline-none focus:border-amber-500/60 w-full sm:w-auto"
+                className="px-3 py-1.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-200 text-xs focus:outline-none focus:border-amber-500/60 w-full sm:w-auto"
               >
                 <option value="all">All Appointments</option>
                 {availableAdminPositions.map((pos) => (
@@ -483,7 +483,7 @@ export const TaskForceRosterView: React.FC = () => {
               placeholder="Search callsign, squadron, appointment..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-200 text-xs font-mono placeholder:text-stone-600 focus:outline-none focus:border-amber-500/60"
+              className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-200 text-xs placeholder:text-stone-500 focus:outline-none focus:border-amber-500/60"
             />
             {searchQuery && (
               <button
@@ -597,7 +597,7 @@ export const TaskForceRosterView: React.FC = () => {
                             {member.callsign}
                           </h3>
                         </div>
-                        <p className="text-[11px] font-mono text-stone-400 truncate">
+                        <p className="text-xs text-stone-400 truncate">
                           {member.gradeName}
                         </p>
                       </div>
@@ -605,7 +605,7 @@ export const TaskForceRosterView: React.FC = () => {
 
                     {/* Tier Badge */}
                     <span
-                      className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider shrink-0 border flex items-center gap-1 ${
+                      className={`px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider shrink-0 border flex items-center gap-1 ${
                         member.isCore
                           ? 'bg-amber-500/15 border-amber-500/40 text-amber-300'
                           : 'bg-stone-800 border-stone-700 text-stone-300'
@@ -617,7 +617,7 @@ export const TaskForceRosterView: React.FC = () => {
                   </div>
 
                   {/* Squadron & Position Details */}
-                  <div className="pt-2 border-t border-stone-800/80 space-y-2 text-xs font-mono">
+                  <div className="pt-2 border-t border-stone-800/80 space-y-2 text-xs">
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2 truncate">
                         {member.squadronEmblemUrl ? (
@@ -642,13 +642,13 @@ export const TaskForceRosterView: React.FC = () => {
                       </div>
 
                       {member.flightIdentifier && (
-                        <span className="px-1.5 py-0.5 rounded bg-stone-950 border border-stone-800 text-[10px] text-amber-300 font-bold shrink-0">
+                        <span className="px-1.5 py-0.5 rounded bg-stone-950 border border-stone-800 text-[11px] font-mono text-amber-300 font-bold shrink-0">
                           {member.flightIdentifier}
                         </span>
                       )}
                     </div>
 
-                    <div className="flex items-center justify-between text-[11px] text-stone-400">
+                    <div className="flex items-center justify-between text-xs text-stone-400">
                       <span className="truncate">{member.position || 'Aviator'}</span>
                     </div>
 
@@ -670,7 +670,7 @@ export const TaskForceRosterView: React.FC = () => {
                                 setCurrentPage(1);
                               }}
                               title={`Filter roster by "${pos}"`}
-                              className={`px-2 py-0.5 rounded-md text-[10px] font-mono font-bold tracking-tight border flex items-center gap-1 transition-all cursor-pointer hover:brightness-125 ${
+                              className={`px-2 py-0.5 rounded-md text-[11px] font-semibold border flex items-center gap-1 transition-all cursor-pointer hover:brightness-125 ${
                                 isDirector
                                   ? 'bg-amber-500/15 border-amber-500/40 text-amber-300'
                                   : isSpecialist
@@ -694,11 +694,11 @@ export const TaskForceRosterView: React.FC = () => {
                     {member.ribbons && member.ribbons.length > 0 && (
                       <div className="pt-2 border-t border-stone-800/60 space-y-1.5">
                         <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-mono uppercase text-stone-400 font-bold tracking-wider flex items-center gap-1">
+                          <span className="text-[11px] uppercase text-stone-400 font-semibold tracking-wider flex items-center gap-1">
                             <Medal className="w-3.5 h-3.5 text-amber-400" />
                             <span>Ribbon Rack</span>
                           </span>
-                          <span className="px-1.5 py-0.2 rounded bg-stone-950 border border-stone-800 text-[10px] font-mono text-amber-300 font-bold">
+                          <span className="px-1.5 py-0.2 rounded bg-stone-950 border border-stone-800 text-[11px] tabular-nums text-amber-300 font-semibold">
                             {member.ribbons.length} {member.ribbons.length === 1 ? 'Award' : 'Awards'}
                           </span>
                         </div>
@@ -714,7 +714,7 @@ export const TaskForceRosterView: React.FC = () => {
                   </div>
 
                   {/* Badges footer */}
-                  <div className="pt-2 border-t border-stone-800/60 flex items-center justify-between text-[11px] font-mono text-stone-500">
+                  <div className="pt-2 border-t border-stone-800/60 flex items-center justify-between text-xs tabular-nums text-stone-500">
                     <div className="flex items-center gap-3">
                       {member.certificatesCount !== undefined && member.certificatesCount > 0 && (
                         <span className="flex items-center gap-1 text-stone-400">
@@ -731,7 +731,7 @@ export const TaskForceRosterView: React.FC = () => {
                     </div>
 
                     {member.enlistedAt && (
-                      <span className="text-[10px] text-stone-500">
+                      <span className="text-xs text-stone-500">
                         Enlisted {formatShortDate(member.enlistedAt)}
                       </span>
                     )}
@@ -743,7 +743,7 @@ export const TaskForceRosterView: React.FC = () => {
 
           {/* Pagination Controls */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-stone-900/90 border border-stone-800 shadow-md">
-            <div className="text-xs font-mono text-stone-400">
+            <div className="text-xs tabular-nums text-stone-400">
               Showing <strong className="text-stone-200">{(safePage - 1) * pageSize + 1}</strong>–
               <strong className="text-stone-200">
                 {Math.min(safePage * pageSize, filteredMembers.length)}
@@ -753,7 +753,7 @@ export const TaskForceRosterView: React.FC = () => {
 
             <div className="flex items-center gap-2 flex-wrap justify-center">
               {/* Page Size Selector */}
-              <div className="flex items-center gap-1.5 mr-2 text-xs font-mono text-stone-400">
+              <div className="flex items-center gap-1.5 mr-2 text-xs text-stone-400">
                 <span>Per Page:</span>
                 <select
                   value={pageSize}
@@ -761,7 +761,7 @@ export const TaskForceRosterView: React.FC = () => {
                     setPageSize(Number(e.target.value));
                     setCurrentPage(1);
                   }}
-                  className="px-2 py-1 rounded-lg bg-stone-950 border border-stone-800 text-stone-200 text-xs font-mono focus:outline-none focus:border-amber-500/60"
+                  className="px-2 py-1 rounded-lg bg-stone-950 border border-stone-800 text-stone-200 text-xs tabular-nums focus:outline-none focus:border-amber-500/60"
                 >
                   <option value={12}>12</option>
                   <option value={24}>24</option>
@@ -870,7 +870,7 @@ export const TaskForceRosterView: React.FC = () => {
                       {selectedMember.grade}
                     </span>
                     <span
-                      className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
+                      className={`px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider ${
                         selectedMember.isCore
                           ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
                           : 'bg-stone-800 text-stone-400'
@@ -882,7 +882,7 @@ export const TaskForceRosterView: React.FC = () => {
                   <h2 className="font-display font-bold text-xl text-stone-100 mt-1">
                     {selectedMember.callsign}
                   </h2>
-                  <p className="text-xs font-mono text-stone-400">
+                  <p className="text-xs text-stone-400">
                     {selectedMember.gradeName} • {selectedMember.name}
                   </p>
                 </div>
@@ -896,29 +896,29 @@ export const TaskForceRosterView: React.FC = () => {
               </button>
             </div>
 
-            <div className="p-6 space-y-4 text-xs font-mono">
+            <div className="p-6 space-y-4 text-xs">
               <div className="grid grid-cols-2 gap-3 p-3 rounded-xl bg-stone-950 border border-stone-800">
                 <div>
-                  <span className="text-stone-500 text-[10px] uppercase">Assigned Squadron</span>
-                  <p className="text-stone-200 font-bold mt-0.5">
+                  <span className="text-stone-500 text-[11px] uppercase tracking-wider font-medium">Assigned Squadron</span>
+                  <p className="text-stone-200 font-semibold mt-0.5">
                     {selectedMember.squadron || '42nd Holding Squadron'}
                   </p>
                 </div>
                 <div>
-                  <span className="text-stone-500 text-[10px] uppercase">Operational Position</span>
-                  <p className="text-stone-200 font-bold mt-0.5">
+                  <span className="text-stone-500 text-[11px] uppercase tracking-wider font-medium">Operational Position</span>
+                  <p className="text-stone-200 font-semibold mt-0.5">
                     {selectedMember.position || 'Aviator'}
                   </p>
                 </div>
                 <div>
-                  <span className="text-stone-500 text-[10px] uppercase">Total Earned XP</span>
-                  <p className="text-amber-400 font-bold mt-0.5">
+                  <span className="text-stone-500 text-[11px] uppercase tracking-wider font-medium">Total Earned XP</span>
+                  <p className="text-amber-400 font-mono font-bold mt-0.5">
                     {selectedMember.xp.toLocaleString()} XP
                   </p>
                 </div>
                 <div>
-                  <span className="text-stone-500 text-[10px] uppercase">Flight Identifier</span>
-                  <p className="text-stone-200 font-bold mt-0.5">
+                  <span className="text-stone-500 text-[11px] uppercase tracking-wider font-medium">Flight Identifier</span>
+                  <p className="text-stone-200 font-mono font-bold mt-0.5">
                     {selectedMember.flightIdentifier || 'None'}
                   </p>
                 </div>
@@ -927,7 +927,7 @@ export const TaskForceRosterView: React.FC = () => {
               {/* Administrative & Specialist Appointments */}
               {selectedMember.adminPositions && selectedMember.adminPositions.length > 0 && (
                 <div className="space-y-2 p-3 rounded-xl bg-stone-950 border border-stone-800">
-                  <span className="text-stone-400 text-[10px] uppercase font-bold tracking-wider flex items-center gap-1.5">
+                  <span className="text-stone-400 text-[11px] uppercase font-semibold tracking-wider flex items-center gap-1.5">
                     <Briefcase className="w-3.5 h-3.5 text-amber-400" />
                     <span>Administrative &amp; Specialist Appointments</span>
                   </span>
@@ -941,7 +941,7 @@ export const TaskForceRosterView: React.FC = () => {
                       return (
                         <div
                           key={idx}
-                          className={`px-3 py-1.5 rounded-lg border flex items-center gap-2 text-xs font-mono font-bold ${
+                          className={`px-3 py-1.5 rounded-lg border flex items-center gap-2 text-xs font-semibold ${
                             isDirector
                               ? 'bg-amber-500/15 border-amber-500/40 text-amber-300'
                               : isSpecialist
@@ -966,11 +966,11 @@ export const TaskForceRosterView: React.FC = () => {
               {selectedMember.ribbons && selectedMember.ribbons.length > 0 && (
                 <div className="space-y-3 p-3.5 rounded-xl bg-stone-950 border border-stone-800">
                   <div className="flex items-center justify-between">
-                    <span className="text-stone-400 text-[10px] uppercase font-bold tracking-wider flex items-center gap-1.5">
+                    <span className="text-stone-400 text-[11px] uppercase font-semibold tracking-wider flex items-center gap-1.5">
                       <Medal className="w-3.5 h-3.5 text-amber-400" />
                       <span>Official Military Ribbon Rack</span>
                     </span>
-                    <span className="px-2 py-0.5 rounded bg-stone-900 border border-stone-800 text-[10px] text-amber-300 font-mono font-bold">
+                    <span className="px-2 py-0.5 rounded bg-stone-900 border border-stone-800 text-[11px] tabular-nums text-amber-300 font-semibold">
                       {selectedMember.ribbons.length} {selectedMember.ribbons.length === 1 ? 'Decoration' : 'Decorations'}
                     </span>
                   </div>
@@ -989,7 +989,7 @@ export const TaskForceRosterView: React.FC = () => {
                     {selectedMember.ribbons.map((ribbon, rIdx) => (
                       <div
                         key={rIdx}
-                        className="p-2 rounded-lg bg-stone-900/40 border border-stone-800/60 flex items-center justify-between gap-3 text-[11px]"
+                        className="p-2 rounded-lg bg-stone-900/40 border border-stone-800/60 flex items-center justify-between gap-3 text-xs"
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
                           <div className="w-10 h-3 rounded-[2px] overflow-hidden border border-stone-700/60 shrink-0">
@@ -998,12 +998,12 @@ export const TaskForceRosterView: React.FC = () => {
                           <div className="min-w-0">
                             <p className="font-semibold text-stone-200 truncate">{ribbon.name}</p>
                             {ribbon.description && (
-                              <p className="text-[10px] text-stone-400 truncate">{stripHtml(ribbon.description)}</p>
+                              <p className="text-[11px] text-stone-400 truncate">{stripHtml(ribbon.description)}</p>
                             )}
                           </div>
                         </div>
                         {ribbon.issueCount && ribbon.issueCount > 1 && (
-                          <span className="px-1.5 py-0.2 rounded bg-amber-500/10 border border-amber-500/30 text-[10px] font-mono text-amber-300 font-bold shrink-0">
+                          <span className="px-1.5 py-0.2 rounded bg-amber-500/10 border border-amber-500/30 text-[11px] tabular-nums text-amber-300 font-semibold shrink-0">
                             {ribbon.issueCount}x Awarded
                           </span>
                         )}

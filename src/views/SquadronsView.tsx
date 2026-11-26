@@ -130,7 +130,7 @@ export const SquadronsView: React.FC = () => {
             <span className="px-2.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 font-mono text-[11px] font-bold tracking-wider">
               S1 // PERSONNEL
             </span>
-            <h1 className="font-display text-2xl font-bold bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent">
+            <h1 className="font-display text-2xl sm:text-3xl font-bold bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent">
               Task Force Squadrons
             </h1>
           </div>
@@ -142,7 +142,7 @@ export const SquadronsView: React.FC = () => {
         <button
           onClick={() => refreshTaskforceData()}
           disabled={isLoadingTaskforce}
-          className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-300 hover:text-amber-300 font-mono text-xs flex items-center gap-2 transition-colors self-start sm:self-auto shrink-0 shadow-sm disabled:opacity-50"
+          className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-300 hover:text-amber-300 text-xs font-medium flex items-center gap-2 transition-colors self-start sm:self-auto shrink-0 shadow-sm disabled:opacity-50"
         >
           <Compass className={`w-3.5 h-3.5 text-amber-400 ${isLoadingTaskforce ? 'animate-spin' : ''}`} />
           <span>{isLoadingTaskforce ? 'Refreshing...' : 'Refresh Squadrons'}</span>
@@ -151,7 +151,7 @@ export const SquadronsView: React.FC = () => {
 
       {/* Search and Count Controls */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3 rounded-2xl bg-stone-900/80 border border-stone-800">
-        <div className="flex items-center gap-2 text-xs font-mono text-stone-400">
+        <div className="flex items-center gap-2 text-xs text-stone-400 tabular-nums">
           <Funnel className="w-3.5 h-3.5 text-amber-400 ml-1.5" />
           <span>
             Showing <strong className="text-stone-200">{filteredSquadrons.length}</strong> of{' '}
@@ -166,7 +166,7 @@ export const SquadronsView: React.FC = () => {
             placeholder="Search by name, airframe, callsign, role..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-8 py-1.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-200 text-xs font-mono placeholder:text-stone-600 focus:outline-none focus:border-amber-500/60"
+            className="w-full pl-9 pr-8 py-1.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-200 text-xs placeholder:text-stone-500 focus:outline-none focus:border-amber-500/60"
           />
           {searchQuery && (
             <button
@@ -213,7 +213,7 @@ export const SquadronsView: React.FC = () => {
                     </span>
 
                     {isUserSquadron && (
-                      <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 flex items-center gap-1">
+                      <span className="px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 flex items-center gap-1">
                         <CheckCircle className="w-3 h-3 text-emerald-400" />
                         <span>YOUR SQUADRON</span>
                       </span>
@@ -242,25 +242,25 @@ export const SquadronsView: React.FC = () => {
                     </div>
 
                     <div className="min-w-0 flex-1">
-                      <h2 className="font-display font-bold text-stone-100 text-base leading-tight group-hover:text-amber-200 transition-colors">
+                      <h2 className="font-display font-bold text-stone-100 text-lg leading-tight group-hover:text-amber-200 transition-colors">
                         {sq.name}
                       </h2>
                       {sq.nickname && (
-                        <p className="text-xs font-mono text-amber-400 font-semibold mt-0.5">
+                        <p className="text-xs text-amber-400 font-semibold mt-0.5">
                           "{sq.nickname}"
                         </p>
                       )}
-                      <p className="text-[11px] font-mono text-stone-400 mt-1 line-clamp-1">
+                      <p className="text-xs text-stone-400 mt-1 line-clamp-1">
                         {sq.role}
                       </p>
                     </div>
                   </div>
 
                   {/* Operational Billets & Callsigns */}
-                  <div className="mt-4 pt-3 border-t border-stone-800/80 space-y-2 text-xs font-mono">
+                  <div className="mt-4 pt-3 border-t border-stone-800/80 space-y-2 text-xs">
                     {sq.primaryAirframe && (
                       <div className="flex items-center justify-between text-stone-400">
-                        <span className="text-stone-500 flex items-center gap-1.5">
+                        <span className="text-stone-400 flex items-center gap-1.5">
                           <AirplaneTilt className="w-3.5 h-3.5 text-stone-500" />
                           <span>Primary:</span>
                         </span>
@@ -272,11 +272,11 @@ export const SquadronsView: React.FC = () => {
 
                     {sq.callsigns && sq.callsigns.length > 0 && (
                       <div className="flex items-center justify-between text-stone-400">
-                        <span className="text-stone-500 flex items-center gap-1.5">
+                        <span className="text-stone-400 flex items-center gap-1.5">
                           <Radio className="w-3.5 h-3.5 text-stone-500" />
                           <span>Callsign:</span>
                         </span>
-                        <span className="text-amber-300 font-semibold truncate max-w-[170px]">
+                        <span className="text-amber-300 font-mono font-semibold truncate max-w-[170px]">
                           {sq.callsigns
                             .map((c: any) =>
                               typeof c === 'string' ? c : c?.callsign || c?.name || ''
@@ -289,11 +289,11 @@ export const SquadronsView: React.FC = () => {
 
                     {sq.frequencies && sq.frequencies.length > 0 && (
                       <div className="flex items-center justify-between text-stone-400">
-                        <span className="text-stone-500 flex items-center gap-1.5">
+                        <span className="text-stone-400 flex items-center gap-1.5">
                           <Broadcast className="w-3.5 h-3.5 text-stone-500" />
                           <span>Tac Comms:</span>
                         </span>
-                        <span className="text-stone-300">
+                        <span className="text-stone-300 font-mono">
                           {sq.frequencies[0].frequency} {sq.frequencies[0].modulation || 'AM'}
                         </span>
                       </div>
@@ -306,13 +306,13 @@ export const SquadronsView: React.FC = () => {
                       {sq.airframes.slice(0, 3).map((af) => (
                         <span
                           key={af.id}
-                          className="px-2 py-0.5 rounded bg-stone-950 border border-stone-800/80 text-[10px] font-mono text-stone-400"
+                          className="px-2 py-0.5 rounded bg-stone-950 border border-stone-800/80 text-[11px] text-stone-300"
                         >
                           {af.abbreviation || af.name}
                         </span>
                       ))}
                       {sq.airframes.length > 3 && (
-                        <span className="px-1.5 py-0.5 rounded bg-stone-950 text-[10px] font-mono text-stone-500">
+                        <span className="px-1.5 py-0.5 rounded bg-stone-950 text-[11px] text-stone-500">
                           +{sq.airframes.length - 3}
                         </span>
                       )}
@@ -324,7 +324,7 @@ export const SquadronsView: React.FC = () => {
                 <div className="p-4 pt-3 bg-stone-950/50 border-t border-stone-800/60 flex items-center justify-between gap-2">
                   <button
                     onClick={() => setInspectedSquadron(sq)}
-                    className="flex-1 py-1.5 px-3 rounded-xl bg-stone-800/80 hover:bg-stone-700/80 text-stone-200 font-mono text-xs flex items-center justify-center gap-1.5 transition-colors"
+                    className="flex-1 py-1.5 px-3 rounded-xl bg-stone-800/80 hover:bg-stone-700/80 text-stone-200 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors"
                   >
                     <Compass className="w-3.5 h-3.5 text-amber-400" />
                     <span>View Squadron Specs</span>
@@ -332,12 +332,12 @@ export const SquadronsView: React.FC = () => {
 
                   <button
                     onClick={() => handleOpenRoster(sq)}
-                    className="py-1.5 px-3 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-800 hover:border-amber-500/50 text-stone-300 hover:text-amber-300 font-mono text-xs flex items-center gap-2 transition-all shrink-0 shadow-sm group"
+                    className="py-1.5 px-3 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-800 hover:border-amber-500/50 text-stone-300 hover:text-amber-300 text-xs font-medium flex items-center gap-2 transition-all shrink-0 shadow-sm group"
                     title={`View ${sq.name} Task Force Roster (${getSquadronMemberCount(sq)} aviators)`}
                   >
                     <UsersFour className="w-4 h-4 text-amber-400 group-hover:scale-110 transition-transform" />
                     <span>Roster</span>
-                    <span className="px-1.5 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[10px] font-bold">
+                    <span className="px-1.5 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] font-bold tabular-nums">
                       {getSquadronMemberCount(sq)}
                     </span>
                   </button>
@@ -388,7 +388,7 @@ export const SquadronsView: React.FC = () => {
                     {inspectedSquadron.name}
                   </h2>
                   {inspectedSquadron.nickname && (
-                    <p className="text-xs font-mono text-amber-400 font-semibold">
+                    <p className="text-xs text-amber-400 font-semibold">
                       "{inspectedSquadron.nickname}"
                     </p>
                   )}
@@ -407,7 +407,7 @@ export const SquadronsView: React.FC = () => {
             <div className="p-6 overflow-y-auto space-y-5 text-xs text-stone-300 leading-relaxed">
               {/* Mission & Role */}
               <div className="space-y-1.5">
-                <h4 className="text-[11px] font-mono uppercase text-stone-400 font-bold tracking-wider">
+                <h4 className="text-xs uppercase text-stone-400 font-bold tracking-wider">
                   Operational Mission &amp; Role
                 </h4>
                 <p className="p-3 rounded-xl bg-stone-950/80 border border-stone-800 text-stone-300 font-sans">
@@ -418,7 +418,7 @@ export const SquadronsView: React.FC = () => {
               {/* Description / History */}
               {inspectedSquadron.description && (
                 <div className="space-y-1.5">
-                  <h4 className="text-[11px] font-mono uppercase text-stone-400 font-bold tracking-wider">
+                  <h4 className="text-xs uppercase text-stone-400 font-bold tracking-wider">
                     Squadron Overview &amp; Doctrine
                   </h4>
                   <div
@@ -430,7 +430,7 @@ export const SquadronsView: React.FC = () => {
 
               {/* Primary Airframe & Operated Airframes */}
               <div className="space-y-1.5">
-                <h4 className="text-[11px] font-mono uppercase text-stone-400 font-bold tracking-wider">
+                <h4 className="text-xs uppercase text-stone-400 font-bold tracking-wider">
                   Assigned Airframes
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -442,7 +442,7 @@ export const SquadronsView: React.FC = () => {
                       >
                         <span className="font-semibold text-stone-200">{af.name}</span>
                         {af.abbreviation && (
-                          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-stone-900 border border-stone-800 text-stone-400">
+                          <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-stone-900 border border-stone-800 text-stone-400">
                             {af.abbreviation}
                           </span>
                         )}
@@ -459,7 +459,7 @@ export const SquadronsView: React.FC = () => {
               {/* Radio Callsigns */}
               {inspectedSquadron.callsigns && inspectedSquadron.callsigns.length > 0 && (
                 <div className="space-y-2">
-                  <h4 className="text-[11px] font-mono uppercase text-stone-400 font-bold tracking-wider">
+                  <h4 className="text-xs uppercase text-stone-400 font-bold tracking-wider">
                     Designated Tactical Callsigns
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
@@ -521,14 +521,14 @@ export const SquadronsView: React.FC = () => {
                               {callsignName}
                             </span>
                             {tasking && (
-                              <span className="px-2 py-0.5 rounded bg-amber-500/15 border border-amber-500/30 text-[10px] font-mono font-bold text-amber-400 uppercase">
+                              <span className="px-2 py-0.5 rounded bg-amber-500/15 border border-amber-500/30 text-[11px] font-bold text-amber-400 uppercase">
                                 {tasking}
                               </span>
                             )}
                           </div>
 
                           {plane && (
-                            <div className="text-[11px] font-mono text-stone-400 flex items-center gap-1.5 pt-0.5 border-t border-stone-900">
+                            <div className="text-xs text-stone-400 flex items-center gap-1.5 pt-0.5 border-t border-stone-900">
                               <AirplaneTilt className="w-3 h-3 text-stone-500 shrink-0" />
                               <span className="truncate">{plane}</span>
                             </div>
@@ -543,7 +543,7 @@ export const SquadronsView: React.FC = () => {
               {/* Frequencies */}
               {inspectedSquadron.frequencies && inspectedSquadron.frequencies.length > 0 && (
                 <div className="space-y-1.5">
-                  <h4 className="text-[11px] font-mono uppercase text-stone-400 font-bold tracking-wider">
+                  <h4 className="text-xs uppercase text-stone-400 font-bold tracking-wider">
                     Assigned Squadron Frequencies
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -552,7 +552,7 @@ export const SquadronsView: React.FC = () => {
                         key={idx}
                         className="p-2.5 rounded-xl bg-stone-950 border border-stone-800 flex items-center justify-between"
                       >
-                        <span className="text-stone-300 font-mono text-xs font-semibold">
+                        <span className="text-stone-300 text-xs font-semibold">
                           {freq.name || `Channel ${idx + 1}`}
                         </span>
                         <span className="text-amber-400 font-mono text-xs font-bold">
@@ -573,18 +573,18 @@ export const SquadronsView: React.FC = () => {
                   setInspectedSquadron(null);
                   handleOpenRoster(targetSq);
                 }}
-                className="px-4 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 hover:border-amber-500/50 text-stone-200 hover:text-amber-300 font-mono text-xs font-bold flex items-center gap-2 transition-all shadow-sm"
+                className="px-4 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 hover:border-amber-500/50 text-stone-200 hover:text-amber-300 text-xs font-bold flex items-center gap-2 transition-all shadow-sm"
               >
                 <UsersFour className="w-4 h-4 text-amber-400" />
                 <span>View Squadron Roster</span>
-                <span className="px-1.5 py-0.5 rounded-md bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px]">
+                <span className="px-1.5 py-0.5 rounded-md bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[11px] tabular-nums">
                   {getSquadronMemberCount(inspectedSquadron)}
                 </span>
               </button>
 
               <button
                 onClick={() => setInspectedSquadron(null)}
-                className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-bold text-xs shadow transition-colors"
+                className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs shadow transition-colors"
               >
                 Close Inspector
               </button>

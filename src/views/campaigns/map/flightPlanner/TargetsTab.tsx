@@ -86,7 +86,7 @@ export const TargetsTab: React.FC<TargetsTabProps> = ({
             </div>
             <div>
               <h3 className="text-xs font-bold text-stone-200">Designated Target Points</h3>
-              <p className="text-[10px] text-stone-400">
+              <p className="text-xs text-stone-400">
                 Ground strike coordinates &amp; JDAM guidance data
               </p>
             </div>
@@ -96,7 +96,7 @@ export const TargetsTab: React.FC<TargetsTabProps> = ({
           </span>
         </div>
 
-        <div className="p-2 rounded bg-stone-950/60 border border-stone-800 text-[11px] text-stone-300 flex items-start gap-2">
+        <div className="p-2 rounded bg-stone-950/60 border border-stone-800 text-xs text-stone-300 flex items-start gap-2">
           <span className="text-amber-400 font-bold shrink-0 mt-0.5">💡</span>
           <div>
             <span className="font-semibold text-stone-200">How to designate targets:</span>
@@ -112,11 +112,11 @@ export const TargetsTab: React.FC<TargetsTabProps> = ({
         {canEdit && (
           <div className="p-2.5 rounded-lg bg-stone-950/80 border border-stone-800 space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-[10px] font-bold uppercase tracking-wider text-stone-300 flex items-center gap-1.5">
+              <label className="text-xs font-bold uppercase tracking-wider text-stone-300 flex items-center gap-1.5">
                 <span className="size-1.5 rounded-full bg-red-500" />
                 Quick Add Target by Coordinates
               </label>
-              <span className="text-[10px] text-stone-500 font-mono">
+              <span className="text-[11px] text-stone-500">
                 MGRS • DDM • DMS • Lat/Lon
               </span>
             </div>
@@ -159,7 +159,7 @@ export const TargetsTab: React.FC<TargetsTabProps> = ({
               </button>
             </div>
             {quickError && (
-              <p className="text-[10px] text-red-400 font-semibold flex items-center gap-1">
+              <p className="text-xs text-red-400 font-semibold flex items-center gap-1">
                 {quickError}
               </p>
             )}
@@ -176,7 +176,7 @@ export const TargetsTab: React.FC<TargetsTabProps> = ({
             </div>
           </div>
           <h4 className="text-xs font-bold text-stone-300">No Target Points Designated</h4>
-          <p className="text-[11px] text-stone-500 max-w-sm mx-auto">
+          <p className="text-xs text-stone-500 max-w-sm mx-auto">
             Right-click anywhere on the map or enter coordinates above to add target points for
             strike missions, JDAM drop planning, and air-to-ground tasking.
           </p>
@@ -205,7 +205,7 @@ export const TargetsTab: React.FC<TargetsTabProps> = ({
                 {/* Top Row */}
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2 flex-1 min-w-0">
-                    <span className="px-1.5 py-0.5 rounded bg-red-950 text-red-300 border border-red-800 font-mono text-[10px] font-bold shrink-0">
+                    <span className="px-1.5 py-0.5 rounded bg-red-950 text-red-300 border border-red-800 font-mono text-[11px] font-bold shrink-0">
                       TGT {tIdx + 1}
                     </span>
                     <input
@@ -260,7 +260,7 @@ export const TargetsTab: React.FC<TargetsTabProps> = ({
                       navigator.clipboard?.writeText(lldm);
                       onNotify('info', `Copied LLDM: ${lldm}`);
                     }}
-                    className="text-stone-400 text-[10px] truncate hover:text-amber-300 text-right cursor-pointer"
+                    className="text-stone-400 text-[11px] truncate hover:text-amber-300 text-right cursor-pointer"
                     title="Click to copy LLDM"
                   >
                     <span className="text-stone-500">LLDM: </span>
@@ -271,7 +271,7 @@ export const TargetsTab: React.FC<TargetsTabProps> = ({
                 {/* 4-Column Target Strike Parameters */}
                 <div className="grid grid-cols-4 gap-2">
                   <div className="space-y-0.5">
-                    <label className="text-[9px] font-bold uppercase tracking-wider text-stone-400 block">
+                    <label className="text-[11px] font-bold uppercase tracking-wider text-stone-400 block">
                       Elev (ft)
                     </label>
                     <input
@@ -291,7 +291,7 @@ export const TargetsTab: React.FC<TargetsTabProps> = ({
                   </div>
 
                   <div className="space-y-0.5">
-                    <label className="text-[9px] font-bold uppercase tracking-wider text-red-400 block">
+                    <label className="text-[11px] font-bold uppercase tracking-wider text-red-400 block">
                       Drop Alt (ft)
                     </label>
                     <input
@@ -307,7 +307,7 @@ export const TargetsTab: React.FC<TargetsTabProps> = ({
                   </div>
 
                   <div className="space-y-0.5">
-                    <label className="text-[9px] font-bold uppercase tracking-wider text-amber-400 block">
+                    <label className="text-[11px] font-bold uppercase tracking-wider text-amber-400 block">
                       Atk Hdg (°)
                     </label>
                     <input
@@ -328,7 +328,7 @@ export const TargetsTab: React.FC<TargetsTabProps> = ({
                   </div>
 
                   <div className="space-y-0.5">
-                    <label className="text-[9px] font-bold uppercase tracking-wider text-stone-400 block">
+                    <label className="text-[11px] font-bold uppercase tracking-wider text-stone-400 block">
                       Drop Spd (kts)
                     </label>
                     <input
@@ -347,7 +347,7 @@ export const TargetsTab: React.FC<TargetsTabProps> = ({
                 {/* Weapon & Station Row */}
                 <div className="grid grid-cols-2 gap-2 pt-1 border-t border-stone-800/60">
                   <div className={`space-y-0.5 ${isF14 ? '' : 'col-span-2'}`}>
-                    <label className="text-[9px] font-bold uppercase tracking-wider text-sky-400 block">
+                    <label className="text-[11px] font-bold uppercase tracking-wider text-sky-400 block">
                       Weapon
                     </label>
                     <input
@@ -363,7 +363,7 @@ export const TargetsTab: React.FC<TargetsTabProps> = ({
 
                   {isF14 && (
                     <div className="space-y-0.5">
-                      <label className="text-[9px] font-bold uppercase tracking-wider text-purple-400 block">
+                      <label className="text-[11px] font-bold uppercase tracking-wider text-purple-400 block">
                         Station (F-14)
                       </label>
                       <select

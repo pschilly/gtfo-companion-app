@@ -178,11 +178,11 @@ export const AssetManagerView: React.FC<AssetManagerViewProps> = ({
       icon: <Folder className="w-4 h-4" />,
       badge:
         outdatedAssets.length > 0 ? (
-          <span className="px-1.5 py-0.2 rounded-full bg-amber-500 text-stone-950 text-[10px] font-mono font-bold">
+          <span className="px-1.5 py-0.5 rounded-full bg-amber-500 text-stone-950 text-[11px] font-bold tabular-nums">
             {outdatedAssets.length} update{outdatedAssets.length === 1 ? '' : 's'}
           </span>
         ) : (
-          <span className="px-1.5 py-0.2 rounded-full bg-stone-800 text-stone-300 text-[10px] font-mono">
+          <span className="px-1.5 py-0.5 rounded-full bg-stone-800 text-stone-300 text-[11px] tabular-nums">
             {installedList.length}
           </span>
         ),
@@ -192,7 +192,7 @@ export const AssetManagerView: React.FC<AssetManagerViewProps> = ({
       label: 'Airframe Liveries',
       icon: <PaintBrush className="w-4 h-4" />,
       badge: (
-        <span className="px-1.5 py-0.2 rounded-full bg-stone-800 text-stone-300 text-[10px] font-mono">
+        <span className="px-1.5 py-0.5 rounded-full bg-stone-800 text-stone-300 text-[11px] tabular-nums">
           {liveryCount}
         </span>
       ),
@@ -202,7 +202,7 @@ export const AssetManagerView: React.FC<AssetManagerViewProps> = ({
       label: 'Mods',
       icon: <Package className="w-4 h-4" />,
       badge: (
-        <span className="px-1.5 py-0.2 rounded-full bg-stone-800 text-stone-300 text-[10px] font-mono">
+        <span className="px-1.5 py-0.5 rounded-full bg-stone-800 text-stone-300 text-[11px] tabular-nums">
           {modCount}
         </span>
       ),
@@ -214,7 +214,7 @@ export const AssetManagerView: React.FC<AssetManagerViewProps> = ({
       {/* Top Header & Sub-Tab Navigation */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-stone-800/80">
         <div>
-          <h1 className="font-display text-2xl font-bold bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent">
+          <h1 className="font-display text-2xl sm:text-3xl font-bold bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent">
             Asset Manager
           </h1>
           <p className="text-xs text-stone-400 mt-0.5">
@@ -234,7 +234,7 @@ export const AssetManagerView: React.FC<AssetManagerViewProps> = ({
               <button
                 key={tab.id}
                 onClick={() => handleSelectSubTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-mono transition-all cursor-pointer ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer ${
                   isActive
                     ? 'bg-amber-500 text-stone-950 font-bold shadow-md shadow-amber-500/20'
                     : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800/80'
@@ -256,7 +256,7 @@ export const AssetManagerView: React.FC<AssetManagerViewProps> = ({
         <div className="space-y-5">
           {/* Library Action Bar */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="text-xs font-mono text-stone-400">
+            <div className="text-xs text-stone-400 tabular-nums">
               Showing <strong className="text-stone-200">{filteredInstalledList.length}</strong>{' '}
               installed package{filteredInstalledList.length === 1 ? '' : 's'}
             </div>
@@ -264,7 +264,7 @@ export const AssetManagerView: React.FC<AssetManagerViewProps> = ({
             <div className="flex flex-wrap items-center gap-2.5">
               <button
                 onClick={rescanLocalAssets}
-                className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-200 font-mono text-xs flex items-center gap-2 transition-colors cursor-pointer"
+                className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-200 text-xs font-medium flex items-center gap-2 transition-colors cursor-pointer"
               >
                 <ArrowsClockwise className="w-3.5 h-3.5 text-amber-400" />
                 Rescan DCS Folder
@@ -274,7 +274,7 @@ export const AssetManagerView: React.FC<AssetManagerViewProps> = ({
                 <button
                   onClick={handleVerifyAll}
                   disabled={isVerifyingAll || Boolean(verifyingAssetId)}
-                  className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-200 font-mono text-xs flex items-center gap-2 transition-colors disabled:opacity-60 cursor-pointer"
+                  className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-200 text-xs font-medium flex items-center gap-2 transition-colors disabled:opacity-60 cursor-pointer"
                   title="Verify local file integrity for all installed packages"
                 >
                   {isVerifyingAll ? (
@@ -289,7 +289,7 @@ export const AssetManagerView: React.FC<AssetManagerViewProps> = ({
               {outdatedAssets.length > 0 && (
                 <button
                   onClick={updateAllOutdated}
-                  className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono font-bold text-xs flex items-center gap-2 shadow cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs flex items-center gap-2 shadow cursor-pointer"
                 >
                   <ArrowCircleUp className="w-4 h-4" />
                   Update All ({outdatedAssets.length})
@@ -299,7 +299,7 @@ export const AssetManagerView: React.FC<AssetManagerViewProps> = ({
           </div>
 
           {verifyAllFeedback && (
-            <div className="p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 font-mono text-xs flex items-center gap-2 animate-fadeIn">
+            <div className="p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-xs flex items-center gap-2 animate-fadeIn">
               <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
               <span>{verifyAllFeedback}</span>
             </div>
@@ -359,50 +359,50 @@ export const AssetManagerView: React.FC<AssetManagerViewProps> = ({
                         <div className="flex flex-wrap items-center gap-2">
                           {record.aircraftOrModule &&
                             !record.aircraftOrModule.toLowerCase().includes('agnostic') && (
-                              <span className="px-2 py-0.5 rounded bg-stone-950 border border-stone-800 text-[11px] font-mono text-amber-300">
+                              <span className="px-2 py-0.5 rounded bg-stone-950 border border-stone-800 text-[11px] font-semibold text-amber-300">
                                 {record.aircraftOrModule}
                               </span>
                             )}
                           <h3
                             onClick={() => remoteItem && setSelectedAsset(remoteItem)}
-                            className="font-display font-semibold text-sm text-stone-100 hover:text-amber-400 cursor-pointer"
+                            className="font-display font-semibold text-base text-stone-100 hover:text-amber-400 cursor-pointer"
                           >
                             {record.name}
                           </h3>
                           {hasUpdate ? (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500 text-stone-950 font-mono font-bold text-[10px]">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500 text-stone-950 font-bold text-[11px]">
                               <ArrowCircleUp className="w-3 h-3" />
                               UPDATE AVAILABLE: v{remoteItem.version}
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 font-mono text-[10px]">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-[11px]">
                               <CheckCircle className="w-3 h-3" />
-                              v{record.installedVersion} (CURRENT)
+                              <span className="font-mono">v{record.installedVersion}</span> (CURRENT)
                             </span>
                           )}
 
                           {verifyRes && verifyRes.valid && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 font-mono font-bold text-[10px]">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 font-bold text-[11px]">
                               <ShieldCheck className="w-3 h-3" />
                               VERIFIED ({verifyRes.checkedCount || record.extractedFiles.length} FILES)
                             </span>
                           )}
 
                           {verifyRes && !verifyRes.valid && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/50 text-amber-300 font-mono font-bold text-[10px]">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/50 text-amber-300 font-bold text-[11px]">
                               <Warning className="w-3 h-3 text-amber-400" />
                               INTEGRITY ISSUE ({issueCount} FILE{issueCount === 1 ? '' : 'S'})
                             </span>
                           )}
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-4 text-xs font-mono text-stone-400">
-                          <span className="flex items-center gap-1.5 truncate">
+                        <div className="flex flex-wrap items-center gap-4 text-xs text-stone-400">
+                          <span className="flex items-center gap-1.5 font-mono truncate">
                             <FolderOpen className="w-3.5 h-3.5 text-stone-500 shrink-0" />
                             {record.installedPath}
                           </span>
                           <span>• Installed {formatShortDate(record.installedAt)}</span>
-                          <span>• {record.extractedFiles.length} tracked files</span>
+                          <span className="tabular-nums">• {record.extractedFiles.length} tracked files</span>
                         </div>
                       </div>
 
@@ -410,7 +410,7 @@ export const AssetManagerView: React.FC<AssetManagerViewProps> = ({
                         {hasUpdate && remoteItem && (
                           <button
                             onClick={() => installAsset(remoteItem)}
-                            className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono font-bold text-xs flex items-center gap-1.5 cursor-pointer"
+                            className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs flex items-center gap-1.5 cursor-pointer"
                           >
                             <ArrowCircleUp className="w-3.5 h-3.5" />
                             Update to v{remoteItem.version}
@@ -421,7 +421,7 @@ export const AssetManagerView: React.FC<AssetManagerViewProps> = ({
                           onClick={() => verifyAsset(record.assetId)}
                           disabled={isVerifying || Boolean(progress)}
                           title="Verify all package files and checksums on disk"
-                          className="px-3 py-2 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-800 text-stone-300 font-mono text-xs flex items-center gap-1.5 disabled:opacity-60 cursor-pointer"
+                          className="px-3 py-2 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-800 text-stone-300 text-xs font-medium flex items-center gap-1.5 disabled:opacity-60 cursor-pointer"
                         >
                           {isVerifying ? (
                             <CircleNotch className="w-3.5 h-3.5 text-amber-400 animate-spin" />
@@ -436,7 +436,7 @@ export const AssetManagerView: React.FC<AssetManagerViewProps> = ({
                             onClick={() => installAsset(remoteItem)}
                             disabled={Boolean(progress)}
                             title="Reinstall / Repair asset files"
-                            className={`px-3 py-2 rounded-xl font-mono text-xs flex items-center gap-1.5 disabled:opacity-60 cursor-pointer ${
+                            className={`px-3 py-2 rounded-xl text-xs font-medium flex items-center gap-1.5 disabled:opacity-60 cursor-pointer ${
                               verifyRes && !verifyRes.valid
                                 ? 'bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold shadow'
                                 : 'bg-stone-950 hover:bg-stone-800 border border-stone-800 text-stone-300'
@@ -450,7 +450,7 @@ export const AssetManagerView: React.FC<AssetManagerViewProps> = ({
                         <button
                           onClick={() => uninstallAsset(record.assetId)}
                           disabled={Boolean(progress)}
-                          className="px-3 py-2 rounded-xl bg-red-500/15 hover:bg-red-500/25 border border-red-500/40 text-red-300 font-mono text-xs flex items-center gap-1.5 disabled:opacity-60 cursor-pointer"
+                          className="px-3 py-2 rounded-xl bg-red-500/15 hover:bg-red-500/25 border border-red-500/40 text-red-300 text-xs font-medium flex items-center gap-1.5 disabled:opacity-60 cursor-pointer"
                         >
                           <Trash className="w-3.5 h-3.5" />
                           Uninstall
@@ -460,12 +460,12 @@ export const AssetManagerView: React.FC<AssetManagerViewProps> = ({
 
                     {progress && (
                       <div className="pt-2 border-t border-stone-800/80 space-y-1.5">
-                        <div className="flex items-center justify-between text-xs font-mono">
+                        <div className="flex items-center justify-between text-xs">
                           <span className="text-amber-300 flex items-center gap-1.5 truncate">
                             <CircleNotch className="w-3.5 h-3.5 animate-spin shrink-0" />
                             {progress.message}
                           </span>
-                          <span className="text-stone-300 shrink-0">{progress.percent}%</span>
+                          <span className="text-stone-300 font-mono shrink-0">{progress.percent}%</span>
                         </div>
                         <div className="w-full h-2 rounded-full bg-stone-950 overflow-hidden border border-stone-800">
                           <div
@@ -492,14 +492,14 @@ export const AssetManagerView: React.FC<AssetManagerViewProps> = ({
           <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3">
             {/* Aircraft / Module Funnel Chips */}
             <div className="flex items-center gap-2 overflow-x-auto pb-1">
-              <span className="text-xs font-mono text-stone-500 flex items-center gap-1 shrink-0 mr-1">
+              <span className="text-xs text-stone-400 flex items-center gap-1 shrink-0 mr-1">
                 <Stack className="w-3.5 h-3.5 text-amber-400" /> Module:
               </span>
               {modules.map((mod) => (
                 <button
                   key={mod}
                   onClick={() => setModuleFilter(mod)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-mono whitespace-nowrap border transition-all cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap border transition-all cursor-pointer ${
                     moduleFilter === mod
                       ? 'bg-amber-500/20 border-amber-500/50 text-amber-300 font-semibold'
                       : 'bg-stone-900/90 border-stone-800 text-stone-400 hover:text-stone-200 hover:border-stone-700'
@@ -512,7 +512,7 @@ export const AssetManagerView: React.FC<AssetManagerViewProps> = ({
 
             {/* Requirement Level & Status Funnel Pills */}
             <div className="flex flex-wrap items-center gap-2 shrink-0">
-              <div className="flex items-center bg-stone-900 border border-stone-800 rounded-xl p-1 text-xs font-mono">
+              <div className="flex items-center bg-stone-900 border border-stone-800 rounded-xl p-1 text-xs">
                 <button
                   onClick={() => setReqFilter('all')}
                   className={`px-3 py-1 rounded-lg transition-colors cursor-pointer ${
@@ -557,7 +557,7 @@ export const AssetManagerView: React.FC<AssetManagerViewProps> = ({
                 </button>
               </div>
 
-              <div className="flex items-center bg-stone-900 border border-stone-800 rounded-xl p-1 text-xs font-mono">
+              <div className="flex items-center bg-stone-900 border border-stone-800 rounded-xl p-1 text-xs">
                 <button
                   onClick={() => setStatusFilter('all')}
                   className={`px-2.5 py-1 rounded-lg cursor-pointer ${

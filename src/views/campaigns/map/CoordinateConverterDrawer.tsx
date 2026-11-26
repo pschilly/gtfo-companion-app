@@ -174,10 +174,10 @@ export const CoordinateConverterDrawer: React.FC<CoordinateConverterDrawerProps>
             value={inputText}
             onChange={(e) => handleParse(e.target.value)}
             placeholder="36.2021, 37.1343 | 37S BV 42310 08920 | N36° 12.1' E037° 08.0'"
-            className="w-full px-3 py-2 rounded-lg bg-stone-950 border border-stone-800 text-xs font-mono text-stone-100 placeholder:text-stone-600 focus:outline-none focus:border-amber-500/60"
+            className="w-full px-3 py-2 rounded-lg bg-stone-950 border border-stone-800 text-xs font-mono text-stone-100 placeholder:text-stone-500 focus:outline-none focus:border-amber-500/60"
           />
           {parseStatus && (
-            <div className="text-[11px] text-amber-300/90 font-medium">{parseStatus}</div>
+            <div className="text-xs text-amber-300/90 font-medium">{parseStatus}</div>
           )}
         </div>
 
@@ -188,7 +188,7 @@ export const CoordinateConverterDrawer: React.FC<CoordinateConverterDrawerProps>
               className="flex items-center justify-between gap-2 bg-stone-900/70 border border-stone-800/80 rounded-lg px-3 py-2"
             >
               <div className="min-w-0">
-                <div className="text-[10px] uppercase tracking-wider text-stone-500 font-semibold">
+                <div className="text-[11px] uppercase tracking-wider text-stone-500 font-semibold">
                   {item.label}
                 </div>
                 <div className="text-xs font-mono text-stone-100 truncate select-text">
@@ -213,7 +213,7 @@ export const CoordinateConverterDrawer: React.FC<CoordinateConverterDrawerProps>
 
         <div className="grid grid-cols-2 gap-2">
           <div className="bg-stone-900/70 border border-stone-800/80 rounded-lg px-3 py-2">
-            <div className="text-[10px] uppercase tracking-wider text-stone-500 font-semibold">
+            <div className="text-[11px] uppercase tracking-wider text-stone-500 font-semibold">
               Terrain Elevation
             </div>
             <div className="text-xs font-mono text-emerald-400 font-semibold">
@@ -226,7 +226,7 @@ export const CoordinateConverterDrawer: React.FC<CoordinateConverterDrawerProps>
           </div>
 
           <div className="bg-stone-900/70 border border-stone-800/80 rounded-lg px-3 py-2">
-            <div className="text-[10px] uppercase tracking-wider text-stone-500 font-semibold">
+            <div className="text-[11px] uppercase tracking-wider text-stone-500 font-semibold">
               Mag Var / Declination
             </div>
             <div className="text-xs font-mono text-sky-300 font-semibold">
@@ -240,7 +240,7 @@ export const CoordinateConverterDrawer: React.FC<CoordinateConverterDrawerProps>
         {braa && activeBullseye && (
           <div className="bg-sky-950/25 border border-sky-800/40 rounded-lg px-3 py-2 flex items-center justify-between">
             <div>
-              <div className="text-[10px] uppercase tracking-wider text-sky-400 font-semibold">
+              <div className="text-[11px] uppercase tracking-wider text-sky-400 font-semibold">
                 Bullseye ({activeBullseye.name}) BRAA
               </div>
               <div className="text-xs font-mono font-semibold text-sky-200">{braa.formatted}</div>

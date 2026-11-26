@@ -23,9 +23,9 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['Inter', 'Segoe UI', 'system-ui', 'sans-serif'],
-        display: ['Lexend', 'Inter', 'system-ui', 'sans-serif'],
-        mono: ['JetBrains Mono', 'Cascadia Code', 'Consolas', 'monospace'],
+        sans: ['"IBM Plex Sans"', '"Segoe UI"', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['"Barlow Semi Condensed"', '"IBM Plex Sans"', '"Segoe UI"', 'system-ui', 'sans-serif'],
+        mono: ['"IBM Plex Mono"', '"Cascadia Mono"', 'Consolas', 'ui-monospace', 'monospace'],
       }
     },
   },

@@ -49,10 +49,10 @@ export const LogoutConfirmModal: React.FC<LogoutConfirmModalProps> = ({
               <SignOut className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="font-display text-sm font-bold text-stone-100">
+              <h3 className="font-display text-base font-bold text-stone-100">
                 Confirm Sign Out
               </h3>
-              <p className="text-[11px] font-mono text-stone-400">
+              <p className="text-xs text-stone-400">
                 Global Task Force Overlord
               </p>
             </div>
@@ -81,8 +81,8 @@ export const LogoutConfirmModal: React.FC<LogoutConfirmModalProps> = ({
               </div>
             )}
             <div className="min-w-0 flex-1">
-              <div className="text-xs font-mono text-stone-400">Signed in as:</div>
-              <div className="font-display font-bold text-sm text-stone-100 truncate">
+              <div className="text-xs text-stone-400">Signed in as:</div>
+              <div className="font-display font-bold text-base text-stone-100 truncate">
                 {callsign}
               </div>
             </div>
@@ -100,7 +100,7 @@ export const LogoutConfirmModal: React.FC<LogoutConfirmModalProps> = ({
         <div className="px-5 py-3.5 bg-stone-950 border-t border-stone-800 flex items-center justify-end gap-2.5">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-xs font-mono font-medium text-stone-300 transition-colors"
+            className="px-4 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-xs font-medium text-stone-300 transition-colors"
           >
             Cancel
           </button>
@@ -109,7 +109,7 @@ export const LogoutConfirmModal: React.FC<LogoutConfirmModalProps> = ({
               onConfirm();
               onClose();
             }}
-            className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-mono font-bold flex items-center gap-1.5 shadow-lg shadow-red-950 transition-all"
+            className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-red-950 transition-all"
           >
             <SignOut className="w-3.5 h-3.5" />
             <span>Yes, Sign Out</span>

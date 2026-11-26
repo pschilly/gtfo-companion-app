@@ -330,7 +330,7 @@ export const HomeView: React.FC = () => {
         {/* Top Section: Always shows "Welcome back" & Member Profile Grade */}
         <div className="relative z-10 p-6 sm:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-2.5 max-w-2xl">
-            <h1 className="font-display text-2xl sm:text-4xl font-extrabold text-stone-100 tracking-tight leading-tight drop-shadow-md">
+            <h1 className="font-display text-3xl sm:text-4xl font-bold text-stone-100 leading-tight drop-shadow-md">
               Welcome back,{' '}
               <span className="bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent">
                 {memberProfile.callsign || 'Pilot'}
@@ -349,7 +349,7 @@ export const HomeView: React.FC = () => {
               <div className="text-sm sm:text-base font-bold text-stone-100">
                 {memberProfile.gradeTitle}
               </div>
-              <div className="text-[11px] text-amber-400/90 font-mono font-medium">
+              <div className="text-xs text-amber-400/90 font-medium">
                 {memberProfile.rosterTier
                   ? `${memberProfile.rosterTier} Roster`
                   : 'Taskforce Member'}
@@ -362,20 +362,20 @@ export const HomeView: React.FC = () => {
         {currentHero && (
           <div className="relative z-10 p-4 sm:p-6 pt-0 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2 bg-stone-950/80 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-stone-800/80 shadow-lg text-xs">
-              <span className="inline-flex items-center gap-1 text-amber-400 font-mono text-[10px] uppercase font-bold tracking-wider">
+              <span className="inline-flex items-center gap-1 text-amber-400 text-[11px] uppercase font-bold tracking-wider">
                 <Camera className="w-3.5 h-3.5" />
                 Spotlight
               </span>
               {currentHero.caption && (
                 <>
                   <span className="text-stone-600 hidden md:inline">•</span>
-                  <span className="text-stone-400 hidden md:inline text-[11px] max-w-xs truncate">
+                  <span className="text-stone-400 hidden md:inline text-xs max-w-xs truncate">
                     {currentHero.caption}
                   </span>
                 </>
               )}
               <span className="text-stone-600">•</span>
-              <span className="text-stone-400 text-[11px]">
+              <span className="text-stone-400 text-xs">
                 Shot by{' '}
                 <strong className="text-amber-300 font-semibold">{currentHero.credit}</strong>
               </span>
@@ -438,10 +438,10 @@ export const HomeView: React.FC = () => {
 
             <div className="space-y-0.5">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="font-display font-bold text-stone-100 text-sm sm:text-base">
+                <span className="font-display font-bold text-stone-100 text-base">
                   Member Readiness: Action Required
                 </span>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono text-[10px] font-bold uppercase tracking-wider border border-amber-500/30">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[11px] font-bold uppercase tracking-wide border border-amber-500/30 tabular-nums">
                   {checklistSummary.pendingCount} Item
                   {checklistSummary.pendingCount === 1 ? '' : 's'} Pending
                 </span>
@@ -460,7 +460,7 @@ export const HomeView: React.FC = () => {
                 e.stopPropagation();
                 setActiveTab('checklist');
               }}
-              className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono font-bold text-xs flex items-center gap-2 transition-all shadow-md shadow-amber-500/20 group-hover:translate-x-0.5"
+              className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs flex items-center gap-2 transition-all shadow-md shadow-amber-500/20 group-hover:translate-x-0.5"
             >
               <span>View Checklist</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -473,14 +473,14 @@ export const HomeView: React.FC = () => {
       <div className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
-            <span className="font-display text-xs font-bold uppercase tracking-wider text-stone-400">
+            <span className="font-display text-sm font-bold uppercase tracking-wider text-stone-400">
               Operations Brief
             </span>
-            <span className="px-2 py-0.5 rounded-full bg-stone-900 border border-stone-800 text-[10px] font-mono text-stone-400">
+            <span className="px-2 py-0.5 rounded-full bg-stone-900 border border-stone-800 text-[11px] text-stone-400 tabular-nums">
               {enabledWidgets.length} active widget{enabledWidgets.length === 1 ? '' : 's'}
             </span>
             {isSyncingHomeLayout && (
-              <span className="inline-flex items-center gap-1 text-[10px] font-mono text-amber-400">
+              <span className="inline-flex items-center gap-1 text-xs text-amber-400">
                 <ArrowsClockwise className="w-3 h-3 animate-spin" />
                 <span>Syncing layout...</span>
               </span>
@@ -493,7 +493,7 @@ export const HomeView: React.FC = () => {
                 <button
                   type="button"
                   onClick={resetHomeLayout}
-                  className="px-3 py-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-300 hover:text-amber-300 text-xs font-mono flex items-center gap-1.5 transition-colors"
+                  className="px-3 py-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-300 hover:text-amber-300 text-xs font-medium flex items-center gap-1.5 transition-colors"
                 >
                   <ArrowCounterClockwise className="w-3.5 h-3.5" />
                   <span>Reset to Default</span>
@@ -501,7 +501,7 @@ export const HomeView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsCustomizing(false)}
-                  className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-mono font-bold flex items-center gap-1.5 shadow-md shadow-amber-500/20 transition-colors"
+                  className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-bold flex items-center gap-1.5 shadow-md shadow-amber-500/20 transition-colors"
                 >
                   <Check weight="bold" className="w-3.5 h-3.5" />
                   <span>Done</span>
@@ -511,7 +511,7 @@ export const HomeView: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsCustomizing(true)}
-                className="px-3 py-1.5 rounded-xl bg-stone-900/90 hover:bg-stone-800 border border-stone-800 hover:border-amber-500/40 text-stone-300 hover:text-amber-300 text-xs font-mono flex items-center gap-1.5 transition-all"
+                className="px-3 py-1.5 rounded-xl bg-stone-900/90 hover:bg-stone-800 border border-stone-800 hover:border-amber-500/40 text-stone-300 hover:text-amber-300 text-xs font-medium flex items-center gap-1.5 transition-all"
               >
                 <SlidersHorizontal className="w-3.5 h-3.5 text-amber-400" />
                 <span>Customize Home</span>
@@ -525,7 +525,7 @@ export const HomeView: React.FC = () => {
           <div className="p-5 rounded-3xl bg-stone-900/95 border border-amber-500/30 shadow-2xl space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-stone-800">
               <div>
-                <h2 className="font-display font-bold text-sm sm:text-base text-stone-100">
+                <h2 className="font-display font-bold text-base text-stone-100">
                   Customize Home Widgets
                 </h2>
                 <p className="text-xs text-stone-400 mt-0.5">
@@ -533,7 +533,7 @@ export const HomeView: React.FC = () => {
                 </p>
               </div>
 
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-stone-950 border border-stone-800 text-[11px] font-mono text-stone-400 shrink-0 self-start sm:self-center">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-stone-950 border border-stone-800 text-xs text-stone-400 shrink-0 self-start sm:self-center">
                 {isSyncingHomeLayout ? (
                   <>
                     <ArrowsClockwise className="w-3.5 h-3.5 text-amber-400 animate-spin" />
@@ -571,17 +571,17 @@ export const HomeView: React.FC = () => {
                           <div className="w-7 h-7 rounded-lg bg-stone-900 border border-stone-800 flex items-center justify-center shrink-0">
                             {getWidgetIcon(entry.id)}
                           </div>
-                          <span className="font-display font-bold text-xs text-stone-100 truncate">
+                          <span className="font-display font-bold text-sm text-stone-100 truncate">
                             {entry.title}
                           </span>
                         </div>
                         {isEnabled && (
-                          <span className="px-1.5 py-0.5 rounded bg-stone-900 border border-stone-800 text-[10px] font-mono text-amber-300 shrink-0">
+                          <span className="px-1.5 py-0.5 rounded bg-stone-900 border border-stone-800 text-[11px] font-mono text-amber-300 shrink-0">
                             {widthLabel} width
                           </span>
                         )}
                       </div>
-                      <p className="text-[11px] text-stone-400 leading-relaxed">
+                      <p className="text-xs text-stone-400 leading-relaxed">
                         {entry.description}
                       </p>
                     </div>
@@ -589,7 +589,7 @@ export const HomeView: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleToggleWidget(entry.id)}
-                      className={`w-full py-1.5 px-3 rounded-xl border text-xs font-mono font-semibold flex items-center justify-center gap-1.5 transition-all ${
+                      className={`w-full py-1.5 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition-all ${
                         isEnabled
                           ? 'bg-emerald-500/15 hover:bg-emerald-500/25 border-emerald-500/40 text-emerald-300'
                           : 'bg-stone-900 hover:bg-amber-500/15 border-stone-700 hover:border-amber-500/40 text-stone-300 hover:text-amber-300'
@@ -631,7 +631,7 @@ export const HomeView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsCustomizing(true)}
-                  className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono font-bold text-xs flex items-center gap-1.5"
+                  className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs flex items-center gap-1.5"
                 >
                   <SlidersHorizontal className="w-3.5 h-3.5" />
                   <span>Customize Widgets</span>
@@ -639,7 +639,7 @@ export const HomeView: React.FC = () => {
                 <button
                   type="button"
                   onClick={resetHomeLayout}
-                  className="px-4 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-200 font-mono text-xs flex items-center gap-1.5"
+                  className="px-4 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-200 text-xs font-medium flex items-center gap-1.5"
                 >
                   <ArrowCounterClockwise className="w-3.5 h-3.5" />
                   <span>Reset to Default</span>
@@ -672,7 +672,7 @@ export const HomeView: React.FC = () => {
                 >
                   {isCustomizing && (
                     <div className="mb-4 pb-2.5 border-b border-stone-800/90 flex flex-wrap items-center justify-between gap-2">
-                      <div className="flex items-center gap-1.5 text-[11px] font-mono text-amber-300">
+                      <div className="flex items-center gap-1.5 text-xs text-amber-300">
                         <span
                           data-widget-drag-handle="true"
                           className="p-1 rounded bg-stone-950 border border-stone-800 cursor-grab active:cursor-grabbing text-stone-400 hover:text-amber-300"
@@ -712,7 +712,7 @@ export const HomeView: React.FC = () => {
 
                         {/* Column Width Selector */}
                         <div
-                          className="flex items-center bg-stone-950 rounded-lg border border-stone-800 p-0.5 text-[10px] font-mono"
+                          className="flex items-center bg-stone-950 rounded-lg border border-stone-800 p-0.5 text-[11px] font-mono"
                           title="Adjust widget width"
                         >
                           {COL_SPAN_OPTIONS.map((opt) => (
@@ -757,7 +757,7 @@ export const HomeView: React.FC = () => {
 
       {isCustomizing && draggedWidgetId && dragPointer && (
         <div
-          className="pointer-events-none fixed z-50 flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-stone-950/95 border border-amber-400/70 shadow-2xl shadow-black/60 backdrop-blur-md text-xs font-mono text-stone-100"
+          className="pointer-events-none fixed z-50 flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-stone-950/95 border border-amber-400/70 shadow-2xl shadow-black/60 backdrop-blur-md text-xs text-stone-100"
           style={{
             left: dragPointer.x + 14,
             top: dragPointer.y + 14,

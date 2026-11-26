@@ -121,7 +121,7 @@ export const CampaignMapHudFooter: React.FC<CampaignMapHudFooterProps> = ({
               }`}
             >
               <CrosshairSimple className="w-3.5 h-3.5" weight="bold" />
-              <span className="text-[10px] tracking-tight">{beName}</span>
+              <span className="text-[11px]">{beName}</span>
             </span>
             <span className="px-2.5 py-1.5 text-xs font-mono text-stone-200 min-w-[115px] text-left">
               {braaFormatted || '--'}

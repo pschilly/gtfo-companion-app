@@ -125,7 +125,7 @@ export const CampaignMapToolbar: React.FC<CampaignMapToolbarProps> = ({
 
         {searchFocused && (
           <div className="absolute top-full left-0 mt-1 w-84 max-h-72 overflow-y-auto bg-stone-900 border border-stone-700 rounded-lg shadow-2xl z-[1200] p-1 divide-y divide-stone-800">
-            <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-wider text-stone-400 flex items-center justify-between">
+            <div className="px-2 py-1 text-[11px] font-semibold uppercase tracking-wider text-stone-400 flex items-center justify-between">
               <span>
                 {searchQuery.trim()
                   ? `Matching Flight Plans (${searchResults.length})`
@@ -151,14 +151,14 @@ export const CampaignMapToolbar: React.FC<CampaignMapToolbarProps> = ({
                 >
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[10px] font-mono font-semibold px-1 py-0.5 rounded bg-stone-950 text-stone-300 border border-stone-700">
+                      <span className="text-[11px] font-mono font-semibold px-1.5 py-0.5 rounded bg-stone-950 text-stone-300 border border-stone-700">
                         {p.identifier}
                       </span>
                       <span className="text-xs font-bold text-stone-200 group-hover:text-white truncate">
                         {p.callsign || p.name}
                       </span>
                     </div>
-                    <div className="text-[10px] text-stone-400 truncate">
+                    <div className="text-xs text-stone-400 truncate mt-0.5">
                       {[p.creator_name && `By ${p.creator_name}`, p.airframe_name, p.mission_name]
                         .filter(Boolean)
                         .join(' • ')}

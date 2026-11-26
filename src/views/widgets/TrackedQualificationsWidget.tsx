@@ -28,10 +28,10 @@ export const TrackedQualificationsWidget: React.FC<HomeWidgetProps> = ({ colSpan
               <GraduationCap className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-display font-bold text-stone-100 text-sm sm:text-base">
+              <h3 className="font-display font-bold text-stone-100 text-base">
                 Training Queue &amp; Certifications
               </h3>
-              <p className="text-[11px] font-mono text-stone-400">
+              <p className="text-xs text-stone-400">
                 Tracked LMS courses &amp; earned quals
               </p>
             </div>
@@ -39,7 +39,7 @@ export const TrackedQualificationsWidget: React.FC<HomeWidgetProps> = ({ colSpan
 
           <button
             onClick={() => setActiveTab('qualifications_zone')}
-            className="text-xs font-mono text-emerald-400 hover:text-emerald-300 flex items-center gap-1 transition"
+            className="text-xs font-medium text-emerald-400 hover:text-emerald-300 flex items-center gap-1 transition"
           >
             <span>Quals Zone</span>
             <ArrowRight className="w-3 h-3" />
@@ -63,14 +63,14 @@ export const TrackedQualificationsWidget: React.FC<HomeWidgetProps> = ({ colSpan
                 >
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2 min-w-0">
-                      <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 shrink-0">
+                      <span className="px-1.5 py-0.5 rounded text-[11px] font-mono font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 shrink-0">
                         {course.code}
                       </span>
                       <span className="font-bold text-xs text-stone-100 group-hover:text-emerald-300 transition truncate">
                         {course.name}
                       </span>
                     </div>
-                    <span className="text-[10px] font-mono text-stone-400 shrink-0">
+                    <span className="text-[11px] text-stone-400 tabular-nums shrink-0">
                       {doneReq}/{totalReq} checks
                     </span>
                   </div>
@@ -82,7 +82,7 @@ export const TrackedQualificationsWidget: React.FC<HomeWidgetProps> = ({ colSpan
                         style={{ width: `${pct}%` }}
                       />
                     </div>
-                    <span className="text-[10px] font-mono text-emerald-400 font-semibold shrink-0">
+                    <span className="text-[11px] font-mono text-emerald-400 font-semibold shrink-0">
                       {pct}%
                     </span>
                   </div>
@@ -93,12 +93,12 @@ export const TrackedQualificationsWidget: React.FC<HomeWidgetProps> = ({ colSpan
         ) : (
           <div className="mt-4 py-7 px-4 text-center space-y-2">
             <Certificate className="w-7 h-7 text-stone-600 mx-auto" />
-            <p className="text-xs font-mono text-stone-400">
+            <p className="text-xs text-stone-400">
               No courses currently tracked in your training queue.
             </p>
             <button
               onClick={() => setActiveTab('qualifications_zone')}
-              className="inline-flex items-center gap-1 text-xs font-mono text-emerald-400 hover:text-emerald-300 font-semibold"
+              className="inline-flex items-center gap-1 text-xs text-emerald-400 hover:text-emerald-300 font-semibold"
             >
               <span>Browse Qualifications Zone</span>
               <ArrowRight className="w-3 h-3" />
@@ -107,11 +107,11 @@ export const TrackedQualificationsWidget: React.FC<HomeWidgetProps> = ({ colSpan
         )}
       </div>
 
-      <div className="mt-4 pt-3 border-t border-stone-800 flex items-center justify-between text-xs font-mono text-stone-400">
+      <div className="mt-4 pt-3 border-t border-stone-800 flex items-center justify-between text-xs text-stone-400">
         <span>{issuedCertCount} issued certification(s)</span>
         <button
           onClick={() => setActiveTab('qualifications')}
-          className="text-emerald-400 hover:text-emerald-300 font-bold"
+          className="text-emerald-400 hover:text-emerald-300 font-semibold"
         >
           My Certifications &rarr;
         </button>

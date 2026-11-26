@@ -17,10 +17,10 @@ export const QualifiedAirframesWidget: React.FC<HomeWidgetProps> = ({ colSpan })
               <AirplaneTilt className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-display font-bold text-stone-100 text-sm sm:text-base">
+              <h3 className="font-display font-bold text-stone-100 text-base">
                 Qualified Airframes
               </h3>
-              <p className="text-[11px] font-mono text-stone-400">
+              <p className="text-xs text-stone-400">
                 Cleared fleet &amp; flight roles
               </p>
             </div>
@@ -28,7 +28,7 @@ export const QualifiedAirframesWidget: React.FC<HomeWidgetProps> = ({ colSpan })
 
           <button
             onClick={() => setActiveTab('airframes')}
-            className="text-xs font-mono text-sky-400 hover:text-sky-300 flex items-center gap-1 transition"
+            className="text-xs font-medium text-sky-400 hover:text-sky-300 flex items-center gap-1 transition"
           >
             <span>View Fleet</span>
             <ArrowRight className="w-3 h-3" />
@@ -61,12 +61,12 @@ export const QualifiedAirframesWidget: React.FC<HomeWidgetProps> = ({ colSpan })
                         {af.name}
                       </span>
                       {af.isPrimary && (
-                        <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 shrink-0">
+                        <span className="px-1.5 py-0.5 rounded text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 shrink-0">
                           PRIMARY
                         </span>
                       )}
                     </div>
-                    <div className="text-[11px] font-mono text-stone-400 truncate">
+                    <div className="text-xs text-stone-400 truncate">
                       {af.roleLabel || af.role || 'Pilot'}
                       {af.squadron ? ` • ${af.squadron}` : ''}
                     </div>
@@ -75,12 +75,12 @@ export const QualifiedAirframesWidget: React.FC<HomeWidgetProps> = ({ colSpan })
 
                 <div className="flex items-center gap-1 shrink-0">
                   {af.isInstructor && (
-                    <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/40">
+                    <span className="px-1.5 py-0.5 rounded text-[11px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/40">
                       IP
                     </span>
                   )}
                   {af.isCrew && (
-                    <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-stone-800 text-stone-300">
+                    <span className="px-1.5 py-0.5 rounded text-[11px] bg-stone-800 text-stone-300">
                       CREW
                     </span>
                   )}
@@ -89,19 +89,19 @@ export const QualifiedAirframesWidget: React.FC<HomeWidgetProps> = ({ colSpan })
             ))}
           </div>
         ) : (
-          <div className="mt-4 py-8 text-center text-xs font-mono text-stone-500">
+          <div className="mt-4 py-8 text-center text-xs text-stone-500">
             No qualified airframes recorded yet.
           </div>
         )}
       </div>
 
-      <div className="mt-4 pt-3 border-t border-stone-800 flex items-center justify-between text-xs font-mono text-stone-400">
+      <div className="mt-4 pt-3 border-t border-stone-800 flex items-center justify-between text-xs text-stone-400">
         <span>
           {(memberProfile.qualifiedAirframes || []).length} qualified platform(s)
         </span>
         <button
           onClick={() => setActiveTab('airframes')}
-          className="text-sky-400 hover:text-sky-300 font-bold"
+          className="text-sky-400 hover:text-sky-300 font-semibold"
         >
           Inspect Type Ratings &rarr;
         </button>

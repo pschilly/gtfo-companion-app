@@ -236,7 +236,7 @@ export const CommsTab: React.FC<CommsTabProps> = ({
                 }`}
               >
                 <span>{r.name}</span>
-                <span className="text-[10px] opacity-75 font-mono">({r.designation})</span>
+                <span className="text-[11px] opacity-75 font-mono">({r.designation})</span>
               </button>
             ))}
           </div>
@@ -275,7 +275,7 @@ export const CommsTab: React.FC<CommsTabProps> = ({
           )}
         </div>
 
-        <div className="flex items-center justify-between px-2.5 py-1.5 rounded bg-stone-950/90 border border-stone-800/80 text-[11px]">
+        <div className="flex items-center justify-between px-2.5 py-1.5 rounded bg-stone-950/90 border border-stone-800/80 text-xs">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-bold text-amber-400 font-mono">
               {activeRadio.name} [{activeRadio.designation}]
@@ -283,14 +283,14 @@ export const CommsTab: React.FC<CommsTabProps> = ({
             <span className="text-stone-600">&bull;</span>
             <span className="text-stone-300">{getRadioBandsSummary(activeRadio)}</span>
           </div>
-          <span className="text-[10px] font-mono text-stone-500 shrink-0 ml-2">
+          <span className="text-[11px] font-mono tabular-nums text-stone-500 shrink-0 ml-2">
             {activeRadio.preset_count || 20} Presets
           </span>
         </div>
       </div>
 
       {/* Table Header */}
-      <div className="grid grid-cols-12 gap-1.5 px-2 py-1 bg-stone-950 text-[10px] font-bold text-stone-400 uppercase rounded border border-stone-800 items-center">
+      <div className="grid grid-cols-12 gap-1.5 px-2 py-1 bg-stone-950 text-[11px] font-bold text-stone-400 uppercase rounded border border-stone-800 items-center">
         <span className="col-span-1 text-center">CH</span>
         <span className="col-span-4">Preset / Net Name</span>
         <span className="col-span-3">Freq (MHz)</span>
@@ -354,7 +354,7 @@ export const CommsTab: React.FC<CommsTabProps> = ({
                 title="Drag to reorder channels"
               >
                 <DotsSixVertical className="size-3 opacity-40 group-hover:opacity-100 shrink-0" weight="bold" />
-                <span className="font-mono font-bold text-amber-400 text-[11px]">
+                <span className="font-mono font-bold text-amber-400 text-xs">
                   {ch.channel ?? idx + 1}
                 </span>
               </div>
@@ -392,7 +392,7 @@ export const CommsTab: React.FC<CommsTabProps> = ({
                 />
                 {!valRes.valid && valRes.error && (
                   <div
-                    className="text-[9px] text-amber-400 font-semibold mt-0.5 leading-tight truncate"
+                    className="text-[11px] text-amber-400 font-semibold mt-0.5 leading-tight truncate"
                     title={valRes.error}
                   >
                     ⚠️ {valRes.error}
@@ -495,11 +495,11 @@ export const MidsTab: React.FC<MidsTabProps> = ({
           <div>
             <h4 className="text-xs font-bold text-white flex items-center gap-1.5">
               <span>Link 16 / MIDS Datalink &amp; Voice Nets</span>
-              <span className="text-[9px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-mono font-semibold">
+              <span className="text-[11px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-semibold">
                 {isJf17 ? 'JF-17' : 'F/A-18C'}
               </span>
             </h4>
-            <p className="text-[10px] text-stone-400 mt-0.5">
+            <p className="text-xs text-stone-400 mt-0.5">
               Configure MIDS Vocal Nets A &amp; B for Link 16 tactical datalink and voice comms.
             </p>
           </div>
@@ -528,13 +528,13 @@ export const MidsTab: React.FC<MidsTabProps> = ({
                 MIDS A (Voice 1 / Net A)
               </span>
             </div>
-            <span className="text-[10px] font-mono font-bold text-cyan-400 px-1.5 py-0.5 rounded bg-cyan-950 border border-cyan-800">
+            <span className="text-[11px] font-mono font-bold text-cyan-400 px-1.5 py-0.5 rounded bg-cyan-950 border border-cyan-800">
               CH {mids.mids_a_channel || '44'}
             </span>
           </div>
 
           <div>
-            <label className="block text-[10px] font-bold text-stone-400 uppercase mb-1">
+            <label className="block text-xs font-bold text-stone-400 uppercase mb-1">
               MIDS Channel / Net #
             </label>
             <input
@@ -553,7 +553,7 @@ export const MidsTab: React.FC<MidsTabProps> = ({
           </div>
 
           <div>
-            <label className="block text-[10px] font-bold text-stone-400 uppercase mb-1">
+            <label className="block text-xs font-bold text-stone-400 uppercase mb-1">
               Preset / Net Label
             </label>
             <input
@@ -573,7 +573,7 @@ export const MidsTab: React.FC<MidsTabProps> = ({
           </div>
 
           <div>
-            <label className="block text-[10px] font-bold text-stone-400 uppercase mb-1">
+            <label className="block text-xs font-bold text-stone-400 uppercase mb-1">
               Purpose / Notes
             </label>
             <input
@@ -601,13 +601,13 @@ export const MidsTab: React.FC<MidsTabProps> = ({
                 MIDS B (Voice 2 / Net B)
               </span>
             </div>
-            <span className="text-[10px] font-mono font-bold text-emerald-400 px-1.5 py-0.5 rounded bg-emerald-950 border border-emerald-800">
+            <span className="text-[11px] font-mono font-bold text-emerald-400 px-1.5 py-0.5 rounded bg-emerald-950 border border-emerald-800">
               CH {mids.mids_b_channel || '49'}
             </span>
           </div>
 
           <div>
-            <label className="block text-[10px] font-bold text-stone-400 uppercase mb-1">
+            <label className="block text-xs font-bold text-stone-400 uppercase mb-1">
               MIDS Channel / Net #
             </label>
             <input
@@ -626,7 +626,7 @@ export const MidsTab: React.FC<MidsTabProps> = ({
           </div>
 
           <div>
-            <label className="block text-[10px] font-bold text-stone-400 uppercase mb-1">
+            <label className="block text-xs font-bold text-stone-400 uppercase mb-1">
               Preset / Net Label
             </label>
             <input
@@ -646,7 +646,7 @@ export const MidsTab: React.FC<MidsTabProps> = ({
           </div>
 
           <div>
-            <label className="block text-[10px] font-bold text-stone-400 uppercase mb-1">
+            <label className="block text-xs font-bold text-stone-400 uppercase mb-1">
               Purpose / Notes
             </label>
             <input
@@ -750,11 +750,11 @@ export const CmdsTab: React.FC<CmdsTabProps> = ({
           <div>
             <h4 className="text-xs font-bold text-white flex items-center gap-1.5">
               <span>Countermeasure Dispenser System (CMDS)</span>
-              <span className="text-[9px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 font-mono font-semibold">
+              <span className="text-[11px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 font-semibold">
                 {isF16 ? 'F-16C Viper' : isF14 ? 'F-14B(U) Tomcat' : 'F/A-18C Hornet'}
               </span>
             </h4>
-            <p className="text-[10px] text-stone-400 mt-0.5">
+            <p className="text-xs text-stone-400 mt-0.5">
               Configure manual/automatic dispenser programs, burst/salvo intervals, threat response,
               and bingo reserves.
             </p>
@@ -786,7 +786,7 @@ export const CmdsTab: React.FC<CmdsTabProps> = ({
               </div>
               <div className="grid grid-cols-3 gap-2.5">
                 <div>
-                  <label className="block text-[10px] font-bold text-stone-400 uppercase mb-1">
+                  <label className="block text-xs font-bold text-stone-400 uppercase mb-1">
                     Chaff Bingo
                   </label>
                   <input
@@ -805,7 +805,7 @@ export const CmdsTab: React.FC<CmdsTabProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-stone-400 uppercase mb-1">
+                  <label className="block text-xs font-bold text-stone-400 uppercase mb-1">
                     Flares Bingo
                   </label>
                   <input
@@ -824,7 +824,7 @@ export const CmdsTab: React.FC<CmdsTabProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-stone-400 uppercase mb-1">
+                  <label className="block text-xs font-bold text-stone-400 uppercase mb-1">
                     Prog Delay (s)
                   </label>
                   <input
@@ -877,7 +877,7 @@ export const CmdsTab: React.FC<CmdsTabProps> = ({
           )}
 
           <div>
-            <label className="block text-[10px] font-bold text-stone-400 uppercase mb-1.5">
+            <label className="block text-xs font-bold text-stone-400 uppercase mb-1.5">
               Select Program to Edit
             </label>
             <div className="grid grid-cols-5 gap-1 select-none">
@@ -920,7 +920,7 @@ export const CmdsTab: React.FC<CmdsTabProps> = ({
               </div>
 
               <div className="space-y-1.5">
-                <div className="grid grid-cols-5 gap-1.5 text-[10px] font-bold text-stone-400 uppercase px-1">
+                <div className="grid grid-cols-5 gap-1.5 text-[11px] font-bold text-stone-400 uppercase px-1">
                   <span>Dispenser</span>
                   <span className="text-center">Burst Qty</span>
                   <span className="text-center">Burst Int (s)</span>
@@ -984,7 +984,7 @@ export const CmdsTab: React.FC<CmdsTabProps> = ({
               <span className="font-bold text-stone-200 text-xs uppercase tracking-wider">
                 Delay Between Programs
               </span>
-              <p className="text-[10px] text-stone-400">
+              <p className="text-xs text-stone-400">
                 Delay interval in seconds before repeating sequence (0-10s)
               </p>
             </div>
@@ -1008,7 +1008,7 @@ export const CmdsTab: React.FC<CmdsTabProps> = ({
           </div>
 
           <div>
-            <label className="block text-[10px] font-bold text-stone-400 uppercase mb-1.5">
+            <label className="block text-xs font-bold text-stone-400 uppercase mb-1.5">
               Select Program to Edit
             </label>
             <div className="grid grid-cols-5 gap-1 select-none">
@@ -1059,7 +1059,7 @@ export const CmdsTab: React.FC<CmdsTabProps> = ({
                     </span>
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-stone-400 uppercase mb-1">
+                    <label className="block text-xs font-bold text-stone-400 uppercase mb-1">
                       Burst Quantity
                     </label>
                     <input
@@ -1081,7 +1081,7 @@ export const CmdsTab: React.FC<CmdsTabProps> = ({
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-stone-400 uppercase mb-1">
+                    <label className="block text-xs font-bold text-stone-400 uppercase mb-1">
                       Interval (Seconds)
                     </label>
                     <input
@@ -1104,7 +1104,7 @@ export const CmdsTab: React.FC<CmdsTabProps> = ({
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-stone-400 uppercase mb-1">
+                    <label className="block text-xs font-bold text-stone-400 uppercase mb-1">
                       Repeat Count
                     </label>
                     <input
@@ -1135,7 +1135,7 @@ export const CmdsTab: React.FC<CmdsTabProps> = ({
                     </span>
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-stone-400 uppercase mb-1">
+                    <label className="block text-xs font-bold text-stone-400 uppercase mb-1">
                       Burst Quantity
                     </label>
                     <input
@@ -1176,7 +1176,7 @@ export const CmdsTab: React.FC<CmdsTabProps> = ({
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] font-bold text-stone-400 uppercase mb-1">
+                  <label className="block text-xs font-bold text-stone-400 uppercase mb-1">
                     Chaff Low Bingo
                   </label>
                   <input
@@ -1195,7 +1195,7 @@ export const CmdsTab: React.FC<CmdsTabProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-stone-400 uppercase mb-1">
+                  <label className="block text-xs font-bold text-stone-400 uppercase mb-1">
                     Flares Low Bingo
                   </label>
                   <input
@@ -1217,10 +1217,10 @@ export const CmdsTab: React.FC<CmdsTabProps> = ({
 
               {cmds.auto_programs && (
                 <div className="pt-2 border-t border-stone-800/80 space-y-1.5">
-                  <span className="block text-[10px] font-bold text-stone-400 uppercase">
+                  <span className="block text-xs font-bold text-stone-400 uppercase">
                     Automated RWR Threat Response Matrix
                   </span>
-                  <div className="grid grid-cols-3 gap-1.5 text-[10px] font-bold text-stone-400 uppercase px-1">
+                  <div className="grid grid-cols-3 gap-1.5 text-[11px] font-bold text-stone-400 uppercase px-1">
                     <span>Threat Class</span>
                     <span className="text-center">Assigned Prog</span>
                     <span className="text-center">Threshold</span>
@@ -1275,7 +1275,7 @@ export const CmdsTab: React.FC<CmdsTabProps> = ({
           )}
 
           <div>
-            <label className="block text-[10px] font-bold text-stone-400 uppercase mb-1.5">
+            <label className="block text-xs font-bold text-stone-400 uppercase mb-1.5">
               Select Program to Edit
             </label>
             <div className="grid grid-cols-4 gap-1 select-none">
@@ -1318,7 +1318,7 @@ export const CmdsTab: React.FC<CmdsTabProps> = ({
                   />
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] font-bold text-stone-400 uppercase">Priority:</span>
+                  <span className="text-xs font-bold text-stone-400 uppercase">Priority:</span>
                   <select
                     disabled={!canEdit}
                     value={cmds.programs[resolvedActiveProg].priority ?? 0}
@@ -1338,7 +1338,7 @@ export const CmdsTab: React.FC<CmdsTabProps> = ({
               </div>
 
               <div className="space-y-1.5">
-                <div className="grid grid-cols-5 gap-1.5 text-[10px] font-bold text-stone-400 uppercase px-1">
+                <div className="grid grid-cols-5 gap-1.5 text-[11px] font-bold text-stone-400 uppercase px-1">
                   <span>Dispenser</span>
                   <span className="text-center">Burst Qty</span>
                   <span className="text-center">Burst Int (s)</span>

@@ -70,10 +70,10 @@ export const UpcomingSortiesWidget: React.FC<HomeWidgetProps> = ({ colSpan }) =>
               <CalendarBlank className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-display font-bold text-stone-100 text-sm sm:text-base">
+              <h3 className="font-display font-bold text-stone-100 text-base">
                 Upcoming Sorties &amp; Training
               </h3>
-              <p className="text-[11px] font-mono text-stone-400">
+              <p className="text-xs text-stone-400">
                 Scheduled taskforce events
               </p>
             </div>
@@ -81,7 +81,7 @@ export const UpcomingSortiesWidget: React.FC<HomeWidgetProps> = ({ colSpan }) =>
 
           <button
             onClick={() => setActiveTab('calendar')}
-            className="text-xs font-mono text-amber-400 hover:text-amber-300 flex items-center gap-1 transition"
+            className="text-xs font-medium text-amber-400 hover:text-amber-300 flex items-center gap-1 transition"
           >
             <span>Full Calendar</span>
             <ArrowRight className="w-3 h-3" />
@@ -114,7 +114,7 @@ export const UpcomingSortiesWidget: React.FC<HomeWidgetProps> = ({ colSpan }) =>
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2 min-w-0">
                       <span
-                        className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase border shrink-0 ${
+                        className={`px-1.5 py-0.5 rounded text-[11px] font-bold uppercase border shrink-0 ${
                           ev.type === 'campaign'
                             ? 'bg-red-500/20 text-red-300 border-red-500/40'
                             : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
@@ -128,21 +128,21 @@ export const UpcomingSortiesWidget: React.FC<HomeWidgetProps> = ({ colSpan }) =>
                     </div>
 
                     {ev.is_attending ? (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-emerald-400 shrink-0">
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-400 shrink-0">
                         <ShieldCheck className="w-3.5 h-3.5" /> Attending
                       </span>
                     ) : (
-                      <span className="text-[10px] font-mono text-stone-400 shrink-0">
+                      <span className="text-[11px] text-stone-400 tabular-nums shrink-0">
                         👥 {ev.attendees?.length || 0}
                       </span>
                     )}
                   </div>
 
-                  <div className="flex items-center justify-between text-[11px] font-mono text-stone-400">
+                  <div className="flex items-center justify-between text-xs text-stone-400">
                     <span className="truncate">
                       {ev.subtitle || ev.theatre || 'Global Task Force'}
                     </span>
-                    <span className="text-amber-300/90 font-semibold shrink-0">
+                    <span className="text-amber-300/90 font-mono font-semibold shrink-0">
                       {dateStr}
                     </span>
                   </div>
@@ -151,21 +151,21 @@ export const UpcomingSortiesWidget: React.FC<HomeWidgetProps> = ({ colSpan }) =>
             })}
           </div>
         ) : eventsLoading ? (
-          <div className="mt-4 py-8 text-center text-xs font-mono text-stone-500">
+          <div className="mt-4 py-8 text-center text-xs text-stone-500">
             Loading upcoming sorties...
           </div>
         ) : (
-          <div className="mt-4 py-8 text-center text-xs font-mono text-stone-500">
+          <div className="mt-4 py-8 text-center text-xs text-stone-500">
             No upcoming sorties scheduled right now.
           </div>
         )}
       </div>
 
-      <div className="mt-4 pt-3 border-t border-stone-800 flex items-center justify-between text-xs font-mono text-stone-400">
+      <div className="mt-4 pt-3 border-t border-stone-800 flex items-center justify-between text-xs text-stone-400">
         <span>Synchronized with Discord briefing boards</span>
         <button
           onClick={() => setActiveTab('calendar')}
-          className="text-amber-400 hover:text-amber-300 font-bold"
+          className="text-amber-400 hover:text-amber-300 font-semibold"
         >
           Sign Up &rarr;
         </button>

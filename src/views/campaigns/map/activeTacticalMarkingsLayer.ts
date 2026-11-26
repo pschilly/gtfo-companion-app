@@ -625,12 +625,12 @@ export class TacticalMarkingsMapController {
                 <div class="font-bold text-amber-400">${escapeHtml(
                   props.label || props.text || `${shape || 'Marking'} #${m.id}`
                 )}</div>
-                <div class="text-[10px] text-stone-400">By: ${escapeHtml(
+                <div class="text-xs text-stone-400">By: ${escapeHtml(
                   m.creator_name || 'Member'
                 )} &bull; ${escapeHtml(String(m.visibility).toUpperCase())}</div>
                 ${
                   props.notes
-                    ? `<p class="text-[11px] text-stone-300 pt-1 border-t border-stone-800 whitespace-pre-wrap">${escapeHtml(
+                    ? `<p class="text-xs text-stone-300 pt-1 border-t border-stone-800 whitespace-pre-wrap">${escapeHtml(
                         props.notes
                       )}</p>`
                     : ''
@@ -698,14 +698,14 @@ export class TacticalMarkingsMapController {
       );
     } else if (shape === 'icon' && props.notes) {
       (layer as L.Marker).bindTooltip(
-        `<div class="text-[11px]">
+        `<div class="text-xs">
           <div class="font-bold text-amber-400">${escapeHtml(props.label || 'Tactical Marker')}</div>
-          <div class="text-[10px] text-stone-300 mt-0.5 whitespace-pre-wrap">${escapeHtml(
+          <div class="text-[11px] text-stone-300 mt-0.5 whitespace-pre-wrap">${escapeHtml(
             props.notes
           )}</div>
           ${
             m.creator_name
-              ? `<div class="text-[9px] text-stone-400 mt-1">By: ${escapeHtml(
+              ? `<div class="text-[11px] text-stone-400 mt-1">By: ${escapeHtml(
                   m.creator_name
                 )} (${escapeHtml(m.visibility)})</div>`
               : ''
@@ -716,11 +716,11 @@ export class TacticalMarkingsMapController {
     } else if (!props.label && shape !== 'text' && shape !== 'icon') {
       const tooltipText = `${props.shape || 'Marking'} #${m.id}`;
       (layer as L.Path).bindTooltip(
-        `<div class="text-[11px] font-bold">
+        `<div class="text-xs font-bold">
           <span class="text-amber-400">${escapeHtml(tooltipText)}</span>
           ${
             m.creator_name
-              ? `<div class="text-[9px] text-stone-400 font-normal">By: ${escapeHtml(
+              ? `<div class="text-[11px] text-stone-400 font-normal">By: ${escapeHtml(
                   m.creator_name
                 )} (${escapeHtml(m.visibility)})</div>`
               : ''
@@ -782,7 +782,7 @@ export class TacticalMarkingsMapController {
         </div>
         ${
           label
-            ? `<div class="tactical-svg-label absolute top-full mt-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold text-white whitespace-nowrap shadow-md pointer-events-none"
+            ? `<div class="tactical-svg-label absolute top-full mt-0.5 px-1.5 py-0.5 rounded text-[11px] font-bold text-white whitespace-nowrap shadow-md pointer-events-none"
                     style="background-color:rgba(15,23,42,0.9);border:1px solid rgba(255,255,255,0.25);text-shadow:0 1px 2px #000;">
                  ${escapeHtml(label)}
                </div>`

@@ -7,7 +7,7 @@
 /* Dark Tactical Leaflet Overrides */
 .leaflet-container {
   background: #09090b;
-  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
 .leaflet-popup-content-wrapper,
@@ -63,7 +63,7 @@
   color: #f5f5f4;
   border-radius: 6px;
   padding: 2px 6px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
 }
@@ -87,8 +87,22 @@
   body {
     background-color: #0c0a09;
     color: #e7e5e4;
-    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    text-rendering: optimizeLegibility;
     user-select: none;
+  }
+
+  code,
+  pre,
+  kbd,
+  samp {
+    font-family: 'IBM Plex Mono', 'Cascadia Mono', Consolas, ui-monospace, monospace;
+  }
+}
+
+@layer utilities {
+  .font-mono {
+    font-variant-numeric: tabular-nums;
   }
 }
 
@@ -239,8 +253,8 @@
   border: 1px solid rgba(255, 255, 255, 0.35) !important;
   border-radius: 4px !important;
   padding: 2px 7px !important;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
-  font-size: 11px !important;
+  font-family: 'IBM Plex Mono', 'Cascadia Mono', Consolas, ui-monospace, monospace !important;
+  font-size: 11.5px !important;
   font-weight: 700 !important;
   letter-spacing: 0.05em !important;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.95), 0 0 3px rgba(0, 0, 0, 0.9) !important;
@@ -443,7 +457,7 @@ path.procedure-track-line {
   border: 1px solid #44403c !important;
   border-radius: 6px !important;
   padding: 4px 8px !important;
-  font-size: 11px !important;
+  font-size: 12px !important;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.75) !important;
 }
 

@@ -73,10 +73,10 @@ export const AppUpdateModal: React.FC = () => {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-display font-bold text-base text-stone-100">
+                <h3 className="font-display font-bold text-lg text-stone-100">
                   Application Update Available
                 </h3>
-                <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono text-[10px] font-bold border border-amber-500/30">
+                <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono text-[11px] font-bold border border-amber-500/30">
                   v{appUpdate.version}
                 </span>
               </div>
@@ -103,8 +103,8 @@ export const AppUpdateModal: React.FC = () => {
           </p>
 
           {appUpdate.body && (
-            <div className="p-3.5 rounded-xl bg-stone-950/70 border border-stone-800/80 max-h-48 overflow-y-auto space-y-1.5 text-xs text-stone-300 font-mono">
-              <div className="text-[10px] uppercase font-bold text-stone-500 pb-1 border-b border-stone-800">
+            <div className="p-3.5 rounded-xl bg-stone-950/70 border border-stone-800/80 max-h-48 overflow-y-auto space-y-1.5 text-xs text-stone-300">
+              <div className="text-[11px] uppercase font-bold text-stone-500 pb-1 border-b border-stone-800">
                 Release Notes
               </div>
               <div className="whitespace-pre-wrap leading-relaxed text-stone-300">
@@ -116,12 +116,12 @@ export const AppUpdateModal: React.FC = () => {
           {/* Progress Bar when Downloading */}
           {isDownloading && (
             <div className="p-4 rounded-xl bg-stone-950 border border-stone-800 space-y-2">
-              <div className="flex items-center justify-between text-xs font-mono">
+              <div className="flex items-center justify-between text-xs">
                 <span className="text-stone-300 font-semibold flex items-center gap-2">
                   <ArrowsClockwise className="w-3.5 h-3.5 text-amber-400 animate-spin" />
                   Downloading update package...
                 </span>
-                <span className="text-amber-400 font-bold">{downloadPercent}%</span>
+                <span className="text-amber-400 font-mono font-bold">{downloadPercent}%</span>
               </div>
 
               <div className="w-full h-2 rounded-full bg-stone-800 overflow-hidden">
@@ -132,7 +132,7 @@ export const AppUpdateModal: React.FC = () => {
               </div>
 
               {totalBytes > 0 && (
-                <div className="text-[11px] font-mono text-stone-500 text-right">
+                <div className="text-xs font-mono text-stone-500 text-right">
                   {formatBytes(downloadedBytes)} / {formatBytes(totalBytes)}
                 </div>
               )}
@@ -160,7 +160,7 @@ export const AppUpdateModal: React.FC = () => {
 
         {/* Footer Actions */}
         <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-stone-800">
-          <span className="text-[11px] font-mono text-stone-500">
+          <span className="text-xs text-stone-500">
             Cryptographically signed with Minisign
           </span>
 
@@ -170,7 +170,7 @@ export const AppUpdateModal: React.FC = () => {
                 <button
                   onClick={() => setIsUpdateModalOpen(false)}
                   disabled={isDownloading}
-                  className="px-3.5 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 disabled:opacity-50 text-stone-300 font-mono text-xs transition-colors"
+                  className="px-3.5 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 disabled:opacity-50 text-stone-300 text-xs font-medium transition-colors"
                 >
                   Later
                 </button>
@@ -178,7 +178,7 @@ export const AppUpdateModal: React.FC = () => {
                 <button
                   onClick={handleStartUpdate}
                   disabled={isDownloading}
-                  className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:bg-stone-800 text-stone-950 font-mono font-bold text-xs flex items-center gap-2 transition-all shadow-md shadow-amber-500/20"
+                  className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:bg-stone-800 text-stone-950 font-bold text-xs flex items-center gap-2 transition-all shadow-md shadow-amber-500/20"
                 >
                   {isDownloading ? (
                     <>
@@ -196,7 +196,7 @@ export const AppUpdateModal: React.FC = () => {
             ) : (
               <button
                 onClick={handleRelaunch}
-                className="px-5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-mono font-bold text-xs flex items-center gap-2 transition-all shadow-md shadow-emerald-500/20 animate-pulse"
+                className="px-5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-bold text-xs flex items-center gap-2 transition-all shadow-md shadow-emerald-500/20 animate-pulse"
               >
                 <ArrowCircleUp className="w-4 h-4" />
                 <span>Relaunch Now</span>

@@ -355,10 +355,10 @@ export const Sidebar: React.FC = () => {
                 />
               </div>
               <div className="min-w-0">
-                <div className="font-display font-bold tracking-tight text-sm bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent leading-tight">
+                <div className="font-display font-bold tracking-wide text-base bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent leading-tight">
                   GTFO Companion
                 </div>
-                {/* <p className="text-[10px] font-mono text-stone-500 truncate uppercase tracking-wider mt-0.5">
+                {/* <p className="text-[11px] text-stone-500 truncate uppercase tracking-wider mt-0.5">
                   Global Task Force Overlord
                 </p> */}
               </div>
@@ -465,7 +465,7 @@ export const Sidebar: React.FC = () => {
                           <div className="w-56 rounded-2xl bg-stone-950/95 backdrop-blur-xl border border-stone-800 shadow-2xl shadow-black p-2 space-y-1 ring-1 ring-white/10">
                             <div className="px-2.5 py-1.5 border-b border-stone-800/80 flex items-center gap-2 text-amber-400">
                               <span className="shrink-0">{section.icon}</span>
-                              <span className="font-display uppercase tracking-wider text-[11px] font-bold truncate">
+                              <span className="font-display uppercase tracking-wider text-xs font-bold truncate">
                                 {section.title}
                               </span>
                             </div>
@@ -528,7 +528,7 @@ export const Sidebar: React.FC = () => {
                                       </div>
                                       {item.badge !== undefined && item.badge !== 0 && (
                                         <span
-                                          className={`min-w-5 h-5 px-1.5 flex items-center justify-center text-[10px] font-mono leading-none rounded-full shrink-0 ${
+                                          className={`min-w-5 h-5 px-1.5 flex items-center justify-center text-[11px] font-bold tabular-nums leading-none rounded-full shrink-0 ${
                                             item.badgeColor ||
                                             (isActive
                                               ? 'bg-amber-500/20 text-amber-300'
@@ -566,7 +566,7 @@ export const Sidebar: React.FC = () => {
                                                 <span className="truncate">{sub.label}</span>
                                               </span>
                                               {sub.badge !== undefined && sub.badge > 0 && (
-                                                <span className="text-[10px] font-mono text-stone-500">
+                                                <span className="text-[11px] font-semibold tabular-nums text-stone-500">
                                                   {sub.badge}
                                                 </span>
                                               )}
@@ -643,7 +643,7 @@ export const Sidebar: React.FC = () => {
                         <span className="text-amber-400/80 group-hover:text-amber-300 transition-colors shrink-0">
                           {section.icon}
                         </span>
-                        <span className="font-display uppercase tracking-wider text-[11px] truncate">
+                        <span className="font-display uppercase tracking-wider text-xs truncate">
                           {section.title}
                         </span>
                         {!isOpen && isSectionActive && (
@@ -703,7 +703,7 @@ export const Sidebar: React.FC = () => {
                                 </div>
                                 {item.badge !== undefined && item.badge !== 0 && (
                                   <span
-                                    className={`min-w-5 h-5 px-1.5 flex items-center justify-center text-[10px] font-mono leading-none rounded-full shrink-0 ${
+                                    className={`min-w-5 h-5 px-1.5 flex items-center justify-center text-[11px] font-bold tabular-nums leading-none rounded-full shrink-0 ${
                                       item.badgeColor ||
                                       (isActive
                                         ? 'bg-amber-500/20 text-amber-300'
@@ -744,7 +744,7 @@ export const Sidebar: React.FC = () => {
                                             <span className="truncate">{sub.label}</span>
                                           </span>
                                           {sub.badge !== undefined && sub.badge > 0 && (
-                                            <span className="text-[10px] font-mono text-stone-500">
+                                            <span className="text-[11px] font-semibold tabular-nums text-stone-500">
                                               {sub.badge}
                                             </span>
                                           )}
@@ -830,7 +830,7 @@ export const Sidebar: React.FC = () => {
           {/* Settings Navigation Button */}
           <button
             onClick={() => setActiveTab('settings')}
-            className={`w-full p-2.5 rounded-xl border flex items-center justify-between text-xs font-mono transition-all group ${
+            className={`w-full p-2.5 rounded-xl border flex items-center justify-between text-xs transition-all group ${
               activeTab === 'settings'
                 ? 'bg-amber-500/20 border-amber-500/50 text-amber-300 shadow-md shadow-amber-500/10'
                 : 'bg-stone-900/90 border-stone-800 hover:border-stone-700 text-stone-300 hover:text-stone-100 hover:bg-stone-900'
@@ -848,12 +848,12 @@ export const Sidebar: React.FC = () => {
                 <Gear className={`w-4 h-4 ${activeTab === 'settings' ? 'text-amber-400 animate-spin-slow' : ''}`} />
               </div>
               <div className="text-left min-w-0">
-                <span className="font-display font-bold text-[13px] block leading-tight text-stone-200 group-hover:text-amber-300">
+                <span className="font-display font-bold text-sm block leading-tight text-stone-200 group-hover:text-amber-300">
                   Settings
                 </span>
               </div>
             </div>
-            <span className="text-[10px] font-mono text-stone-500 bg-stone-950 px-1.5 py-0.5 rounded border border-stone-800/80 shrink-0">
+            <span className="text-[11px] font-mono text-stone-500 bg-stone-950 px-1.5 py-0.5 rounded border border-stone-800/80 shrink-0">
               v{currentAppVersion}
             </span>
           </button>
@@ -880,14 +880,14 @@ export const Sidebar: React.FC = () => {
                   )}
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">
-                      <p className="text-xs font-display font-semibold text-stone-100 group-hover:text-amber-400 transition-colors truncate">
+                      <p className="text-sm font-display font-semibold text-stone-100 group-hover:text-amber-400 transition-colors truncate">
                         {userSession.globalName}
                       </p>
-                      <span className="px-1.5 py-0.2 rounded bg-stone-800 text-amber-400 font-mono text-[10px] font-bold shrink-0">
+                      <span className="px-1.5 py-0.5 rounded bg-stone-800 text-amber-400 font-mono text-[11px] font-bold shrink-0">
                         {memberProfile.grade}
                       </span>
                     </div>
-                    <p className="text-[10px] font-mono text-stone-400 truncate">
+                    <p className="text-xs text-stone-400 truncate">
                       {memberProfile.adminPosition
                         ? memberProfile.adminPosition
                         : memberProfile.squadronAssignment
@@ -922,7 +922,7 @@ export const Sidebar: React.FC = () => {
                 <Shield className="w-4 h-4 text-amber-400 shrink-0" />
                 <span>Discord Auth Required</span>
               </div>
-              <p className="text-[11px] text-stone-400 leading-relaxed">
+              <p className="text-xs text-stone-400 leading-relaxed">
                 Sign in with Discord to verify your Global Task Force Overlord membership roles.
               </p>
               <button

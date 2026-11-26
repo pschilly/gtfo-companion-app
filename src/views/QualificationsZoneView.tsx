@@ -174,7 +174,7 @@ export const QualificationsZoneView: React.FC = () => {
             <span className="px-2.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 font-mono text-[11px] font-bold tracking-wider">
               S3 // TRAINING &amp; DOCTRINE
             </span>
-            <h1 className="font-display text-2xl font-bold bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent">
+            <h1 className="font-display text-2xl sm:text-3xl font-bold bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent">
               Qualifications Zone &amp; LMS
             </h1>
           </div>
@@ -188,7 +188,7 @@ export const QualificationsZoneView: React.FC = () => {
             href={STATIC_CONFIG.kbUrl}
             target="_blank"
             rel="noreferrer"
-            className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-300 hover:text-amber-300 font-mono text-xs flex items-center gap-1.5 transition-colors shadow-sm"
+            className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-300 hover:text-amber-300 text-xs font-medium flex items-center gap-1.5 transition-colors shadow-sm"
           >
             <span>Knowledge Base Syllabus</span>
             <ArrowSquareOut className="w-3.5 h-3.5 text-stone-400" />
@@ -197,7 +197,7 @@ export const QualificationsZoneView: React.FC = () => {
           <button
             onClick={() => refreshTaskforceData()}
             disabled={isLoadingTaskforce}
-            className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-300 hover:text-amber-300 font-mono text-xs flex items-center gap-2 transition-colors shrink-0 shadow-sm disabled:opacity-50"
+            className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-300 hover:text-amber-300 text-xs font-medium flex items-center gap-2 transition-colors shrink-0 shadow-sm disabled:opacity-50"
           >
             <Compass className={`w-3.5 h-3.5 text-amber-400 ${isLoadingTaskforce ? 'animate-spin' : ''}`} />
             <span>{isLoadingTaskforce ? 'Refreshing...' : 'Refresh LMS'}</span>
@@ -209,11 +209,11 @@ export const QualificationsZoneView: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="p-4 rounded-xl bg-stone-900/90 border border-stone-800 flex items-center justify-between shadow-md">
           <div>
-            <p className="text-[11px] font-mono uppercase text-stone-400">Available Qualifications</p>
-            <p className="text-2xl font-bold font-display text-amber-400 mt-0.5">
+            <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">Available Qualifications</p>
+            <p className="text-2xl font-bold font-display tabular-nums text-amber-400 mt-0.5">
               {totalCoursesCount}
             </p>
-            <p className="text-[11px] font-mono text-stone-500 mt-0.5">
+            <p className="text-xs text-stone-400 mt-0.5">
               Official Task Force Syllabi
             </p>
           </div>
@@ -224,11 +224,11 @@ export const QualificationsZoneView: React.FC = () => {
 
         <div className="p-4 rounded-xl bg-stone-900/90 border border-stone-800 flex items-center justify-between shadow-md">
           <div>
-            <p className="text-[11px] font-mono uppercase text-stone-400">Tracked in Progress</p>
-            <p className="text-2xl font-bold font-display text-sky-400 mt-0.5">
+            <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">Tracked in Progress</p>
+            <p className="text-2xl font-bold font-display tabular-nums text-sky-400 mt-0.5">
               {trackedCoursesCount}
             </p>
-            <p className="text-[11px] font-mono text-stone-500 mt-0.5">
+            <p className="text-xs text-stone-400 mt-0.5">
               Active in your training queue
             </p>
           </div>
@@ -239,11 +239,11 @@ export const QualificationsZoneView: React.FC = () => {
 
         <div className="p-4 rounded-xl bg-stone-900/90 border border-stone-800 flex items-center justify-between shadow-md">
           <div>
-            <p className="text-[11px] font-mono uppercase text-stone-400">Issued Credentials</p>
-            <p className="text-2xl font-bold font-display text-emerald-400 mt-0.5">
+            <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">Issued Credentials</p>
+            <p className="text-2xl font-bold font-display tabular-nums text-emerald-400 mt-0.5">
               {earnedCredentialsCount}
             </p>
-            <p className="text-[11px] font-mono text-stone-500 mt-0.5">
+            <p className="text-xs text-stone-400 mt-0.5">
               Completed checkrides on record
             </p>
           </div>
@@ -256,7 +256,7 @@ export const QualificationsZoneView: React.FC = () => {
       {/* LMS Mode Navigation Tabs & Filters */}
       <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 p-3 rounded-2xl bg-stone-900/80 border border-stone-800">
         {/* Main Tab Switcher */}
-        <div className="flex items-center gap-1 bg-stone-950 p-1 rounded-xl border border-stone-800 text-xs font-mono self-start lg:self-auto">
+        <div className="flex items-center gap-1 bg-stone-950 p-1 rounded-xl border border-stone-800 text-xs font-medium self-start lg:self-auto">
           <button
             onClick={() => setActiveTab('all')}
             className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
@@ -300,7 +300,7 @@ export const QualificationsZoneView: React.FC = () => {
             <select
               value={selectedAirframe}
               onChange={(e) => setSelectedAirframe(e.target.value)}
-              className="px-3 py-1.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-200 text-xs font-mono focus:outline-none focus:border-amber-500/60 w-full sm:w-auto"
+              className="px-3 py-1.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-200 text-xs focus:outline-none focus:border-amber-500/60 w-full sm:w-auto"
             >
               <option value="all">All Airframes</option>
               {availableAirframes.map((af) => (
@@ -315,7 +315,7 @@ export const QualificationsZoneView: React.FC = () => {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-3 py-1.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-200 text-xs font-mono focus:outline-none focus:border-amber-500/60 w-full sm:w-auto"
+              className="px-3 py-1.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-200 text-xs focus:outline-none focus:border-amber-500/60 w-full sm:w-auto"
             >
               <option value="all">All Categories</option>
               {availableCategories.map((cat) => (
@@ -333,7 +333,7 @@ export const QualificationsZoneView: React.FC = () => {
               placeholder="Search syllabus or skill..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-200 text-xs font-mono placeholder:text-stone-600 focus:outline-none focus:border-amber-500/60"
+              className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-200 text-xs placeholder:text-stone-500 focus:outline-none focus:border-amber-500/60"
             />
             {searchQuery && (
               <button
@@ -347,7 +347,7 @@ export const QualificationsZoneView: React.FC = () => {
 
           <button
             onClick={isAllExpanded ? collapseAll : expandAll}
-            className="px-3 py-1.5 rounded-xl bg-stone-950 hover:bg-stone-900 border border-stone-800 text-stone-300 hover:text-amber-400 font-mono text-xs flex items-center gap-1.5 transition-colors shrink-0"
+            className="px-3 py-1.5 rounded-xl bg-stone-950 hover:bg-stone-900 border border-stone-800 text-stone-300 hover:text-amber-400 text-xs font-medium flex items-center gap-1.5 transition-colors shrink-0"
           >
             {isAllExpanded ? (
               <>
@@ -450,14 +450,14 @@ export const QualificationsZoneView: React.FC = () => {
                         </h2>
 
                         {isIssued && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 font-mono text-[10px] font-bold uppercase tracking-wider">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-[11px] font-bold uppercase tracking-wider">
                             <CheckCircle className="w-3 h-3 text-emerald-400" />
                             <span>ISSUED // CHECKRIDE PASSED</span>
                           </span>
                         )}
 
                         {isTracked && !isIssued && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-300 font-mono text-[10px] font-bold uppercase tracking-wider">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-300 text-[11px] font-bold uppercase tracking-wider">
                             <BookmarkSimple className="w-3 h-3 text-amber-400" />
                             <span>ACTIVE IN TRAINING QUEUE</span>
                           </span>
@@ -465,14 +465,14 @@ export const QualificationsZoneView: React.FC = () => {
                       </div>
 
                       {/* Course Metadata Strip */}
-                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-mono text-stone-400">
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-stone-400">
                         {course.airframe && (
                           <span className="inline-flex items-center gap-1.5 text-stone-300">
                             <AirplaneTilt className="w-3.5 h-3.5 text-amber-400" />
                             <span>{course.airframe}</span>
                           </span>
                         )}
-                        <span className="px-2 py-0.5 rounded bg-stone-950 border border-stone-800 text-stone-400 text-[10px]">
+                        <span className="px-2 py-0.5 rounded bg-stone-950 border border-stone-800 text-stone-400 text-[11px]">
                           {course.category}
                         </span>
                         {course.awardedRole && (
@@ -480,11 +480,11 @@ export const QualificationsZoneView: React.FC = () => {
                             Role: <strong className="text-stone-300">{course.awardedRole}</strong>
                           </span>
                         )}
-                        <span className="text-emerald-400 font-bold flex items-center gap-1">
+                        <span className="text-emerald-400 font-mono font-bold flex items-center gap-1">
                           <Sparkle className="w-3.5 h-3.5" />
                           <span>+{course.xpValue.toLocaleString()} XP</span>
                         </span>
-                        <span className="text-stone-500">
+                        <span className="text-stone-500 tabular-nums">
                           {course.requirements.length} Syllabus Modules
                         </span>
                       </div>
@@ -495,7 +495,7 @@ export const QualificationsZoneView: React.FC = () => {
                   <div className="flex items-center gap-2 self-start lg:self-center shrink-0">
                     <button
                       onClick={() => toggleTrackedQualification(course.id)}
-                      className={`px-3.5 py-2 rounded-xl font-mono text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm ${
+                      className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm ${
                         isTracked
                           ? 'bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300'
                           : 'bg-stone-950 hover:bg-stone-800 border border-stone-700 text-stone-300 hover:text-amber-300'
@@ -516,7 +516,7 @@ export const QualificationsZoneView: React.FC = () => {
 
                     <button
                       onClick={() => toggleCourseExpand(course.id)}
-                      className="px-3 py-2 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-800 text-stone-300 hover:text-stone-100 font-mono text-xs flex items-center gap-1 transition-colors"
+                      className="px-3 py-2 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-800 text-stone-300 hover:text-stone-100 text-xs font-medium flex items-center gap-1 transition-colors"
                       title={isExpanded ? 'Collapse Syllabus' : 'Expand Syllabus'}
                     >
                       <span>{isExpanded ? 'Hide Details' : 'View Syllabus'}</span>
@@ -532,9 +532,9 @@ export const QualificationsZoneView: React.FC = () => {
                 {/* Tracked Progress Bar (if in queue) */}
                 {isTracked && (
                   <div className="px-5 py-2 bg-stone-950/70 border-t border-stone-800/80 flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-2 text-xs font-mono">
+                    <div className="flex items-center gap-2 text-xs">
                       <span className="text-stone-400">Self-Paced Progress:</span>
-                      <span className="text-amber-300 font-bold">
+                      <span className="text-amber-300 font-bold tabular-nums">
                         {completedCount} of {totalRequirements} Hops Completed ({progressPercent}%)
                       </span>
                     </div>
@@ -555,7 +555,7 @@ export const QualificationsZoneView: React.FC = () => {
                     <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-2">
                       <div className="flex items-center gap-2">
                         <Target className="w-4 h-4 text-amber-400 shrink-0" />
-                        <h4 className="font-display font-bold text-amber-300 text-xs tracking-wider uppercase">
+                        <h4 className="font-display font-bold text-amber-300 text-sm tracking-wide uppercase">
                           How to Obtain this Qualification
                         </h4>
                       </div>
@@ -579,9 +579,9 @@ export const QualificationsZoneView: React.FC = () => {
 
                     {/* Syllabus Hops Accordion / Grid */}
                     <div className="space-y-3">
-                      <h4 className="text-[11px] font-mono uppercase text-stone-400 font-bold tracking-wider flex items-center gap-2">
+                      <h4 className="text-xs uppercase text-stone-400 font-bold tracking-wider flex items-center gap-2">
                         <span>Required Training Syllabi &amp; Flight Hops</span>
-                        <span className="px-2 py-0.5 rounded bg-stone-950 border border-stone-800 text-[10px] text-amber-400">
+                        <span className="px-2 py-0.5 rounded bg-stone-950 border border-stone-800 text-[11px] text-amber-400 tabular-nums">
                           {course.requirements.length} Hops
                         </span>
                       </h4>
@@ -634,7 +634,7 @@ export const QualificationsZoneView: React.FC = () => {
                                   </div>
 
                                   <span
-                                    className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold shrink-0 border ${
+                                    className={`px-2 py-0.5 rounded text-[11px] font-bold shrink-0 border ${
                                       isChecked
                                         ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'
                                         : 'bg-stone-900 border-stone-800 text-stone-400'

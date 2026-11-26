@@ -554,7 +554,7 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
   ) => {
     if (points.length === 0) {
       return (
-        <div className="p-3 text-center text-stone-400 bg-stone-900/40 rounded-lg border border-stone-800 text-[11px]">
+        <div className="p-3 text-center text-stone-400 bg-stone-900/40 rounded-lg border border-stone-800 text-xs">
           No vertices defined yet{maxLabel ? ` (${maxLabel})` : ''}. Enable{' '}
           <span className="text-amber-300 font-semibold">Plot on Map</span> or import a campaign
           preset.
@@ -570,8 +570,8 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
             className="flex items-center justify-between gap-2 bg-stone-900/70 border border-stone-800 rounded-lg px-2.5 py-1.5"
           >
             <div className="min-w-0">
-              <div className="text-[11px] font-semibold text-stone-200">Vertex #{idx + 1}</div>
-              <div className="text-[10px] font-mono text-stone-400">
+              <div className="text-xs font-semibold text-stone-200">Vertex #{idx + 1}</div>
+              <div className="text-[11px] font-mono text-stone-400">
                 {formatCoordinateDdm(Number(pt.lat), Number(pt.lng))}
               </div>
             </div>
@@ -605,7 +605,7 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
     <div className="space-y-3">
       {/* Header + Airframe badge */}
       <div className="flex items-center justify-between gap-2">
-        <span className="font-bold text-[11px] text-amber-300 flex items-center gap-1.5">
+        <span className="font-bold text-xs text-amber-300 flex items-center gap-1.5">
           <SlidersHorizontal className="w-4 h-4" />
           {airframeType === 'f18'
             ? 'F/A-18C Situational Awareness (SA)'
@@ -617,7 +617,7 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
                   ? 'JF-17 Custom Airspace (BKYA–BKYD)'
                   : 'Tactical Avionics Overlay'}
         </span>
-        <span className="text-[10px] text-stone-400 font-mono uppercase px-1.5 py-0.5 rounded bg-stone-900 border border-stone-800">
+        <span className="text-[11px] text-stone-400 uppercase px-1.5 py-0.5 rounded bg-stone-900 border border-stone-800">
           Drag vertices on map
         </span>
       </div>
@@ -628,7 +628,7 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
           <select
             value={selectedPresetKey}
             onChange={(e) => setSelectedPresetKey(e.target.value)}
-            className="flex-1 min-w-0 px-2 py-1 rounded bg-stone-950 border border-stone-800 text-[11px] text-stone-200"
+            className="flex-1 min-w-0 px-2 py-1 rounded bg-stone-950 border border-stone-800 text-xs text-stone-200"
           >
             <option value="">-- Pull Campaign Frontline / Zone / AOR --</option>
             {geometryPresets.map((pr) => (
@@ -641,7 +641,7 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
             type="button"
             onClick={handleImportPreset}
             disabled={!selectedPresetKey}
-            className="px-2.5 py-1 rounded bg-sky-500/20 hover:bg-sky-500/30 disabled:opacity-40 border border-sky-500/50 text-sky-300 text-[10px] font-bold flex items-center gap-1 shrink-0 cursor-pointer"
+            className="px-2.5 py-1 rounded bg-sky-500/20 hover:bg-sky-500/30 disabled:opacity-40 border border-sky-500/50 text-sky-300 text-[11px] font-bold flex items-center gap-1 shrink-0 cursor-pointer"
           >
             <DownloadSimple className="w-3 h-3" />
             Import
@@ -665,7 +665,7 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
                 key={key}
                 type="button"
                 onClick={() => setF18Section(key)}
-                className={`py-1 rounded text-[10px] font-bold transition cursor-pointer ${
+                className={`py-1 rounded text-[11px] font-bold transition cursor-pointer ${
                   f18Section === key
                     ? 'bg-emerald-500/25 text-emerald-300 border border-emerald-500/50'
                     : 'text-stone-400 hover:text-stone-200'
@@ -743,7 +743,7 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
                       };
                     });
                   }}
-                  className="px-2 py-1 rounded-lg bg-stone-900 border border-stone-800 text-stone-400 hover:text-red-400 text-[10px] cursor-pointer"
+                  className="px-2 py-1 rounded-lg bg-stone-900 border border-stone-800 text-stone-400 hover:text-red-400 text-[11px] cursor-pointer"
                 >
                   Clear
                 </button>
@@ -759,7 +759,7 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
               const cap = caps.find((c: any) => Number(c?.num) === f18SlotNum);
               if (!cap) {
                 return (
-                  <div className="p-3 text-center text-stone-400 bg-stone-900/40 rounded-lg border border-stone-800 text-[11px]">
+                  <div className="p-3 text-center text-stone-400 bg-stone-900/40 rounded-lg border border-stone-800 text-xs">
                     No CAP #{f18SlotNum} racetrack placed. Click{' '}
                     <span className="text-amber-300">Plot on Map</span> to set anchor.
                   </div>
@@ -776,19 +776,19 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
               };
               return (
                 <div className="bg-stone-900/70 border border-stone-800 rounded-lg p-2.5 space-y-2">
-                  <div className="flex items-center justify-between text-[10px] font-mono text-stone-300">
+                  <div className="flex items-center justify-between text-[11px] font-mono text-stone-300">
                     <span>Anchor: {formatCoordinateDdm(Number(cap.lat), Number(cap.lng))}</span>
                     <button
                       type="button"
                       onClick={() => onCenterMap(Number(cap.lat), Number(cap.lng), 10)}
-                      className="text-amber-300 hover:underline flex items-center gap-0.5 cursor-pointer"
+                      className="text-amber-300 hover:underline flex items-center gap-0.5 font-sans cursor-pointer"
                     >
                       <Crosshair className="w-3 h-3" /> Center
                     </button>
                   </div>
-                  <div className="grid grid-cols-2 gap-2 text-[11px]">
+                  <div className="grid grid-cols-2 gap-2 text-xs">
                     <div>
-                      <label className="block text-[9px] uppercase text-stone-400 mb-0.5">
+                      <label className="block text-[11px] uppercase text-stone-400 mb-0.5">
                         Inbound Course (°)
                       </label>
                       <input
@@ -802,7 +802,7 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
                       />
                     </div>
                     <div>
-                      <label className="block text-[9px] uppercase text-stone-400 mb-0.5">
+                      <label className="block text-[11px] uppercase text-stone-400 mb-0.5">
                         Leg Length (NM)
                       </label>
                       <input
@@ -816,7 +816,7 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
                       />
                     </div>
                     <div>
-                      <label className="block text-[9px] uppercase text-stone-400 mb-0.5">
+                      <label className="block text-[11px] uppercase text-stone-400 mb-0.5">
                         Turn Direction
                       </label>
                       <select
@@ -830,7 +830,7 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
                       </select>
                     </div>
                     <div>
-                      <label className="block text-[9px] uppercase text-stone-400 mb-0.5">
+                      <label className="block text-[11px] uppercase text-stone-400 mb-0.5">
                         CAP Altitude (ft)
                       </label>
                       <input
@@ -887,7 +887,7 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
             <button
               type="button"
               onClick={() => setF16Section('geo')}
-              className={`py-1 rounded text-[10px] font-bold transition cursor-pointer ${
+              className={`py-1 rounded text-[11px] font-bold transition cursor-pointer ${
                 f16Section === 'geo'
                   ? 'bg-emerald-500/25 text-emerald-300 border border-emerald-500/50'
                   : 'text-stone-400 hover:text-stone-200'
@@ -898,7 +898,7 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
             <button
               type="button"
               onClick={() => setF16Section('dest')}
-              className={`py-1 rounded text-[10px] font-bold transition cursor-pointer ${
+              className={`py-1 rounded text-[11px] font-bold transition cursor-pointer ${
                 f16Section === 'dest'
                   ? 'bg-amber-500/25 text-amber-300 border border-amber-500/50'
                   : 'text-stone-400 hover:text-stone-200'
@@ -964,7 +964,7 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
                           return { ...p, geo_lines_settings: { ...geo, lines } };
                         })
                       }
-                      className="px-2 py-1 rounded-lg bg-stone-900 border border-stone-800 text-stone-400 hover:text-red-400 text-[10px] cursor-pointer"
+                      className="px-2 py-1 rounded-lg bg-stone-900 border border-stone-800 text-stone-400 hover:text-red-400 text-[11px] cursor-pointer"
                     >
                       Clear
                     </button>
@@ -972,7 +972,7 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
                 )}
               </div>
 
-              <div className="text-[10px] text-stone-400 font-mono">
+              <div className="text-[11px] text-stone-400">
                 {F16_GEO_COLORS[f16LineNum].label}
               </div>
 
@@ -1031,7 +1031,7 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
                           onClick={() =>
                             onMutatePlan((p) => ({ ...p, dest_points_settings: [] }))
                           }
-                          className="px-2 py-1 rounded-lg bg-stone-900 border border-stone-800 text-stone-400 hover:text-red-400 text-[10px] cursor-pointer"
+                          className="px-2 py-1 rounded-lg bg-stone-900 border border-stone-800 text-stone-400 hover:text-red-400 text-[11px] cursor-pointer"
                         >
                           Clear All
                         </button>
@@ -1040,7 +1040,7 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
                   )}
 
                   {destList.length === 0 ? (
-                    <div className="p-3 text-center text-stone-400 bg-stone-900/40 rounded-lg border border-stone-800 text-[11px]">
+                    <div className="p-3 text-center text-stone-400 bg-stone-900/40 rounded-lg border border-stone-800 text-xs">
                       No F-16 DEST Points (STPT 81–99) defined yet.
                     </div>
                   ) : (
@@ -1051,7 +1051,7 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
                           className="bg-stone-900/70 border border-stone-800 rounded-lg p-2 space-y-1.5"
                         >
                           <div className="flex items-center justify-between gap-1.5">
-                            <span className="text-[10px] font-mono font-bold text-amber-300">
+                            <span className="text-[11px] font-mono font-bold text-amber-300">
                               STPT {pt.stpt || 81 + idx}
                             </span>
                             <input
@@ -1107,7 +1107,7 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
                               </button>
                             )}
                           </div>
-                          <div className="text-[10px] font-mono text-stone-400">
+                          <div className="text-[11px] font-mono text-stone-400">
                             {formatCoordinateDdm(Number(pt.lat), Number(pt.lng))}
                           </div>
                         </div>
@@ -1197,7 +1197,7 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
                             },
                           }))
                         }
-                        className="px-2 py-1 rounded-lg bg-stone-900 border border-stone-800 text-stone-400 hover:text-red-400 text-[10px] cursor-pointer"
+                        className="px-2 py-1 rounded-lg bg-stone-900 border border-stone-800 text-stone-400 hover:text-red-400 text-[11px] cursor-pointer"
                       >
                         Clear
                       </button>
@@ -1206,7 +1206,7 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
                 </div>
 
                 {canEdit && (
-                  <label className="inline-flex items-center gap-2 text-[11px] text-stone-300 cursor-pointer select-none">
+                  <label className="inline-flex items-center gap-2 text-xs text-stone-300 cursor-pointer select-none">
                     <input
                       type="checkbox"
                       checked={closed}
@@ -1266,7 +1266,7 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
                         key={key}
                         type="button"
                         onClick={() => setJf17Key(key)}
-                        className={`px-2 py-1 rounded text-[10px] font-mono font-bold border flex items-center gap-1 cursor-pointer ${
+                        className={`px-2 py-1 rounded text-[11px] font-mono font-bold border flex items-center gap-1 cursor-pointer ${
                           jf17Key === key
                             ? 'bg-stone-800 border-stone-500 text-white'
                             : 'bg-stone-900 border-stone-800 text-stone-400 hover:text-stone-200'
@@ -1317,7 +1317,7 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
                             },
                           }))
                         }
-                        className="px-2 py-1 rounded-lg bg-stone-900 border border-stone-800 text-stone-400 hover:text-red-400 text-[10px] cursor-pointer"
+                        className="px-2 py-1 rounded-lg bg-stone-900 border border-stone-800 text-stone-400 hover:text-red-400 text-[11px] cursor-pointer"
                       >
                         Clear
                       </button>
@@ -1327,7 +1327,7 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
 
                 {canEdit && (
                   <div className="flex items-center justify-between gap-3 bg-stone-900/50 px-2.5 py-1.5 rounded-lg border border-stone-800">
-                    <label className="inline-flex items-center gap-2 text-[11px] text-stone-300 cursor-pointer select-none">
+                    <label className="inline-flex items-center gap-2 text-xs text-stone-300 cursor-pointer select-none">
                       <input
                         type="checkbox"
                         checked={closed}
@@ -1344,7 +1344,7 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
                       />
                       Closed Filled Polygon
                     </label>
-                    <label className="inline-flex items-center gap-1.5 text-[10px] text-stone-400">
+                    <label className="inline-flex items-center gap-1.5 text-xs text-stone-400">
                       Color
                       <input
                         type="color"
@@ -1414,7 +1414,7 @@ export const AirframeAvionicsPanel: React.FC<AirframeAvionicsPanelProps> = ({
                     sa_settings: { ...(p.sa_settings || {}), points: [] },
                   }))
                 }
-                className="px-2 py-1 rounded-lg bg-stone-900 border border-stone-800 text-stone-400 hover:text-red-400 text-[10px] cursor-pointer"
+                className="px-2 py-1 rounded-lg bg-stone-900 border border-stone-800 text-stone-400 hover:text-red-400 text-[11px] cursor-pointer"
               >
                 Clear All
               </button>

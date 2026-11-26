@@ -60,7 +60,7 @@ export const DossierNav: React.FC = () => {
           <button
             key={t.id}
             onClick={() => setActiveTab(t.id)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-mono transition-all ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all ${
               isActive
                 ? 'bg-amber-500 text-stone-950 font-bold shadow-md shadow-amber-500/20'
                 : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800/80'
@@ -72,7 +72,7 @@ export const DossierNav: React.FC = () => {
             <span>{t.label}</span>
             {t.count !== undefined && (
               <span
-                className={`min-w-5 h-5 px-1.5 flex items-center justify-center rounded-full text-[10px] font-bold leading-none ${
+                className={`min-w-5 h-5 px-1.5 flex items-center justify-center rounded-full text-[11px] font-bold leading-none tabular-nums ${
                   isActive
                     ? 'bg-stone-950 text-amber-300'
                     : t.badgeColor || 'bg-stone-800 text-stone-300 border border-stone-700'

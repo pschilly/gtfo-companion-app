@@ -429,12 +429,12 @@ export const CampaignIntelTab: React.FC<CampaignIntelTabProps> = ({
                   Intelligence Reports &amp; After Action Assessments
                 </h2>
                 {aarCount > 0 && (
-                  <span className="px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-[10px] font-mono text-amber-300">
+                  <span className="px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-[11px] font-medium tabular-nums text-amber-300">
                     {aarCount} Sortie AAR{aarCount === 1 ? '' : 's'} Linked
                   </span>
                 )}
               </div>
-              <p className="text-[11px] font-mono text-stone-400">
+              <p className="text-xs text-stone-400">
                 Reconnaissance dispatches, imagery, and filed sortie BDA / AAR reports for{' '}
                 {campaign.name}
               </p>
@@ -445,11 +445,11 @@ export const CampaignIntelTab: React.FC<CampaignIntelTabProps> = ({
         {/* Relevance / Recency Window Selector */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pt-2 border-t border-stone-800/80">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[10px] font-mono uppercase tracking-wider text-stone-500 flex items-center gap-1.5 mr-1">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-stone-500 flex items-center gap-1.5 mr-1">
               <Clock className="w-3.5 h-3.5 text-amber-400" />
               Relevance Window:
             </span>
-            <div className="flex items-center bg-stone-950 rounded-xl border border-stone-800 p-1 text-xs font-mono flex-wrap">
+            <div className="flex items-center bg-stone-950 rounded-xl border border-stone-800 p-1 text-xs font-medium flex-wrap">
               {RECENCY_WINDOW_OPTIONS.map((opt) => (
                 <button
                   key={opt.key}
@@ -472,7 +472,7 @@ export const CampaignIntelTab: React.FC<CampaignIntelTabProps> = ({
             <button
               type="button"
               onClick={() => setRecencyWindow('all')}
-              className="text-[11px] font-mono text-stone-400 hover:text-amber-300 flex items-center gap-1.5 self-start md:self-auto transition-colors"
+              className="text-xs text-stone-400 hover:text-amber-300 flex items-center gap-1.5 self-start md:self-auto transition-colors"
             >
               <span>
                 {agedOutCount} older report{agedOutCount === 1 ? '' : 's'} aged out of current view
@@ -480,7 +480,7 @@ export const CampaignIntelTab: React.FC<CampaignIntelTabProps> = ({
               <span className="underline text-amber-400">Show Archive</span>
             </button>
           ) : (
-            <span className="text-[11px] font-mono text-stone-500">
+            <span className="text-xs tabular-nums text-stone-500">
               {filteredEntries.length === 0
                 ? `Showing 0 of ${allUnifiedEntries.length} total entr${
                     allUnifiedEntries.length === 1 ? 'y' : 'ies'
@@ -493,7 +493,7 @@ export const CampaignIntelTab: React.FC<CampaignIntelTabProps> = ({
         {/* Type, Scope & Search Filters */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pt-2 border-t border-stone-800/60">
           <div className="flex items-center gap-2 flex-wrap">
-            <div className="flex items-center bg-stone-950 rounded-xl border border-stone-800 p-1 text-xs font-mono flex-wrap">
+            <div className="flex items-center bg-stone-950 rounded-xl border border-stone-800 p-1 text-xs font-medium flex-wrap">
               {Object.entries(INTEL_TYPE_LABELS).map(([key, label]) => (
                 <button
                   key={key}
@@ -514,7 +514,7 @@ export const CampaignIntelTab: React.FC<CampaignIntelTabProps> = ({
               value={missionScope}
               onChange={(e) => setMissionScope(e.target.value)}
               aria-label="Filter by mission scope"
-              className="px-3 py-1.5 rounded-xl bg-stone-950 border border-stone-800 text-xs font-mono text-stone-200 focus:outline-none focus:border-amber-500/50"
+              className="px-3 py-1.5 rounded-xl bg-stone-950 border border-stone-800 text-xs text-stone-200 focus:outline-none focus:border-amber-500/50"
             >
               <option value="all">All Scopes</option>
               <option value="campaign_wide">Campaign-Wide Intel</option>
@@ -559,7 +559,7 @@ export const CampaignIntelTab: React.FC<CampaignIntelTabProps> = ({
             <button
               type="button"
               onClick={() => setRecencyWindow('all')}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/35 text-xs font-mono font-bold text-amber-300 transition-colors"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/35 text-xs font-semibold text-amber-300 transition-colors"
             >
               <span>View Historical Archive ({agedOutCount})</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -591,20 +591,20 @@ export const CampaignIntelTab: React.FC<CampaignIntelTabProps> = ({
                           {getIntelTypeIcon('aar')}
                         </div>
                         <div className="min-w-0">
-                          <div className="flex items-center gap-1.5 flex-wrap text-[10px] font-mono">
-                            <span className="px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 uppercase font-bold">
+                          <div className="flex items-center gap-1.5 flex-wrap text-[11px]">
+                            <span className="px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 uppercase font-bold tracking-wider">
                               Sortie AAR &amp; BDA
                             </span>
                             {renderFreshnessBadge(entry)}
                             <span
-                              className={`px-1.5 py-0.5 rounded border uppercase font-bold ${getMissionStatusBadgeClasses(
+                              className={`px-1.5 py-0.5 rounded border uppercase font-semibold ${getMissionStatusBadgeClasses(
                                 mission.status
                               )}`}
                             >
                               {mission.statusLabel || mission.status}
                             </span>
                             {sortie.attendedCount > 0 && (
-                              <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/25 text-emerald-300 inline-flex items-center gap-1">
+                              <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/25 text-emerald-300 tabular-nums inline-flex items-center gap-1">
                                 <CheckCircle className="w-3 h-3" />
                                 {sortie.attendedCount} Attended
                               </span>
@@ -613,11 +613,11 @@ export const CampaignIntelTab: React.FC<CampaignIntelTabProps> = ({
                           <h3 className="font-display font-bold text-base text-stone-100 mt-1.5">
                             {sortie.name}
                           </h3>
-                          <div className="text-[11px] font-mono text-stone-400 flex items-center gap-1.5 flex-wrap mt-0.5">
+                          <div className="text-xs text-stone-400 flex items-center gap-1.5 flex-wrap mt-0.5">
                             <Target className="w-3 h-3 text-amber-400 shrink-0" />
                             <span className="text-stone-300">{mission.name}</span>
                             <span className="text-stone-600">&bull;</span>
-                            <span>Sortie #{sortie.sortieNumber}</span>
+                            <span className="font-mono">Sortie #{sortie.sortieNumber}</span>
                           </div>
                         </div>
                       </div>
@@ -630,7 +630,7 @@ export const CampaignIntelTab: React.FC<CampaignIntelTabProps> = ({
                       sortie.enemyLosses) && (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div className="rounded-2xl border border-rose-500/25 bg-rose-950/15 p-3">
-                          <div className="text-[10px] font-mono uppercase tracking-wider text-rose-300 font-bold mb-1.5">
+                          <div className="text-[11px] uppercase tracking-wider text-rose-300 font-bold mb-1.5">
                             Friendly Losses
                           </div>
                           {sortie.ourLossesHtml ? (
@@ -646,7 +646,7 @@ export const CampaignIntelTab: React.FC<CampaignIntelTabProps> = ({
                         </div>
 
                         <div className="rounded-2xl border border-emerald-500/25 bg-emerald-950/15 p-3">
-                          <div className="text-[10px] font-mono uppercase tracking-wider text-emerald-300 font-bold mb-1.5">
+                          <div className="text-[11px] uppercase tracking-wider text-emerald-300 font-bold mb-1.5">
                             Estimated Enemy Losses
                           </div>
                           {sortie.enemyLossesHtml ? (
@@ -666,7 +666,7 @@ export const CampaignIntelTab: React.FC<CampaignIntelTabProps> = ({
                     {/* AAR Narrative Notes */}
                     {(sortie.aarNotesHtml || sortie.aarNotes) && (
                       <div className="rounded-2xl border border-stone-800 bg-stone-950/75 p-3.5">
-                        <div className="text-[10px] font-mono uppercase tracking-wider text-stone-400 font-bold mb-1.5">
+                        <div className="text-[11px] uppercase tracking-wider text-stone-400 font-bold mb-1.5">
                           Debrief &amp; Assessment
                         </div>
                         {sortie.aarNotesHtml ? (
@@ -692,7 +692,7 @@ export const CampaignIntelTab: React.FC<CampaignIntelTabProps> = ({
 
                       return (
                         <div className="space-y-1.5">
-                          <div className="flex items-center justify-between gap-2 text-[10px] font-mono uppercase tracking-wider text-stone-500">
+                          <div className="flex items-center justify-between gap-2 text-[11px] font-semibold uppercase tracking-wider text-stone-500">
                             <span>BDA Reconnaissance Imagery ({bdaImages.length})</span>
                             {bdaImages.length > INITIAL_VISIBLE_IMAGES && (
                               <button
@@ -746,7 +746,7 @@ export const CampaignIntelTab: React.FC<CampaignIntelTabProps> = ({
                             key={`${entry.uid}-doc-${idx}`}
                             type="button"
                             onClick={() => onOpenExternal(media.url)}
-                            className="px-2.5 py-1.5 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-800 text-xs font-mono text-stone-200 flex items-center gap-1.5"
+                            className="px-2.5 py-1.5 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-800 text-xs text-stone-200 flex items-center gap-1.5"
                           >
                             <FileText className="w-3.5 h-3.5 text-amber-400" />
                             <span className="truncate max-w-[200px]">{media.filename}</span>
@@ -758,7 +758,7 @@ export const CampaignIntelTab: React.FC<CampaignIntelTabProps> = ({
                   </div>
 
                   {/* AAR Card Footer */}
-                  <div className="pt-3 border-t border-stone-800/80 flex items-center justify-between gap-2 flex-wrap text-[11px] font-mono text-stone-400">
+                  <div className="pt-3 border-t border-stone-800/80 flex items-center justify-between gap-2 flex-wrap text-xs text-stone-400">
                     <div>
                       <span>
                         Lead:{' '}
@@ -831,14 +831,14 @@ export const CampaignIntelTab: React.FC<CampaignIntelTabProps> = ({
                         {getIntelTypeIcon(report.type)}
                       </div>
                       <div className="min-w-0">
-                        <div className="flex items-center gap-1.5 flex-wrap text-[10px] font-mono">
-                          <span className="px-1.5 py-0.5 rounded bg-stone-950 border border-stone-800 text-amber-300 uppercase font-bold">
+                        <div className="flex items-center gap-1.5 flex-wrap text-[11px]">
+                          <span className="px-1.5 py-0.5 rounded bg-stone-950 border border-stone-800 text-amber-300 uppercase font-semibold tracking-wider">
                             {INTEL_TYPE_LABELS[report.type] || report.type}
                           </span>
                           {renderFreshnessBadge(entry)}
                           {mission && (
                             <span
-                              className={`px-1.5 py-0.5 rounded border uppercase font-bold ${getMissionStatusBadgeClasses(
+                              className={`px-1.5 py-0.5 rounded border uppercase font-semibold ${getMissionStatusBadgeClasses(
                                 mission.status
                               )}`}
                             >
@@ -875,7 +875,7 @@ export const CampaignIntelTab: React.FC<CampaignIntelTabProps> = ({
                     return (
                       <div className="space-y-1.5">
                         {images.length > INITIAL_VISIBLE_IMAGES && (
-                          <div className="flex items-center justify-between gap-2 text-[10px] font-mono uppercase tracking-wider text-stone-500">
+                          <div className="flex items-center justify-between gap-2 text-[11px] font-semibold uppercase tracking-wider text-stone-500">
                             <span>Reconnaissance Imagery ({images.length})</span>
                             <button
                               type="button"
@@ -913,7 +913,7 @@ export const CampaignIntelTab: React.FC<CampaignIntelTabProps> = ({
                       key={`${report.id}-aud-${idx}`}
                       className="p-2.5 rounded-xl bg-stone-950 border border-stone-800 space-y-1"
                     >
-                      <div className="text-[10px] font-mono text-amber-300">
+                      <div className="text-xs font-medium text-amber-300">
                         Intercept Audio #{idx + 1}
                       </div>
                       <audio controls preload="none" className="w-full">
@@ -937,7 +937,7 @@ export const CampaignIntelTab: React.FC<CampaignIntelTabProps> = ({
                     <button
                       type="button"
                       onClick={() => onOpenExternal(report.videoUrl)}
-                      className="px-3 py-2 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/30 text-xs font-mono text-purple-300 flex items-center gap-1.5"
+                      className="px-3 py-2 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/30 text-xs font-medium text-purple-300 flex items-center gap-1.5"
                     >
                       <VideoCamera weight="duotone" className="w-4 h-4" />
                       <span>Open External Video Feed</span>
@@ -956,7 +956,7 @@ export const CampaignIntelTab: React.FC<CampaignIntelTabProps> = ({
                             key={`${report.id}-doc-${idx}`}
                             type="button"
                             onClick={() => onOpenExternal(url)}
-                            className="px-2.5 py-1.5 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-800 text-xs font-mono text-stone-200 flex items-center gap-1.5"
+                            className="px-2.5 py-1.5 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-800 text-xs text-stone-200 flex items-center gap-1.5"
                           >
                             <FileText className="w-3.5 h-3.5 text-emerald-400" />
                             <span className="truncate max-w-[200px]">{fileName}</span>
@@ -969,7 +969,7 @@ export const CampaignIntelTab: React.FC<CampaignIntelTabProps> = ({
                 </div>
 
                 {/* Footer */}
-                <div className="pt-3 border-t border-stone-800/80 flex items-center justify-between gap-2 flex-wrap text-[11px] font-mono text-stone-400">
+                <div className="pt-3 border-t border-stone-800/80 flex items-center justify-between gap-2 flex-wrap text-xs text-stone-400">
                   <div>
                     {report.reporterName ? (
                       <span>
@@ -1014,7 +1014,7 @@ export const CampaignIntelTab: React.FC<CampaignIntelTabProps> = ({
 
           {/* Pagination Controls */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-stone-900/90 border border-stone-800 shadow-md">
-            <div className="text-xs font-mono text-stone-400 flex items-center gap-2 flex-wrap">
+            <div className="text-xs tabular-nums text-stone-400 flex items-center gap-2 flex-wrap">
               <span>
                 Showing <strong className="text-stone-200">{startIndex + 1}</strong>–
                 <strong className="text-stone-200">{endIndex}</strong> of{' '}
@@ -1033,7 +1033,7 @@ export const CampaignIntelTab: React.FC<CampaignIntelTabProps> = ({
             </div>
 
             <div className="flex items-center gap-2 flex-wrap justify-center">
-              <div className="flex items-center gap-1.5 mr-2 text-xs font-mono text-stone-400">
+              <div className="flex items-center gap-1.5 mr-2 text-xs text-stone-400">
                 <span>Per Page:</span>
                 <select
                   value={pageSize}
@@ -1042,7 +1042,7 @@ export const CampaignIntelTab: React.FC<CampaignIntelTabProps> = ({
                     setCurrentPage(1);
                   }}
                   aria-label="Intel reports per page"
-                  className="px-2 py-1 rounded-lg bg-stone-950 border border-stone-800 text-stone-200 text-xs font-mono focus:outline-none focus:border-amber-500/60"
+                  className="px-2 py-1 rounded-lg bg-stone-950 border border-stone-800 text-stone-200 text-xs tabular-nums focus:outline-none focus:border-amber-500/60"
                 >
                   <option value={6}>6</option>
                   <option value={12}>12</option>

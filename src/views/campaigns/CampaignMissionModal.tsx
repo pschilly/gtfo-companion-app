@@ -286,38 +286,38 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
           <div className="space-y-1.5 min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <span
-                className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${getMissionStatusBadgeClasses(
+                className={`px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider border ${getMissionStatusBadgeClasses(
                   mission.status
                 )}`}
               >
                 {mission.statusLabel}
               </span>
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-500/15 text-amber-300 border border-amber-500/30">
+              <span className="px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider bg-amber-500/15 text-amber-300 border border-amber-500/30">
                 {mission.taskingName}
               </span>
               {mission.squadronName && (
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-stone-900 text-stone-300 border border-stone-800 flex items-center gap-1">
+                <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-stone-900 text-stone-300 border border-stone-800 flex items-center gap-1">
                   <ShieldChevron className="w-3 h-3 text-amber-400" />
                   {mission.squadronName}
                 </span>
               )}
               {sortiesWithAar.length > 0 && (
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+                <span className="px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
                   {sortiesWithAar.length} AAR Filed
                 </span>
               )}
               {isUserAttendingAny && (
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/35">
+                <span className="px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/35">
                   ✓ Attending Sortie
                 </span>
               )}
             </div>
 
-            <h2 className="font-display text-xl sm:text-2xl font-extrabold text-stone-100 leading-tight">
+            <h2 className="font-display text-xl sm:text-2xl font-bold text-stone-100 leading-tight">
               {mission.name}
             </h2>
 
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-mono text-stone-400">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-stone-400">
               <span className="text-amber-300 font-semibold">{campaign.name}</span>
               {campaign.theatre && (
                 <>
@@ -336,7 +336,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
               {mission.missionTime && (
                 <>
                   <span>•</span>
-                  <span className="text-sky-300">{mission.missionTime}</span>
+                  <span className="font-mono text-sky-300">{mission.missionTime}</span>
                 </>
               )}
             </div>
@@ -347,7 +347,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
               <button
                 type="button"
                 onClick={() => onOpenExternal(mission.discordThreadUrl)}
-                className="px-3 py-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-300 text-xs font-mono flex items-center gap-1.5 transition-colors"
+                className="px-3 py-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-300 text-xs font-medium flex items-center gap-1.5 transition-colors"
               >
                 <DiscordLogo className="w-4 h-4" />
                 <span>Briefing Thread</span>
@@ -359,7 +359,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
               <button
                 type="button"
                 onClick={() => onOpenOnMap(mission.id)}
-                className="px-3 py-1.5 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/35 text-sky-300 text-xs font-mono font-bold flex items-center gap-1.5 transition-colors"
+                className="px-3 py-1.5 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/35 text-sky-300 text-xs font-semibold flex items-center gap-1.5 transition-colors"
               >
                 <MapTrifold weight="duotone" className="w-4 h-4" />
                 <span>Open on Map</span>
@@ -390,7 +390,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                     key={item.id}
                     type="button"
                     onClick={() => setActiveSection(item.id)}
-                    className={`flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl border text-xs font-mono transition-all whitespace-nowrap shrink-0 text-left ${
+                    className={`flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl border text-xs font-medium transition-all whitespace-nowrap shrink-0 text-left ${
                       isActive
                         ? 'bg-amber-500/15 border-amber-500/45 text-amber-300 font-bold shadow-sm'
                         : 'bg-stone-900/50 hover:bg-stone-900 border-stone-800/80 text-stone-300 hover:text-stone-100'
@@ -404,7 +404,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                     </span>
                     {item.badge !== undefined && (
                       <span
-                        className={`px-1.5 py-0.2 rounded-full text-[10px] shrink-0 ${
+                        className={`px-1.5 py-0.2 rounded-full text-[11px] tabular-nums shrink-0 ${
                           isActive
                             ? 'bg-amber-500/25 text-amber-200 border border-amber-500/30'
                             : 'bg-stone-800 text-stone-400'
@@ -419,28 +419,28 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
             </nav>
 
             {/* Quick Telemetry Summary (Desktop Sidebar Footer) */}
-            <div className="hidden md:block mt-4 p-3.5 rounded-2xl bg-stone-900/70 border border-stone-800 space-y-2.5 text-[11px] font-mono">
-              <div className="text-[10px] uppercase tracking-wider font-bold text-stone-400 border-b border-stone-800 pb-1.5">
+            <div className="hidden md:block mt-4 p-3.5 rounded-2xl bg-stone-900/70 border border-stone-800 space-y-2.5 text-xs">
+              <div className="text-[11px] uppercase tracking-wider font-semibold text-stone-400 border-b border-stone-800 pb-1.5">
                 Mission Telemetry
               </div>
               <div className="flex items-center justify-between gap-2">
                 <span className="text-stone-400">Sorties</span>
-                <span className="text-stone-200 font-bold">{sorties.length}</span>
+                <span className="font-mono text-stone-200 font-bold">{sorties.length}</span>
               </div>
               <div className="flex items-center justify-between gap-2">
                 <span className="text-stone-400">Objectives</span>
-                <span className="text-amber-300 font-bold">
+                <span className="font-mono text-amber-300 font-bold">
                   {mission.completedObjectivesCount}/{mission.objectivesCount}
                 </span>
               </div>
               <div className="flex items-center justify-between gap-2">
                 <span className="text-stone-400">Flights</span>
-                <span className="text-sky-300 font-bold">{mission.flightsCount}</span>
+                <span className="font-mono text-sky-300 font-bold">{mission.flightsCount}</span>
               </div>
               {mission.totalRewardsSummary && mission.totalRewardsSummary !== 'None' && (
                 <div className="pt-1.5 border-t border-stone-800 space-y-0.5">
-                  <span className="text-[10px] text-stone-500 uppercase">Rewards Earned / Total</span>
-                  <div className="text-amber-300 font-bold leading-snug">
+                  <span className="text-[11px] text-stone-500 uppercase tracking-wider font-medium">Rewards Earned / Total</span>
+                  <div className="font-mono text-amber-300 font-bold leading-snug">
                     {mission.earnedRewardsSummary} / {mission.totalRewardsSummary}
                   </div>
                 </div>
@@ -451,7 +451,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                 mission.lng !== undefined && (
                   <div className="pt-1.5 border-t border-stone-800 flex items-center justify-between text-stone-400">
                     <span>Coords</span>
-                    <span className="text-stone-200">
+                    <span className="font-mono text-stone-200">
                       {mission.lat.toFixed(3)}°, {mission.lng.toFixed(3)}°
                     </span>
                   </div>
@@ -467,7 +467,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                 {/* Key Metadata Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                   <div className="p-3.5 rounded-2xl bg-stone-950/90 border border-stone-800">
-                    <div className="text-[10px] font-mono uppercase text-stone-400 flex items-center gap-1.5">
+                    <div className="text-[11px] font-semibold uppercase tracking-wider text-stone-400 flex items-center gap-1.5">
                       <Clock className="w-3.5 h-3.5 text-amber-400" />
                       <span>Execution Window</span>
                     </div>
@@ -478,34 +478,34 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                           : 'See Sortie Schedule')}
                     </div>
                     {mission.startTime && (
-                      <div className="text-[11px] font-mono text-amber-400/90 mt-0.5">
+                      <div className="text-xs font-mono text-amber-400/90 mt-0.5">
                         Zulu: {formatZuluShort(mission.startTime)}
                       </div>
                     )}
                   </div>
 
                   <div className="p-3.5 rounded-2xl bg-stone-950/90 border border-stone-800">
-                    <div className="text-[10px] font-mono uppercase text-stone-400 flex items-center gap-1.5">
+                    <div className="text-[11px] font-semibold uppercase tracking-wider text-stone-400 flex items-center gap-1.5">
                       <GlobeHemisphereWest className="w-3.5 h-3.5 text-sky-400" />
                       <span>Tasking &amp; Squadron</span>
                     </div>
                     <div className="text-xs font-semibold text-stone-100 mt-1 truncate">
                       {mission.taskingName}
                     </div>
-                    <div className="text-[11px] font-mono text-stone-400 mt-0.5 truncate">
+                    <div className="text-xs text-stone-400 mt-0.5 truncate">
                       {mission.squadronName || 'Multi-Squadron Tasking'}
                     </div>
                   </div>
 
                   <div className="p-3.5 rounded-2xl bg-stone-950/90 border border-stone-800">
-                    <div className="text-[10px] font-mono uppercase text-stone-400 flex items-center gap-1.5">
+                    <div className="text-[11px] font-semibold uppercase tracking-wider text-stone-400 flex items-center gap-1.5">
                       <MapPin className="w-3.5 h-3.5 text-emerald-400" />
                       <span>Area of Responsibility</span>
                     </div>
                     <div className="text-xs font-semibold text-stone-100 mt-1 truncate">
                       {formatAorSummary(mission.aor) || 'Primary Target Point'}
                     </div>
-                    <div className="text-[11px] font-mono text-stone-400 mt-0.5">
+                    <div className="text-xs font-mono text-stone-400 mt-0.5">
                       {mission.lat !== null &&
                       mission.lat !== undefined &&
                       mission.lng !== null &&
@@ -516,7 +516,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                   </div>
 
                   <div className="p-3.5 rounded-2xl bg-stone-950/90 border border-stone-800">
-                    <div className="text-[10px] font-mono uppercase text-stone-400 flex items-center gap-1.5">
+                    <div className="text-[11px] font-semibold uppercase tracking-wider text-stone-400 flex items-center gap-1.5">
                       <WarningCircle className="w-3.5 h-3.5 text-amber-400" />
                       <span>Weather (METAR)</span>
                     </div>
@@ -529,7 +529,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                 {/* General Overview Briefing */}
                 {mission.descriptionHtml && (
                   <div className="p-5 rounded-2xl bg-stone-950/80 border border-stone-800 space-y-2">
-                    <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+                    <h3 className="text-xs font-semibold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
                       <Note className="w-4 h-4" />
                       <span>General Overview Briefing</span>
                     </h3>
@@ -547,7 +547,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                       <Crosshair className="w-4 h-4 text-amber-400" />
                       <span>SMEAC Operational Orders</span>
                     </h3>
-                    <span className="text-[11px] font-mono text-stone-400">
+                    <span className="text-xs tabular-nums text-stone-400">
                       {smeacCount}/5 Paragraphs Populated
                     </span>
                   </div>
@@ -566,7 +566,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                             key={sec.key}
                             className="p-4 rounded-2xl bg-stone-950/75 border border-stone-800 space-y-2"
                           >
-                            <div className="text-xs font-mono font-bold uppercase tracking-wider text-amber-300">
+                            <div className="text-xs font-semibold uppercase tracking-wider text-amber-300">
                               {sec.label}
                             </div>
                             <div
@@ -606,7 +606,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                             loading="lazy"
                           />
-                          <div className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-stone-950/85 border border-stone-700 text-[10px] font-mono text-sky-300">
+                          <div className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-stone-950/85 border border-stone-700 text-[11px] font-medium text-sky-300">
                             Expand
                           </div>
                         </button>
@@ -646,18 +646,18 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                             className={`p-3.5 rounded-2xl border ${style.border} bg-gradient-to-br ${style.gradient} space-y-2`}
                           >
                             <div className="flex items-center justify-between gap-2">
-                              <span className="text-[11px] font-mono font-bold uppercase text-stone-300 truncate">
+                              <span className="text-[11px] font-semibold uppercase tracking-wider text-stone-300 truncate">
                                 {item.label}
                               </span>
                               <div className={`p-1.5 rounded-lg border shrink-0 ${style.iconBox}`}>
                                 {renderResourceIcon(item.type, 'w-4 h-4')}
                               </div>
                             </div>
-                            <div className={`text-lg font-black font-mono ${style.text}`}>
+                            <div className={`text-lg font-bold font-display tabular-nums ${style.text}`}>
                               +{item.total.toLocaleString()}{' '}
-                              <span className={`text-xs ${style.accent}`}>{item.shortLabel}</span>
+                              <span className={`text-xs font-mono ${style.accent}`}>{item.shortLabel}</span>
                             </div>
-                            <div className="flex items-center justify-between text-[10px] font-mono text-stone-400">
+                            <div className="flex items-center justify-between text-xs tabular-nums text-stone-400">
                               <span>
                                 Earned:{' '}
                                 <strong className="text-stone-200">
@@ -665,7 +665,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                                 </strong>
                               </span>
                               {item.isFullyEarned && (
-                                <span className="text-emerald-400 font-bold">✓ Full</span>
+                                <span className="text-emerald-400 font-semibold">✓ Full</span>
                               )}
                             </div>
                           </div>
@@ -687,7 +687,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                       ))}
                     </div>
                   ) : (
-                    <div className="p-4 rounded-2xl border border-dashed border-stone-800 bg-stone-950/40 text-xs font-mono text-stone-500 text-center">
+                    <div className="p-4 rounded-2xl border border-dashed border-stone-800 bg-stone-950/40 text-xs text-stone-500 text-center">
                       No specific resource rewards configured for this mission.
                     </div>
                   )}
@@ -706,7 +706,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                   </div>
 
                   {mission.objectives.length === 0 ? (
-                    <div className="p-8 rounded-2xl border border-dashed border-stone-800 bg-stone-950/40 text-center text-xs font-mono text-stone-500">
+                    <div className="p-8 rounded-2xl border border-dashed border-stone-800 bg-stone-950/40 text-center text-xs text-stone-500">
                       No discrete tactical objectives defined for this mission yet.
                     </div>
                   ) : (
@@ -728,21 +728,21 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
                               <div className="space-y-1 min-w-0 flex-1">
                                 <div className="flex flex-wrap items-center gap-2">
-                                  <span className="px-2 py-0.5 rounded bg-stone-900 border border-stone-700 text-[10px] font-mono font-bold text-stone-400">
+                                  <span className="px-2 py-0.5 rounded bg-stone-900 border border-stone-700 text-[11px] font-mono font-bold text-stone-400">
                                     OBJ #{(obj.index ?? idx) + 1}
                                   </span>
                                   <span
-                                    className={`px-2 py-0.5 rounded border text-[10px] font-mono font-bold uppercase ${prio.classes}`}
+                                    className={`px-2 py-0.5 rounded border text-[11px] font-semibold uppercase tracking-wider ${prio.classes}`}
                                   >
                                     {prio.label}
                                   </span>
                                   <span
-                                    className={`px-2 py-0.5 rounded border text-[10px] font-mono font-bold uppercase ${stat.classes}`}
+                                    className={`px-2 py-0.5 rounded border text-[11px] font-semibold uppercase tracking-wider ${stat.classes}`}
                                   >
                                     {stat.label}
                                   </span>
                                   {obj.points !== undefined && obj.points > 0 && (
-                                    <span className="px-2 py-0.5 rounded bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[10px] font-mono font-bold inline-flex items-center gap-1">
+                                    <span className="px-2 py-0.5 rounded bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] font-mono font-bold inline-flex items-center gap-1">
                                       {renderResourceIcon(
                                         obj.resourceType || 'command_points',
                                         'w-3 h-3'
@@ -762,9 +762,9 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                             {(obj.mgrs ||
                               objAor ||
                               (obj.squadrons && obj.squadrons.length > 0)) && (
-                              <div className="pt-2 border-t border-stone-800/70 flex flex-wrap items-center gap-2 text-[11px] font-mono">
+                              <div className="pt-2 border-t border-stone-800/70 flex flex-wrap items-center gap-2 text-xs">
                                 {obj.mgrs && (
-                                  <span className="px-2 py-0.5 rounded bg-stone-900 border border-stone-800 text-stone-300">
+                                  <span className="px-2 py-0.5 rounded bg-stone-900 border border-stone-800 font-mono text-stone-300">
                                     MGRS: <strong className="text-amber-300">{obj.mgrs}</strong>
                                   </span>
                                 )}
@@ -842,45 +842,45 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                           <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-3 pb-3 border-b border-stone-800/80">
                             <div className="space-y-1.5 min-w-0">
                               <div className="flex flex-wrap items-center gap-2">
-                                <span className="text-sm font-bold font-mono text-amber-300 flex items-center gap-1.5">
+                                <span className="text-sm font-bold font-display text-amber-300 flex items-center gap-1.5">
                                   <AirplaneTakeoff weight="duotone" className="w-4 h-4" />
                                   {sortie.name}
                                 </span>
 
                                 {sortie.hasAar ? (
-                                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/35">
+                                  <span className="px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/35">
                                     AAR Filed
                                   </span>
                                 ) : sortie.isConcluded ? (
-                                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-stone-800 text-stone-400 border border-stone-700">
+                                  <span className="px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider bg-stone-800 text-stone-400 border border-stone-700">
                                     Concluded
                                   </span>
                                 ) : sortie.isSignupOpen ? (
-                                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/35">
+                                  <span className="px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/35">
                                     Sign-up Open
                                   </span>
                                 ) : (
-                                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-rose-500/20 text-rose-300 border border-rose-500/35">
+                                  <span className="px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider bg-rose-500/20 text-rose-300 border border-rose-500/35">
                                     Cut-off Passed
                                   </span>
                                 )}
 
                                 {userAtt && (
-                                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500 text-stone-950">
+                                  <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500 text-stone-950">
                                     ✓ You: {userAtt.flightCallsign || userAtt.roleLabel}
                                   </span>
                                 )}
 
                                 {sortie.allowOpfor && (
-                                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-950/50 text-rose-300 border border-rose-500/30">
+                                  <span className="px-2 py-0.5 rounded text-[11px] font-semibold tabular-nums bg-rose-950/50 text-rose-300 border border-rose-500/30">
                                     OPFOR ({sortie.opforCount}
                                     {sortie.opforSlots ? `/${sortie.opforSlots}` : ''})
                                   </span>
                                 )}
                               </div>
 
-                              <div className="flex flex-wrap items-center gap-3 text-xs font-mono text-stone-300">
-                                <span className="flex items-center gap-1.5">
+                              <div className="flex flex-wrap items-center gap-3 text-xs text-stone-300">
+                                <span className="flex items-center gap-1.5 font-mono">
                                   <Clock className="w-3.5 h-3.5 text-amber-400" />
                                   <span>
                                     {sortie.scheduledAt
@@ -894,7 +894,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                                 {sortie.signupCutoffAt && (
                                   <span className="flex items-center gap-1 text-stone-400">
                                     <Lock className="w-3 h-3 text-stone-500" />
-                                    <span>Cut-off: {formatDateTimeShort(sortie.signupCutoffAt)}</span>
+                                    <span>Cut-off: <span className="font-mono">{formatDateTimeShort(sortie.signupCutoffAt)}</span></span>
                                   </span>
                                 )}
                               </div>
@@ -910,7 +910,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                                     missionSection: 'sorties',
                                   })
                                 }
-                                className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono font-bold text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/15 transition-colors"
+                                className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-semibold text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/15 transition-colors"
                               >
                                 <CalendarBlank weight="bold" className="w-3.5 h-3.5" />
                                 <span>
@@ -924,7 +924,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                                 <button
                                   type="button"
                                   onClick={() => setActiveSection('aar')}
-                                  className="px-3 py-1.5 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/35 text-cyan-300 font-mono font-bold text-xs flex items-center gap-1.5 transition-colors"
+                                  className="px-3 py-1.5 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/35 text-cyan-300 font-semibold text-xs flex items-center gap-1.5 transition-colors"
                                 >
                                   <Sword className="w-3.5 h-3.5" />
                                   <span>View AAR</span>
@@ -935,7 +935,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                                 <button
                                   type="button"
                                   onClick={() => onOpenExternal(sortie.discordEventUrl)}
-                                  className="px-2.5 py-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-300 text-xs font-mono flex items-center gap-1 transition-colors"
+                                  className="px-2.5 py-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-300 text-xs font-medium flex items-center gap-1 transition-colors"
                                 >
                                   <DiscordLogo className="w-3.5 h-3.5" />
                                   <span>Event</span>
@@ -949,27 +949,27 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                             sortie.jtacSlots > 0 ||
                             sortie.atcSlots > 0 ||
                             sortie.gciSlots > 0) && (
-                            <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono">
-                              <span className="text-stone-400 uppercase font-bold">
+                            <div className="flex flex-wrap items-center gap-2 text-xs tabular-nums">
+                              <span className="text-stone-400 text-[11px] uppercase tracking-wider font-semibold">
                                 Support Slots:
                               </span>
                               {sortie.gameMasterSlots > 0 && (
-                                <span className="px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/25 text-amber-300">
+                                <span className="px-2 py-0.5 rounded font-mono text-[11px] bg-amber-500/10 border border-amber-500/25 text-amber-300">
                                   GM {sortie.gameMasterCount}/{sortie.gameMasterSlots}
                                 </span>
                               )}
                               {sortie.jtacSlots > 0 && (
-                                <span className="px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/25 text-emerald-300">
+                                <span className="px-2 py-0.5 rounded font-mono text-[11px] bg-emerald-500/10 border border-emerald-500/25 text-emerald-300">
                                   JTAC {sortie.jtacCount}/{sortie.jtacSlots}
                                 </span>
                               )}
                               {sortie.atcSlots > 0 && (
-                                <span className="px-2 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/25 text-cyan-300">
+                                <span className="px-2 py-0.5 rounded font-mono text-[11px] bg-cyan-500/10 border border-cyan-500/25 text-cyan-300">
                                   ATC {sortie.atcCount}/{sortie.atcSlots}
                                 </span>
                               )}
                               {sortie.gciSlots > 0 && (
-                                <span className="px-2 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/25 text-indigo-300">
+                                <span className="px-2 py-0.5 rounded font-mono text-[11px] bg-indigo-500/10 border border-indigo-500/25 text-indigo-300">
                                   GCI {sortie.gciCount}/{sortie.gciSlots}
                                 </span>
                               )}
@@ -992,8 +992,8 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
 
                           {/* Registered Flight Roster */}
                           <div className="space-y-2.5">
-                            <div className="flex items-center justify-between text-xs font-mono">
-                              <span className="font-bold text-stone-200 flex items-center gap-1.5">
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="font-semibold text-stone-200 flex items-center gap-1.5 tabular-nums">
                                 <Users className="w-3.5 h-3.5 text-amber-400" />
                                 {sortie.hasAar
                                   ? `Attendance (${sortie.attendedCount} Attended / ${sortie.absentCount} Absent)`
@@ -1002,7 +1002,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                             </div>
 
                             {sortie.attendees.length === 0 ? (
-                              <div className="p-4 rounded-xl border border-dashed border-stone-800 text-center text-xs font-mono text-stone-500">
+                              <div className="p-4 rounded-xl border border-dashed border-stone-800 text-center text-xs text-stone-500">
                                 No pilots or support personnel signed up for this sortie yet.
                               </div>
                             ) : (
@@ -1013,11 +1013,11 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                                       key={sqnName}
                                       className="rounded-xl border border-stone-800 bg-stone-900/70 overflow-hidden"
                                     >
-                                      <div className="px-3 py-1.5 bg-stone-900 border-b border-stone-800 flex items-center justify-between text-[11px] font-mono">
-                                        <span className="font-bold text-amber-300 truncate">
+                                      <div className="px-3 py-1.5 bg-stone-900 border-b border-stone-800 flex items-center justify-between text-xs">
+                                        <span className="font-semibold text-amber-300 truncate">
                                           {sqnName}
                                         </span>
-                                        <span className="text-stone-400 shrink-0">
+                                        <span className="text-stone-400 tabular-nums shrink-0">
                                           {list.length} Pilot{list.length === 1 ? '' : 's'}
                                         </span>
                                       </div>
@@ -1034,7 +1034,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                                             >
                                               <div className="flex items-center gap-1.5 min-w-0 flex-wrap">
                                                 {att.flightCallsign && (
-                                                  <span className="px-1.5 py-0.2 rounded bg-amber-500/15 border border-amber-500/35 text-amber-300 font-mono font-bold text-[10px]">
+                                                  <span className="px-1.5 py-0.2 rounded bg-amber-500/15 border border-amber-500/35 text-amber-300 font-mono font-bold text-[11px]">
                                                     {att.flightCallsign}
                                                   </span>
                                                 )}
@@ -1048,7 +1048,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                                                   {att.callsign}
                                                 </span>
                                                 <span
-                                                  className={`px-1.5 py-0.2 rounded border text-[9px] font-mono font-bold uppercase ${getRoleBadgeClass(
+                                                  className={`px-1.5 py-0.2 rounded border text-[11px] font-semibold uppercase ${getRoleBadgeClass(
                                                     att.role
                                                   )}`}
                                                 >
@@ -1056,16 +1056,16 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                                                 </span>
                                                 {sortie.hasAar &&
                                                   (att.isPresent === false ? (
-                                                    <span className="px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[9px] font-mono font-bold uppercase">
+                                                    <span className="px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[11px] font-semibold uppercase">
                                                       Absent
                                                     </span>
                                                   ) : att.xpAwarded ? (
-                                                    <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[9px] font-mono font-bold">
+                                                    <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] font-mono font-bold">
                                                       +500 XP
                                                     </span>
                                                   ) : null)}
                                               </div>
-                                              <span className="px-2 py-0.5 rounded bg-stone-950 border border-stone-800 text-[10px] font-mono text-stone-300 shrink-0">
+                                              <span className="px-2 py-0.5 rounded bg-stone-950 border border-stone-800 text-[11px] font-mono text-stone-300 shrink-0">
                                                 {att.isSupport
                                                   ? att.roleLabel
                                                   : att.airframeAbbreviation ||
@@ -1082,11 +1082,11 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
 
                                 {grouped.opfor.length > 0 && (
                                   <div className="rounded-xl border border-rose-500/30 bg-rose-950/15 overflow-hidden">
-                                    <div className="px-3 py-1.5 bg-rose-500/10 border-b border-rose-500/30 flex items-center justify-between text-[11px] font-mono">
-                                      <span className="font-bold text-rose-300">
+                                    <div className="px-3 py-1.5 bg-rose-500/10 border-b border-rose-500/30 flex items-center justify-between text-xs">
+                                      <span className="font-semibold text-rose-300">
                                         OPFOR Aggressor Element
                                       </span>
-                                      <span className="text-rose-300/80">
+                                      <span className="text-rose-300/80 tabular-nums">
                                         {grouped.opfor.length} Pilot
                                         {grouped.opfor.length === 1 ? '' : 's'}
                                       </span>
@@ -1099,7 +1099,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                                         >
                                           <div className="flex items-center gap-1.5 min-w-0">
                                             {att.flightCallsign && (
-                                              <span className="px-1.5 py-0.2 rounded bg-rose-500/20 border border-rose-500/40 text-rose-200 font-mono font-bold text-[10px]">
+                                              <span className="px-1.5 py-0.2 rounded bg-rose-500/20 border border-rose-500/40 text-rose-200 font-mono font-bold text-[11px]">
                                                 {att.flightCallsign}
                                               </span>
                                             )}
@@ -1107,7 +1107,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                                               {att.callsign}
                                             </span>
                                           </div>
-                                          <span className="px-2 py-0.5 rounded bg-stone-950 border border-rose-500/30 text-[10px] font-mono text-rose-300 shrink-0">
+                                          <span className="px-2 py-0.5 rounded bg-stone-950 border border-rose-500/30 text-[11px] font-mono text-rose-300 shrink-0">
                                             {att.airframeAbbreviation ||
                                               att.airframeName ||
                                               'OPFOR'}
@@ -1162,15 +1162,15 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-800">
                             <div>
                               <div className="flex items-center gap-2 flex-wrap">
-                                <span className="text-sm font-bold font-mono text-cyan-300">
+                                <span className="text-sm font-bold font-display text-cyan-300">
                                   {sortie.name} — After Action Report
                                 </span>
-                                <span className="px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[10px] font-mono font-bold">
+                                <span className="px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[11px] tabular-nums font-semibold">
                                   {sortie.attendedCount} Attended / {sortie.absentCount} Absent
                                 </span>
                               </div>
                               {sortie.scheduledAt && (
-                                <p className="text-[11px] font-mono text-stone-400 mt-0.5">
+                                <p className="text-xs font-mono text-stone-400 mt-0.5">
                                   Flown: {formatDateTimeShort(sortie.scheduledAt)} (
                                   {formatZuluShort(sortie.scheduledAt)})
                                 </p>
@@ -1186,7 +1186,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                                     missionSection: 'aar',
                                   })
                                 }
-                                className="px-2.5 py-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-amber-300 text-xs font-mono flex items-center gap-1.5 transition-colors"
+                                className="px-2.5 py-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-amber-300 text-xs font-medium flex items-center gap-1.5 transition-colors"
                               >
                                 <CalendarBlank className="w-3.5 h-3.5" />
                                 <span>Calendar Record</span>
@@ -1196,7 +1196,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                                 <button
                                   type="button"
                                   onClick={() => onOpenExternal(sortie.aarDiscordMessageUrl)}
-                                  className="px-2.5 py-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-300 text-xs font-mono flex items-center gap-1.5 transition-colors"
+                                  className="px-2.5 py-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-300 text-xs font-medium flex items-center gap-1.5 transition-colors"
                                 >
                                   <DiscordLogo className="w-3.5 h-3.5" />
                                   <span>Discord AAR</span>
@@ -1213,7 +1213,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                               {(sortie.ourLossesHtml || sortie.ourLosses) && (
                                 <div className="px-4 py-3 rounded-xl bg-rose-950/25 border border-rose-500/30 space-y-1.5 overflow-hidden">
-                                  <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-rose-300">
+                                  <div className="text-[11px] font-bold uppercase tracking-wider text-rose-300">
                                     Friendly Losses
                                   </div>
                                   {sortie.ourLossesHtml ? (
@@ -1222,7 +1222,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                                       dangerouslySetInnerHTML={{ __html: sortie.ourLossesHtml }}
                                     />
                                   ) : (
-                                    <p className="text-xs font-mono text-rose-200 whitespace-pre-line">
+                                    <p className="text-xs text-rose-200 whitespace-pre-line leading-relaxed">
                                       {sortie.ourLosses}
                                     </p>
                                   )}
@@ -1231,7 +1231,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
 
                               {(sortie.enemyLossesHtml || sortie.enemyLosses) && (
                                 <div className="px-4 py-3 rounded-xl bg-emerald-950/25 border border-emerald-500/30 space-y-1.5 overflow-hidden">
-                                  <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-300">
+                                  <div className="text-[11px] font-bold uppercase tracking-wider text-emerald-300">
                                     Estimated Enemy Losses
                                   </div>
                                   {sortie.enemyLossesHtml ? (
@@ -1240,7 +1240,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                                       dangerouslySetInnerHTML={{ __html: sortie.enemyLossesHtml }}
                                     />
                                   ) : (
-                                    <p className="text-xs font-mono text-emerald-200 whitespace-pre-line">
+                                    <p className="text-xs text-emerald-200 whitespace-pre-line leading-relaxed">
                                       {sortie.enemyLosses}
                                     </p>
                                   )}
@@ -1252,7 +1252,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                           {/* AAR Narrative Notes */}
                           {(sortie.aarNotesHtml || sortie.aarNotes) && (
                             <div className="px-4 py-3 rounded-xl bg-stone-900/80 border border-stone-800 space-y-1.5 overflow-hidden">
-                              <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-300">
+                              <div className="text-[11px] font-bold uppercase tracking-wider text-amber-300">
                                 Debrief Narrative &amp; Summary
                               </div>
                               {sortie.aarNotesHtml ? (
@@ -1271,7 +1271,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                           {/* Gun Camera / Strike Videos */}
                           {bdaVideos.length > 0 && (
                             <div className="space-y-2">
-                              <div className="text-[11px] font-mono font-bold uppercase text-stone-300 flex items-center gap-1.5">
+                              <div className="text-[11px] font-semibold tracking-wider uppercase text-stone-300 flex items-center gap-1.5">
                                 <VideoCamera className="w-4 h-4 text-rose-400" />
                                 <span>Gun Camera &amp; Strike Footage ({bdaVideos.length})</span>
                               </div>
@@ -1298,7 +1298,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                           {/* BDA Imagery Grid */}
                           {bdaImages.length > 0 && (
                             <div className="space-y-2">
-                              <div className="text-[11px] font-mono font-bold uppercase text-stone-300 flex items-center gap-1.5">
+                              <div className="text-[11px] font-semibold tracking-wider uppercase text-stone-300 flex items-center gap-1.5">
                                 <ImageIcon className="w-4 h-4 text-cyan-400" />
                                 <span>BDA Imagery ({bdaImages.length})</span>
                               </div>
@@ -1345,13 +1345,13 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                   </h3>
 
                   {mission.frequencies.length === 0 ? (
-                    <div className="p-4 rounded-2xl border border-dashed border-stone-800 bg-stone-950/40 text-xs font-mono text-stone-500 text-center">
+                    <div className="p-4 rounded-2xl border border-dashed border-stone-800 bg-stone-950/40 text-xs text-stone-500 text-center">
                       No mission-wide radio frequencies configured.
                     </div>
                   ) : (
                     <div className="overflow-x-auto rounded-2xl border border-stone-800 bg-stone-950/75">
                       <table className="w-full text-left text-xs font-mono">
-                        <thead className="bg-stone-900 border-b border-stone-800 text-[10px] uppercase text-stone-400">
+                        <thead className="bg-stone-900 border-b border-stone-800 font-sans text-[11px] uppercase tracking-wider text-stone-400">
                           <tr>
                             <th className="px-3.5 py-2.5">Agency / Station</th>
                             <th className="px-3.5 py-2.5">Frequency</th>
@@ -1362,7 +1362,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                         <tbody className="divide-y divide-stone-800/60">
                           {mission.frequencies.map((freq, idx) => (
                             <tr key={idx} className="hover:bg-stone-900/50">
-                              <td className="px-3.5 py-2.5 font-bold text-stone-100">
+                              <td className="px-3.5 py-2.5 font-sans font-bold text-stone-100">
                                 {freq.name}
                               </td>
                               <td className="px-3.5 py-2.5 text-amber-300 font-bold">
@@ -1371,7 +1371,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                               <td className="px-3.5 py-2.5 text-sky-300">
                                 {freq.band} / {freq.modulation}
                               </td>
-                              <td className="px-3.5 py-2.5 text-stone-400">
+                              <td className="px-3.5 py-2.5 font-sans text-stone-400">
                                 {freq.notes || '—'}
                               </td>
                             </tr>
@@ -1390,7 +1390,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                   </h3>
 
                   {mission.flightPlans.length === 0 ? (
-                    <div className="p-4 rounded-2xl border border-dashed border-stone-800 bg-stone-950/40 text-xs font-mono text-stone-500 text-center">
+                    <div className="p-4 rounded-2xl border border-dashed border-stone-800 bg-stone-950/40 text-xs text-stone-500 text-center">
                       No filed or mission flight plans associated yet.
                     </div>
                   ) : (
@@ -1402,27 +1402,27 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                         >
                           <div className="space-y-1 min-w-0">
                             <div className="flex flex-wrap items-center gap-2">
-                              <span className="font-mono font-bold text-xs text-amber-300">
+                              <span className="font-display font-bold text-sm text-amber-300">
                                 {plan.name}
                               </span>
-                              <span className="px-1.5 py-0.2 rounded bg-stone-900 border border-stone-700 text-[10px] font-mono text-stone-400">
+                              <span className="px-1.5 py-0.2 rounded bg-stone-900 border border-stone-700 text-[11px] font-mono text-stone-400">
                                 {plan.identifier}
                               </span>
                               {plan.isFiled && (
-                                <span className="px-1.5 py-0.2 rounded bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[10px] font-mono font-bold inline-flex items-center gap-1">
+                                <span className="px-1.5 py-0.2 rounded bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[11px] font-semibold inline-flex items-center gap-1">
                                   <CheckCircle className="w-3 h-3" />
                                   Filed
                                 </span>
                               )}
                               {plan.airframeName && (
-                                <span className="px-1.5 py-0.2 rounded bg-sky-500/10 border border-sky-500/30 text-sky-300 text-[10px] font-mono">
+                                <span className="px-1.5 py-0.2 rounded bg-sky-500/10 border border-sky-500/30 text-sky-300 text-[11px] font-medium">
                                   {plan.airframeName}
                                 </span>
                               )}
                             </div>
-                            <div className="text-[11px] font-mono text-stone-400 flex flex-wrap items-center gap-2">
+                            <div className="text-xs text-stone-400 flex flex-wrap items-center gap-2">
                               {(plan.departureAirfield || plan.destinationAirfield) && (
-                                <span>
+                                <span className="font-mono">
                                   {plan.departureAirfield || 'DEP'} &rarr;{' '}
                                   {plan.destinationAirfield || 'ARR'}
                                 </span>
@@ -1430,14 +1430,14 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                               {plan.authorName && (
                                 <span>&bull; by {plan.authorName}</span>
                               )}
-                              <span>&bull; {plan.waypointsCount} WPTs</span>
+                              <span className="font-mono">&bull; {plan.waypointsCount} WPTs</span>
                             </div>
                           </div>
 
                           <button
                             type="button"
                             onClick={() => handleOpenFlightPlanInAtc(plan.id)}
-                            className="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/35 text-amber-300 text-xs font-mono font-bold shrink-0 transition-colors"
+                            className="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/35 text-amber-300 text-xs font-semibold shrink-0 transition-colors"
                           >
                             Open in ATC &amp; DTC &rarr;
                           </button>
@@ -1465,12 +1465,12 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                               {flight.callsign}
                             </span>
                             {flight.frequency && (
-                              <span className="text-[11px] font-mono text-sky-300">
+                              <span className="text-xs font-mono text-sky-300">
                                 {flight.frequency} MHz
                               </span>
                             )}
                           </div>
-                          <div className="flex flex-wrap gap-1.5 text-[10px] font-mono text-stone-300">
+                          <div className="flex flex-wrap gap-1.5 text-[11px] font-medium text-stone-300">
                             {flight.task && (
                               <span className="px-2 py-0.5 rounded bg-stone-900 border border-stone-800">
                                 {flight.task}
@@ -1520,7 +1520,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                   </h3>
 
                   {linkedIntels.length === 0 ? (
-                    <div className="p-4 rounded-2xl border border-dashed border-stone-800 bg-stone-950/40 text-xs font-mono text-stone-500 text-center">
+                    <div className="p-4 rounded-2xl border border-dashed border-stone-800 bg-stone-950/40 text-xs text-stone-500 text-center">
                       No intel reports directly linked to this mission.
                     </div>
                   ) : (
@@ -1532,7 +1532,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                         >
                           <div className="flex items-start justify-between gap-2">
                             <div className="space-y-0.5 min-w-0">
-                              <span className="px-1.5 py-0.2 rounded bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[9px] font-mono font-bold uppercase">
+                              <span className="px-1.5 py-0.2 rounded bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[11px] font-semibold uppercase tracking-wider">
                                 {intel.type}
                               </span>
                               <h4 className="text-xs font-bold text-stone-100 truncate">
@@ -1551,13 +1551,13 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
                             )}
                           </div>
                           {intel.notes && (
-                            <p className="text-[11px] text-stone-300 line-clamp-3 leading-relaxed">
+                            <p className="text-xs text-stone-300 line-clamp-3 leading-relaxed">
                               {intel.notes}
                             </p>
                           )}
-                          <div className="text-[10px] font-mono text-stone-500 flex items-center justify-between pt-1 border-t border-stone-800/70">
+                          <div className="text-[11px] text-stone-500 flex items-center justify-between pt-1 border-t border-stone-800/70">
                             <span>{intel.reporterName || 'Squadron Pilot'}</span>
-                            {intel.createdAt && <span>{formatDateTimeShort(intel.createdAt)}</span>}
+                            {intel.createdAt && <span className="font-mono">{formatDateTimeShort(intel.createdAt)}</span>}
                           </div>
                         </div>
                       ))}
@@ -1583,7 +1583,7 @@ export const CampaignMissionModal: React.FC<CampaignMissionModalProps> = ({
             className="max-w-5xl w-full max-h-[90vh] flex flex-col gap-3"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between text-xs font-mono text-stone-200">
+            <div className="flex items-center justify-between text-xs text-stone-200">
               <span className="font-bold truncate">{lightboxImage.title}</span>
               <button
                 type="button"

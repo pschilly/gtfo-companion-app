@@ -184,13 +184,13 @@ export const MeasureToolDrawer: React.FC<MeasureToolDrawerProps> = ({
 
         <div className="bg-stone-950/70 border border-stone-800/80 rounded-lg px-3 py-2 flex items-center justify-between gap-2">
           <div>
-            <div className="text-[10px] uppercase tracking-wider text-stone-500 font-semibold">
+            <div className="text-[11px] uppercase tracking-wider text-stone-500 font-semibold">
               Total Distance ({legs.length} {legs.length === 1 ? 'leg' : 'legs'})
             </div>
             <div className="text-lg font-mono font-bold text-amber-400">{totalDisplay}</div>
           </div>
           <div className="text-right">
-            <div className="text-[10px] uppercase tracking-wider text-stone-500 font-semibold">
+            <div className="text-[11px] uppercase tracking-wider text-stone-500 font-semibold">
               Est. Travel Time
             </div>
             <div className="text-lg font-mono font-bold text-emerald-400">{totalEteDisplay}</div>
@@ -225,7 +225,7 @@ export const MeasureToolDrawer: React.FC<MeasureToolDrawerProps> = ({
             {legs.length > 0 && (
               <div className="border border-stone-800 rounded-lg overflow-hidden">
                 <table className="w-full text-[11px]">
-                  <thead className="bg-stone-950 text-stone-400 uppercase tracking-wider text-[10px]">
+                  <thead className="bg-stone-950 text-stone-400 uppercase tracking-wider text-[11px]">
                     <tr>
                       <th className="px-2 py-1.5 text-left">Leg</th>
                       <th className="px-1.5 py-1.5 text-right">HDG (M/T)</th>
