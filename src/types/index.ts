@@ -946,6 +946,13 @@ export interface CalendarSupportRoleOption {
 }
 
 export interface CalendarRsvpOptions {
+  is_core_member?: boolean;
+  has_basic_membership?: boolean;
+  is_opfor_squadron_member?: boolean;
+  is_squadron_777?: boolean;
+  can_rsvp_campaign_blufor?: boolean;
+  can_rsvp_campaign_opfor?: boolean;
+  can_rsvp_training?: boolean;
   campaign_airframes: CalendarRsvpAirframeOption[];
   training_airframes: CalendarRsvpAirframeOption[];
   support_roles?: CalendarSupportRoleOption[];
@@ -982,6 +989,15 @@ export interface CalendarEventItem {
   opfor_count?: number;
   is_opfor_eligible: boolean;
   has_available_opfor_slots: boolean;
+  is_core_member?: boolean;
+  is_opfor_squadron_member?: boolean;
+  is_squadron_777?: boolean;
+  has_basic_membership?: boolean;
+  can_rsvp_blufor?: boolean;
+  can_rsvp_opfor?: boolean;
+  can_rsvp_campaign?: boolean;
+  can_rsvp_training?: boolean;
+  rsvp_ineligibility_reason?: string | null;
   game_master_slots?: number;
   game_master_count?: number;
   has_available_game_master_slots?: boolean;

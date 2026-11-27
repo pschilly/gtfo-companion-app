@@ -3,6 +3,7 @@ import {
   CalendarEventItem,
   CalendarEventsResponse,
   CalendarEventType,
+  CalendarRsvpOptions,
   CalendarRsvpResponse,
   SubmitCalendarCompletePayload,
 } from '../types';
@@ -91,12 +92,12 @@ export async function fetchCalendarEventDetail(
   id: number,
   discordId?: string,
   token?: string
-): Promise<{ event: CalendarEventItem }> {
+): Promise<{ event: CalendarEventItem; rsvp_options?: CalendarRsvpOptions }> {
   const cleanBase = normalizeCompanionBaseUrl(baseUrl);
   const query = discordId ? `?discord_id=${encodeURIComponent(discordId)}` : '';
   const endpoint = `${cleanBase}/calendar/${encodeURIComponent(type)}/${id}${query}`;
 
-  return await sendPortalApiRequest<{ event: CalendarEventItem }>(
+  return await sendPortalApiRequest<{ event: CalendarEventItem; rsvp_options?: CalendarRsvpOptions }>(
     endpoint,
     'GET',
     undefined,

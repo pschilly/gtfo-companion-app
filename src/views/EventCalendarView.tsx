@@ -459,6 +459,7 @@ export const EventCalendarView: React.FC = () => {
     campaign_airframes: [],
     training_airframes: [],
   });
+  const [hasLoadedRsvpOptions, setHasLoadedRsvpOptions] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -528,6 +529,7 @@ export const EventCalendarView: React.FC = () => {
         setEvents(res.events || []);
         if (res.rsvp_options) {
           setRsvpOptions(res.rsvp_options);
+          setHasLoadedRsvpOptions(true);
         }
       } catch (err: any) {
         const msg = err?.message || 'Unable to load Event Calendar from Member Portal.';
@@ -620,6 +622,10 @@ export const EventCalendarView: React.FC = () => {
     )
       .then((res) => {
         if (cancelled || !res?.event) return;
+        if (res.rsvp_options) {
+          setRsvpOptions(res.rsvp_options);
+          setHasLoadedRsvpOptions(true);
+        }
         setEvents((prev) => {
           if (prev.some((e) => e.uid === res.event.uid)) return prev;
           return [...prev, res.event];
@@ -652,47 +658,106 @@ export const EventCalendarView: React.FC = () => {
     userSession?.id,
   ]);
 
+  const isCoreMember = useMemo(() => {
+    if (selectedEvent?.is_core_member !== undefined) {
+      return Boolean(selectedEvent.is_core_member);
+    }
+    if (rsvpOptions.is_core_member !== undefined) {
+      return Boolean(rsvpOptions.is_core_member);
+    }
+    return memberProfile.rosterTier === 'CORE';
+  }, [selectedEvent?.is_core_member, rsvpOptions.is_core_member, memberProfile.rosterTier]);
+
+  const hasBasicMembership = useMemo(() => {
+    if (selectedEvent?.has_basic_membership !== undefined) {
+      return Boolean(selectedEvent.has_basic_membership);
+    }
+    if (rsvpOptions.has_basic_membership !== undefined) {
+      return Boolean(rsvpOptions.has_basic_membership);
+    }
+    return memberProfile.rosterTier === 'CORE' || memberProfile.rosterTier === 'Community';
+  }, [selectedEvent?.has_basic_membership, rsvpOptions.has_basic_membership, memberProfile.rosterTier]);
+
   // Available airframes for the currently selected event
   const availableAirframesForSelectedEvent = useMemo<CalendarRsvpAirframeOption[]>(() => {
     if (!selectedEvent) return [];
-    const list =
-      selectedEvent.type === 'campaign'
-        ? rsvpOptions.campaign_airframes
-        : rsvpOptions.training_airframes;
 
-    if (list && list.length > 0) {
-      return list;
+    if (hasLoadedRsvpOptions) {
+      return selectedEvent.type === 'campaign'
+        ? rsvpOptions.campaign_airframes || []
+        : rsvpOptions.training_airframes || [];
     }
 
-    // Fallback to memberProfile qualified airframes if API options aren't populated
+    // Strict fallback only before API rsvp_options have loaded
+    if (selectedEvent.type === 'campaign') {
+      if (!isCoreMember) return [];
+      return (memberProfile.qualifiedAirframes || [])
+        .filter((af) => {
+          if (typeof af.id !== 'number') return false;
+          const status = (af.status || 'qualified').toLowerCase();
+          if (status !== 'qualified') return false;
+          return Boolean(af.isPilot) || Boolean(af.isCrew);
+        })
+        .map((af) => {
+          const roles: Array<{ value: string; label: string }> = [];
+          if (af.isPilot) roles.push({ value: 'pilot', label: 'Pilot' });
+          if (af.isCrew) roles.push({ value: 'crew', label: 'Aircrew / RIO / WSO / CPG' });
+          return {
+            id: af.id as number,
+            name: af.name,
+            abbreviation: af.abbreviation || af.name,
+            is_primary: Boolean(af.isPrimary),
+            status: af.status || 'qualified',
+            allowed_roles: roles,
+          };
+        })
+        .filter((af) => af.allowed_roles.length > 0);
+    }
+
+    if (!hasBasicMembership) return [];
     return (memberProfile.qualifiedAirframes || [])
-      .filter((af) => typeof af.id === 'number')
-      .map((af) => ({
-        id: af.id as number,
-        name: af.name,
-        abbreviation: af.abbreviation || af.name,
-        is_primary: Boolean(af.isPrimary),
-        status: af.status || 'qualified',
-        allowed_roles:
-          selectedEvent.type === 'training'
-            ? [
-                { value: 'pilot', label: 'Pilot' },
-                { value: 'student', label: 'Student / Trainee' },
-              ]
-            : [{ value: 'pilot', label: 'Pilot' }],
-      }));
-  }, [selectedEvent, rsvpOptions, memberProfile.qualifiedAirframes]);
+      .filter((af) => {
+        if (typeof af.id !== 'number') return false;
+        const status = (af.status || 'qualified').toLowerCase();
+        if (status === 'in_training') return true;
+        return status === 'qualified' && (Boolean(af.isPilot) || Boolean(af.isCrew));
+      })
+      .map((af) => {
+        const status = (af.status || 'qualified').toLowerCase();
+        const roles: Array<{ value: string; label: string }> = [];
+        if (af.isPilot) roles.push({ value: 'pilot', label: 'Pilot' });
+        if (af.isCrew) roles.push({ value: 'crew', label: 'Aircrew / RIO / WSO / CPG' });
+        if (af.isInstructor) roles.push({ value: 'instructor', label: 'Instructor / Lead' });
+        if (status === 'in_training') roles.push({ value: 'student', label: 'Student / Trainee' });
+        return {
+          id: af.id as number,
+          name: af.name,
+          abbreviation: af.abbreviation || af.name,
+          is_primary: Boolean(af.isPrimary),
+          status: af.status || 'qualified',
+          allowed_roles: roles,
+        };
+      })
+      .filter((af) => af.allowed_roles.length > 0);
+  }, [
+    selectedEvent,
+    hasLoadedRsvpOptions,
+    rsvpOptions,
+    isCoreMember,
+    hasBasicMembership,
+    memberProfile.qualifiedAirframes,
+  ]);
 
   // Available roles for the currently selected airframe
   const availableRolesForSelectedAirframe = useMemo(() => {
-    if (!selectedEvent) return [{ value: 'pilot', label: 'Pilot' }];
+    if (!selectedEvent) return [];
     const found = availableAirframesForSelectedEvent.find(
       (a) => a.id === Number(rsvpAirframeId)
     );
     if (found && found.allowed_roles && found.allowed_roles.length > 0) {
       return found.allowed_roles;
     }
-    return [{ value: 'pilot', label: 'Pilot' }];
+    return [];
   }, [selectedEvent, availableAirframesForSelectedEvent, rsvpAirframeId]);
 
   // Authorized callsigns for the currently selected airframe & side
@@ -709,19 +774,32 @@ export const EventCalendarView: React.FC = () => {
   }, [selectedEvent, availableAirframesForSelectedEvent, rsvpAirframeId, rsvpSide]);
 
   // Support role options allocated for this campaign sortie
-  // Holders of SUP-ATC or SUP-GCI may fill either ATC or GCI slots.
+  // Holders of SUP-ATC or SUP-GCI may fill either ATC or GCI slots (requires CORE membership).
   const hasAtcGciQualification = useMemo(() => {
     return (memberProfile.certificates || []).some(
       (c) => c.isIssued && ['SUP-ATC', 'SUP-GCI'].includes((c.code || '').toUpperCase())
     );
   }, [memberProfile.certificates]);
 
+  const hasJtacQualification = useMemo(() => {
+    return (memberProfile.certificates || []).some(
+      (c) => c.isIssued && (c.code || '').toUpperCase() === 'SUP-JTAC'
+    );
+  }, [memberProfile.certificates]);
+
   const supportRoleOptions = useMemo(() => {
     if (!selectedEvent || selectedEvent.type !== 'campaign') return [];
     const atcGciEligible =
-      hasAtcGciQualification ||
-      Boolean(selectedEvent.can_rsvp_atc) ||
-      Boolean(selectedEvent.can_rsvp_gci);
+      isCoreMember &&
+      (hasAtcGciQualification ||
+        Boolean(selectedEvent.can_rsvp_atc) ||
+        Boolean(selectedEvent.can_rsvp_gci));
+
+    const jtacEligible =
+      isCoreMember &&
+      (hasJtacQualification || Boolean(selectedEvent.can_rsvp_jtac));
+
+    const gmEligible = isCoreMember && Boolean(selectedEvent.can_rsvp_game_master);
 
     const options = [];
     if ((selectedEvent.game_master_slots ?? 0) > 0) {
@@ -729,10 +807,11 @@ export const EventCalendarView: React.FC = () => {
         value: 'game_master',
         label: 'Game Master (GM)',
         short_label: 'GM',
+        lockHint: 'Requires CORE + GM role',
         totalSlots: selectedEvent.game_master_slots ?? 0,
         occupiedSlots: selectedEvent.game_master_count ?? 0,
         available: Boolean(selectedEvent.has_available_game_master_slots),
-        eligible: Boolean(selectedEvent.can_rsvp_game_master),
+        eligible: gmEligible,
         active: selectedEvent.my_rsvp?.role === 'game_master',
       });
     }
@@ -741,10 +820,11 @@ export const EventCalendarView: React.FC = () => {
         value: 'jtac',
         label: 'JTAC',
         short_label: 'JTAC',
+        lockHint: 'Requires CORE + SUP-JTAC',
         totalSlots: selectedEvent.jtac_slots ?? 0,
         occupiedSlots: selectedEvent.jtac_count ?? 0,
         available: Boolean(selectedEvent.has_available_jtac_slots),
-        eligible: Boolean(selectedEvent.can_rsvp_jtac),
+        eligible: jtacEligible,
         active: selectedEvent.my_rsvp?.role === 'jtac',
       });
     }
@@ -753,6 +833,7 @@ export const EventCalendarView: React.FC = () => {
         value: 'atc',
         label: 'Air Traffic Control (ATC)',
         short_label: 'ATC',
+        lockHint: 'Requires CORE + SUP-ATC / SUP-GCI',
         totalSlots: selectedEvent.atc_slots ?? 0,
         occupiedSlots: selectedEvent.atc_count ?? 0,
         available: Boolean(selectedEvent.has_available_atc_slots),
@@ -765,6 +846,7 @@ export const EventCalendarView: React.FC = () => {
         value: 'gci',
         label: 'Ground-Controlled Interceptor (GCI)',
         short_label: 'GCI',
+        lockHint: 'Requires CORE + SUP-ATC / SUP-GCI',
         totalSlots: selectedEvent.gci_slots ?? 0,
         occupiedSlots: selectedEvent.gci_count ?? 0,
         available: Boolean(selectedEvent.has_available_gci_slots),
@@ -773,7 +855,28 @@ export const EventCalendarView: React.FC = () => {
       });
     }
     return options;
-  }, [selectedEvent, hasAtcGciQualification]);
+  }, [selectedEvent, isCoreMember, hasAtcGciQualification, hasJtacQualification]);
+
+  const hasEligibleSupportOption = useMemo(() => {
+    return supportRoleOptions.some((opt) => opt.eligible);
+  }, [supportRoleOptions]);
+
+  const canRsvpSelectedEvent = useMemo(() => {
+    if (!selectedEvent) return false;
+    if (selectedEvent.type === 'campaign') {
+      return (
+        isCoreMember &&
+        (availableAirframesForSelectedEvent.length > 0 || hasEligibleSupportOption)
+      );
+    }
+    return hasBasicMembership && availableAirframesForSelectedEvent.length > 0;
+  }, [
+    selectedEvent,
+    isCoreMember,
+    hasBasicMembership,
+    availableAirframesForSelectedEvent.length,
+    hasEligibleSupportOption,
+  ]);
 
   const isSupportRole = useMemo(() => {
     return ['game_master', 'gm', 'jtac', 'atc', 'gci'].includes((rsvpRole || '').toLowerCase());
@@ -872,28 +975,47 @@ export const EventCalendarView: React.FC = () => {
         );
       }
     } else {
-      setRsvpCategory('flight');
-      const primaryAf =
-        availableAirframesForSelectedEvent.find((a) => a.is_primary) ||
-        availableAirframesForSelectedEvent[0];
-      const defaultAfId = primaryAf ? primaryAf.id : '';
-      setRsvpAirframeId(defaultAfId);
+      const shouldDefaultSupport =
+        selectedEvent.type === 'campaign' &&
+        isCoreMember &&
+        availableAirframesForSelectedEvent.length === 0 &&
+        hasEligibleSupportOption;
 
-      const defaultRole =
-        primaryAf?.allowed_roles?.[0]?.value || 'pilot';
-      setRsvpRole(defaultRole);
-      setRsvpSide('blufor');
-      setRsvpNotes('');
+      if (shouldDefaultSupport) {
+        const firstEligible =
+          supportRoleOptions.find((o) => o.eligible && (o.available || o.active)) ||
+          supportRoleOptions.find((o) => o.eligible) ||
+          supportRoleOptions[0];
+        setRsvpCategory('support');
+        setRsvpAirframeId('');
+        setRsvpRole(firstEligible?.value || 'atc');
+        setRsvpSide('blufor');
+        setRsvpNotes('');
+        setRsvpCallsign(firstEligible?.label || 'Support');
+      } else {
+        setRsvpCategory('flight');
+        const primaryAf =
+          availableAirframesForSelectedEvent.find((a) => a.is_primary) ||
+          availableAirframesForSelectedEvent[0];
+        const defaultAfId = primaryAf ? primaryAf.id : '';
+        setRsvpAirframeId(defaultAfId);
 
-      const authList = getAuthorizedCallsignsForOption(primaryAf, false);
-      const base = authList[0]?.callsign || 'Overlord';
-      setRsvpCallsign(
-        computeNextAvailableCallsign(
-          base,
-          selectedEvent.attendees || [],
-          userSession?.id
-        )
-      );
+        const defaultRole =
+          primaryAf?.allowed_roles?.[0]?.value || '';
+        setRsvpRole(defaultRole);
+        setRsvpSide('blufor');
+        setRsvpNotes('');
+
+        const authList = getAuthorizedCallsignsForOption(primaryAf, false);
+        const base = authList[0]?.callsign || 'Overlord';
+        setRsvpCallsign(
+          computeNextAvailableCallsign(
+            base,
+            selectedEvent.attendees || [],
+            userSession?.id
+          )
+        );
+      }
     }
   }, [
     selectedEvent?.uid,
@@ -901,6 +1023,9 @@ export const EventCalendarView: React.FC = () => {
     availableAirframesForSelectedEvent,
     resolvedAttendeeCallsigns,
     userSession?.id,
+    isCoreMember,
+    hasEligibleSupportOption,
+    supportRoleOptions,
   ]);
 
   const handleAirframeChange = (newAirframeId: number | '') => {
@@ -2226,37 +2351,61 @@ export const EventCalendarView: React.FC = () => {
                         The sign-up cut-off for this sortie has passed. Contact S2/S3 command on Discord for late slot changes.
                       </span>
                     </div>
-                  ) : availableAirframesForSelectedEvent.length === 0 && supportRoleOptions.length === 0 ? (
-                    <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 flex items-center gap-2.5">
-                      <Info className="w-4 h-4 text-amber-400 shrink-0" />
-                      <span>
-                        No qualified {selectedEvent.type === 'training' ? 'or in-training ' : ''}airframes were found on your Member Dossier. Complete an airframe qualification to RSVP.
-                      </span>
+                  ) : selectedEvent.is_signup_open && !canRsvpSelectedEvent ? (
+                    <div className="space-y-3">
+                      <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 flex items-start gap-2.5">
+                        <Lock className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                        <span>
+                          {selectedEvent.rsvp_ineligibility_reason ||
+                            (selectedEvent.type === 'campaign'
+                              ? !isCoreMember
+                                ? 'CORE Membership Group is required to RSVP for Campaign Sorties.'
+                                : 'You require a Qualified aircraft (Pilot or Crew) or an eligible Support qualification (SUP-ATC, SUP-JTAC, SUP-GCI, or Game Master) with an open slot on this sortie.'
+                              : !hasBasicMembership
+                              ? 'Basic Membership Group (Community or CORE) is required to RSVP for Training Sorties.'
+                              : 'You require at least one Qualified (Pilot/Crew) or In-Training aircraft on your Member Dossier to RSVP for Training Sorties.')}
+                        </span>
+                      </div>
+                      {selectedEvent.is_attending && (
+                        <div className="flex justify-end">
+                          <button
+                            type="button"
+                            disabled={isSubmittingRsvp}
+                            onClick={() => handleSubmitRsvp('cancel')}
+                            className="px-4 py-2 rounded-xl bg-red-500/15 hover:bg-red-500/25 border border-red-500/40 text-red-300 font-semibold text-xs flex items-center gap-1.5 transition-all disabled:opacity-50"
+                          >
+                            <Trash className="w-3.5 h-3.5" />
+                            <span>Cancel RSVP</span>
+                          </button>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <div className="space-y-4">
                       {/* Slot Category Selector: Flight Slot vs Support Slot */}
                       {supportRoleOptions.length > 0 && selectedEvent.is_signup_open && (
                         <div className="flex items-center gap-2 p-1 rounded-xl bg-stone-900 border border-stone-800 text-xs font-medium">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setRsvpCategory('flight');
-                              const primaryAf =
-                                availableAirframesForSelectedEvent.find((a) => a.is_primary) ||
-                                availableAirframesForSelectedEvent[0];
-                              setRsvpAirframeId(primaryAf ? primaryAf.id : '');
-                              setRsvpRole(primaryAf?.allowed_roles?.[0]?.value || 'pilot');
-                            }}
-                            className={`flex-1 py-1.5 px-3 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all ${
-                              rsvpCategory === 'flight'
-                                ? 'bg-amber-500 text-stone-950 shadow-sm'
-                                : 'text-stone-400 hover:text-stone-200'
-                            }`}
-                          >
-                            <AirplaneTilt className="w-3.5 h-3.5" />
-                            <span>Flight Slot (Aircraft)</span>
-                          </button>
+                          {availableAirframesForSelectedEvent.length > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setRsvpCategory('flight');
+                                const primaryAf =
+                                  availableAirframesForSelectedEvent.find((a) => a.is_primary) ||
+                                  availableAirframesForSelectedEvent[0];
+                                setRsvpAirframeId(primaryAf ? primaryAf.id : '');
+                                setRsvpRole(primaryAf?.allowed_roles?.[0]?.value || '');
+                              }}
+                              className={`flex-1 py-1.5 px-3 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all ${
+                                rsvpCategory === 'flight'
+                                  ? 'bg-amber-500 text-stone-950 shadow-sm'
+                                  : 'text-stone-400 hover:text-stone-200'
+                              }`}
+                            >
+                              <AirplaneTilt className="w-3.5 h-3.5" />
+                              <span>Flight Slot (Aircraft)</span>
+                            </button>
+                          )}
                           <button
                             type="button"
                             onClick={() => {
@@ -2322,7 +2471,7 @@ export const EventCalendarView: React.FC = () => {
                                     <div className="text-xs">
                                       {isLocked ? (
                                         <span className="text-rose-400/80 flex items-center gap-1">
-                                          <Lock className="w-3 h-3" /> Locked &bull; Requires {opt.short_label} role
+                                          <Lock className="w-3 h-3" /> Locked &bull; {opt.lockHint}
                                         </span>
                                       ) : isFull ? (
                                         <span className="text-stone-500">All slots filled</span>
@@ -2528,10 +2677,11 @@ export const EventCalendarView: React.FC = () => {
                       {/* Optional Faction Selector for OPFOR-eligible Campaign Sorties */}
                       {selectedEvent.is_signup_open &&
                         selectedEvent.type === 'campaign' &&
-                        selectedEvent.is_opfor_eligible && (
+                        selectedEvent.is_opfor_eligible &&
+                        availableAirframesForSelectedEvent.length > 0 && (
                           <div className="space-y-1.5">
                             <label className="block text-[11px] font-semibold tracking-wider uppercase text-stone-400">
-                              Force Assignment (OPFOR Certified)
+                              Force Assignment (OPFOR Squadron)
                             </label>
                             <div className="grid grid-cols-2 gap-3">
                               <button
@@ -2597,7 +2747,11 @@ export const EventCalendarView: React.FC = () => {
                         {selectedEvent.is_signup_open && (
                           <button
                             type="button"
-                            disabled={isSubmittingRsvp || (!isSupportRole && !rsvpAirframeId)}
+                            disabled={
+                              isSubmittingRsvp ||
+                              (!isSupportRole && (!rsvpAirframeId || !rsvpRole || availableRolesForSelectedAirframe.length === 0)) ||
+                              (isSupportRole && !supportRoleOptions.some((o) => o.value.toLowerCase() === rsvpRole.toLowerCase() && o.eligible && (o.available || o.active)))
+                            }
                             onClick={() => handleSubmitRsvp('attend')}
                             className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-semibold text-xs flex items-center gap-2 transition-all shadow-md shadow-amber-500/20 disabled:opacity-50"
                           >
