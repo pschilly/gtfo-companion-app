@@ -1249,6 +1249,11 @@ export const EventCalendarView: React.FC = () => {
         userSession?.accessToken
       );
 
+      if (response.rsvp_options) {
+        setRsvpOptions(response.rsvp_options);
+        setHasLoadedRsvpOptions(true);
+      }
+
       const updatedEvent = response.event;
       if (updatedEvent) {
         if (action === 'attend' && submittedCallsign) {
@@ -2298,7 +2303,7 @@ export const EventCalendarView: React.FC = () => {
                       <p className="text-xs text-stone-400 mt-0.5">
                         {selectedEvent.type === 'campaign'
                           ? 'Select a qualified aircraft and crew position for this Operation.'
-                          : 'Select a qualified or in-training aircraft and role for this Training sortie.'}
+                          : 'Select a qualified aircraft or choose any new aircraft to enroll as In Training (Student).'}
                       </p>
                     </div>
 
@@ -2363,7 +2368,7 @@ export const EventCalendarView: React.FC = () => {
                                 : 'You require a Qualified aircraft (Pilot or Crew) or an eligible Support qualification (SUP-ATC, SUP-JTAC, SUP-GCI, or Game Master) with an open slot on this sortie.'
                               : !hasBasicMembership
                               ? 'Basic Membership Group (Community or CORE) is required to RSVP for Training Sorties.'
-                              : 'You require at least one Qualified (Pilot/Crew) or In-Training aircraft on your Member Dossier to RSVP for Training Sorties.')}
+                              : 'No aircraft are available in the taskforce catalog for Training Sorties.')}
                         </span>
                       </div>
                       {selectedEvent.is_attending && (
@@ -2524,7 +2529,9 @@ export const EventCalendarView: React.FC = () => {
                                 <option key={af.id} value={af.id}>
                                   {af.name}
                                   {af.is_primary ? ' ★ (Primary)' : ''}
-                                  {af.status === 'in_training'
+                                  {af.status === 'new_training'
+                                    ? ' [Start Training]'
+                                    : af.status === 'in_training'
                                     ? ' [In Training]'
                                     : ''}
                                 </option>

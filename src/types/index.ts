@@ -1059,6 +1059,7 @@ export interface CalendarRsvpResponse {
   message?: string;
   error?: string;
   event?: CalendarEventItem;
+  rsvp_options?: CalendarRsvpOptions;
 }
 
 export type HomeWidgetId =
